@@ -30,10 +30,16 @@ Between start and end (your computer's local time) it checks booster boxes every
 
 New-listing alerts are on by default. To switch them off: "new_listings": false
 
+No double posts: give both copies the same private "heartbeat_topic" (in "alerts" on the PC,
+the HEARTBEAT_TOPIC secret in the cloud, plus HEARTBEAT_ROLE=listen there). The PC copy says
+"I'm on" through ntfy.sh every 15 minutes; the cloud copy keeps checking and remembering, but
+only posts while it hasn't heard from the PC for 20 minutes.
+
 Alert settings can also come from environment variables, which win over config.json.
 The cloud copy (GitHub Actions) uses these so the webhooks stay secret:
     DISCORD_WEBHOOK, DISCORD_WEBHOOK_BOXES, DISCORD_WEBHOOK_SINGLES, DISCORD_PING,
-    NTFY_TOPIC, BOT_NAME (the name the Discord posts show, e.g. "One Piece Restock (cloud)")
+    NTFY_TOPIC, BOT_NAME (the name the Discord posts show, e.g. "One Piece Restock (cloud)"),
+    HEARTBEAT_TOPIC, HEARTBEAT_ROLE
 """
 import argparse
 import json
@@ -65,7 +71,15 @@ ENV_ALERTS = {
     "DISCORD_PING": "discord_ping",
     "NTFY_TOPIC": "ntfy_topic",
     "BOT_NAME": "bot_name",
+    "HEARTBEAT_TOPIC": "heartbeat_topic",
+    "HEARTBEAT_ROLE": "heartbeat_role",
 }
+
+# PC and cloud copies share a private ntfy topic. The PC says "I'm on" there now and then;
+# the cloud copy reads it and stays quiet while the PC is on, so finds aren't posted twice.
+HEARTBEAT_EVERY = 15 * 60       # PC sends at most one "I'm on" message every 15 minutes
+HEARTBEAT_FRESH = "20m"         # cloud treats the PC as on if it heard from it in the last 20 minutes
+_last_heartbeat = 0.0
 
 # Variant words that mean "not the regular print" (used unless a card overrides it)
 DEFAULT_EXCLUDE = [
@@ -450,6 +464,44 @@ def seconds_until_next_check(cfg, normal_minutes, now=None):
     return normal
 
 
+# ---------------------------------------------------------------- PC/cloud hand-off
+def heartbeat_role(cfg):
+    a = cfg.get("alerts") or {}
+    if not a.get("heartbeat_topic"):
+        return None
+    return (a.get("heartbeat_role") or "send").lower()
+
+
+def send_heartbeat(cfg):
+    """PC copy: tell the cloud copy we're on (at most every 15 minutes)."""
+    global _last_heartbeat
+    if time.time() - _last_heartbeat < HEARTBEAT_EVERY:
+        return
+    topic = cfg["alerts"]["heartbeat_topic"]
+    try:
+        req = urllib.request.Request(f"https://ntfy.sh/{topic}", data=b"pc-on",
+                                     headers={"User-Agent": UA, "Cache": "yes"})
+        urllib.request.urlopen(req, timeout=15).read()
+        _last_heartbeat = time.time()
+    except Exception as e:  # noqa: BLE001
+        print(f"   ! couldn't tell the cloud copy the PC is on ({e})")
+
+
+def pc_is_on(cfg):
+    """Cloud copy: has the PC copy checked in recently? If ntfy can't be read, assume not
+    (a doubled alert is better than a missed one)."""
+    topic = cfg["alerts"]["heartbeat_topic"]
+    try:
+        req = urllib.request.Request(f"https://ntfy.sh/{topic}/json?poll=1&since={HEARTBEAT_FRESH}",
+                                     headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            lines = r.read().decode("utf-8", "replace").splitlines()
+        return any(json.loads(l).get("event") == "message" for l in lines if l.strip())
+    except Exception as e:  # noqa: BLE001
+        print(f"   ! couldn't check whether the PC is on ({e}), posting anyway")
+        return False
+
+
 # ---------------------------------------------------------------- state + alerts
 def load_state():
     try:
@@ -652,6 +704,13 @@ def run_once(cfg, args, drop=None):
             if not ((k.startswith("box|") and "Booster box" in checked) or (k.startswith("card|") and "Single" in checked))}
     kept.update({f["id"]: f["price"] for f in finds})
     save_state(kept)
+
+    role = heartbeat_role(cfg)
+    if role == "send":
+        send_heartbeat(cfg)
+    if show and not args.all and role == "listen" and pc_is_on(cfg):
+        print("   (your PC copy is on and posts these itself - cloud copy staying quiet)")
+        return
 
     if show and not args.all:
         desktop_beep()

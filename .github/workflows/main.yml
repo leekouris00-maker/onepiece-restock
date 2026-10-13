@@ -32,6 +32,8 @@ jobs:
           DISCORD_WEBHOOK_BOXES: ${{ secrets.DISCORD_WEBHOOK_BOXES }}
           DISCORD_WEBHOOK_SINGLES: ${{ secrets.DISCORD_WEBHOOK_SINGLES }}
           DISCORD_PING: ${{ secrets.DISCORD_PING }}
+          HEARTBEAT_TOPIC: ${{ secrets.HEARTBEAT_TOPIC }}
+          HEARTBEAT_ROLE: listen          # stay quiet while the PC copy is on
           BOT_NAME: "One Piece Restock (cloud)"
           TZ: Australia/Melbourne
         run: python tcg_bot.py
