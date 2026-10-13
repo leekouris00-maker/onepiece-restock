@@ -1,4 +1,4 @@
-﻿{
+{
     "_help":  "Edit this file to change what the bot watches. \u0027max\u0027 is the most you\u0027d pay (AUD, near-mint). Set \u0027enabled\u0027 to false to stop watching a card. \u0027handles\u0027 are product URL endings at Mayhem/Good Games; leave them out and the bot searches by name (or by \u0027search\u0027) and checks the card number itself.",
     "alerts":  {
                    "ntfy_topic":  "",
