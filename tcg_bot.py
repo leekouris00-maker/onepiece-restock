@@ -6,7 +6,9 @@ One Piece TCG restock bot (Lee's version)
 Checks Australian shops for:
   1. English One Piece booster boxes in stock (or buyable on pre-order) at or under your max price
   2. Singles on your want list at Elemental Arcade, Mayhem Collectables and Good Games
-  3. NEW box listings: a box a shop has just added to its catalogue, even before it's buyable
+  3. Other English sealed products on a watch list (starter decks, double packs, illustration boxes,
+     premium collections...) at or under their max price - see DEFAULT_SEALED_WATCH
+  4. NEW listings: a box or watched product a shop has just added, even before it's buyable
 
 Every find comes with a one-tap "Buy" link that puts it straight into your cart at
 checkout. You still press pay yourself - the bot never buys anything or logs in.
@@ -102,7 +104,20 @@ DEFAULT_EXCLUDE = [
 BOX_EXCLUDE = ["japanese", "(jp)", " jp ", "asia", "asian", "chinese", "korean",
                "case", "sleeved", "single pack", "booster pack", "display case"]
 
-BOX_KINDS = ("Booster box", "New listing")
+BOX_KINDS = ("Booster box", "Sealed", "New listing")
+
+# Other English sealed products to watch (besides booster boxes). Each alerts when it's buyable at or
+# under "max" (AUD), and as a new listing when a shop first lists it. Override with "sealed_watch"
+# in config.json - same format. "match" is any text in the shop's product title (dashes optional).
+DEFAULT_SEALED_WATCH = [
+    {"name": "Starter decks ST-37 / ST-38", "match": ["ST-37", "ST-38"], "max": 45},
+    {"name": "Double Pack Set DP-13", "match": ["DP-13"], "max": 35},
+    {"name": "Illustration Box IB-09 / IB-10", "match": ["IB-09", "IB-10", "Illustration Box"], "max": 130},
+    {"name": "Heroines Gift Collection", "match": ["Gift Collection"], "max": 120},
+    {"name": "Ace, Sabo & Luffy Premium Card Collection", "match": ["Ace, Sabo", "Sabo & Luffy", "Sabo and Luffy"], "max": 150},
+    {"name": "29th Anniversary Premium Card Collection", "match": ["29th Anniversary"], "max": 150},
+]
+WATCH_EXCLUDE = ["japanese", "(jp)", " jp ", "chinese", "korean", "asia", "simplified", "traditional"]
 
 
 # ---------------------------------------------------------------- helpers
@@ -169,6 +184,20 @@ def is_box_title(title):
     return ("booster box" in t or "booster display" in t) and not is_excluded(title, BOX_EXCLUDE)
 
 
+def watch_item(title, watch):
+    """The sealed_watch entry this product title matches, or None (box titles are left to the box check)."""
+    if not title or is_box_title(title) or is_excluded(title, WATCH_EXCLUDE):
+        return None
+    t = title.lower()
+    squashed = re.sub(r"[\s\-]", "", t)
+    for w in watch:
+        for m in w.get("match", []):
+            m = m.lower()
+            if m in t or re.sub(r"[\s\-]", "", m) in squashed:
+                return w
+    return None
+
+
 def card_num_variants(num):
     """OP13-120 -> ['op13-120', 'op13120'] (Elemental sometimes drops the dash in handles)."""
     n = num.lower()
@@ -200,8 +229,9 @@ def cheapest_available(variants, cents):
 
 
 # ---------------------------------------------------------------- sealed
-def shopify_boxes(shop_name, url, max_price):
-    """Returns (finds, listings). listings is None if the shop couldn't be read."""
+def shopify_boxes(shop_name, url, max_price, watch=()):
+    """Returns (finds, listings). listings is None if the shop couldn't be read.
+    Covers booster boxes and the other sealed products in the watch list."""
     data = fetch_json(url)
     if not data:
         return [], None
@@ -209,33 +239,36 @@ def shopify_boxes(shop_name, url, max_price):
     finds, listings = [], []
     for p in data.get("products", []):
         title = p.get("title", "")
-        if not is_box_title(title):
+        w = None if is_box_title(title) else watch_item(title, watch)
+        if not is_box_title(title) and not w:
             continue
+        kind, prefix, group = ("Sealed", "sealed", "watch") if w else ("Booster box", "box", "box")
+        limit = w["max"] if w else max_price
         handle = p.get("handle")
         page = f"{base}/products/{handle}"
         is_pre = "pre" in (json.dumps(p.get("tags", "")) + title).lower()
         variants = p.get("variants", [])
         price, vid = cheapest_available(variants, cents=False)
         all_prices = [float(v["price"]) for v in variants if v.get("price")]
+        note = ", ".join(x for x in ((w["name"] if w else ""), ("pre-order" if is_pre else "")) if x)
         listings.append({
-            "id": f"list|{shop_name}|{handle}", "box_id": f"box|{shop_name}|{handle}",
+            "id": f"list|{shop_name}|{handle}", "box_id": f"{prefix}|{shop_name}|{handle}", "group": group,
             "kind": "New listing", "name": title, "shop": shop_name,
             "price": price if price is not None else (min(all_prices) if all_prices else 0.0),
             "available": price is not None, "url": page,
             "cart": shopify_cart_link(base, vid) if vid else "",
-            "note": "pre-order" if is_pre else "", "max": max_price,
+            "note": note, "max": limit,
         })
-        if price is None or price > max_price:
+        if price is None or price > limit:
             continue
         finds.append({
-            "id": f"box|{shop_name}|{handle}", "kind": "Booster box", "name": title, "shop": shop_name,
-            "price": price, "url": page, "cart": shopify_cart_link(base, vid),
-            "note": "pre-order" if is_pre else "",
+            "id": f"{prefix}|{shop_name}|{handle}", "kind": kind, "name": title, "shop": shop_name,
+            "price": price, "url": page, "cart": shopify_cart_link(base, vid), "note": note,
         })
     return finds, listings
 
 
-def shopify_product_box(shop_name, url, max_price):
+def shopify_product_box(shop_name, url, max_price, watch=()):
     """A single product .js URL (Shopify prices are in cents here). Not used for new-listing alerts."""
     p = fetch_json(url)
     if not p:
@@ -248,29 +281,35 @@ def shopify_product_box(shop_name, url, max_price):
              "cart": shopify_cart_link(url, vid), "note": ""}], []
 
 
-def woo_boxes(shop_name, url, max_price):
+def woo_boxes(shop_name, url, max_price, watch=()):
     data = fetch_json(url)
     if not isinstance(data, list):
         return [], None
     finds, listings = [], []
     for p in data:
         name = re.sub("<[^>]+>", "", p.get("name", ""))
-        if "one piece" not in name.lower() or not is_box_title(name):
+        if "one piece" not in name.lower():
             continue
+        w = None if is_box_title(name) else watch_item(name, watch)
+        if not is_box_title(name) and not w:
+            continue
+        kind, prefix, group = ("Sealed", "sealed", "watch") if w else ("Booster box", "box", "box")
+        limit = w["max"] if w else max_price
         prices = p.get("prices", {})
         minor = int(prices.get("currency_minor_unit", 2))
         price = int(prices.get("price", 0) or 0) / (10 ** minor)
         buyable = bool(p.get("is_in_stock") and p.get("is_purchasable", True))
         link = woo_cart_link(url, p.get("id")) if buyable else ""
+        note = w["name"] if w else ""
         listings.append({
-            "id": f"list|{shop_name}|{p.get('id')}", "box_id": f"box|{shop_name}|{p.get('id')}",
-            "kind": "New listing", "name": name, "shop": shop_name, "price": price,
-            "available": buyable, "url": p.get("permalink"), "cart": link, "note": "", "max": max_price,
+            "id": f"list|{shop_name}|{p.get('id')}", "box_id": f"{prefix}|{shop_name}|{p.get('id')}",
+            "group": group, "kind": "New listing", "name": name, "shop": shop_name, "price": price,
+            "available": buyable, "url": p.get("permalink"), "cart": link, "note": note, "max": limit,
         })
-        if not buyable or price <= 0 or price > max_price:
+        if not buyable or price <= 0 or price > limit:
             continue
-        finds.append({"id": f"box|{shop_name}|{p.get('id')}", "kind": "Booster box", "name": name,
-                      "shop": shop_name, "price": price, "url": p.get("permalink"), "cart": link, "note": ""})
+        finds.append({"id": f"{prefix}|{shop_name}|{p.get('id')}", "kind": kind, "name": name,
+                      "shop": shop_name, "price": price, "url": p.get("permalink"), "cart": link, "note": note})
     return finds, listings
 
 
@@ -278,13 +317,14 @@ def check_sealed(cfg):
     """Returns (finds, listings_by_shop). listings_by_shop[shop] is None when that shop failed."""
     s = cfg["sealed"]
     mx = s["max_price"]
+    watch = cfg.get("sealed_watch", DEFAULT_SEALED_WATCH) or []
     jobs = []
     for shop in s["shopify_collections"]:
-        jobs.append((shopify_boxes, shop["name"], shop["url"], mx))
+        jobs.append((shopify_boxes, shop["name"], shop["url"], mx, watch))
     for shop in s.get("shopify_products", []):
-        jobs.append((shopify_product_box, shop["name"], shop["url"], mx))
+        jobs.append((shopify_product_box, shop["name"], shop["url"], mx, watch))
     for shop in s.get("woocommerce", []):
-        jobs.append((woo_boxes, shop["name"], shop["url"], mx))
+        jobs.append((woo_boxes, shop["name"], shop["url"], mx, watch))
     with ThreadPoolExecutor(max_workers=8) as ex:
         results = list(ex.map(lambda j: (j, j[0](*j[1:])), jobs))
     finds, by_shop = [], {}
@@ -323,12 +363,19 @@ def new_listings(by_shop, known, box_finds):
     what's there (no alerts), so a fresh install doesn't flood you."""
     finds_ids = {f["id"] for f in box_finds}
     out = []
+    groups = {}
     for shop, listings in by_shop.items():
         if listings is None:
             continue
+        for l in listings:
+            key = shop if l.get("group", "box") == "box" else f"{shop} (other sealed)"
+            groups.setdefault(key, []).append(l)
+        groups.setdefault(shop, [])              # a shop with no boxes still gets remembered
+    for shop, listings in groups.items():
         ids = {l["id"] for l in listings}
         if shop not in known:
-            print(f"   (remembering {len(ids)} existing box listing(s) at {shop}; new ones will alert)")
+            what = "other sealed" if shop.endswith("(other sealed)") else "box"
+            print(f"   (remembering {len(ids)} existing {what} listing(s) at {shop.replace(' (other sealed)', '')}; new ones will alert)")
             known[shop] = sorted(ids)
             continue
         before = set(known[shop])
@@ -675,6 +722,8 @@ def _discord_embeds(finds):
                            "value": str(f["note"])[:1000], "inline": False})
         if kind == "Booster box":
             icon, color = "📦 ", 0xF4A261
+        elif kind == "Sealed":
+            icon, color = "🎁 ", 0x2A9D8F
         elif kind == "New listing":
             icon, color = "🆕 ", 0x9B5DE5
         else:
@@ -725,6 +774,7 @@ def best_single_shop(finds):
 
 def report(finds, label):
     boxes = [f for f in finds if f["kind"] == "Booster box"]
+    sealed = [f for f in finds if f["kind"] == "Sealed"]
     listed = [f for f in finds if f["kind"] == "New listing"]
     singles = sorted([f for f in finds if f["kind"] == "Single"],
                      key=lambda f: (not f.get("priority"), f["name"], f["price"]))
@@ -733,6 +783,13 @@ def report(finds, label):
         lines.append("BOOSTER BOXES")
         for f in sorted(boxes, key=lambda f: f["price"]):
             lines.append(f"  {f['name']}  {money(f['price'])}  @ {f['shop']} {f['note']}".rstrip())
+            lines.append(f"    {f['url']}")
+            if f.get("cart"):
+                lines.append(f"    BUY: {f['cart']}")
+    if sealed:
+        lines.append("OTHER SEALED")
+        for f in sorted(sealed, key=lambda f: f["price"]):
+            lines.append(f"  {f['name']}  {money(f['price'])}  @ {f['shop']}  ({f['note']})")
             lines.append(f"    {f['url']}")
             if f.get("cart"):
                 lines.append(f"    BUY: {f['cart']}")
@@ -794,7 +851,7 @@ def run_once(cfg, args, drop=None):
     if do_singles:
         checked.add("Single")
     kept = {k: v for k, v in state.items()
-            if not ((k.startswith("box|") and "Booster box" in checked) or (k.startswith("card|") and "Single" in checked))}
+            if not ((k.startswith(("box|", "sealed|")) and "Booster box" in checked) or (k.startswith("card|") and "Single" in checked))}
     kept.update({f["id"]: f["price"] for f in finds})
     save_state(kept)
 
@@ -826,13 +883,13 @@ def run_once(cfg, args, drop=None):
         desktop_beep()
         with open(LOG_PATH, "a", encoding="utf-8") as fh:
             fh.write(f"\n--- {stamp} ---\n{text}\n")
-        n_box = sum(1 for f in show if f["kind"] == "Booster box")
+        n_box = sum(1 for f in show if f["kind"] in ("Booster box", "Sealed"))
         n_new = sum(1 for f in show if f["kind"] == "New listing")
         title = f"One Piece: {len(show)} new find(s)" + (f", {n_box} box(es)" if n_box else "") + \
             (f", {n_new} new listing(s)" if n_new else "")
         push_phone(cfg, title, text[:3500])
         # boxes first, then new listings, then priority singles, so the important ones fill Discord's 10 slots
-        order = {"Booster box": 0, "New listing": 1, "Single": 2}
+        order = {"Booster box": 0, "Sealed": 1, "New listing": 2, "Single": 3}
         ordered = sorted(show, key=lambda f: (order[f["kind"]], not f.get("priority"), f["price"]))
         push_discord(cfg, title, text, ordered)
 
