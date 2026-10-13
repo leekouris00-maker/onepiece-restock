@@ -10,9 +10,9 @@ from bench import summarise, table  # noqa: E402
 
 SCENARIOS = [
     ("cloud", "Cloud config (4 cards), calibrated network",
-     "The cloud copy's own config.json. Network model calibrated so v1 takes 13-14 s, like its manual GitHub runs on 13 Oct."),
+     "The cloud copy's own config.json and today's shop list (4 more sealed shops than on 13 Oct; see Calibration)."),
     ("cloud_slow", "Cloud config, network twice as slow",
-     "Closer to today's real cloud runs (25 s scheduled run, 23 and 37 s recaps, with 4 more shops than on 13 Oct)."),
+     "Every request twice as slow: how the result holds up on a slower link."),
     ("pc", "PC config (5 cards), calibrated network", "Adds Sabo PRB02-014, searched by name, like the PC's want list."),
     ("pc_noskip", "PC config, v2 asks down shops every check",
      "`down_retry_minutes: 0`, so v2 also asks Mayhem and JToys every check: the speed-up without that feature."),
@@ -21,6 +21,8 @@ SCENARIOS = [
     ("slow_network", "PC config, network twice as slow", ""),
     ("faults", "PC config with faults",
      "Gameology, Good Games TCG and Gumnut answer 503 to 15% of requests; TCGroup is 6.4 s slower than normal."),
+    ("today", "Cloud config, the shop failures of 14 Oct",
+     "Also failing: M-G and Friendly Collectibles (503), as in the cloud copy's scheduled run at 6:35 am on 14 Oct, which took 25 s."),
 ]
 
 
@@ -29,7 +31,8 @@ def main():
     with open(path, encoding="utf-8") as f:
         r = json.load(f)
     out = ["# Benchmark results: v1 vs v2", "",
-           f"Run {r.get('when', '')}. Both versions ran unmodified (`python tcg_bot.py`, a fresh process per check, "
+           f"Run {r.get('when', '')} on commit fb445c5 (the next commit only changes new-listing bookkeeping, which no "
+           "timed path uses). Both versions ran unmodified (`python tcg_bot.py`, a fresh process per check, "
            "exactly as the cloud copy runs) against the same local mock shops, alternating v1, v2, v1, v2. "
            "The mock shops are built from the bot's own saved data (recap.json, known_products.json) and speak real "
            "HTTPS with keep-alive and gzip. Mayhem answers 401 and JToys 403, as the real sites did on 13-14 Oct. "
@@ -48,6 +51,11 @@ def main():
         s1, s2 = r[key]["v1"]["summary"], r[key]["v2"]["summary"]
         out += ["", f"{note} **{s1['p50'] / s2['p50']:.1f}x faster at p50**, {s1['requests_mean'] / max(1, s2['requests_mean']):.1f}x fewer "
                     f"requests, {s1['mb_mean'] / max(0.001, s2['mb_mean']):.1f}x less downloaded.".strip(), ""]
+    if "calib_13oct" in r:
+        c = summarise(r["calib_13oct"]["v1"]["runs"])
+        out += ["## Calibration", "",
+                f"With the shop list of 13 Oct (before the 4 extra sealed shops), v1 takes {c['p50']:.1f} s (p50) in the "
+                "model; its real manual runs that day took 13 to 14 s in GitHub Actions' \"Check shops\" step.", ""]
     if "startup" in r:
         st = r["startup"]
         out += ["## Start-up (Python start + `import tcg_bot`)", "", "| | v1 | v2 |", "|---|---|---|",
@@ -67,10 +75,13 @@ def main():
     if "commands" in r:
         c = r["commands"]
         out += ["## `/deals` reply time (time the bot needs before it can answer)", "",
-                "| Version | People asking at once | p50 (s) | p95 (s) | Shop requests per burst |", "|---|---|---|---|---|"]
+                "| Version | People asking at once | p50 | p95 | Shop requests per burst |", "|---|---|---|---|---|"]
+
+        def t(x):
+            return f"{x * 1000:.1f} ms" if x < 0.1 else f"{x:.2f} s"
         label = {"v1": "v1 (always live)", "v2-fresh": "v2 `fresh:True` (shared live check)", "v2": "v2 default (last check)"}
         for k, v in c.items():
-            out.append(f"| {label[v['mode']]} | {v['concurrency']} | {v['p50']:.2f} | {v['p95']:.2f} | {v['requests_per_round']:.0f} |")
+            out.append(f"| {label[v['mode']]} | {v['concurrency']} | {t(v['p50'])} | {t(v['p95'])} | {v['requests_per_round']:.0f} |")
         out += ["", "Discord allows 3 s for the first response, then 15 minutes for a follow-up; v1 and `fresh:True` "
                     "acknowledge first and follow up. The v2 default answers inside the 3 s.", ""]
     abl_path = os.path.join(HERE, "results", "ablation.json")

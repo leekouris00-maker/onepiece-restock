@@ -234,6 +234,14 @@ class NewListings(unittest.TestCase):
                                            listing("Pokebox", "brand-new", page=2)]}, known, [], pages)
         self.assertEqual([l["id"] for l in out], ["list|Pokebox|brand-new"])
 
+    def test_fresh_install_records_depth_so_page_two_additions_alert(self):
+        known, pages = {}, {}
+        tb.new_listings({"Pokebox": [listing("Pokebox", "a"), listing("Pokebox", "b", page=2)]}, known, [], pages)
+        self.assertEqual(pages["Pokebox"], 2)
+        out = tb.new_listings({"Pokebox": [listing("Pokebox", "a"), listing("Pokebox", "b", page=2),
+                                           listing("Pokebox", "c", page=2)]}, known, [], pages)
+        self.assertEqual([l["id"] for l in out], ["list|Pokebox|c"])
+
     def test_buyable_box_not_doubled_as_new_listing(self):
         known = {"Gumnut": []}
         l = listing("Gumnut", "op18", available=True, price=250)

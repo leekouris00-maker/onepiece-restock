@@ -316,7 +316,11 @@ def build(scenario="baseline"):
     ]}
     with open(os.path.join(REPO, "recap.json"), "rb") as f:
         raw = {"/leekouris00-maker/onepiece-restock/master/recap.json": f.read()}
-    return {"shopify": shopify, "woo": woo, "raw": raw, "refuse": dict(REFUSE)}
+    refuse = dict(REFUSE)
+    if scenario == "today":
+        # the cloud copy's scheduled run at 6:35 am on 14 Oct also failed to read these two (status.json)
+        refuse.update({"www.m-g.com.au": 503, "friendlycollectibles.com.au": 503})
+    return {"shopify": shopify, "woo": woo, "raw": raw, "refuse": refuse}
 
 
 def all_hosts():

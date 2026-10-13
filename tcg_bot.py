@@ -1244,6 +1244,10 @@ def new_listings(by_shop, known, box_finds, pages_seen=None):
         groups.setdefault(shop, [])              # a shop with no boxes still gets remembered
     deepest = {}
     for shop, listings in groups.items():
+        base_shop = shop.replace(" (other sealed)", "")
+        for l in listings:
+            deepest[base_shop] = max(deepest.get(base_shop, 1), int(l.get("page", 1)))
+    for shop, listings in groups.items():
         ids = {l["id"] for l in listings}
         base_shop = shop.replace(" (other sealed)", "")
         if shop not in known:
@@ -1254,7 +1258,6 @@ def new_listings(by_shop, known, box_finds, pages_seen=None):
         before = set(known[shop])
         read_to = int(pages_seen.get(base_shop, 1))
         for l in listings:
-            deepest[base_shop] = max(deepest.get(base_shop, 1), int(l.get("page", 1)))
             if l["id"] in before or l["box_id"] in finds_ids:
                 continue            # already known, or already alerting as a buyable box
             if int(l.get("page", 1)) > read_to:

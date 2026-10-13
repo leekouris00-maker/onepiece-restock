@@ -310,6 +310,10 @@ def main():
     e.add_argument("--workload", default="cloud")
     e.add_argument("--scale", type=float, default=1.6)
     e.add_argument("--runs", type=int, default=15)
+    e.add_argument("--scenario", default="baseline", help="baseline, restock or today")
+    e.add_argument("--extra-shops", default="yes", choices=["yes", "no"],
+                   help="no = the shop list of 13 Oct, before the 4 extra sealed shops")
+    e.add_argument("--only", default="", help="v1 or v2: run just one version")
     e.add_argument("--out", default=os.path.join(HERE, "results"))
     a = ap.parse_args()
     os.makedirs(CACHE, exist_ok=True)
@@ -320,7 +324,14 @@ def main():
         path = os.path.join(a.out, "results.json")
         with open(path) as f:
             res = json.load(f)
-        r = compare({"v1": a.v1, "v2": a.v2}, a.workload, a.runs, profile=Profile(scale=a.scale))
+        versions = {"v1": a.v1, "v2": a.v2}
+        if a.only:
+            versions = {a.only: versions[a.only]}
+        workload = a.workload
+        if a.extra_shops == "no":
+            WORKLOADS[workload + "_13oct"] = lambda: dict(WORKLOADS[a.workload](), extra_shops=False)
+            workload += "_13oct"
+        r = compare(versions, workload, a.runs, profile=Profile(scale=a.scale), scenario=a.scenario)
         res[a.name] = {k: {"summary": v["summary"], "runs": v["runs"]} for k, v in r.items()}
         with open(path, "w") as f:
             json.dump(res, f, indent=1)
@@ -340,3 +351,18 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def rerun_commands(out_dir, v1, v2):
+    """Re-measure only the /deals reply times into an existing results.json."""
+    path = os.path.join(out_dir, "results.json")
+    with open(path) as f:
+        res = json.load(f)
+    v1_dir, v2_dir = os.path.dirname(os.path.abspath(v1)), os.path.dirname(os.path.abspath(v2))
+    cmd_v1 = os.environ.get("V1_COMMANDS") or os.path.join(v1_dir, "commands_bot_v1.py")
+    res["commands"] = command_latency({"tcg_bot.py": v1, "commands_bot.py": cmd_v1},
+                                      {"tcg_bot.py": v2, "commands_bot.py": os.path.join(v2_dir, "commands_bot.py")},
+                                      profile=Profile(scale=1.6))
+    with open(path, "w") as f:
+        json.dump(res, f, indent=1)
+    return res["commands"]

@@ -41,7 +41,7 @@ message style. Either version can pick up the other's state, so rolling back is 
 - **PC/cloud hand-off:** the PC copy says "I'm on" after posting (and straight after posting finds), so the cloud
   copy knows those finds were handled.
 - **Pre-order note fixed:** v1 tagged anything containing "pre" (e.g. "Premium Booster") as a pre-order.
-- `finds.log` and the `.bat` logs roll over instead of growing forever.
+- `finds.log` rolls over at 1 MB; the `.bat` runners move their logs aside past 5 MB each time they (re)start the bot.
 - The cloud workflows retry their state commit when another push lands at the same time (one recap run
   failed this way on 13 Oct), and no longer commit per-run timestamps.
 

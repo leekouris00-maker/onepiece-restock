@@ -39,8 +39,12 @@ async def main():
         if mode == "v1":
             await asyncio.gather(*(one_v1() for _ in range(conc)))
         else:
-            cb.LIVE.result, cb.LIVE.t = None, 0.0          # every round starts cold
+            # every round starts cold, as if asked minutes after the last one: no shared result, no
+            # remembered responses, no warm connections (the robots.txt cache stays, as it would)
+            cb.LIVE.result, cb.LIVE.t = None, 0.0
             cb._cooldown.clear()
+            cb.tb.HTTP.memo.clear()
+            cb.tb.HTTP.close_idle()
             await asyncio.gather(*(one_v2(mode == "v2-fresh", f"u{r}-{i}") for i in range(conc)))
     print(json.dumps({"mode": mode, "concurrency": conc, "latencies": lat}))
 

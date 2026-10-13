@@ -28,8 +28,9 @@ python tcg_bot.py --recap         post the daily recap
 
 ## What v2 changed (14 Oct 2026)
 
-Checks are about **4x faster** in the benchmark (13.5 s → 3.2 s for the cloud config, same shops and data),
-download about **6x less**, and open **60% fewer connections**; Discord answers in well under a second.
+Checks are about **5x faster** in the benchmark (13.1 s → 2.7 s for the cloud config, 15.6 s → 2.9 s for the PC
+config, same shops and data), download about **6x less**, and open **56% fewer connections**; `/deals` answers
+from the last check in under a millisecond of work.
 Details and numbers: [`bench/RESULTS.md`](bench/RESULTS.md) and [`CHANGELOG.md`](CHANGELOG.md).
 
 * **Speed:** connections are kept open and reused, replies are gzip-compressed, identical requests within
@@ -48,7 +49,7 @@ Details and numbers: [`bench/RESULTS.md`](bench/RESULTS.md) and [`CHANGELOG.md`]
   every change is backed up and written to `audit.log`).
 * **Polite and compliant:** follows each shop's robots.txt, and a shop that's been down 3 checks in a row
   is retried every 15 minutes instead of every check.
-* **Safer files:** state files are written atomically (a crash can't leave half a file), logs roll over,
+* **Safer files:** state files are written atomically (a crash can't leave half a file), finds.log rolls over,
   and a typo in one card's settings switches off that card with a warning instead of stopping the bot.
 
 ### New optional settings (config.json)
@@ -86,7 +87,7 @@ the project. A small always-on machine (a spare PC or a Raspberry Pi running `tc
 ## Tests and benchmarks
 
 ```
-python -m unittest discover -s tests          # 59 tests; the network ones need: pip install cryptography
+python -m unittest discover -s tests          # 68 tests; the network ones need: pip install cryptography (and discord.py for the commands)
 python bench/bench.py suite --v1 bench/baseline/tcg_bot_v1.py --v2 tcg_bot.py
 ```
 
