@@ -30,6 +30,10 @@ Between start and end (your computer's local time) it checks booster boxes every
 
 New-listing alerts are on by default. To switch them off: "new_listings": false
 
+Status posts (no ping) go to "discord_webhook_status" if set, otherwise the boxes channel:
+bot online, drop mode on/off, a shop not loading for 3 checks / loading again, config.json
+typos, failed checks, and (cloud copy) the PC going quiet or coming back.
+
 No double posts: give both copies the same private "heartbeat_topic" (in "alerts" on the PC,
 the HEARTBEAT_TOPIC secret in the cloud, plus HEARTBEAT_ROLE=listen there). The PC copy says
 "I'm on" through ntfy.sh every 15 minutes; the cloud copy keeps checking and remembering, but
@@ -46,6 +50,7 @@ import json
 import os
 import re
 import sys
+import threading
 import time
 import urllib.parse
 import urllib.request
@@ -56,12 +61,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(HERE, "config.json")
 STATE_PATH = os.path.join(HERE, "seen.json")
 KNOWN_PATH = os.path.join(HERE, "known_products.json")
+STATUS_PATH = os.path.join(HERE, "status.json")
 LOG_PATH = os.path.join(HERE, "finds.log")
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
 
 MIN_DROP_SECONDS = 30
+SHOP_DOWN_AFTER = 3             # a shop that fails this many checks in a row gets a "can't reach" status post
+
+# per-run record of which shop websites answered: host -> [ok, failed]
+_host_results = {}
+_host_lock = threading.Lock()
 
 # environment variable -> key in config.json "alerts"
 ENV_ALERTS = {
@@ -113,12 +124,21 @@ def fetch_json(url, tries=2):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"})
             with urllib.request.urlopen(req, timeout=25) as r:
-                return json.loads(r.read().decode("utf-8", "replace"))
+                data = json.loads(r.read().decode("utf-8", "replace"))
+            _note_host(url, True)
+            return data
         except Exception as e:  # noqa: BLE001
             last = e
             time.sleep(1.5 * (i + 1))
     print(f"   ! couldn't read {short(url)} ({last})")
+    _note_host(url, False)
     return None
+
+
+def _note_host(url, ok):
+    host = urllib.parse.urlparse(url).netloc
+    with _host_lock:
+        _host_results.setdefault(host, [0, 0])[0 if ok else 1] += 1
 
 
 def short(url):
@@ -502,6 +522,77 @@ def pc_is_on(cfg):
         return False
 
 
+# ---------------------------------------------------------------- status posts
+# Short, no-ping Discord posts about the bot itself (not finds). They go to "discord_webhook_status"
+# if you add one, otherwise to the booster-boxes channel.
+GREEN, AMBER, RED, BLUE, GREY = 0x2A9D8F, 0xF4A261, 0xE63946, 0x457B9D, 0x6C757D
+
+
+def load_status():
+    try:
+        return json.load(open(STATUS_PATH, encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def save_status(status):
+    json.dump(status, open(STATUS_PATH, "w", encoding="utf-8"), indent=1, sort_keys=True)
+
+
+def post_status(cfg, text, color=GREY):
+    alerts = (cfg or {}).get("alerts") or {}
+    hook = alerts.get("discord_webhook_status") or alerts.get("discord_webhook_boxes") or alerts.get("discord_webhook")
+    print(f"   [status] {text}")
+    if not hook:
+        return
+    payload = {"username": alerts.get("bot_name") or "One Piece Restock",
+               "embeds": [{"description": text[:4000], "color": color}],
+               "allowed_mentions": {"parse": []}}
+    try:
+        req = urllib.request.Request(hook, data=json.dumps(payload).encode("utf-8"),
+                                     headers={"Content-Type": "application/json", "User-Agent": UA})
+        urllib.request.urlopen(req, timeout=15).read()
+    except Exception as e:  # noqa: BLE001
+        print(f"   ! status post failed: {e}")
+
+
+def shop_names(cfg):
+    names = {}
+    s = cfg.get("sealed", {})
+    for group in ("shopify_collections", "shopify_products", "woocommerce"):
+        for shop in s.get(group, []):
+            names.setdefault(urllib.parse.urlparse(shop["url"]).netloc, shop["name"])
+    for name, base in cfg.get("singles", {}).get("shops", {}).items():
+        names.setdefault(urllib.parse.urlparse(base).netloc, name)
+    return names
+
+
+def shop_health(cfg, status):
+    """Compare this run's shop results with earlier runs. Returns (text, color) posts for
+    shops that just went down (failed SHOP_DOWN_AFTER checks in a row) or just came back."""
+    names = shop_names(cfg)
+    fails = status.setdefault("shop_fails", {})
+    down = set(status.get("shop_down", []))
+    posts = []
+    with _host_lock:
+        results = dict(_host_results)
+    for host, (ok, bad) in results.items():
+        name = names.get(host, host)
+        if ok:
+            fails[host] = 0
+            if host in down:
+                down.discard(host)
+                posts.append((f"✅ **{name}** is loading again, so it's back on watch.", GREEN))
+        elif bad:
+            fails[host] = fails.get(host, 0) + 1
+            if fails[host] >= SHOP_DOWN_AFTER and host not in down:
+                down.add(host)
+                posts.append((f"⚠️ **{name}** hasn't loaded for {fails[host]} checks in a row, so the bot "
+                              f"can't see its stock right now. You'll get a post when it's back.", AMBER))
+    status["shop_down"] = sorted(down)
+    return posts
+
+
 # ---------------------------------------------------------------- state + alerts
 def load_state():
     try:
@@ -672,6 +763,8 @@ def report(finds, label):
 # ---------------------------------------------------------------- main
 def run_once(cfg, args, drop=None):
     stamp = datetime.now().strftime("%a %d %b %Y %I:%M:%S %p")
+    with _host_lock:
+        _host_results.clear()
     tag = f" [DROP MODE: {drop['name']}]" if drop else ""
     print(f"\n=== One Piece restock check - {stamp}{tag} ===")
     do_sealed = not args.singles
@@ -708,7 +801,24 @@ def run_once(cfg, args, drop=None):
     role = heartbeat_role(cfg)
     if role == "send":
         send_heartbeat(cfg)
-    if show and not args.all and role == "listen" and pc_is_on(cfg):
+    pc_on = pc_is_on(cfg) if role == "listen" else False
+
+    # status posts: shop health, and (cloud copy) the PC going quiet or coming back
+    status = load_status()
+    posts = shop_health(cfg, status)
+    if role == "listen":
+        before = status.get("pc_on")
+        if before is True and not pc_on:
+            posts.append(("🖥️ Your PC copy has gone quiet (off or asleep). The **cloud copy** is posting alerts now.", BLUE))
+        elif before is False and pc_on:
+            post_status(cfg, "🖥️ Your PC copy is back on and posting alerts. The cloud copy is going quiet.", BLUE)
+        status["pc_on"] = pc_on
+    save_status(status)
+    if not pc_on:            # while the PC is on, it reports these itself
+        for text, color in posts:
+            post_status(cfg, text, color)
+
+    if show and not args.all and pc_on:
         print("   (your PC copy is on and posts these itself - cloud copy staying quiet)")
         return
 
@@ -754,26 +864,49 @@ def main():
         run_once(cfg, args)
         return
     print(f"Running every {args.loop:g} minutes (faster inside drop windows). Press Ctrl+C to stop.")
-    was_dropping = None
+    every = f"{args.loop:g} minute" + ("" if args.loop == 1 else "s")
+    windows = [w for w in parse_windows(cfg) if w["end"] > datetime.now()]
+    nxt = f" Next drop window: **{windows[0]['name']}**, {windows[0]['start']:%a %d %b %I:%M %p}." if windows else ""
+    post_status(cfg, f"🟢 **Bot online** ({'PC' if heartbeat_role(cfg) != 'listen' else 'cloud'}). "
+                     f"Checking every {every}.{nxt}", GREEN)
+    good_cfg, was_dropping, problem = cfg, None, None
     while True:
         try:
-            cfg = load_config()  # pick up edits without restarting
+            try:
+                cfg = load_config()  # pick up edits without restarting
+            except json.JSONDecodeError as e:
+                if problem != "config":
+                    post_status(good_cfg, f"⚠️ **config.json has a typo**, so the bot is paused until it's fixed "
+                                          f"and saved.\n`{e}`", RED)
+                problem = "config"
+                print(f"   ! config.json has a typo, fix and save it: {e}")
+                time.sleep(60)
+                continue
+            if problem == "config":
+                post_status(cfg, "✅ config.json is fixed. Checking again.", GREEN)
+            good_cfg = cfg
             drop = active_window(cfg)
             if drop and was_dropping != drop["name"]:
                 print(f"\n>>> DROP MODE ON: {drop['name']} until {drop['end']:%I:%M %p}, "
                       f"checking every {drop['every']}s")
+                post_status(cfg, f"🚨 **Drop mode ON: {drop['name']}.** Checking booster boxes every "
+                                 f"{drop['every']}s until {drop['end']:%I:%M %p}.", RED)
             elif not drop and was_dropping:
                 print(f"\n>>> DROP MODE OFF, back to every {args.loop:g} minutes")
+                post_status(cfg, f"Drop mode off ({was_dropping} finished). Back to every {every}.", GREY)
             was_dropping = drop["name"] if drop else None
             run_once(cfg, args, drop)
+            if problem == "crash":
+                post_status(cfg, "✅ Checks are working again.", GREEN)
+            problem = None
             wait = seconds_until_next_check(cfg, args.loop)
         except KeyboardInterrupt:
             raise
-        except json.JSONDecodeError as e:
-            print(f"   ! config.json has a typo, fix and save it: {e}")
-            wait = 60
         except Exception as e:  # noqa: BLE001
             print(f"   ! check failed: {e}")
+            if problem != "crash":
+                post_status(good_cfg, f"⚠️ **A check failed:** `{str(e)[:300]}`\nIt'll keep retrying every {every}.", RED)
+            problem = "crash"
             wait = args.loop * 60
         sys.stdout.flush()
         time.sleep(wait)
