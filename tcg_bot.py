@@ -838,6 +838,12 @@ def run_once(cfg, args, drop=None):
 
 
 def main():
+    # Windows writes bot_output in an old encoding that has no emoji; don't let that crash the bot
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:  # noqa: BLE001
+            pass
     ap = argparse.ArgumentParser(description="One Piece TCG restock bot")
     ap.add_argument("--all", action="store_true", help="show everything matching, not just new finds")
     ap.add_argument("--loop", type=float, metavar="MINUTES", help="keep checking every N minutes")
