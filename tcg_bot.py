@@ -140,6 +140,18 @@ DEFAULT_RELEASES = [
 RECAP_DAYS_AHEAD = 14
 RECAP_MOVE_PCT = 5      # price changes smaller than this (%) are left out of the recap
 
+# Extra sealed shops, added on top of config.json (skip with "extra_shops": false in config.json).
+# Shops with a One Piece section are read like the others; the rest are read through their search.
+EXTRA_SHOPIFY_COLLECTIONS = [
+    {"name": "Alpha Gaming", "url": "https://alphagaming.com.au/collections/one-piece-sealed-products/products.json?limit=250"},
+]
+EXTRA_SHOPIFY_SEARCH = [
+    {"name": "Grailborne", "base": "https://grailborne.com.au"},
+    {"name": "Collectible Madness", "base": "https://collectiblemadness.com.au"},
+    {"name": "Friendly Collectibles", "base": "https://friendlycollectibles.com.au"},
+]
+SEARCH_QUERIES = ["one piece booster box", "one piece booster display", "one piece card game"]
+
 WATCH_EXCLUDE = ["japanese", "(jp)", " jp ", "chinese", "korean", "asia", "simplified", "traditional"]
 
 
@@ -291,6 +303,63 @@ def shopify_boxes(shop_name, url, max_price, watch=()):
     return finds, listings
 
 
+def shopify_search_boxes(shop_name, base, max_price, watch=()):
+    """For shops without a One Piece section: read their search results instead.
+    Returns (finds, listings) like shopify_boxes; listings is None if every search failed."""
+    base = base.rstrip("/")
+    products, any_ok = {}, False
+    for q in SEARCH_QUERIES:
+        data = fetch_json(f"{base}/search/suggest.json?q={urllib.parse.quote(q)}"
+                          f"&resources[type]=product&resources[limit]=10")
+        if data is None:
+            continue
+        any_ok = True
+        for p in data.get("resources", {}).get("results", {}).get("products", []):
+            products.setdefault(p.get("handle"), p)
+    if not any_ok:
+        return [], None
+    finds, listings = [], []
+    for handle, p in products.items():
+        title = p.get("title", "")
+        if "one piece" not in title.lower():
+            continue
+        w = None if is_box_title(title) else watch_item(title, watch)
+        if not is_box_title(title) and not w:
+            continue
+        kind, prefix, group = ("Sealed", "sealed", "watch") if w else ("Booster box", "box", "box")
+        limit = w["max"] if w else max_price
+        page = f"{base}/products/{handle}"
+        available = bool(p.get("available"))
+        price = float(p.get("price") or p.get("price_min") or 0)
+        is_pre = "pre" in (json.dumps(p.get("tags", "")) + title).lower()
+        note = ", ".join(x for x in ((w["name"] if w else ""), ("pre-order" if is_pre else "")) if x)
+        cart = ""
+        if available and 0 < price <= limit:      # only look up the cart ID when it's worth alerting
+            js = product_js(base, handle) or {}
+            _, vid = cheapest_available(js.get("variants"), cents=True)
+            cart = shopify_cart_link(base, vid)
+        listings.append({"id": f"list|{shop_name}|{handle}", "box_id": f"{prefix}|{shop_name}|{handle}",
+                         "group": group, "kind": "New listing", "name": title, "shop": shop_name,
+                         "price": price, "available": available, "url": page, "cart": cart,
+                         "note": note, "max": limit})
+        if available and 0 < price <= limit:
+            finds.append({"id": f"{prefix}|{shop_name}|{handle}", "kind": kind, "name": title,
+                          "shop": shop_name, "price": price, "url": page, "cart": cart, "note": note})
+    return finds, listings
+
+
+def sealed_shops(cfg):
+    """(collections, single products, woocommerce, search) shop lists, with the extra shops added."""
+    s = cfg["sealed"]
+    cols = list(s.get("shopify_collections", []))
+    search = list(s.get("shopify_search", []))
+    if cfg.get("extra_shops", True):
+        have = {x["name"] for x in cols + search}
+        cols += [x for x in EXTRA_SHOPIFY_COLLECTIONS if x["name"] not in have]
+        search += [x for x in EXTRA_SHOPIFY_SEARCH if x["name"] not in have]
+    return cols, s.get("shopify_products", []), s.get("woocommerce", []), search
+
+
 def shopify_product_box(shop_name, url, max_price, watch=()):
     """A single product .js URL (Shopify prices are in cents here). Not used for new-listing alerts."""
     p = fetch_json(url)
@@ -338,16 +407,18 @@ def woo_boxes(shop_name, url, max_price, watch=()):
 
 def check_sealed(cfg):
     """Returns (finds, listings_by_shop). listings_by_shop[shop] is None when that shop failed."""
-    s = cfg["sealed"]
-    mx = s["max_price"]
+    mx = cfg["sealed"]["max_price"]
     watch = cfg.get("sealed_watch", DEFAULT_SEALED_WATCH) or []
+    cols, prods, woo, search = sealed_shops(cfg)
     jobs = []
-    for shop in s["shopify_collections"]:
+    for shop in cols:
         jobs.append((shopify_boxes, shop["name"], shop["url"], mx, watch))
-    for shop in s.get("shopify_products", []):
+    for shop in prods:
         jobs.append((shopify_product_box, shop["name"], shop["url"], mx, watch))
-    for shop in s.get("woocommerce", []):
+    for shop in woo:
         jobs.append((woo_boxes, shop["name"], shop["url"], mx, watch))
+    for shop in search:
+        jobs.append((shopify_search_boxes, shop["name"], shop["base"], mx, watch))
     with ThreadPoolExecutor(max_workers=8) as ex:
         results = list(ex.map(lambda j: (j, j[0](*j[1:])), jobs))
     finds, by_shop = [], {}
@@ -493,9 +564,53 @@ def handle_shop_card(card, shop_name, base):
 
 def single_find(card, shop, price, url, title, cart=""):
     return {"id": f"card|{shop}|{card['num']}|{url.rsplit('/', 1)[-1]}", "kind": "Single",
-            "name": f"{card['name']} {card['num']}", "deck": card.get("deck", ""), "qty": card.get("qty", 1),
+            "name": f"{card['name']} {card['num']}".strip(), "deck": card.get("deck", ""), "qty": card.get("qty", 1),
             "shop": shop, "price": price, "url": url, "cart": cart, "note": title,
             "priority": card.get("priority", False)}
+
+
+MAX_VALUE_PICKS = 15
+
+
+def load_value_picks():
+    """Cards the daily market ledger thinks are good value, from market_picks.json:
+    {"watch": [{"name", "product_url", "max", "market", "note"}, ...]}. Missing file = none."""
+    try:
+        data = json.load(open(PICKS_PATH, encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+    out = []
+    for x in (data.get("watch", []) if isinstance(data, dict) else [])[:MAX_VALUE_PICKS]:
+        try:
+            if x["product_url"].startswith("https://") and float(x["max"]) > 0:
+                out.append(x)
+        except (KeyError, TypeError, ValueError):
+            continue
+    return out
+
+
+def value_pick_card(pick):
+    """Check one value pick's product page; returns a find if it's buyable at or under its max."""
+    url = pick["product_url"].split("?")[0].rstrip("/")
+    p = fetch_json(url + ".js")
+    if not p:
+        return []
+    price, vid = nm_price(p)
+    if price is None or price > float(pick["max"]):
+        return []
+    card = {"name": pick.get("name", p.get("title", "Value pick")), "num": "", "qty": 1, "max": float(pick["max"]),
+            "deck": "value pick", "priority": False}
+    host = urllib.parse.urlparse(url).netloc
+    shop = {"elementalarcade.com.au": "Elemental Arcade", "tcg.goodgames.com.au": "Good Games"}.get(
+        host, "Mayhem" if "mayhem" in host else host)
+    f = single_find(card, shop, price, url, p.get("title", ""), shopify_cart_link(url, vid))
+    f["id"] = f"card|pick|{url}"
+    f["kind"] = "Single"
+    f["value_pick"] = True
+    market = pick.get("market")
+    f["note"] = (p.get("title", "") + (f" · US market ≈ {money(float(market))}" if market else "") +
+                 (f" · {pick['note']}" if pick.get("note") else ""))
+    return [f]
 
 
 def check_singles(cfg):
@@ -508,6 +623,9 @@ def check_singles(cfg):
         for name in ("Mayhem", "Good Games"):
             if name in shops:
                 jobs.append((handle_shop_card, c, name, shops[name]))
+    if cfg.get("value_picks", True):
+        for pick in load_value_picks():
+            jobs.append((value_pick_card, pick))
     with ThreadPoolExecutor(max_workers=6) as ex:
         results = list(ex.map(lambda j: j[0](*j[1:]), jobs))
     return [f for r in results for f in r]
@@ -628,10 +746,9 @@ def post_status(cfg, text, color=GREY):
 
 def shop_names(cfg):
     names = {}
-    s = cfg.get("sealed", {})
-    for group in ("shopify_collections", "shopify_products", "woocommerce"):
-        for shop in s.get(group, []):
-            names.setdefault(urllib.parse.urlparse(shop["url"]).netloc, shop["name"])
+    for group in sealed_shops(cfg):
+        for shop in group:
+            names.setdefault(urllib.parse.urlparse(shop.get("url") or shop.get("base")).netloc, shop["name"])
     for name, base in cfg.get("singles", {}).get("shops", {}).items():
         names.setdefault(urllib.parse.urlparse(base).netloc, name)
     return names
@@ -755,6 +872,8 @@ def _discord_embeds(finds):
             icon, color = "🎁 ", 0x2A9D8F
         elif kind == "New listing":
             icon, color = "🆕 ", 0x9B5DE5
+        elif f.get("value_pick"):
+            icon, color = "💎 Value pick: ", 0x9B5DE5
         else:
             icon, color = ("⭐ ", 0xE63946) if f.get("priority") else ("🃏 ", 0x457B9D)
         embeds.append({"title": (icon + f["name"])[:256], "url": f["url"], "color": color, "fields": fields})
