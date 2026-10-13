@@ -88,7 +88,7 @@ the project. A small always-on machine (a spare PC or a Raspberry Pi running `tc
 ## Tests and benchmarks
 
 ```
-python -m unittest discover -s tests          # 68 tests; the network ones need: pip install cryptography (and discord.py for the commands)
+python -m unittest discover -s tests          # 69 tests; the network ones need: pip install cryptography (and discord.py for the commands)
 python bench/bench.py suite --v1 bench/baseline/tcg_bot_v1.py --v2 tcg_bot.py
 ```
 
