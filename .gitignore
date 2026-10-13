@@ -1,0 +1,4 @@
+# Never commit the PC copy's local files: logs, locks, and anything with secrets
+*.log
+*.lock
+__pycache__/
