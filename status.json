@@ -1,0 +1,17 @@
+{
+ "pc_on": true,
+ "shop_down": [],
+ "shop_fails": {
+  "elementalarcade.com.au": 0,
+  "pocketgames.com.au": 0,
+  "shop.goodgames.com.au": 0,
+  "tcg.goodgames.com.au": 0,
+  "www.gameology.com.au": 0,
+  "www.gumnut.com.au": 0,
+  "www.jtoys.com.au": 1,
+  "www.m-g.com.au": 0,
+  "www.mayhemcollectables.com.au": 1,
+  "www.pokebox.com.au": 0,
+  "www.tcgroupau.com.au": 0
+ }
+}
