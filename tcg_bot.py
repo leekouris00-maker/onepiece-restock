@@ -43,7 +43,7 @@ only posts while it hasn't heard from the PC for 20 minutes.
 
 Alert settings can also come from environment variables, which win over config.json.
 The cloud copy (GitHub Actions) uses these so the webhooks stay secret:
-    DISCORD_WEBHOOK, DISCORD_WEBHOOK_BOXES, DISCORD_WEBHOOK_SINGLES, DISCORD_PING,
+    DISCORD_WEBHOOK, DISCORD_WEBHOOK_BOXES, DISCORD_WEBHOOK_SINGLES, DISCORD_WEBHOOK_SEALED, DISCORD_PING,
     NTFY_TOPIC, BOT_NAME (the name the Discord posts show, e.g. "One Piece Restock (cloud)"),
     HEARTBEAT_TOPIC, HEARTBEAT_ROLE
 """
@@ -81,6 +81,7 @@ ENV_ALERTS = {
     "DISCORD_WEBHOOK": "discord_webhook",
     "DISCORD_WEBHOOK_BOXES": "discord_webhook_boxes",
     "DISCORD_WEBHOOK_SINGLES": "discord_webhook_singles",
+    "DISCORD_WEBHOOK_SEALED": "discord_webhook_sealed",
     "DISCORD_PING": "discord_ping",
     "NTFY_TOPIC": "ntfy_topic",
     "BOT_NAME": "bot_name",
@@ -682,17 +683,23 @@ def push_discord(cfg, title, body, finds=None):
     default = alerts.get("discord_webhook")
     boxes_hook = alerts.get("discord_webhook_boxes") or default
     singles_hook = alerts.get("discord_webhook_singles") or default
+    sealed_hook = alerts.get("discord_webhook_sealed") or boxes_hook
     if not (default or boxes_hook or singles_hook):
         return False
     if finds is None:  # test message: post to every channel that's set up
         ok = True
-        for hook in dict.fromkeys(h for h in (boxes_hook, singles_hook, default) if h):
+        for hook in dict.fromkeys(h for h in (boxes_hook, singles_hook, sealed_hook, default) if h):
             ok = _discord_post(alerts, hook, title, [{"title": title[:256], "description": body[:4000],
                                                        "color": 0x2A9D8F}], 0) and ok
         return ok
     groups = {}
     for f in finds:
-        hook = boxes_hook if f["kind"] in BOX_KINDS else singles_hook
+        if f["kind"] == "Sealed" or (f["kind"] == "New listing" and f.get("group") == "watch"):
+            hook = sealed_hook               # other sealed products: their own channel if set up
+        elif f["kind"] in BOX_KINDS:
+            hook = boxes_hook
+        else:
+            hook = singles_hook
         if hook:
             groups.setdefault(hook, []).append(f)
     ok = True
