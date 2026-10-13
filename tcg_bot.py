@@ -21,6 +21,7 @@ Only needs Python 3.8+ (no extra installs).
     python tcg_bot.py --sealed        only check booster boxes
     python tcg_bot.py --singles       only check singles
     python tcg_bot.py --test-discord  post a test message to your Discord channel and stop
+    python tcg_bot.py --recap         post the daily recap (the GitHub copy does this every morning)
 
 Drop-day mode (in --loop only): add "drop_windows" to config.json, e.g.
     "drop_windows": [
@@ -64,6 +65,8 @@ CONFIG_PATH = os.path.join(HERE, "config.json")
 STATE_PATH = os.path.join(HERE, "seen.json")
 KNOWN_PATH = os.path.join(HERE, "known_products.json")
 STATUS_PATH = os.path.join(HERE, "status.json")
+RECAP_PATH = os.path.join(HERE, "recap.json")          # yesterday's prices, for the daily recap
+PICKS_PATH = os.path.join(HERE, "market_picks.json")   # optional: value picks from the market ledger
 LOG_PATH = os.path.join(HERE, "finds.log")
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -85,6 +88,8 @@ ENV_ALERTS = {
     "DISCORD_PING": "discord_ping",
     "NTFY_TOPIC": "ntfy_topic",
     "BOT_NAME": "bot_name",
+    "DISCORD_WEBHOOK_RECAP": "discord_webhook_recap",
+    "LEDGER_URL": "ledger_url",
     "HEARTBEAT_TOPIC": "heartbeat_topic",
     "HEARTBEAT_ROLE": "heartbeat_role",
 }
@@ -118,6 +123,23 @@ DEFAULT_SEALED_WATCH = [
     {"name": "Ace, Sabo & Luffy Premium Card Collection", "match": ["Ace, Sabo", "Sabo & Luffy", "Sabo and Luffy"], "max": 150},
     {"name": "29th Anniversary Premium Card Collection", "match": ["29th Anniversary"], "max": 150},
 ]
+# English release calendar for the recap's "coming up" section. Override with "releases" in config.json.
+DEFAULT_RELEASES = [
+    {"date": "2026-10-30", "name": "EB-05 Heroines Edition Vol. 2"},
+    {"date": "2026-10-30", "name": "TS-03 Mini Case Set Vol. 3"},
+    {"date": "2026-11-20", "name": "OP-18 The Dominance of God"},
+    {"date": "2026-11-20", "name": "Heroines Gift Collection"},
+    {"date": "2026-11-20", "name": "DP-13 Double Pack Set Vol. 13"},
+    {"date": "2026-12-04", "name": "IB-09 / IB-10 Illustration Boxes"},
+    {"date": "2026-12-18", "name": "ST-37 / ST-38 Starter Decks"},
+    {"date": "2027-01-29", "name": "EB-06 Extra Booster"},
+    {"date": "2027-03-01", "name": "29th Anniversary Premium Card Collection (date approx.)"},
+    {"date": "2027-03-05", "name": "OP-19 Booster Set"},
+    {"date": "2027-04-01", "name": "Ace, Sabo & Luffy Premium Card Collection (April, approx.)"},
+]
+RECAP_DAYS_AHEAD = 14
+RECAP_MOVE_PCT = 5      # price changes smaller than this (%) are left out of the recap
+
 WATCH_EXCLUDE = ["japanese", "(jp)", " jp ", "chinese", "korean", "asia", "simplified", "traditional"]
 
 
@@ -824,6 +846,133 @@ def report(finds, label):
     return f"{label}:\n" + "\n".join(lines)
 
 
+# ---------------------------------------------------------------- daily recap
+def _lines(items, limit=8):
+    out = "\n".join(items[:limit])
+    if len(items) > limit:
+        out += f"\n…and {len(items) - limit} more"
+    return out[:1020] or "-"
+
+
+def _short(name, n=60):
+    return name if len(name) <= n else name[:n - 1] + "…"
+
+
+def run_recap(cfg, now=None):
+    """One Discord post summing up the day: what's buyable within your limits, price moves and
+    new listings since yesterday's recap, what's coming up, and shops that are down."""
+    now = now or datetime.now()
+    print(f"\n=== Daily recap - {now:%a %d %b %Y %I:%M %p} ===")
+    box_finds, by_shop = check_sealed(cfg)
+    singles = check_singles(cfg)
+
+    # today's snapshot: every box / watched listing (in stock or not) plus in-stock singles
+    snap = {}
+    for listings in by_shop.values():
+        for l in listings or []:
+            snap[l["id"]] = {"name": l["name"], "shop": l["shop"], "price": round(l["price"], 2),
+                             "available": l["available"], "url": l["url"]}
+    for f in singles:
+        snap[f["id"]] = {"name": f["name"], "shop": f["shop"], "price": round(f["price"], 2),
+                         "available": True, "url": f["url"]}
+    try:
+        prev = json.load(open(RECAP_PATH, encoding="utf-8")).get("snapshot", {})
+    except Exception:  # noqa: BLE001
+        prev = None
+
+    fields = []
+    # 1. buyable now within your limits
+    order = {"Booster box": 0, "Sealed": 1, "Single": 2}
+    buy = sorted(box_finds + singles, key=lambda f: (order[f["kind"]], not f.get("priority"), f["price"]))
+    icon = {"Booster box": "📦", "Sealed": "🎁", "Single": "🃏"}
+    lines = [f"{icon[f['kind']]} [{_short(f['name'])}]({f.get('cart') or f['url']}) **{money(f['price'])}** · {f['shop']}"
+             for f in buy]
+    fields.append({"name": f"🛒 Buyable now within your limits ({len(buy)})",
+                   "value": _lines(lines) if lines else "Nothing on your list is in stock under your max right now."})
+
+    # 2. price moves, restocks and new listings since the last recap
+    if prev is not None:
+        moves, back, new = [], [], []
+        for k, v in snap.items():
+            p = prev.get(k)
+            if not p:
+                new.append(f"[{_short(v['name'])}]({v['url']}) {money(v['price'])} · {v['shop']}")
+                continue
+            if v["available"] and not p.get("available"):
+                back.append(f"[{_short(v['name'])}]({v['url']}) {money(v['price'])} · {v['shop']}")
+            if p.get("price") and v["price"] and abs(v["price"] - p["price"]) >= 1:
+                pct = (v["price"] - p["price"]) / p["price"] * 100
+                if abs(pct) >= RECAP_MOVE_PCT:
+                    moves.append((pct, f"{'📉' if pct < 0 else '📈'} [{_short(v['name'], 50)}]({v['url']}) "
+                                       f"{money(p['price'])} → **{money(v['price'])}** ({pct:+.0f}%) · {v['shop']}"))
+        moves.sort(key=lambda m: m[0])           # biggest drops first
+        fields.append({"name": "💸 Price changes since yesterday",
+                       "value": _lines([m[1] for m in moves]) if moves else "No moves of 5% or more."})
+        if back:
+            fields.append({"name": "🔁 Back in stock", "value": _lines(back)})
+        if new:
+            fields.append({"name": "🆕 Newly listed", "value": _lines(new)})
+    else:
+        fields.append({"name": "💸 Price changes", "value": "First recap: price changes start showing from tomorrow."})
+
+    # 3. market value picks from the ledger, if they've been shared with the bot
+    try:
+        picks = json.load(open(PICKS_PATH, encoding="utf-8"))
+        if isinstance(picks, dict):
+            picks = picks.get("picks", [])
+        pl = [f"⭐ [{_short(x['name'])}]({x.get('url', '')}) **{money(float(x['price']))}** · {x.get('shop', '')}"
+              + (f" · {x['note']}" if x.get("note") else "") for x in picks if x.get("name") and x.get("price")]
+        if pl:
+            fields.append({"name": "📊 Worth a look (vs US market)", "value": _lines(pl, 6)})
+    except Exception:  # noqa: BLE001
+        pass
+
+    # 4. coming up: releases and drop windows in the next two weeks
+    soon = []
+    for r in cfg.get("releases", DEFAULT_RELEASES) or []:
+        try:
+            d = datetime.strptime(r["date"], "%Y-%m-%d")
+        except (KeyError, ValueError):
+            continue
+        days = (d.date() - now.date()).days
+        if 0 <= days <= RECAP_DAYS_AHEAD:
+            soon.append((d, f"📅 **{d:%a %d %b}** {r['name']}" + (" (today!)" if days == 0 else f" (in {days} days)")))
+    for w in parse_windows(cfg):
+        if now < w["end"] and (w["start"] - now).days <= RECAP_DAYS_AHEAD:
+            soon.append((w["start"], f"🚨 Drop mode: {w['name']}, {w['start']:%a %d %b %I:%M %p}"))
+    soon.sort(key=lambda x: x[0])
+    fields.append({"name": f"🗓️ Next {RECAP_DAYS_AHEAD} days",
+                   "value": _lines([x[1] for x in soon]) if soon else "No releases in the next two weeks."})
+
+    # 5. shops the bot can't see
+    down = load_status().get("shop_down", [])
+    if down:
+        names = shop_names(cfg)
+        fields.append({"name": "⚠️ Not loading", "value": ", ".join(names.get(h, h) for h in down)})
+
+    alerts = cfg.get("alerts") or {}
+    ledger = alerts.get("ledger_url") or cfg.get("ledger_url")
+    embed = {"title": f"☀️ Daily recap · {now:%A %d %B}", "color": 0xE9C46A, "fields": fields[:25]}
+    if ledger:
+        embed["description"] = f"Full market report (US prices, PSA, movers): [Grand Line Ledger]({ledger})"
+        embed["url"] = ledger
+    hook = alerts.get("discord_webhook_recap") or alerts.get("discord_webhook_status") or \
+        alerts.get("discord_webhook_boxes") or alerts.get("discord_webhook")
+    for fld in fields:
+        print(f"\n{fld['name']}\n{fld['value']}")
+    if hook:
+        payload = {"username": alerts.get("bot_name") or "One Piece Restock", "embeds": [embed],
+                   "allowed_mentions": {"parse": []}}
+        try:
+            req = urllib.request.Request(hook, data=json.dumps(payload).encode("utf-8"),
+                                         headers={"Content-Type": "application/json", "User-Agent": UA})
+            urllib.request.urlopen(req, timeout=15).read()
+            print("\n   (recap posted to Discord)")
+        except Exception as e:  # noqa: BLE001
+            print(f"\n   ! recap post failed: {e}")
+    json.dump({"date": f"{now:%Y-%m-%d}", "snapshot": snap}, open(RECAP_PATH, "w", encoding="utf-8"), indent=1)
+
+
 # ---------------------------------------------------------------- main
 def run_once(cfg, args, drop=None):
     stamp = datetime.now().strftime("%a %d %b %Y %I:%M:%S %p")
@@ -914,6 +1063,7 @@ def main():
     ap.add_argument("--sealed", action="store_true", help="only booster boxes")
     ap.add_argument("--singles", action="store_true", help="only singles")
     ap.add_argument("--test-discord", action="store_true", help="post a test message to Discord and stop")
+    ap.add_argument("--recap", action="store_true", help="post the daily recap to Discord and stop")
     args = ap.parse_args()
 
     try:
@@ -929,6 +1079,10 @@ def main():
         ok = push_discord(cfg, "Test from your One Piece restock bot",
                           "If you can see this, Discord alerts are working.")
         sys.exit(0 if ok else 1)
+
+    if args.recap:
+        run_recap(cfg)
+        return
 
     if not args.loop:
         run_once(cfg, args)

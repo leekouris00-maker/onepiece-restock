@@ -1,0 +1,46 @@
+# Posts the daily recap to Discord every morning: what's buyable within your limits, price moves,
+# restocks and new listings since yesterday, what's coming up, and shops that aren't loading.
+name: Daily recap
+
+on:
+  schedule:
+    - cron: "27 21 * * *"     # 8:27am Melbourne in summer (7:27am in winter), after the market ledger updates
+  workflow_dispatch:          # "Run workflow" button for testing
+
+permissions:
+  contents: write             # saves recap.json so tomorrow's recap can compare prices
+
+concurrency:
+  group: restock              # waits for any running restock check, so the two never clash
+  cancel-in-progress: false
+
+jobs:
+  recap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Post the daily recap
+        env:
+          DISCORD_WEBHOOK_BOXES: ${{ secrets.DISCORD_WEBHOOK_BOXES }}
+          DISCORD_WEBHOOK_SINGLES: ${{ secrets.DISCORD_WEBHOOK_SINGLES }}
+          DISCORD_WEBHOOK_SEALED: ${{ secrets.DISCORD_WEBHOOK_SEALED }}
+          BOT_NAME: "One Piece Restock (cloud)"
+          LEDGER_URL: "https://claude.ai/artifact/N7WhtLb9z9q1GeBUWxMaoN"
+          TZ: Australia/Melbourne
+        run: python tcg_bot.py --recap
+
+      - name: Remember today's prices
+        run: |
+          git config user.name "restock-bot"
+          git config user.email "restock-bot@users.noreply.github.com"
+          [ -f recap.json ] && git add recap.json
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -m "Daily recap snapshot"
+          git pull --rebase
+          git push
