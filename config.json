@@ -1,0 +1,117 @@
+﻿{
+    "_help":  "Edit this file to change what the bot watches. \u0027max\u0027 is the most you\u0027d pay (AUD, near-mint). Set \u0027enabled\u0027 to false to stop watching a card. \u0027handles\u0027 are product URL endings at Mayhem/Good Games; leave them out and the bot searches by name (or by \u0027search\u0027) and checks the card number itself.",
+    "alerts":  {
+                   "ntfy_topic":  "",
+                   "_help":  "CLOUD COPY: no webhooks in this file. The GitHub repo is public, so the webhooks live in the repo\u0027s Secrets instead."
+               },
+    "sealed":  {
+                   "max_price":  260,
+                   "shopify_collections":  [
+                                               {
+                                                   "name":  "Gumnut",
+                                                   "url":  "https://www.gumnut.com.au/collections/one-piece-card-game/products.json?limit=250"
+                                               },
+                                               {
+                                                   "name":  "Good Games (sealed)",
+                                                   "url":  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250"
+                                               },
+                                               {
+                                                   "name":  "Gameology",
+                                                   "url":  "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
+                                               },
+                                               {
+                                                   "name":  "TCGroup",
+                                                   "url":  "https://www.tcgroupau.com.au/collections/one-piece-booster-box/products.json?limit=250"
+                                               },
+                                               {
+                                                   "name":  "Pokebox",
+                                                   "url":  "https://www.pokebox.com.au/collections/one-piece-card-game-booster-boxes-english/products.json?limit=250"
+                                               },
+                                               {
+                                                   "name":  "Pocket Games",
+                                                   "url":  "https://pocketgames.com.au/collections/one-piece-tcg-cards/products.json?limit=250"
+                                               }
+                                           ],
+                   "shopify_products":  [
+                                            {
+                                                "name":  "Pokebox",
+                                                "url":  "https://www.pokebox.com.au/products/one-piece-card-game-extra-booster-heroines-edition-vol-2-eb-05-booster-box-english.js"
+                                            }
+                                        ],
+                   "woocommerce":  [
+                                       {
+                                           "name":  "JToys",
+                                           "url":  "https://www.jtoys.com.au/wp-json/wc/store/v1/products?search=booster%20box\u0026per_page=50"
+                                       },
+                                       {
+                                           "name":  "M-G",
+                                           "url":  "https://www.m-g.com.au/wp-json/wc/store/v1/products?search=one%20piece%20booster%20box\u0026per_page=50"
+                                       }
+                                   ]
+               },
+    "singles":  {
+                    "_help":  "Mint Collectables is left out on purpose (about $20 shipping).",
+                    "shops":  {
+                                  "Elemental Arcade":  "https://elementalarcade.com.au",
+                                  "Mayhem":  "https://www.mayhemcollectables.com.au",
+                                  "Good Games":  "https://tcg.goodgames.com.au"
+                              },
+                    "cards":  [
+                                  {
+                                      "name":  "Sabo",
+                                      "num":  "OP13-120",
+                                      "qty":  4,
+                                      "max":  12,
+                                      "deck":  "Sabo",
+                                      "priority":  true,
+                                      "enabled":  true,
+                                      "exclude":  [
+                                                      "super alternate",
+                                                      "red ",
+                                                      "wanted",
+                                                      "treasure",
+                                                      "manga",
+                                                      "anniversary",
+                                                      "promotion",
+                                                      "japanese",
+                                                      "pre-release",
+                                                      "release event"
+                                                  ],
+                                      "handles":  {
+                                                      "Good Games":  [
+                                                                         "sabo-sp-carrying-on-his-will",
+                                                                         "sabo-parallel-carrying-on-his-will"
+                                                                     ]
+                                                  },
+                                      "note":  "SEC: regular/SP or Parallel only. Mayhem \u0027sabo-carrying-on-his-will\u0027 is the LEADER, not this."
+                                  },
+                                  {
+                                      "name":  "Belo Betty",
+                                      "num":  "OP05-015",
+                                      "qty":  4,
+                                      "max":  1.5,
+                                      "deck":  "Sabo",
+                                      "priority":  false,
+                                      "enabled":  true
+                                  },
+                                  {
+                                      "name":  "Monkey.D.Garp",
+                                      "num":  "OP13-016",
+                                      "qty":  4,
+                                      "max":  1.5,
+                                      "deck":  "Sabo",
+                                      "priority":  false,
+                                      "enabled":  true
+                                  },
+                                  {
+                                      "name":  "Revolutionary Army HQ",
+                                      "num":  "OP05-021",
+                                      "qty":  3,
+                                      "max":  1,
+                                      "deck":  "Sabo",
+                                      "priority":  false,
+                                      "enabled":  true
+                                  }
+                              ]
+                }
+}
