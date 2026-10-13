@@ -1,6 +1,9 @@
 {
  "pc_on": true,
- "shop_down": [],
+ "shop_down": [
+  "www.jtoys.com.au",
+  "www.mayhemcollectables.com.au"
+ ],
  "shop_fails": {
   "elementalarcade.com.au": 0,
   "pocketgames.com.au": 0,
@@ -8,9 +11,9 @@
   "tcg.goodgames.com.au": 0,
   "www.gameology.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 2,
+  "www.jtoys.com.au": 3,
   "www.m-g.com.au": 0,
-  "www.mayhemcollectables.com.au": 2,
+  "www.mayhemcollectables.com.au": 3,
   "www.pokebox.com.au": 0,
   "www.tcgroupau.com.au": 0
  }
