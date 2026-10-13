@@ -78,8 +78,9 @@ Rolling back is the same in reverse: put the old files back. v2 reads and writes
 
 ## The cloud copy (GitHub Actions)
 
-In its first 7 hours (13-14 Oct 2026) the 5-minute schedule in `main.yml` fired **once**, instead of about
-80 times; every other run was a manual "Run workflow". GitHub says scheduled runs can be delayed or dropped at busy times, and its
+In its first 9 hours (13-14 Oct 2026) the 5-minute schedule in `main.yml` fired **once** (6:35 am on 14 Oct),
+instead of about 100 times, and the 8:27 am daily recap that morning didn't run at all; every other run was a manual
+"Run workflow". GitHub says scheduled runs can be delayed or dropped at busy times, and its
 terms ask that GitHub-hosted runners not be used for activity unrelated to building, testing or deploying
 the project. A small always-on machine (a spare PC or a Raspberry Pi running `tcg_bot.py --loop 5` with
 `HEARTBEAT_ROLE=listen`) is a better home for a backup copy.
