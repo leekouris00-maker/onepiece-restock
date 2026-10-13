@@ -67,6 +67,10 @@ KNOWN_PATH = os.path.join(HERE, "known_products.json")
 STATUS_PATH = os.path.join(HERE, "status.json")
 RECAP_PATH = os.path.join(HERE, "recap.json")          # yesterday's prices, for the daily recap
 PICKS_PATH = os.path.join(HERE, "market_picks.json")   # optional: value picks from the market ledger
+# The ledger saves its picks (and the cloud copy its recap snapshot) to the GitHub repo; the PC copy
+# reads them from there. Override with "repo_raw_url" in config.json.
+REPO_RAW_URL = "https://raw.githubusercontent.com/leekouris00-maker/onepiece-restock/master"
+_remote_cache = {}
 LOG_PATH = os.path.join(HERE, "finds.log")
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -368,7 +372,7 @@ def shopify_product_box(shop_name, url, max_price, watch=()):
     price, vid = cheapest_available(p.get("variants", []), cents=True)
     if price is None or price > max_price:
         return [], []
-    return [{"id": f"box|{shop_name}|{p.get('handle')}", "kind": "Booster box", "name": p.get("title"),
+    return [{"id": f"box|{shop_name}|{p.get('handle')}", "kind": "Booster box", "name": p.get("title") or p.get("handle") or "Booster box",
              "shop": shop_name, "price": price, "url": url.replace(".js", ""),
              "cart": shopify_cart_link(url, vid), "note": ""}], []
 
@@ -572,12 +576,48 @@ def single_find(card, shop, price, url, title, cart=""):
 MAX_VALUE_PICKS = 15
 
 
-def load_value_picks():
+def repo_json(cfg, name, max_age=1800):
+    """A JSON file from the bot's GitHub repo (cached for max_age seconds). None if unavailable."""
+    url = f"{(cfg or {}).get('repo_raw_url', REPO_RAW_URL).rstrip('/')}/{name}"
+    hit = _remote_cache.get(url)
+    if hit and time.time() - hit[0] < max_age:
+        return hit[1]
+    data = None
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": UA, "Cache-Control": "no-cache"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode("utf-8", "replace"))
+    except Exception:  # noqa: BLE001
+        data = None      # not there yet (e.g. before the ledger's first run) - that's fine
+    _remote_cache[url] = (time.time(), data)
+    return data
+
+
+def load_picks_file(cfg=None):
+    """market_picks.json: the local copy if it's today's (the cloud copy has it from the repo),
+    otherwise the latest one from GitHub (the PC copy)."""
+    local = None
+    try:
+        local = json.load(open(PICKS_PATH, encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        pass
+    if isinstance(local, dict) and local.get("date") == f"{datetime.now():%Y-%m-%d}":
+        return local
+    remote = repo_json(cfg, "market_picks.json")
+    if isinstance(remote, dict):
+        try:
+            json.dump(remote, open(PICKS_PATH, "w", encoding="utf-8"), indent=1)
+        except Exception:  # noqa: BLE001
+            pass
+        return remote
+    return local
+
+
+def load_value_picks(cfg=None):
     """Cards the daily market ledger thinks are good value, from market_picks.json:
     {"watch": [{"name", "product_url", "max", "market", "note"}, ...]}. Missing file = none."""
-    try:
-        data = json.load(open(PICKS_PATH, encoding="utf-8"))
-    except Exception:  # noqa: BLE001
+    data = load_picks_file(cfg)
+    if not data:
         return []
     out = []
     for x in (data.get("watch", []) if isinstance(data, dict) else [])[:MAX_VALUE_PICKS]:
@@ -624,7 +664,7 @@ def check_singles(cfg):
             if name in shops:
                 jobs.append((handle_shop_card, c, name, shops[name]))
     if cfg.get("value_picks", True):
-        for pick in load_value_picks():
+        for pick in load_value_picks(cfg):
             jobs.append((value_pick_card, pick))
     with ThreadPoolExecutor(max_workers=6) as ex:
         results = list(ex.map(lambda j: j[0](*j[1:]), jobs))
@@ -974,12 +1014,14 @@ def _lines(items, limit=8):
 
 
 def _short(name, n=60):
+    name = name or "(no name)"
     return name if len(name) <= n else name[:n - 1] + "…"
 
 
-def run_recap(cfg, now=None):
+def run_recap(cfg, now=None, post=True, save=True):
     """One Discord post summing up the day: what's buyable within your limits, price moves and
-    new listings since yesterday's recap, what's coming up, and shops that are down."""
+    new listings since yesterday's recap, what's coming up, and shops that are down.
+    Returns the embed (the /recap command replies with it instead of posting)."""
     now = now or datetime.now()
     print(f"\n=== Daily recap - {now:%a %d %b %Y %I:%M %p} ===")
     box_finds, by_shop = check_sealed(cfg)
@@ -997,7 +1039,8 @@ def run_recap(cfg, now=None):
     try:
         prev = json.load(open(RECAP_PATH, encoding="utf-8")).get("snapshot", {})
     except Exception:  # noqa: BLE001
-        prev = None
+        remote = repo_json(cfg, "recap.json")       # the PC copy compares with the cloud's last recap
+        prev = remote.get("snapshot") if isinstance(remote, dict) else None
 
     fields = []
     # 1. buyable now within your limits
@@ -1036,7 +1079,7 @@ def run_recap(cfg, now=None):
 
     # 3. market value picks from the ledger, if they've been shared with the bot
     try:
-        picks = json.load(open(PICKS_PATH, encoding="utf-8"))
+        picks = load_picks_file(cfg) or {}
         if isinstance(picks, dict):
             picks = picks.get("picks", [])
         pl = [f"⭐ [{_short(x['name'])}]({x.get('url', '')}) **{money(float(x['price']))}** · {x.get('shop', '')}"
@@ -1079,7 +1122,7 @@ def run_recap(cfg, now=None):
         alerts.get("discord_webhook_boxes") or alerts.get("discord_webhook")
     for fld in fields:
         print(f"\n{fld['name']}\n{fld['value']}")
-    if hook:
+    if hook and post:
         payload = {"username": alerts.get("bot_name") or "One Piece Restock", "embeds": [embed],
                    "allowed_mentions": {"parse": []}}
         try:
@@ -1089,7 +1132,9 @@ def run_recap(cfg, now=None):
             print("\n   (recap posted to Discord)")
         except Exception as e:  # noqa: BLE001
             print(f"\n   ! recap post failed: {e}")
-    json.dump({"date": f"{now:%Y-%m-%d}", "snapshot": snap}, open(RECAP_PATH, "w", encoding="utf-8"), indent=1)
+    if save:
+        json.dump({"date": f"{now:%Y-%m-%d}", "snapshot": snap}, open(RECAP_PATH, "w", encoding="utf-8"), indent=1)
+    return embed
 
 
 # ---------------------------------------------------------------- main
@@ -1137,6 +1182,8 @@ def run_once(cfg, args, drop=None):
 
     # status posts: shop health, and (cloud copy) the PC going quiet or coming back
     status = load_status()
+    status["last_check"] = f"{datetime.now():%Y-%m-%d %H:%M:%S}"
+    status["last_found"] = len(finds)
     posts = shop_health(cfg, status)
     if role == "listen":
         before = status.get("pc_on")
