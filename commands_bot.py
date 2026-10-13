@@ -112,6 +112,9 @@ class Live:
         return result, self.t
 
     def _run(self, cfg):
+        # same settings as the restock bot (user agent, robots.txt cache from its status.json), but no
+        # skipping of down shops: someone asking for a fresh check wants every shop tried
+        tb.begin_check(cfg, None, skip_down=False)
         (finds, by_shop), singles = tb.run_checks(cfg)
         self.result = {"sealed": {"finds": finds, "listings": [l for ls in by_shop.values() for l in (ls or [])],
                                   "down": sorted(n for n, ls in by_shop.items() if ls is None)},

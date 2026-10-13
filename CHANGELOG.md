@@ -8,7 +8,7 @@ message style. Either version can pick up the other's state, so rolling back is 
 
 ### Faster
 - **HTTP client (stdlib only):** one kept-alive TLS connection per shop instead of a new handshake per
-  request (urllib forces `Connection: close`), `Accept-Encoding: gzip`, at most 3 requests in flight per
+  request (urllib forces `Connection: close`), `Accept-Encoding: gzip`, at most 4 requests in flight per
   shop, `If-None-Match` / `If-Modified-Since` revalidation in `--loop` when shops send validators.
 - **Retries that make sense:** only timeouts, 5xx, 408, 425 and 429 are retried, with jittered exponential
   backoff or the server's `Retry-After`; no sleep after the last attempt. v1 retried everything and slept
@@ -30,13 +30,16 @@ message style. Either version can pick up the other's state, so rolling back is 
 - **PC → cloud hand-off gap closed:** while the PC copy is on, the cloud copy holds what it sees; once the PC
   checks in after that, it's dropped (the PC posted it). If the PC goes quiet first, the cloud copy posts it.
   v1 marked those finds as seen and never posted them.
-- **Big shops read in full:** Shopify collections are read past the first 250 products (up to 4 pages).
+- **Big shops read in full:** Shopify collections are read past the first 250 products (up to 4 pages); pages a
+  collection filled last check are asked for together, so a two-page shop costs one round trip, not two.
   Products seen for the first time this way are remembered quietly, not announced as new.
 - **Atomic state files** (temp file + rename), with retries for Windows file locks; a corrupt file is
   reported and started fresh instead of crashing.
 - **config.json checks:** numbers typed as text are fixed, a broken card or shop is switched off with a
   warning (posted once to Discord) instead of crashing the loop, likely typos in setting names are pointed
   out, and a UTF-8 BOM (Notepad) is accepted.
+- **PC/cloud hand-off:** the PC copy says "I'm on" after posting (and straight after posting finds), so the cloud
+  copy knows those finds were handled.
 - **Pre-order note fixed:** v1 tagged anything containing "pre" (e.g. "Premium Booster") as a pre-order.
 - `finds.log` and the `.bat` logs roll over instead of growing forever.
 - The cloud workflows retry their state commit when another push lands at the same time (one recap run

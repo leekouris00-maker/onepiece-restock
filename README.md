@@ -34,12 +34,13 @@ Details and numbers: [`bench/RESULTS.md`](bench/RESULTS.md) and [`CHANGELOG.md`]
 
 * **Speed:** connections are kept open and reused, replies are gzip-compressed, identical requests within
   a check are shared, boxes and singles are checked at the same time, product pages are fetched in
-  parallel (at most 3 at once per shop), and a shop that refuses the bot (401/403) isn't asked again in the
+  parallel (at most 4 at once per shop), and a shop that refuses the bot (401/403) isn't asked again in the
   same check. v1 also slept 4.5 s after every refused request; v2 doesn't retry those at all.
 * **No lost alerts:** posts wait out Discord's rate limits and confirm delivery; anything that still
   fails is posted at the next check instead of being marked as seen. More than 10 finds go out over
   several messages (v1 cut them off at 10).
-* **Nothing missed in big shops:** collections with more than 250 products are read page by page.
+* **Nothing missed in big shops:** collections with more than 250 products are read page by page (pages it had
+  last time are asked for together).
 * **One cart per shop** for singles, so several cards from the same shop are one order and one shipping fee.
 * **Price history:** box alerts show the lowest price seen; `/history` and `/stats` in Discord.
 * **Instant commands:** `/deals`, `/boxes` and `/sealed` answer from the last check; `fresh:True` checks live.
@@ -76,8 +77,8 @@ Rolling back is the same in reverse: put the old files back. v2 reads and writes
 
 ## The cloud copy (GitHub Actions)
 
-As of 14 Oct 2026 the 5-minute schedule in `main.yml` had **never fired**: every run in the history was a
-manual "Run workflow". GitHub also says scheduled runs can be delayed or dropped at busy times, and its
+In its first 7 hours (13-14 Oct 2026) the 5-minute schedule in `main.yml` fired **once**, instead of about
+80 times; every other run was a manual "Run workflow". GitHub says scheduled runs can be delayed or dropped at busy times, and its
 terms ask that GitHub-hosted runners not be used for activity unrelated to building, testing or deploying
 the project. A small always-on machine (a spare PC or a Raspberry Pi running `tcg_bot.py --loop 5` with
 `HEARTBEAT_ROLE=listen`) is a better home for a backup copy.

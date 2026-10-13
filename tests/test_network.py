@@ -149,6 +149,24 @@ class Pagination(Base):
         self.assertEqual(len(products), 315)
         self.assertEqual(pages["one-piece-card-game-extra-booster-heroines-edition-vol-2-eb-05-booster-box-english"], 2)
 
+    def test_known_second_page_is_asked_for_at_once(self):
+        tb.PAGE_HINTS.clear()
+        a, pa = tb.shopify_collection(POKEBOX)
+        self.assertEqual(tb.PAGE_HINTS[POKEBOX], 2)
+        tb.HTTP.memo.clear()
+        NET.inet.stats.reset()
+        b, pb = tb.shopify_collection(POKEBOX)
+        self.assertEqual([p["handle"] for p in a], [p["handle"] for p in b])
+        self.assertEqual(pa, pb)
+        self.assertEqual(NET.inet.stats.paths[("www.pokebox.com.au", "collection")], 2)
+
+    def test_a_shrunk_collection_resets_its_hint(self):
+        tb.PAGE_HINTS[GUMNUT] = 3                      # Gumnut has one page now
+        products, pages = tb.shopify_collection(GUMNUT)
+        self.assertEqual(len(products), 100)
+        self.assertEqual(set(pages.values()), {1})
+        self.assertEqual(tb.PAGE_HINTS[GUMNUT], 1)
+
     def test_shopify_boxes_sees_eb05_in_the_collection(self):
         finds, listings = tb.shopify_boxes("Pokebox", POKEBOX, 260, tb.DEFAULT_SEALED_WATCH)
         self.assertTrue(any("EB-05" in l["name"] for l in listings))

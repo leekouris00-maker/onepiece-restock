@@ -38,7 +38,7 @@ What's new in v2 (all optional settings go in config.json; nothing to change if 
     Discord use it too.
   * Instant Discord commands: every check saves its results to latest.json.
   * Polite by default: follows each shop's robots.txt ("respect_robots": false to switch off), at
-    most 3 requests at once per shop, and a shop that's been down 3 checks in a row is retried every
+    most 4 requests at once per shop, and a shop that's been down 3 checks in a row is retried every
     15 minutes instead of every check ("down_retry_minutes").
   * "singles_every_minutes": 15  - in --loop, check singles less often than boxes (boxes stay fast)
   * "auto_drop_windows": true    - drop mode turns itself on for booster releases in the release list
@@ -214,7 +214,7 @@ PREORDER_RE = re.compile(r"\bpre[\s_-]?(?:orders?|sale)\b", re.I)
 # backoff, honouring Retry-After), and follows robots.txt.
 HTTP_TIMEOUT = 15               # seconds to connect / for each read (v1: 25)
 HTTP_TRIES = 2                  # attempts per GET (a retry only for timeouts, 5xx, 408, 425, 429)
-PER_HOST = 3                    # most requests in flight to one shop at once
+PER_HOST = 4                    # most requests in flight to one shop at once (v1 reached 4-5 at Good Games)
 IDLE_MAX = 20                   # seconds an idle kept-alive connection is trusted for reuse
 RETRY_STATUSES = {408, 425, 429, 500, 502, 503, 504}
 MAX_RETRY_AFTER = 8             # a shop asking us to wait longer than this is left until next check
@@ -673,6 +673,9 @@ def begin_check(cfg, status=None, drop=None, skip_down=True):
     now = time.time()
     retry = status.get("shop_retry") or {}
     HTTP.skip_hosts = set() if (drop or not skip_down) else {h for h, t in retry.items() if float(t) > now}
+    hints = status.get("page_hints")
+    if isinstance(hints, dict):
+        PAGE_HINTS.update(hints)
     _run_t0[0] = time.perf_counter()
     return status
 
@@ -985,23 +988,42 @@ def cheapest_available(variants, cents):
 
 
 # ---------------------------------------------------------------- sealed
+PAGE_HINTS = {}                 # collection URL -> pages it filled last check (kept in status.json "page_hints")
+
+
 def shopify_collection(url, max_pages=MAX_PAGES):
     """Every product in a Shopify collection: page 1, then page=2, 3... while pages come back full
-    (v1 only ever saw the first 250). -> (products, {handle: page}) or (None, {}) if page 1 failed."""
-    first = fetch_json(url)
-    if not isinstance(first, dict):
-        return None, {}
-    products = list(first.get("products") or [])
+    (v1 only ever saw the first 250). The pages a collection filled last time are asked for together,
+    which saves a round trip per extra page. -> (products, {handle: page}) or (None, {}) if page 1 failed."""
     q = dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(url).query))
     try:
         limit = max(1, int(q.get("limit", 30)))
     except ValueError:
         limit = 30
-    pages = {p.get("handle"): 1 for p in products}
-    batch, page = products, 1
+
+    def page_url(n):
+        return url if n == 1 else url + ("&" if "?" in url else "?") + f"page={n}"
+
+    try:
+        hint = 1 if "page" in q else max(1, min(max_pages, int(PAGE_HINTS.get(url, 1))))
+    except (TypeError, ValueError):
+        hint = 1
+    first_pages = pmap(lambda n: fetch_json(page_url(n)), range(1, hint + 1))
+    if not isinstance(first_pages[0], dict):
+        return None, {}
+    products, pages, page, batch = [], {}, 0, []
+    for data in first_pages:
+        page += 1
+        batch = (data or {}).get("products") or [] if isinstance(data, dict) else []
+        new = [p for p in batch if p.get("handle") not in pages]
+        for p in new:
+            pages[p.get("handle")] = page
+        products.extend(new)
+        if len(batch) < limit or (page > 1 and not new):
+            break
     while len(batch) >= limit and page < max_pages and "page" not in q:
         page += 1
-        nxt = fetch_json(url + ("&" if "?" in url else "?") + f"page={page}")
+        nxt = fetch_json(page_url(page))
         batch = (nxt or {}).get("products") or [] if isinstance(nxt, dict) else []
         new = [p for p in batch if p.get("handle") not in pages]
         if not new:
@@ -1009,6 +1031,7 @@ def shopify_collection(url, max_pages=MAX_PAGES):
         for p in new:
             pages[p.get("handle")] = page
         products.extend(new)
+    PAGE_HINTS[url] = max(pages.values(), default=1)
     return products, pages
 
 
@@ -1514,10 +1537,12 @@ def heartbeat_role(cfg):
     return (a.get("heartbeat_role") or "send").lower()
 
 
-def send_heartbeat(cfg):
-    """PC copy: tell the cloud copy we're on (at most every 15 minutes)."""
+def send_heartbeat(cfg, force=False):
+    """PC copy: tell the cloud copy we're on (every 15 minutes, and straight after posting finds, at most
+    once a minute: ntfy.sh allows 250 messages a day)."""
     global _last_heartbeat
-    if DRY_RUN[0] or time.time() - _last_heartbeat < HEARTBEAT_EVERY:
+    gap = time.time() - _last_heartbeat
+    if DRY_RUN[0] or gap < (60 if force else HEARTBEAT_EVERY):
         return
     topic = cfg["alerts"]["heartbeat_topic"]
     try:
@@ -1814,7 +1839,7 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
             content = ((alerts.get("discord_ping", "") + " ") if (ping and i == 0) else "") + label
             payload = {"username": alerts.get("bot_name") or "One Piece Restock", "content": content.strip()[:2000],
                        "embeds": [e for e, _ in msg],
-                       "allowed_mentions": {"parse": ["roles", "users"]} if (ping and i == 0) else {"parse": []}}
+                       "allowed_mentions": {"parse": ["roles", "users", "everyone"]} if (ping and i == 0) else {"parse": []}}
             if len(msg) == 1:            # a single find gets big tap-friendly buttons
                 f = next((x for x in group if x["id"] in msg[0][1]), None)
                 if f and f.get("cart"):
@@ -1910,7 +1935,7 @@ def _discord_post(alerts, hook, title, embeds, extra):
         content += f" (+{extra} more, see finds.log)"
     payload = {"username": alerts.get("bot_name") or "One Piece Restock",
                "content": content.strip()[:2000], "embeds": embeds[:10],
-               "allowed_mentions": {"parse": ["roles", "users"]}}
+               "allowed_mentions": {"parse": ["roles", "users", "everyone"]}}
     ok = discord_send(alerts, hook, payload)
     if ok:
         print("   (posted to Discord)")
@@ -2277,8 +2302,6 @@ def run_once(cfg, args, drop=None):
     kept.update({f["id"]: f["price"] for f in finds})
 
     role = heartbeat_role(cfg)
-    if role == "send":
-        send_heartbeat(cfg)
     pc_seen = pc_last_seen(cfg) if role == "listen" else None
     pc_on = pc_seen is not None
 
@@ -2315,10 +2338,11 @@ def run_once(cfg, args, drop=None):
             for f in show if not args.all else []:
                 held.setdefault(f["id"], {"t": int(nowts), "f": f})
         in_stock = {f["id"] for f in finds}
+        looked = {"Single": do_singles, "Booster box": do_sealed, "Sealed": do_sealed}
         for k, v in list(held.items()):
             f = v.get("f") or {}
             if v.get("t", 0) <= (pc_seen or 0) or nowts - v.get("t", 0) > 6 * 3600 or \
-                    (f.get("kind") != "New listing" and k not in in_stock):
+                    (looked.get(f.get("kind"), False) and k not in in_stock):
                 held.pop(k)
         if not pc_on and held:
             have = {f["id"] for f in deliver}
@@ -2348,6 +2372,8 @@ def run_once(cfg, args, drop=None):
         if role == "listen":
             for k in [k for k in status.get("held", {}) if k not in undelivered]:
                 status["held"].pop(k)
+    if role == "send":
+        send_heartbeat(cfg, force=bool(deliver) and not undelivered)
     if undelivered:
         # not marked as seen, so the next check tries again (a doubled alert beats a missed one)
         for k in undelivered:
@@ -2366,6 +2392,7 @@ def run_once(cfg, args, drop=None):
         if known is not None:
             save_known(known)
         status["robots"] = {h: e for h, e in HTTP.robots.items() if time.time() - e.get("t", 0) < 7 * 86400}
+        status["page_hints"] = {u: n for u, n in PAGE_HINTS.items() if n > 1}
         if not IN_ACTIONS:
             status["last_run"] = metrics
         save_status(status)

@@ -124,6 +124,7 @@ def summarise(rows):
             "min": min(walls), "max": max(walls),
             "cpu_mean": statistics.fmean(r["cpu"] for r in rows),
             "maxrss_mb": max(r["maxrss_mb"] for r in rows),
+            "rss_p50": pct([r["maxrss_mb"] for r in rows], 50),
             "requests_mean": statistics.fmean(r["requests"] for r in rows),
             "connections_mean": statistics.fmean(r["connections"] for r in rows),
             "mb_mean": statistics.fmean(r["bytes"] for r in rows) / 1e6,
@@ -158,7 +159,7 @@ def table(results, title):
     keys = list(results)
     lines = [f"### {title}", "", "| metric | " + " | ".join(keys) + " |", "|---|" + "---|" * len(keys)]
     rows = [("p50 latency (s)", "p50", "{:.2f}"), ("p95 latency (s)", "p95", "{:.2f}"), ("p99 latency (s)", "p99", "{:.2f}"),
-            ("mean ± sd (s)", None, None), ("CPU time (s)", "cpu_mean", "{:.2f}"), ("peak memory (MB)", "maxrss_mb", "{:.1f}"),
+            ("mean ± sd (s)", None, None), ("CPU time (s)", "cpu_mean", "{:.2f}"), ("peak memory, median run (MB)", "rss_p50", "{:.1f}"),
             ("HTTP requests / check", "requests_mean", "{:.1f}"), ("TCP+TLS connections / check", "connections_mean", "{:.1f}"),
             ("MB downloaded / check", "mb_mean", "{:.2f}"), ("checks per minute", "throughput_checks_per_min", "{:.1f}"),
             ("error rate", "error_rate", "{:.0%}")]
@@ -302,10 +303,28 @@ def main():
     m.add_argument("--scale", type=float, default=1.0)
     m.add_argument("--args", default="")
     m.add_argument("--out")
+    e = sub.add_parser("extra", help="add one more scenario to an existing results.json")
+    e.add_argument("--name", required=True)
+    e.add_argument("--v1", required=True)
+    e.add_argument("--v2", required=True)
+    e.add_argument("--workload", default="cloud")
+    e.add_argument("--scale", type=float, default=1.6)
+    e.add_argument("--runs", type=int, default=15)
+    e.add_argument("--out", default=os.path.join(HERE, "results"))
     a = ap.parse_args()
     os.makedirs(CACHE, exist_ok=True)
     if a.cmd == "suite":
         suite(a.v1, a.v2, a.out, a.runs)
+        return
+    if a.cmd == "extra":
+        path = os.path.join(a.out, "results.json")
+        with open(path) as f:
+            res = json.load(f)
+        r = compare({"v1": a.v1, "v2": a.v2}, a.workload, a.runs, profile=Profile(scale=a.scale))
+        res[a.name] = {k: {"summary": v["summary"], "runs": v["runs"]} for k, v in r.items()}
+        with open(path, "w") as f:
+            json.dump(res, f, indent=1)
+        print(table(r, a.name))
         return
     if a.cmd == "calibrate":
         res = compare({"bot": a.bot}, a.workload, a.runs, profile=Profile(scale=a.scale))
