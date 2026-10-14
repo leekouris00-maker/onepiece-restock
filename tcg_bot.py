@@ -9,6 +9,8 @@ Checks Australian shops for:
   3. Other English sealed products on a watch list (starter decks, double packs, illustration boxes,
      premium collections...) at or under their max price - see DEFAULT_SEALED_WATCH
   4. NEW listings: a box or watched product a shop has just added, even before it's buyable
+  5. eBay: cards in ebay_watch.json listed at or under your max, delivered (needs a free eBay key,
+     see the top of ebay_watch.py; without one this part is simply off)
 
 Every find comes with a one-tap "Buy" link that puts it straight into your cart at
 checkout. You still press pay yourself - the bot never buys anything or logs in.
@@ -59,6 +61,11 @@ import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+
+try:
+    import ebay_watch          # eBay watch list (ebay_watch.json); optional
+except ImportError:            # ebay_watch.py not next to the bot: eBay is skipped, everything else as normal
+    ebay_watch = None
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(HERE, "config.json")
@@ -1055,6 +1062,8 @@ def run_recap(cfg, now=None, post=True, save=True):
     print(f"\n=== Daily recap - {now:%a %d %b %Y %I:%M %p} ===")
     box_finds, by_shop = check_sealed(cfg)
     singles = check_singles(cfg)
+    if ebay_watch:
+        singles += ebay_watch.check(cfg, {}, force=True).finds
 
     # today's snapshot: every box / watched listing (in stock or not) plus in-stock singles
     snap = {}
@@ -1176,6 +1185,8 @@ def run_once(cfg, args, drop=None):
     do_sealed = not args.singles
     do_singles = not args.sealed and not (drop and drop["sealed_only"])
     finds, listed = [], []
+    status = load_status()
+    ebay = None
     if do_sealed:
         print(" checking booster boxes...")
         box_finds, by_shop = check_sealed(cfg)
@@ -1187,6 +1198,9 @@ def run_once(cfg, args, drop=None):
     if do_singles:
         print(" checking singles...")
         finds += check_singles(cfg)
+        if ebay_watch:
+            ebay = ebay_watch.check(cfg, status, force=args.all)
+            finds += ebay.finds
 
     state = load_state()
     show = finds if args.all else new_only(finds, state)
@@ -1200,7 +1214,8 @@ def run_once(cfg, args, drop=None):
     if do_singles:
         checked.add("Single")
     kept = {k: v for k, v in state.items()
-            if not ((k.startswith(("box|", "sealed|")) and "Booster box" in checked) or (k.startswith("card|") and "Single" in checked))}
+            if not ((k.startswith(("box|", "sealed|")) and "Booster box" in checked) or (k.startswith("card|") and "Single" in checked)
+                    or (k.startswith("ebay|") and ebay is not None and ebay.ran))}
     kept.update({f["id"]: f["price"] for f in finds})
     save_state(kept)
 
@@ -1209,11 +1224,14 @@ def run_once(cfg, args, drop=None):
         send_heartbeat(cfg)
     pc_on = pc_is_on(cfg) if role == "listen" else False
 
-    # status posts: shop health, and (cloud copy) the PC going quiet or coming back
-    status = load_status()
+    # status posts: shop health, the eBay watch, and (cloud copy) the PC going quiet or coming back
     status["last_check"] = f"{datetime.now():%Y-%m-%d %H:%M:%S}"
     status["last_found"] = len(finds)
     posts = shop_health(cfg, status)
+    if ebay_watch:
+        msg = ebay_watch.status_message(status, ebay)
+        if msg:
+            posts.append(msg)
     if role == "listen":
         before = status.get("pc_on")
         if before is True and not pc_on:

@@ -34,6 +34,8 @@ jobs:
           DISCORD_WEBHOOK_SEALED: ${{ secrets.DISCORD_WEBHOOK_SEALED }}
           DISCORD_PING: ${{ secrets.DISCORD_PING }}
           HEARTBEAT_TOPIC: ${{ secrets.HEARTBEAT_TOPIC }}
+          EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}           # eBay watch (ebay_watch.json); off until set
+          EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
           HEARTBEAT_ROLE: listen          # stay quiet while the PC copy is on
           BOT_NAME: "One Piece Restock (cloud)"
           TZ: Australia/Melbourne
