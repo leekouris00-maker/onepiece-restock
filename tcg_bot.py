@@ -78,6 +78,8 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 
 MIN_DROP_SECONDS = 30
 SHOP_DOWN_AFTER = 3             # a shop that fails this many checks in a row gets a "can't reach" status post
+OFFLINE_SHARE = 0.8             # if this share of shops fail in the same check, it's the bot's connection, not the shops
+OFFLINE_MIN_SHOPS = 4           # ...but only judge that when at least this many shops were checked
 
 # per-run record of which shop websites answered: host -> [ok, failed]
 _host_results = {}
@@ -774,7 +776,8 @@ def post_status(cfg, text, color=GREY):
     if not hook:
         return
     payload = {"username": alerts.get("bot_name") or "One Piece Restock",
-               "embeds": [{"description": text[:4000], "color": color}],
+               "embeds": [{"description": text[:4000], "color": color,
+                           "footer": {"text": f"Sent by the {copy_label(cfg)}"}}],
                "allowed_mentions": {"parse": []}}
     try:
         req = urllib.request.Request(hook, data=json.dumps(payload).encode("utf-8"),
@@ -782,6 +785,13 @@ def post_status(cfg, text, color=GREY):
         urllib.request.urlopen(req, timeout=15).read()
     except Exception as e:  # noqa: BLE001
         print(f"   ! status post failed: {e}")
+
+
+def copy_label(cfg):
+    """Which copy of the bot is running: the cloud one (GitHub Actions) or the PC one."""
+    if os.environ.get("GITHUB_ACTIONS") == "true" or heartbeat_role(cfg) == "listen":
+        return "cloud copy (GitHub)"
+    return "PC copy"
 
 
 def shop_names(cfg):
@@ -803,6 +813,25 @@ def shop_health(cfg, status):
     posts = []
     with _host_lock:
         results = dict(_host_results)
+
+    # Nearly every shop failing in the same check means the bot lost its connection (or got
+    # blocked), not that the shops went down. Post one message about that instead of one per shop,
+    # and leave the per-shop counters alone so they don't all fire once the connection is back.
+    failed = [h for h, (ok, bad) in results.items() if bad and not ok]
+    if len(results) >= OFFLINE_MIN_SHOPS and len(failed) >= OFFLINE_SHARE * len(results):
+        streak = status.get("offline_streak", 0) + 1
+        status["offline_streak"] = streak
+        if streak == SHOP_DOWN_AFTER:
+            posts.append((f"📡 **The bot can't reach the shops.** {len(failed)} of {len(results)} sites failed "
+                          f"for {streak} checks in a row, so this is the bot's internet connection (or it's being "
+                          f"blocked), not the shops. Stock isn't being watched until it's back. You'll get a post "
+                          f"when it is.", RED))
+        status["shop_down"] = sorted(down)
+        return posts
+    if status.get("offline_streak", 0) >= SHOP_DOWN_AFTER:
+        posts.append(("📡 **Connection is back**, so the bot can see the shops again.", GREEN))
+    status["offline_streak"] = 0
+
     for host, (ok, bad) in results.items():
         name = names.get(host, host)
         if ok:
