@@ -96,7 +96,7 @@ from collections import Counter, OrderedDict, defaultdict, deque
 from concurrent.futures import Future, ThreadPoolExecutor
 from datetime import datetime, timedelta
 
-VERSION = "2.0"
+VERSION = "2.0.1"
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(HERE, "config.json")
@@ -318,6 +318,17 @@ def robots_allows(rules, path):
     return allowed
 
 
+def tls_context(cafile=None):
+    """The same TLS handshake urllib (and so v1) sends: ALPN "http/1.1" plus post-handshake auth.
+    A bare ssl.create_default_context() leaves both out, and the shops' bot protection answered
+    that handshake with 403 Forbidden for every request on 14 Oct 2026."""
+    ctx = ssl.create_default_context(cafile=cafile)
+    ctx.set_alpn_protocols(["http/1.1"])
+    if ctx.post_handshake_auth is not None:
+        ctx.post_handshake_auth = True
+    return ctx
+
+
 class _Http:
     def __init__(self):
         self.lock = threading.Lock()
@@ -345,7 +356,7 @@ class _Http:
     @property
     def ctx(self):
         if self._ctx is None:
-            self._ctx = ssl.create_default_context()
+            self._ctx = tls_context()
         return self._ctx
 
     def _sem(self, host):

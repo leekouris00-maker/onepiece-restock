@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.1 - 15 Oct 2026
+
+- **Fixed: every shop answered 403 Forbidden.** v2's own HTTP client built its TLS settings with a bare
+  `ssl.create_default_context()`, which leaves out ALPN (`http/1.1`) and post-handshake auth. urllib (v1)
+  sends both, and the shops' bot protection refused the handshake without them, so the first live run on
+  the PC (14 Oct, 11:54 pm) couldn't read a single shop. The client now uses `tls_context()`, which sends
+  exactly the handshake v1 did; `tests/test_tls.py` checks the two stay identical.
+
 ## 2.0 - 14 Oct 2026
 
 Everything v1 did still works the same way: same commands and flags, same `config.json`, same state

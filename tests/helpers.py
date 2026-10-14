@@ -57,7 +57,7 @@ class Net:
                 return real("127.0.0.1", port, *a, **k)
             return real(host, p, *a, **k)
         socket.getaddrinfo = getaddrinfo
-        tb.HTTP._ctx = ssl.create_default_context(cafile=self.ca)
+        tb.HTTP._ctx = tb.tls_context(cafile=self.ca)   # the real handshake settings, trusting the mock's CA
         os.environ["no_proxy"] = os.environ["NO_PROXY"] = "*"
 
     def unpatch_process(self):
