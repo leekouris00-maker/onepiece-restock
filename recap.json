@@ -1,5 +1,5 @@
 {
- "date": "2026-10-14",
+ "date": "2026-10-15",
  "snapshot": {
   "list|Gumnut|one-piece-card-game-a-fist-of-divine-speed-booster-box-op-11": {
    "name": "One Piece Card Game - A Fist of Divine Speed - Booster Box (OP-11) (24) (One Per Customer)",
@@ -778,19 +778,19 @@
    "available": true,
    "url": "https://alphagaming.com.au/products/in-transit-one-piece-premium-booster-box-prb-02-limit-2-per-customer"
   },
-  "list|Grailborne|one-piece-card-game-op-18-booster-box-english": {
-   "name": "One Piece Card Game: [OP-18] Booster Box (English) (Releases 20 Nov 2026)",
-   "shop": "Grailborne",
-   "price": 639.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-op-18-booster-box-english"
-  },
   "list|Grailborne|one-piece-card-game-op-08-two-legends-booster-box-english": {
    "name": "One Piece Card Game OP-08 Two Legends Booster Box (English)",
    "shop": "Grailborne",
    "price": 429.0,
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-op-08-two-legends-booster-box-english"
+  },
+  "list|Grailborne|one-piece-card-game-op-18-booster-box-english": {
+   "name": "One Piece Card Game: [OP-18] Booster Box (English) (Releases 20 Nov 2026)",
+   "shop": "Grailborne",
+   "price": 549.0,
+   "available": true,
+   "url": "https://grailborne.com.au/products/one-piece-card-game-op-18-booster-box-english"
   },
   "list|Grailborne|one-piece-card-game-the-time-of-battle-op-16-booster-box-english": {
    "name": "One Piece Card Game: The Time of Battle [OP-16] Booster Box (English)",
@@ -799,12 +799,26 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-the-time-of-battle-op-16-booster-box-english"
   },
+  "list|Grailborne|one-piece-card-game-adventure-on-kamis-island-op-15-sealed-booster-box-english": {
+   "name": "One Piece Card Game: Adventure on KAMI\u2019s Island (OP-15) Sealed Booster Box (English)",
+   "shop": "Grailborne",
+   "price": 459.0,
+   "available": true,
+   "url": "https://grailborne.com.au/products/one-piece-card-game-adventure-on-kamis-island-op-15-sealed-booster-box-english"
+  },
   "list|Grailborne|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-english": {
    "name": "One Piece Card Game: The World's Strongest Warriors [OP-17] Booster Box (English)",
    "shop": "Grailborne",
    "price": 639.0,
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-english"
+  },
+  "list|Grailborne|one-piece-card-game-eb-05-extra-booster-heroines-edition-vol-2-booster-box": {
+   "name": "One Piece Card Game: EB-05 Extra Booster Heroines Edition Vol. 2 Booster Box (Releases 30 Oct 2026)",
+   "shop": "Grailborne",
+   "price": 579.0,
+   "available": true,
+   "url": "https://grailborne.com.au/products/one-piece-card-game-eb-05-extra-booster-heroines-edition-vol-2-booster-box"
   },
   "list|Grailborne|one-piece-card-game-op-19-booster-box-releases-5-mar-2027": {
    "name": "One Piece Card Game: OP-19 Booster Box (Releases 5 Mar 2027)",
@@ -813,20 +827,6 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-op-19-booster-box-releases-5-mar-2027"
   },
-  "list|Grailborne|one-piece-card-game-op-14-the-azure-seas-seven-booster-box-english": {
-   "name": "One Piece Card Game: OP-14 The Azure Sea's Seven Booster Box (English)",
-   "shop": "Grailborne",
-   "price": 459.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-op-14-the-azure-seas-seven-booster-box-english"
-  },
-  "list|Grailborne|one-piece-card-game-adventure-on-kamis-island-op-15-sealed-booster-box-english": {
-   "name": "One Piece Card Game: Adventure on KAMI\u2019s Island (OP-15) Sealed Booster Box (English)",
-   "shop": "Grailborne",
-   "price": 459.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-adventure-on-kamis-island-op-15-sealed-booster-box-english"
-  },
   "list|Grailborne|one-piece-card-game-op-13-carrying-on-his-will-booster-box-english": {
    "name": "One Piece Card Game OP-13 Carrying on His Will Booster Box (English)",
    "shop": "Grailborne",
@@ -834,19 +834,12 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-op-13-carrying-on-his-will-booster-box-english"
   },
-  "list|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed": {
-   "name": "One Piece Card Game: Illustration Box Vol.7 (IB-07) - English Sealed",
+  "list|Grailborne|one-piece-card-game-op-14-the-azure-seas-seven-booster-box-english": {
+   "name": "One Piece Card Game: OP-14 The Azure Sea's Seven Booster Box (English)",
    "shop": "Grailborne",
-   "price": 89.0,
+   "price": 459.0,
    "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed"
-  },
-  "list|Grailborne|one-piece-card-game-gift-collection-heroines-gc-2026-display-6-sets": {
-   "name": "One Piece Card Game: Gift Collection - Heroines [GC 2026] - Display (6 Sets) (Releases 20 Nov 2026)",
-   "shop": "Grailborne",
-   "price": 2400.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-gift-collection-heroines-gc-2026-display-6-sets"
+   "url": "https://grailborne.com.au/products/one-piece-card-game-op-14-the-azure-seas-seven-booster-box-english"
   },
   "list|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": {
    "name": "One Piece Card Game: Premium Card Collection - 29th Anniversary Edition (P-159 Monkey D. Luffy, 8 Cards) (Ships March 2027)",
@@ -855,12 +848,12 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-premium-card-collection-29th-anniversary-edition"
   },
-  "list|Grailborne|one-piece-card-game-double-pack-set-vol-13-dp-13": {
-   "name": "One Piece Card Game: Double Pack Set Vol.13 [DP-13] (Releases 20 Nov 2026)",
+  "list|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed": {
+   "name": "One Piece Card Game: Illustration Box Vol.7 (IB-07) - English Sealed",
    "shop": "Grailborne",
-   "price": 79.0,
+   "price": 89.0,
    "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-double-pack-set-vol-13-dp-13"
+   "url": "https://grailborne.com.au/products/one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed"
   },
   "list|Collectible Madness|one-piece-card-game-tba-op-16-booster-box": {
    "name": "One Piece Card Game The Time of Battle [OP-16] Booster Box",
@@ -914,7 +907,7 @@
   "card|Elemental Arcade|OP13-016|monkeydgarp-op13016-carrying-on-his-will": {
    "name": "Monkey.D.Garp OP13-016",
    "shop": "Elemental Arcade",
-   "price": 0.6,
+   "price": 0.55,
    "available": true,
    "url": "https://elementalarcade.com.au/products/monkeydgarp-op13016-carrying-on-his-will"
   },
