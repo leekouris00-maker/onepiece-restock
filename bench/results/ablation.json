@@ -1,0 +1,1043 @@
+{
+ "v2": {
+  "label": "v2 as shipped",
+  "summary": {
+   "n": 8,
+   "p50": 2.585375519500303,
+   "p95": 3.3243263703999673,
+   "p99": 3.401809190080012,
+   "mean": 2.7467105223751105,
+   "stdev": 0.328230777573374,
+   "min": 2.474006200000076,
+   "max": 3.421179895000023,
+   "cpu_mean": 0.25761275,
+   "maxrss_mb": 65.39453125,
+   "rss_p50": 64.625,
+   "requests_mean": 54.0,
+   "connections_mean": 28.0,
+   "mb_mean": 0.614292,
+   "error_rate": 0.0,
+   "throughput_checks_per_min": 21.84431140858533
+  },
+  "runs": [
+   {
+    "wall": 3.144455538999864,
+    "cpu": 0.24999,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 54,
+    "connections": 28,
+    "bytes": 614292,
+    "statuses": {
+     "200": 53,
+     "404": 1
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.574680912000076,
+    "cpu": 0.273072,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 54,
+    "connections": 28,
+    "bytes": 614292,
+    "statuses": {
+     "404": 1,
+     "200": 53
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.59607012700053,
+    "cpu": 0.283014,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 54,
+    "connections": 28,
+    "bytes": 614292,
+    "statuses": {
+     "404": 1,
+     "200": 53
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.762734222999825,
+    "cpu": 0.280702,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 54,
+    "connections": 28,
+    "bytes": 614292,
+    "statuses": {
+     "200": 53,
+     "404": 1
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.5145097360000364,
+    "cpu": 0.24947399999999997,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 54,
+    "connections": 28,
+    "bytes": 614292,
+    "statuses": {
+     "404": 1,
+     "200": 53
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 3.421179895000023,
+    "cpu": 0.24480699999999997,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 54,
+    "connections": 28,
+    "bytes": 614292,
+    "statuses": {
+     "404": 1,
+     "200": 53
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.486047547000453,
+    "cpu": 0.235009,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 54,
+    "connections": 28,
+    "bytes": 614292,
+    "statuses": {
+     "404": 1,
+     "200": 53
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.474006200000076,
+    "cpu": 0.244834,
+    "maxrss_mb": 65.39453125,
+    "exit": 0,
+    "requests": 54,
+    "connections": 28,
+    "bytes": 614292,
+    "statuses": {
+     "404": 1,
+     "200": 53
+    },
+    "discord_posts": 0
+   }
+  ]
+ },
+ "no_skip": {
+  "label": "asks down shops every check",
+  "summary": {
+   "n": 8,
+   "p50": 2.60778612599961,
+   "p95": 2.9410397778999595,
+   "p99": 2.9761885211797106,
+   "mean": 2.663270498999964,
+   "stdev": 0.17849465324767114,
+   "min": 2.4801194060000853,
+   "max": 2.9849757069996485,
+   "cpu_mean": 0.267825,
+   "maxrss_mb": 65.39453125,
+   "rss_p50": 64.625,
+   "requests_mean": 57.0,
+   "connections_mean": 31.0,
+   "mb_mean": 0.614397,
+   "error_rate": 0.0,
+   "throughput_checks_per_min": 22.528691705378595
+  },
+  "runs": [
+   {
+    "wall": 2.5076357039997674,
+    "cpu": 0.267567,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 57,
+    "connections": 31,
+    "bytes": 614397,
+    "statuses": {
+     "404": 1,
+     "200": 53,
+     "403": 1,
+     "401": 2
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.6614639290000923,
+    "cpu": 0.27386699999999997,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 57,
+    "connections": 31,
+    "bytes": 614397,
+    "statuses": {
+     "404": 1,
+     "403": 1,
+     "200": 53,
+     "401": 2
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.859444481000537,
+    "cpu": 0.32776199999999994,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 57,
+    "connections": 31,
+    "bytes": 614397,
+    "statuses": {
+     "404": 1,
+     "403": 1,
+     "200": 53,
+     "401": 2
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.5541083229991273,
+    "cpu": 0.259193,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 57,
+    "connections": 31,
+    "bytes": 614397,
+    "statuses": {
+     "403": 1,
+     "404": 1,
+     "200": 53,
+     "401": 2
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.4801194060000853,
+    "cpu": 0.266553,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 57,
+    "connections": 31,
+    "bytes": 614397,
+    "statuses": {
+     "404": 1,
+     "403": 1,
+     "200": 53,
+     "401": 2
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.9849757069996485,
+    "cpu": 0.250206,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 57,
+    "connections": 31,
+    "bytes": 614397,
+    "statuses": {
+     "403": 1,
+     "404": 1,
+     "200": 53,
+     "401": 2
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.4862088790005146,
+    "cpu": 0.242246,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 57,
+    "connections": 31,
+    "bytes": 614397,
+    "statuses": {
+     "404": 1,
+     "403": 1,
+     "200": 53,
+     "401": 2
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 2.772207562999938,
+    "cpu": 0.255206,
+    "maxrss_mb": 65.39453125,
+    "exit": 0,
+    "requests": 57,
+    "connections": 31,
+    "bytes": 614397,
+    "statuses": {
+     "403": 1,
+     "404": 1,
+     "200": 53,
+     "401": 2
+    },
+    "discord_posts": 0
+   }
+  ]
+ },
+ "no_parallel": {
+  "label": "no extra parallelism",
+  "summary": {
+   "n": 8,
+   "p50": 6.851075429999582,
+   "p95": 8.254769630299824,
+   "p99": 8.346629846859805,
+   "mean": 7.151131819749821,
+   "stdev": 0.6300994474933505,
+   "min": 6.657526822999898,
+   "max": 8.3695949009998,
+   "cpu_mean": 0.25632249999999995,
+   "maxrss_mb": 65.39453125,
+   "rss_p50": 64.625,
+   "requests_mean": 58.0,
+   "connections_mean": 25.0,
+   "mb_mean": 0.614432,
+   "error_rate": 0.0,
+   "throughput_checks_per_min": 8.39028023987664
+  },
+  "runs": [
+   {
+    "wall": 6.892418706999706,
+    "cpu": 0.258328,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 58,
+    "connections": 25,
+    "bytes": 614432,
+    "statuses": {
+     "200": 53,
+     "403": 1,
+     "404": 1,
+     "401": 3
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 6.672529425999528,
+    "cpu": 0.255476,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 58,
+    "connections": 25,
+    "bytes": 614432,
+    "statuses": {
+     "200": 53,
+     "403": 1,
+     "404": 1,
+     "401": 3
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 6.809732152999459,
+    "cpu": 0.26818,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 58,
+    "connections": 25,
+    "bytes": 614432,
+    "statuses": {
+     "200": 53,
+     "403": 1,
+     "404": 1,
+     "401": 3
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 6.657526822999898,
+    "cpu": 0.26977599999999996,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 58,
+    "connections": 25,
+    "bytes": 614432,
+    "statuses": {
+     "200": 53,
+     "403": 1,
+     "404": 1,
+     "401": 3
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 6.660797698000351,
+    "cpu": 0.257605,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 58,
+    "connections": 25,
+    "bytes": 614432,
+    "statuses": {
+     "200": 53,
+     "403": 1,
+     "404": 1,
+     "401": 3
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 7.104932150999957,
+    "cpu": 0.261086,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 58,
+    "connections": 25,
+    "bytes": 614432,
+    "statuses": {
+     "200": 53,
+     "403": 1,
+     "404": 1,
+     "401": 3
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 8.04152269899987,
+    "cpu": 0.23619999999999997,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 58,
+    "connections": 25,
+    "bytes": 614432,
+    "statuses": {
+     "200": 53,
+     "403": 1,
+     "404": 1,
+     "401": 3
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 8.3695949009998,
+    "cpu": 0.24392899999999998,
+    "maxrss_mb": 65.39453125,
+    "exit": 0,
+    "requests": 58,
+    "connections": 25,
+    "bytes": 614432,
+    "statuses": {
+     "200": 53,
+     "403": 1,
+     "404": 1,
+     "401": 3
+    },
+    "discord_posts": 0
+   }
+  ]
+ },
+ "v1_retries": {
+  "label": "v1 retries (4.5 s per refused request)",
+  "summary": {
+   "n": 8,
+   "p50": 12.995473954500085,
+   "p95": 13.151946577900208,
+   "p99": 13.168110481179983,
+   "mean": 12.958653816874971,
+   "stdev": 0.15015764365980724,
+   "min": 12.769543235999663,
+   "max": 13.172151456999927,
+   "cpu_mean": 0.24499249999999997,
+   "maxrss_mb": 65.39453125,
+   "rss_p50": 64.625,
+   "requests_mean": 64.0,
+   "connections_mean": 23.0,
+   "mb_mean": 0.614642,
+   "error_rate": 0.0,
+   "throughput_checks_per_min": 4.630110569190992
+  },
+  "runs": [
+   {
+    "wall": 12.769543235999663,
+    "cpu": 0.252868,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 614642,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.794630404999225,
+    "cpu": 0.227898,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 614642,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.172151456999927,
+    "cpu": 0.24113199999999999,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 614642,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.770504245999291,
+    "cpu": 0.26966199999999996,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 614642,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.057030051000766,
+    "cpu": 0.23235799999999998,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 614642,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.114423231000728,
+    "cpu": 0.245133,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 614642,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.001683217999926,
+    "cpu": 0.253951,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 614642,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.989264691000244,
+    "cpu": 0.23693799999999998,
+    "maxrss_mb": 65.39453125,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 614642,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   }
+  ]
+ },
+ "no_gzip": {
+  "label": "no gzip",
+  "summary": {
+   "n": 8,
+   "p50": 12.818114090000108,
+   "p95": 13.00418118990001,
+   "p99": 13.048003246780173,
+   "mean": 12.836936541499881,
+   "stdev": 0.10350618038147805,
+   "min": 12.689752704999592,
+   "max": 13.058958761000213,
+   "cpu_mean": 0.24456187499999998,
+   "maxrss_mb": 65.39453125,
+   "rss_p50": 64.625,
+   "requests_mean": 64.0,
+   "connections_mean": 23.0,
+   "mb_mean": 3.89065,
+   "error_rate": 0.0,
+   "throughput_checks_per_min": 4.674012355364463
+  },
+  "runs": [
+   {
+    "wall": 12.902451414999632,
+    "cpu": 0.242506,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.820406259000265,
+    "cpu": 0.244307,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.689752704999592,
+    "cpu": 0.244039,
+    "maxrss_mb": 64.23046875,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.791228598000089,
+    "cpu": 0.281707,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.753544297999724,
+    "cpu": 0.23209799999999997,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.058958761000213,
+    "cpu": 0.236757,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.863328374999583,
+    "cpu": 0.246232,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.815821920999952,
+    "cpu": 0.228849,
+    "maxrss_mb": 65.39453125,
+    "exit": 0,
+    "requests": 64,
+    "connections": 23,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   }
+  ]
+ },
+ "no_keepalive": {
+  "label": "new connection per request",
+  "summary": {
+   "n": 8,
+   "p50": 13.076711863999662,
+   "p95": 13.361025616999815,
+   "p99": 13.36347344979955,
+   "mean": 13.110357695250059,
+   "stdev": 0.17444920757202034,
+   "min": 12.897626022000622,
+   "max": 13.364085407999482,
+   "cpu_mean": 0.30105099999999996,
+   "maxrss_mb": 65.39453125,
+   "rss_p50": 64.625,
+   "requests_mean": 64.0,
+   "connections_mean": 64.0,
+   "mb_mean": 3.89065,
+   "error_rate": 0.0,
+   "throughput_checks_per_min": 4.5765341720415655
+  },
+  "runs": [
+   {
+    "wall": 13.209518530999958,
+    "cpu": 0.29934199999999994,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 64,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.957619755999986,
+    "cpu": 0.32037399999999994,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 64,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.35534314800043,
+    "cpu": 0.30995999999999996,
+    "maxrss_mb": 64.23046875,
+    "exit": 0,
+    "requests": 64,
+    "connections": 64,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.945244969000669,
+    "cpu": 0.310822,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 64,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.002140510999197,
+    "cpu": 0.281912,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 64,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.364085407999482,
+    "cpu": 0.286628,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 64,
+    "connections": 64,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.151283217000127,
+    "cpu": 0.301573,
+    "maxrss_mb": 65.39453125,
+    "exit": 0,
+    "requests": 64,
+    "connections": 64,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.897626022000622,
+    "cpu": 0.297797,
+    "maxrss_mb": 65.39453125,
+    "exit": 0,
+    "requests": 64,
+    "connections": 64,
+    "bytes": 3890650,
+    "statuses": {
+     "200": 53,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   }
+  ]
+ },
+ "v1": {
+  "label": "v1",
+  "summary": {
+   "n": 8,
+   "p50": 12.99144007599989,
+   "p95": 13.291713501700041,
+   "p99": 13.355588165139935,
+   "mean": 12.988860486375074,
+   "stdev": 0.21673054359113197,
+   "min": 12.639349742000377,
+   "max": 13.371556830999907,
+   "cpu_mean": 0.2857665,
+   "maxrss_mb": 65.39453125,
+   "rss_p50": 64.625,
+   "requests_mean": 63.0,
+   "connections_mean": 63.0,
+   "mb_mean": 3.656373,
+   "error_rate": 0.0,
+   "throughput_checks_per_min": 4.619342864059415
+  },
+  "runs": [
+   {
+    "wall": 13.371556830999907,
+    "cpu": 0.30604299999999995,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 63,
+    "connections": 63,
+    "bytes": 3656373,
+    "statuses": {
+     "200": 52,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.940748242000154,
+    "cpu": 0.284209,
+    "maxrss_mb": 63.97265625,
+    "exit": 0,
+    "requests": 63,
+    "connections": 63,
+    "bytes": 3656373,
+    "statuses": {
+     "200": 52,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.042131909999625,
+    "cpu": 0.316287,
+    "maxrss_mb": 64.23046875,
+    "exit": 0,
+    "requests": 63,
+    "connections": 63,
+    "bytes": 3656373,
+    "statuses": {
+     "200": 52,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.738913621000393,
+    "cpu": 0.28874299999999997,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 63,
+    "connections": 63,
+    "bytes": 3656373,
+    "statuses": {
+     "200": 52,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.10109458199986,
+    "cpu": 0.271437,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 63,
+    "connections": 63,
+    "bytes": 3656373,
+    "statuses": {
+     "200": 52,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.639349742000377,
+    "cpu": 0.272824,
+    "maxrss_mb": 64.625,
+    "exit": 0,
+    "requests": 63,
+    "connections": 63,
+    "bytes": 3656373,
+    "statuses": {
+     "200": 52,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 12.933655929999986,
+    "cpu": 0.280744,
+    "maxrss_mb": 65.39453125,
+    "exit": 0,
+    "requests": 63,
+    "connections": 63,
+    "bytes": 3656373,
+    "statuses": {
+     "200": 52,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   },
+   {
+    "wall": 13.143433033000292,
+    "cpu": 0.265845,
+    "maxrss_mb": 65.39453125,
+    "exit": 0,
+    "requests": 63,
+    "connections": 63,
+    "bytes": 3656373,
+    "statuses": {
+     "200": 52,
+     "403": 2,
+     "404": 1,
+     "401": 8
+    },
+    "discord_posts": 0
+   }
+  ]
+ }
+}
