@@ -799,19 +799,19 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-the-time-of-battle-op-16-booster-box-english"
   },
-  "list|Grailborne|one-piece-card-game-op-19-booster-box-releases-5-mar-2027": {
-   "name": "One Piece Card Game: OP-19 Booster Box (Releases 5 Mar 2027)",
-   "shop": "Grailborne",
-   "price": 499.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-op-19-booster-box-releases-5-mar-2027"
-  },
   "list|Grailborne|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-english": {
    "name": "One Piece Card Game: The World's Strongest Warriors [OP-17] Booster Box (English)",
    "shop": "Grailborne",
    "price": 639.0,
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-english"
+  },
+  "list|Grailborne|one-piece-card-game-op-19-booster-box-releases-5-mar-2027": {
+   "name": "One Piece Card Game: OP-19 Booster Box (Releases 5 Mar 2027)",
+   "shop": "Grailborne",
+   "price": 499.0,
+   "available": true,
+   "url": "https://grailborne.com.au/products/one-piece-card-game-op-19-booster-box-releases-5-mar-2027"
   },
   "list|Grailborne|one-piece-card-game-op-14-the-azure-seas-seven-booster-box-english": {
    "name": "One Piece Card Game: OP-14 The Azure Sea's Seven Booster Box (English)",
@@ -914,7 +914,7 @@
   "card|Elemental Arcade|OP13-016|monkeydgarp-op13016-carrying-on-his-will": {
    "name": "Monkey.D.Garp OP13-016",
    "shop": "Elemental Arcade",
-   "price": 0.55,
+   "price": 0.6,
    "available": true,
    "url": "https://elementalarcade.com.au/products/monkeydgarp-op13016-carrying-on-his-will"
   },
