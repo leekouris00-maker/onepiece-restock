@@ -582,7 +582,7 @@ def single_find(card, shop, price, url, title, cart=""):
             "priority": card.get("priority", False)}
 
 
-MAX_VALUE_PICKS = 15
+MAX_VALUE_PICKS = 80              # the ledger sends every listing worth watching (up to ~70); each is re-checked every singles check
 
 
 def repo_json(cfg, name, max_age=1800):
