@@ -1,5 +1,5 @@
 {
- "date": "2026-10-17",
+ "date": "2026-10-18",
  "snapshot": {
   "list|Gumnut|one-piece-card-game-a-fist-of-divine-speed-booster-box-op-11": {
    "name": "One Piece Card Game - A Fist of Divine Speed - Booster Box (OP-11) (24) (One Per Customer)",
@@ -85,19 +85,19 @@
    "available": false,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-op-08-booster-box"
   },
-  "list|Good Games (sealed)|one-piece-card-game-memorial-collection-extra-booster-box": {
-   "name": "One Piece Card Game - Memorial Collection Extra Booster Box EB-01",
-   "shop": "Good Games (sealed)",
-   "price": 1999.0,
-   "available": false,
-   "url": "https://shop.goodgames.com.au/products/one-piece-card-game-memorial-collection-extra-booster-box"
-  },
   "list|Good Games (sealed)|one-piece-card-game-op-16-booster-box": {
    "name": "One Piece Card Game - The Time of Battle OP-16 Booster Box",
    "shop": "Good Games (sealed)",
    "price": 359.0,
    "available": false,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-op-16-booster-box"
+  },
+  "list|Good Games (sealed)|one-piece-card-game-memorial-collection-extra-booster-box": {
+   "name": "One Piece Card Game - Memorial Collection Extra Booster Box EB-01",
+   "shop": "Good Games (sealed)",
+   "price": 1999.0,
+   "available": false,
+   "url": "https://shop.goodgames.com.au/products/one-piece-card-game-memorial-collection-extra-booster-box"
   },
   "list|Good Games (sealed)|one-piece-card-game-paramount-war-op-02-booster-box": {
    "name": "One Piece Card Game - Paramount War (OP-02) Booster Box",
@@ -214,7 +214,7 @@
   "list|Gameology|one-piece-card-game-op-15-booster-box": {
    "name": "One Piece Card Game OP-15 Adventure on Kami's Island Booster Box",
    "shop": "Gameology",
-   "price": 499.95,
+   "price": 519.95,
    "available": true,
    "url": "https://www.gameology.com.au/products/one-piece-card-game-op-15-booster-box"
   },
@@ -242,7 +242,7 @@
   "list|Gameology|one-piece-card-game-op-14-booster-box": {
    "name": "One Piece Card Game OP-14 The Azure Sea's Seven Booster Box",
    "shop": "Gameology",
-   "price": 559.95,
+   "price": 579.95,
    "available": true,
    "url": "https://www.gameology.com.au/products/one-piece-card-game-op-14-booster-box"
   },
@@ -547,19 +547,19 @@
    "available": false,
    "url": "https://www.pokebox.com.au/products/one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-english"
   },
-  "list|Pokebox|one-piece-card-game-extra-booster-eb-02-booster-box-english": {
-   "name": "One Piece Card Game - Extra Booster EB-02 Booster Box - English",
-   "shop": "Pokebox",
-   "price": 299.99,
-   "available": false,
-   "url": "https://www.pokebox.com.au/products/one-piece-card-game-extra-booster-eb-02-booster-box-english"
-  },
   "list|Pokebox|one-piece-card-game-extra-booster-heroines-edition-vol-2-eb-05-booster-box-english": {
    "name": "One Piece Card Game: Extra Booster - Heroines Edition vol.2 [EB-05] Booster Box - English",
    "shop": "Pokebox",
    "price": 220.0,
    "available": false,
    "url": "https://www.pokebox.com.au/products/one-piece-card-game-extra-booster-heroines-edition-vol-2-eb-05-booster-box-english"
+  },
+  "list|Pokebox|one-piece-card-game-extra-booster-eb-02-booster-box-english": {
+   "name": "One Piece Card Game - Extra Booster EB-02 Booster Box - English",
+   "shop": "Pokebox",
+   "price": 299.99,
+   "available": false,
+   "url": "https://www.pokebox.com.au/products/one-piece-card-game-extra-booster-eb-02-booster-box-english"
   },
   "list|Pokebox|one-piece-card-game-carrying-on-his-will-op-13-booster-box-english": {
    "name": "One Piece Card Game: Carrying On His Will OP-13 Booster Box - English",
@@ -963,16 +963,30 @@
   "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle": {
    "name": "Moby Dick OP16-021 Alternate Art",
    "shop": "Elemental Arcade",
-   "price": 22.6,
+   "price": 22.8,
    "available": true,
    "url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle"
+  },
+  "card|pick|https://elementalarcade.com.au/products/rocksdxebec-op17039-alternate-art-the-worlds-strongest-warriors": {
+   "name": "Rocks.D.Xebec OP17-039 Alternate Art",
+   "shop": "Elemental Arcade",
+   "price": 59.9,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/rocksdxebec-op17039-alternate-art-the-worlds-strongest-warriors"
   },
   "card|pick|https://elementalarcade.com.au/products/kaido-op17062-super-alternate-art-the-worlds-strongest-warriors": {
    "name": "Kaido OP17-062 Super Alternate Art",
    "shop": "Elemental Arcade",
-   "price": 301.3,
+   "price": 293.5,
    "available": true,
    "url": "https://elementalarcade.com.au/products/kaido-op17062-super-alternate-art-the-worlds-strongest-warriors"
+  },
+  "card|pick|https://elementalarcade.com.au/products/monkeydluffy-alternate-art-op17079-the-worlds-strongest-warriors": {
+   "name": "Monkey.D.Luffy OP17-079 Alternate Art",
+   "shop": "Elemental Arcade",
+   "price": 68.0,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/monkeydluffy-alternate-art-op17079-the-worlds-strongest-warriors"
   }
  }
 }
