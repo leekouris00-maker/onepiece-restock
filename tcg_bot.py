@@ -89,6 +89,7 @@ import ssl
 import sys
 import threading
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 import zlib
@@ -96,7 +97,7 @@ from collections import Counter, OrderedDict, defaultdict, deque
 from concurrent.futures import Future, ThreadPoolExecutor
 from datetime import datetime, timedelta
 
-VERSION = "2.0.1"
+VERSION = "2.0.2"
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(HERE, "config.json")
@@ -122,6 +123,9 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 
 MIN_DROP_SECONDS = 30
 SHOP_DOWN_AFTER = 3             # a shop that fails this many checks in a row gets a "can't reach" status post
+OFFLINE_SHARE = 0.8             # if this share of shops fail in the same check, it's the bot's side, not the shops
+OFFLINE_MIN_SHOPS = 4           # ...but only judge that when at least this many shops were checked
+SINGLES_EVERY_DEFAULT = 15       # singles (3 shops, lots of product pages) every 15 min; boxes every check
 DOWN_RETRY_MIN = 15             # ...and is then retried every 15 minutes instead of every check
 
 # per-run record of which shop websites answered: host -> [ok, failed]
@@ -214,15 +218,22 @@ PREORDER_RE = re.compile(r"\bpre[\s_-]?(?:orders?|sale)\b", re.I)
 # backoff, honouring Retry-After), and follows robots.txt.
 HTTP_TIMEOUT = 15               # seconds to connect / for each read (v1: 25)
 HTTP_TRIES = 2                  # attempts per GET (a retry only for timeouts, 5xx, 408, 425, 429)
-PER_HOST = 4                    # most requests in flight to one shop at once (v1 reached 4-5 at Good Games)
+PER_HOST = 2                    # most requests in flight to one shop at once (v1 reached 4-5 at Good Games)
+HOST_GAP = 0.5                  # at least this many seconds between two requests to the same shop
+COOL_MIN = 120                  # a shop that answers 429 is left alone for at least 2 minutes...
+COOL_MAX = 30 * 60              # ...doubling each time it happens again, up to 30 minutes
 IDLE_MAX = 20                   # seconds an idle kept-alive connection is trusted for reuse
-RETRY_STATUSES = {408, 425, 429, 500, 502, 503, 504}
+RETRY_STATUSES = {408, 425, 500, 502, 503, 504}   # 429 is never retried straight away (see cooldown)
 MAX_RETRY_AFTER = 8             # a shop asking us to wait longer than this is left until next check
 MEMO_TTL = 15                   # identical GETs within 15 s share one request (drop mode is never faster than 30 s)
 REFUSED_TTL = 60                # after a 401/403, the same shop+path isn't asked again for a minute
 COND_CACHE_BYTES = 24 * 1024 * 1024   # bodies kept for If-None-Match / If-Modified-Since in --loop
 ROBOTS_TTL = 24 * 3600          # RFC 9309: don't trust a cached robots.txt for more than 24 hours
 ROBOT_TOKEN = "onepiecerestockbot"
+# Shops whose bot protection refuses a browser-looking User-Agent from a script, but whose robots.txt
+# welcomes bots: tell them honestly what we are. Add more in config.json "user_agent_by_shop".
+BOT_UA = f"Mozilla/5.0 (compatible; {ROBOT_TOKEN}/2.0; personal stock checker, a few requests every 5 min)"
+UA_BY_HOST = {"www.jtoys.com.au": BOT_UA}
 JOB_WORKERS = 16                # shop-level jobs in parallel
 LEAF_WORKERS = 24               # individual requests inside a job (product pages, search queries)
 
@@ -338,10 +349,14 @@ class _Http:
         self.cond = OrderedDict()           # url -> (validators, body)
         self.cond_bytes = 0
         self.refused = {}                   # (host, first path part) -> (until, HttpError)
+        self.cool = {}                    # host -> [until, strikes]: shops that said 429, left alone
+        self.next_at = {}                 # host -> earliest time for its next request (HOST_GAP)
         self.skip_hosts = set()
         self.robots = {}                    # host -> {"t": fetched at, "rules": [[allow, pattern], ...]}
         self.robots_on = True
         self.user_agent = UA
+        self.classic = True                 # send requests the v1 way (see _exchange_classic)
+        self.ua_by_host = dict(UA_BY_HOST)
         self.timeout = HTTP_TIMEOUT
         self._ctx = None
         self.reset_metrics()
@@ -440,12 +455,16 @@ class _Http:
         scheme = (u.scheme or "https").lower()
         host = (u.hostname or "").lower()
         port = u.port or (443 if scheme == "https" else 80)
+        if self.classic and method == "GET" and body is None:
+            return self._exchange_classic(url, host, headers)
         target = (u.path or "/") + (("?" + u.query) if u.query else "")
         h = {"User-Agent": self.user_agent, "Accept-Encoding": "gzip, deflate",
              "Accept": "application/json, text/plain, */*"}
         h.update(headers or {})
         key = (scheme, host, port)
         with self._sem(host):
+            if method == "GET":
+                self._pace(host)
             for fresh in (False, True):
                 conn, reused = self._checkout(key)
                 t0 = time.perf_counter()
@@ -486,6 +505,39 @@ class _Http:
                 return resp.status, hdrs, data
         raise http.client.HTTPException("unreachable")  # pragma: no cover
 
+    def _exchange_classic(self, url, host, headers=None):
+        """One GET sent exactly the way v1 sent it (urllib: same headers, one connection per request).
+        The shops' bot protection refused v2's own request style with 403 on 14-15 Oct 2026 while the
+        same PC loaded the same pages fine in a browser and v1 had been fine, so this is the default.
+        Set "classic_requests": false in config.json to go back to v2's pooled connections."""
+        ua = self.ua_by_host.get(host) or self.ua_by_host.get(host.removeprefix("www.")) or self.user_agent
+        h = {"User-Agent": ua, "Accept": "application/json"}
+        h.update(headers or {})
+        with self._sem(host):
+            self._pace(host)
+            t0 = time.perf_counter()
+            req = urllib.request.Request(url, headers=h)
+            try:
+                with urllib.request.urlopen(req, timeout=self.timeout, context=self.ctx) as r:
+                    status, hdrs, raw = r.status, {k.lower(): v for k, v in r.getheaders()}, r.read()
+            except urllib.error.HTTPError as e:
+                status, hdrs = e.code, {k.lower(): v for k, v in (e.headers or {}).items()}
+                try:
+                    raw = e.read()
+                except Exception:  # noqa: BLE001
+                    raw = b""
+            except urllib.error.URLError as e:
+                reason = e.reason
+                raise reason if isinstance(reason, OSError) else OSError(str(reason))
+            ms = (time.perf_counter() - t0) * 1000
+            with self.lock:
+                self.m["requests"] += 1
+                self.m["connections"] += 1
+                self.m["bytes_wire"] += len(raw)
+                self.m["bytes"] += len(raw)
+                self.lat[host].append(ms)
+            return status, hdrs, raw
+
     # ------------------------------------------------------------ GET with the works
     def fetch(self, url, tries=HTTP_TRIES, conditional=True, robots=True, memo=True):
         """GET -> body bytes. Raises HttpError, SkipHost, RobotsDisallowed or a network error."""
@@ -523,6 +575,13 @@ class _Http:
         host = (u.hostname or "").lower()
         rkey = (host, (u.path.split("/") + [""])[1])
         with self.lock:
+            cool = self.cool.get(host)
+        if cool and cool[0] > time.time():
+            with self.lock:
+                self.m["cooling_skips"] += 1
+            raise HttpError(429, f"Too Many Requests - shop asked us to slow down, trying again in "
+                                 f"{int(cool[0] - time.time()) // 60 + 1} min", cool[0] - time.time())
+        with self.lock:
             hit = self.refused.get(rkey)
         if hit and hit[0] > time.time():
             raise hit[1]               # the shop said no to this a moment ago - don't ask again
@@ -548,6 +607,7 @@ class _Http:
                     continue
                 raise
             if 200 <= status < 300:
+                self._calm(host)
                 if conditional:
                     self._remember(url, h, data)
                 return data
@@ -558,6 +618,9 @@ class _Http:
                         self.cond.move_to_end(url)
                 return cached[1]
             ra = _retry_after(h, data if status == 429 else b"")
+            if status == 429:
+                wait = self._cool_down(host, ra)
+                raise HttpError(429, f"Too Many Requests - leaving this shop alone for {int(wait) // 60 + (wait % 60 > 0)} min", wait)
             err = HttpError(status, http.client.responses.get(status, ""), ra)
             if status in RETRY_STATUSES and attempt + 1 < tries and (ra is None or ra <= MAX_RETRY_AFTER):
                 last = err
@@ -568,6 +631,38 @@ class _Http:
                     self.refused[rkey] = (time.time() + REFUSED_TTL, err)
             raise err
         raise last  # pragma: no cover
+
+    def _cool_down(self, host, retry_after):
+        """The shop said 429: stop asking it anything (every page) until it's had a rest.
+        Honours Retry-After; otherwise 2, 4, 8 ... up to 30 minutes for repeat 429s."""
+        with self.lock:
+            until, strikes = self.cool.get(host, [0, 0])
+            wait = min(COOL_MAX, max(float(retry_after or 0), COOL_MIN * (2 ** strikes)))
+            self.cool[host] = [time.time() + wait, strikes + 1]
+            self.m["rate_limited"] += 1
+        return wait
+
+    def _calm(self, host):
+        """A good answer: the shop is happy again, so the next 429 starts back at 2 minutes."""
+        with self.lock:
+            c = self.cool.get(host)
+            if c and c[0] <= time.time():
+                del self.cool[host]
+
+    def cooling(self):
+        """{host: seconds left} for shops currently being left alone after a 429."""
+        now = time.time()
+        with self.lock:
+            return {h: c[0] - now for h, c in self.cool.items() if c[0] > now}
+
+    def _pace(self, host):
+        """Space requests to one shop at least HOST_GAP seconds apart (call while holding its slot)."""
+        with self.lock:
+            now = time.time()
+            at = max(now, self.next_at.get(host, 0))
+            self.next_at[host] = at + HOST_GAP
+        if at > now:
+            time.sleep(at - now)
 
     def _get_following(self, url, hdrs):
         for _ in range(6):                       # urllib followed redirects; so do we (up to 5)
@@ -676,6 +771,9 @@ def begin_check(cfg, status=None, drop=None, skip_down=True):
     _seen_errors.clear()
     HTTP.reset_metrics()
     HTTP.user_agent = (cfg or {}).get("user_agent") or UA
+    HTTP.classic = bool((cfg or {}).get("classic_requests", True))
+    HTTP.ua_by_host = {**UA_BY_HOST, **{str(k).lower(): v for k, v in
+                                        ((cfg or {}).get("user_agent_by_shop") or {}).items() if v}}
     HTTP.robots_on = bool((cfg or {}).get("respect_robots", True))
     status = load_status() if status is None else status
     for host, e in (status.get("robots") or {}).items():
@@ -783,8 +881,9 @@ def _num(x):
 
 
 KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
-                  "extra_shops", "value_picks", "repo_raw_url", "ledger_url", "singles_every_minutes",
-                  "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history"}
+                  "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
+                  "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
+                  "classic_requests", "user_agent_by_shop"}
 CONFIG_WARNINGS = []
 
 
@@ -910,6 +1009,11 @@ def _say_once(key, text):
 
 def _fail(url, err):
     host = urllib.parse.urlparse(url).netloc
+    if isinstance(err, HttpError) and err.status == 429:
+        # Rate-limited: the shop is up, it just wants fewer requests. Say so once per check and don't
+        # count it as the shop being down (no "hasn't loaded" posts, no "can't reach the shops" alarm).
+        _say_once((host, 429), f"   ~ {host} asked the bot to slow down ({redact(err)})")
+        return
     _say_once((host, str(err)), f"   ! couldn't read {short(url)} ({redact(err)})")
     _note_host(url, False)
 
@@ -1371,7 +1475,9 @@ def single_find(card, shop, price, url, title, cart=""):
             "priority": card.get("priority", False)}
 
 
-MAX_VALUE_PICKS = 15
+MAX_VALUE_PICKS = 80              # the ledger sends every listing worth watching (up to ~80)
+VALUE_PICKS_PER_RUN = 15          # ...but each singles check only looks at 15 of them, taking turns,
+_pick_turn = [0]                  # so every pick is still seen about once an hour without flooding the shops
 
 
 def repo_json(cfg, name, max_age=1800):
@@ -1444,6 +1550,15 @@ def value_pick_card(pick):
     return [f]
 
 
+def picks_this_turn(picks, n):
+    """The next n value picks, wrapping round, so all of them get checked over a few singles checks."""
+    if len(picks) <= n:
+        return picks
+    start = _pick_turn[0] % len(picks)
+    _pick_turn[0] = start + n
+    return (picks + picks)[start:start + n]
+
+
 def check_singles(cfg):
     shops = cfg["singles"]["shops"]
     cards = [c for c in cfg["singles"]["cards"] if c.get("enabled", True)]
@@ -1455,7 +1570,7 @@ def check_singles(cfg):
             if name in shops:
                 jobs.append((handle_shop_card, c, name, shops[name]))
     if cfg.get("value_picks", True):
-        for pick in load_value_picks(cfg):
+        for pick in picks_this_turn(load_value_picks(cfg), int(_num(cfg.get("value_picks_per_check")) or VALUE_PICKS_PER_RUN)):
             jobs.append((value_pick_card, pick))
     results = pmap(lambda j: j[0](*j[1:]), jobs, leaf=False)
     return [f for r in results for f in r]
@@ -1614,9 +1729,17 @@ def post_status(cfg, text, color=GREY):
     if not hook or DRY_RUN[0]:
         return
     payload = {"username": alerts.get("bot_name") or "One Piece Restock",
-               "embeds": [{"description": text[:4000], "color": color}],
+               "embeds": [{"description": text[:4000], "color": color,
+                           "footer": {"text": f"Sent by the {copy_label(cfg)}"}}],
                "allowed_mentions": {"parse": []}}
     discord_send(alerts, hook, payload)
+
+
+def copy_label(cfg):
+    """Which copy of the bot is running: the cloud one (GitHub Actions) or the PC one."""
+    if os.environ.get("GITHUB_ACTIONS") == "true" or heartbeat_role(cfg) == "listen":
+        return "cloud copy (GitHub)"
+    return "PC copy"
 
 
 def shop_names(cfg):
@@ -1629,6 +1752,17 @@ def shop_names(cfg):
     return names
 
 
+def store_locked(host):
+    """True if a Shopify shop has put its whole store behind a password page (closed, 'opening soon'
+    or members-only). Its product feeds then answer 401, which isn't a fault the bot can get round."""
+    try:
+        req = urllib.request.Request(f"https://{host}/", headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            return urllib.parse.urlsplit(r.geturl()).path.rstrip("/") == "/password"
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def shop_health(cfg, status):
     """Compare this run's shop results with earlier runs. Returns (text, color) posts for
     shops that just went down (failed SHOP_DOWN_AFTER checks in a row) or just came back.
@@ -1637,10 +1771,31 @@ def shop_health(cfg, status):
     fails = status.setdefault("shop_fails", {})
     retry = status.setdefault("shop_retry", {})
     down = set(status.get("shop_down", []))
+    locked = set(status.get("shop_locked", []))
     gap = 60 * float(_num(cfg.get("down_retry_minutes", DOWN_RETRY_MIN)) or 0)
     posts = []
     with _host_lock:
         results = dict(_host_results)
+
+    # Nearly every shop failing in the same check means the bot lost its connection or is being
+    # blocked, not that the shops went down. Post one message instead of one per shop, and leave the
+    # per-shop counters alone so every shop keeps being checked and recovery is spotted straight away.
+    failed = [h for h, (ok, bad) in results.items() if bad and not ok]
+    if len(results) >= OFFLINE_MIN_SHOPS and len(failed) >= OFFLINE_SHARE * len(results):
+        streak = status.get("offline_streak", 0) + 1
+        status["offline_streak"] = streak
+        if streak == SHOP_DOWN_AFTER:
+            posts.append((f"📡 **The bot can't reach the shops.** {len(failed)} of {len(results)} sites failed "
+                          f"for {streak} checks in a row, so the problem is on the bot's side (no internet, or "
+                          f"the shops are blocking it), not the shops. Stock isn't being watched until it's "
+                          f"back. You'll get a post when it is.", RED))
+        status["shop_down"] = sorted(down)
+        return posts
+    if any(ok for ok, bad in results.values()):
+        if status.get("offline_streak", 0) >= SHOP_DOWN_AFTER:
+            posts.append(("📡 **Connection is back**, so the bot can see the shops again.", GREEN))
+        status["offline_streak"] = 0
+
     for host, (ok, bad) in results.items():
         name = names.get(host, host)
         if ok:
@@ -1648,16 +1803,27 @@ def shop_health(cfg, status):
             retry.pop(host, None)
             if host in down:
                 down.discard(host)
-                posts.append((f"✅ **{name}** is loading again, so it's back on watch.", GREEN))
+                if host in locked:
+                    posts.append((f"🔓 **{name}** has opened its store (no more password page), so it's on watch now.", GREEN))
+                else:
+                    posts.append((f"✅ **{name}** is loading again, so it's back on watch.", GREEN))
+            locked.discard(host)
         elif bad:
             fails[host] = min(fails.get(host, 0) + 1, SHOP_DOWN_AFTER)   # stops counting once it's down
             if fails[host] >= SHOP_DOWN_AFTER:
                 if host not in down:
                     down.add(host)
-                    posts.append((f"⚠️ **{name}** hasn't loaded for {fails[host]} checks in a row, so the bot "
-                                  f"can't see its stock right now. You'll get a post when it's back.", AMBER))
+                    if store_locked(host):
+                        locked.add(host)
+                        posts.append((f"🔒 **{name}** has locked its whole store behind a password (closed, opening "
+                                      f"soon, or members only), so nobody can see its stock. The bot keeps checking "
+                                      f"and will post when it opens.", GREY))
+                    else:
+                        posts.append((f"⚠️ **{name}** hasn't loaded for {fails[host]} checks in a row, so the bot "
+                                      f"can't see its stock right now. You'll get a post when it's back.", AMBER))
                 if gap > 0:
                     retry[host] = round(time.time() + gap)
+    status["shop_locked"] = sorted(locked & down)
     status["shop_down"] = sorted(down)
     return posts
 
@@ -2280,7 +2446,7 @@ def run_once(cfg, args, drop=None):
     print(f"\n=== One Piece restock check - {stamp}{tag} ===")
     do_sealed = not args.singles
     do_singles = not args.sealed and not (drop and drop["sealed_only"])
-    every = _num(cfg.get("singles_every_minutes")) or 0
+    every = _num(cfg.get("singles_every_minutes", SINGLES_EVERY_DEFAULT)) or 0
     if do_singles and do_sealed and every > 0 and getattr(args, "loop", None) and not args.all:
         if time.time() - float(status.get("singles_ts", 0) or 0) < every * 60 - 20:
             do_singles = False         # boxes this time; singles when they're due

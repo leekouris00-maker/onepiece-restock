@@ -316,3 +316,17 @@ class SeenLogic(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ValuePickTurns(unittest.TestCase):
+    def test_every_pick_gets_a_turn(self):
+        tb._pick_turn[0] = 0
+        picks = list(range(40))
+        seen = []
+        for _ in range(3):
+            seen += tb.picks_this_turn(picks, 15)
+        self.assertEqual(set(seen), set(picks))
+        self.assertEqual(len(tb.picks_this_turn(picks[:10], 15)), 10)
+
+    def test_singles_default_to_every_15_minutes(self):
+        self.assertEqual(tb.SINGLES_EVERY_DEFAULT, 15)

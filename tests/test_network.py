@@ -38,6 +38,8 @@ class Base(unittest.TestCase):
         tb.HTTP.cond_bytes = 0
         tb.HTTP.robots.clear()
         tb.HTTP.skip_hosts = set()
+        tb.HTTP.cool.clear()
+        tb.HTTP.next_at.clear()
         tb.HTTP.reset_metrics()
         NET.inet.stats.reset()
         NET.inet.script.clear()
@@ -86,10 +88,43 @@ class Retries(Base):
         by = NET.inet.stats.snapshot()["by_host"]["www.mayhemcollectables.com.au"]
         self.assertEqual(by.get("s401", 0), 1)
 
-    def test_429_short_retry_after_is_waited_out(self):
+    def test_429_puts_the_shop_on_a_cooldown(self):
+        # A 429 isn't retried straight away (that's what got the PC blocked on 17 Oct 2026): the shop is
+        # left alone for at least COOL_MIN seconds, and every page there fails fast without a request.
         NET.inet.script[("www.gumnut.com.au", "/collections/one-piece-card-game/products.json")] = [
             (429, {"Retry-After": "0.2"}, b"")]
-        self.assertIsNotNone(tb.fetch_json(GUMNUT))
+        self.assertIsNone(tb.fetch_json(GUMNUT))
+        left = tb.HTTP.cooling().get("www.gumnut.com.au", 0)
+        self.assertGreater(left, tb.COOL_MIN - 5)
+        before = NET.inet.stats.requests
+        self.assertIsNone(tb.fetch_json(GUMNUT))
+        self.assertEqual(NET.inet.stats.requests, before)       # no request sent while cooling
+
+    def test_cooldown_doubles_and_resets_after_a_good_answer(self):
+        h = "www.gumnut.com.au"
+        self.assertAlmostEqual(tb.HTTP._cool_down(h, None), tb.COOL_MIN)
+        tb.HTTP.cool[h][0] = 0                                  # cooldown over
+        self.assertAlmostEqual(tb.HTTP._cool_down(h, None), tb.COOL_MIN * 2)
+        tb.HTTP.cool[h][0] = 0
+        self.assertAlmostEqual(tb.HTTP._cool_down(h, 5000), tb.COOL_MAX)   # capped
+        tb.HTTP.cool[h][0] = 0
+        self.assertIsNotNone(tb.fetch_json(GUMNUT))             # answers fine -> back to the start
+        self.assertNotIn(h, tb.HTTP.cool)
+
+    def test_429_is_not_counted_as_the_shop_being_down(self):
+        NET.inet.script[("www.gumnut.com.au", "/collections/one-piece-card-game/products.json")] = [
+            (429, {}, b"")]
+        with tb._host_lock:
+            tb._host_results.clear()
+        self.assertIsNone(tb.fetch_json(GUMNUT))
+        self.assertNotIn("www.gumnut.com.au", tb._host_results)
+
+    def test_requests_to_one_shop_are_spaced_out(self):
+        tb.HTTP.memo.clear()
+        t0 = time.perf_counter()
+        for q in ("a", "b", "c"):
+            tb.fetch_json(GUMNUT + "&x=" + q)
+        self.assertGreaterEqual(time.perf_counter() - t0, 2 * tb.HOST_GAP - 0.05)
 
     def test_429_long_retry_after_is_left_for_next_check(self):
         NET.inet.script[("www.gumnut.com.au", "/collections/one-piece-card-game/products.json")] = [
