@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.9", "3.12"]
+        python: ["3.12", "3.14"]   # the cloud copy runs 3.12, the PC 3.14 (3.9 is end-of-life)
     steps:
       - uses: actions/checkout@v4
 
