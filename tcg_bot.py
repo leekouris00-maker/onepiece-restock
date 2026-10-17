@@ -1569,10 +1569,12 @@ def check_singles(cfg):
     cards = [c for c in cfg["singles"]["cards"] if c.get("enabled", True)]
     jobs = []
     for c in cards:
-        if "Elemental Arcade" in shops:
+        only = c.get("shops")          # optional per card, e.g. ["Elemental Arcade"]: check just those shops
+        want = set(only) if isinstance(only, list) and only else None
+        if "Elemental Arcade" in shops and (want is None or "Elemental Arcade" in want):
             jobs.append((elemental_card, c, shops["Elemental Arcade"]))
         for name in ("Mayhem", "Good Games"):
-            if name in shops:
+            if name in shops and (want is None or name in want):
                 jobs.append((handle_shop_card, c, name, shops[name]))
     if cfg.get("value_picks", True):
         for pick in picks_this_turn(load_value_picks(cfg), int(_num(cfg.get("value_picks_per_check")) or VALUE_PICKS_PER_RUN)):

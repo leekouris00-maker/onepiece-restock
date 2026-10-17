@@ -330,3 +330,21 @@ class ValuePickTurns(unittest.TestCase):
 
     def test_singles_default_to_every_15_minutes(self):
         self.assertEqual(tb.SINGLES_EVERY_DEFAULT, 15)
+
+
+class CardShops(unittest.TestCase):
+    def test_a_card_can_be_limited_to_some_shops(self):
+        calls = []
+        orig = (tb.elemental_card, tb.handle_shop_card, tb.load_value_picks)
+        tb.elemental_card = lambda c, base: calls.append(("E", c["num"])) or []
+        tb.handle_shop_card = lambda c, name, base: calls.append((name, c["num"])) or []
+        tb.load_value_picks = lambda cfg=None: []
+        try:
+            cfg = {"singles": {"shops": {"Elemental Arcade": "e", "Mayhem": "m", "Good Games": "g"}, "cards": [
+                {"name": "A", "num": "OP17-095", "max": 1, "shops": ["Elemental Arcade"]},
+                {"name": "B", "num": "OP15-088", "max": 8}]}}
+            tb.check_singles(cfg)
+        finally:
+            tb.elemental_card, tb.handle_shop_card, tb.load_value_picks = orig
+        self.assertEqual(sorted(calls), sorted([("E", "OP17-095"), ("E", "OP15-088"),
+                                                ("Mayhem", "OP15-088"), ("Good Games", "OP15-088")]))
