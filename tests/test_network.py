@@ -49,6 +49,15 @@ class Base(unittest.TestCase):
 
 
 class KeepAliveAndGzip(Base):
+    # These cover v2's pooled connections, which are off by default ("classic_requests": true sends
+    # requests the v1/urllib way, after shops' bot protection refused the pooled style in Oct 2026).
+    def setUp(self):
+        super().setUp()
+        self._classic, tb.HTTP.classic = tb.HTTP.classic, False
+
+    def tearDown(self):
+        tb.HTTP.classic = self._classic
+
     def test_one_connection_for_many_requests(self):
         for h in ("sabo-sp-carrying-on-his-will", "sabo-parallel-carrying-on-his-will"):
             self.assertIsNotNone(tb.fetch_json(f"https://tcg.goodgames.com.au/products/{h}.js"))

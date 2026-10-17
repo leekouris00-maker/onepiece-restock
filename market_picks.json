@@ -1,0 +1,511 @@
+{
+ "date": "2026-10-15",
+ "picks": [
+  {
+   "name": "Sabo OP13-004 Regular",
+   "price": 1.0,
+   "shop": "Elemental Arcade",
+   "note": "75% under US market",
+   "url": "https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will"
+  },
+  {
+   "name": "Monkey.D.Dragon OP07-015 Regular",
+   "price": 2.0,
+   "shop": "Elemental Arcade",
+   "note": "30% under US market",
+   "url": "https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future"
+  },
+  {
+   "name": "Benn.Beckman OP17-027 Alternate Art",
+   "price": 17.4,
+   "shop": "Good Games",
+   "note": "5% under US market",
+   "url": "https://tcg.goodgames.com.au/products/benn-beckman-alternate-art-the-worlds-strongest-warriors"
+  },
+  {
+   "name": "Brook OP15-022 Alternate Art",
+   "price": 82.7,
+   "shop": "Elemental Arcade",
+   "note": "4% under US market",
+   "url": "https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island"
+  }
+ ],
+ "watch": [
+  {
+   "name": "Sabo OP13-004 Regular",
+   "product_url": "https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will",
+   "max": 4.02,
+   "market": 4.02,
+   "note": "in stock, listed 75% under market"
+  },
+  {
+   "name": "Monkey.D.Dragon OP07-015 Regular",
+   "product_url": "https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future",
+   "max": 2.85,
+   "market": 2.85,
+   "note": "in stock, listed 30% under market"
+  },
+  {
+   "name": "Benn.Beckman OP17-027 Alternate Art",
+   "product_url": "https://tcg.goodgames.com.au/products/benn-beckman-alternate-art-the-worlds-strongest-warriors",
+   "max": 18.27,
+   "market": 18.27,
+   "note": "in stock, listed 5% under market"
+  },
+  {
+   "name": "Brook OP15-022 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island",
+   "max": 86.06,
+   "market": 86.06,
+   "note": "in stock, listed 4% under market"
+  },
+  {
+   "name": "Dracule Mihawk OP12-030 SP",
+   "product_url": "https://elementalarcade.com.au/products/dracule-mihawk-op12030-sp-the-azure-seas-seven",
+   "max": 204.96,
+   "market": 204.96,
+   "note": "in stock, listed 8% over market"
+  },
+  {
+   "name": "Tashigi OP14-029 SP",
+   "product_url": "https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle",
+   "max": 93.23,
+   "market": 93.23,
+   "note": "in stock, listed 8% over market"
+  },
+  {
+   "name": "Cavendish OP10-045 SP",
+   "product_url": "https://elementalarcade.com.au/products/cavendish-sp-op10045-the-time-of-battle",
+   "max": 59.84,
+   "market": 59.84,
+   "note": "in stock, listed 9% over market"
+  },
+  {
+   "name": "Gol.D.Roger OP09-118 Wanted",
+   "product_url": "https://elementalarcade.com.au/products/goldroger-op09118-sp-wanted-poster-carrying-on-his-will",
+   "max": 232.34,
+   "market": 232.34,
+   "note": "in stock, listed 10% over market"
+  },
+  {
+   "name": "Moby Dick OP16-021 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
+   "max": 22.93,
+   "market": 22.93,
+   "note": "in stock, listed 11% over market"
+  },
+  {
+   "name": "Yasopp OP09-013 SP",
+   "product_url": "https://tcg.goodgames.com.au/products/yasopp-sp-legacy-of-the-master",
+   "max": 57.37,
+   "market": 57.37,
+   "note": "in stock, listed 19% over market"
+  },
+  {
+   "name": "Come On!! We'll Fight You!! OP09-020 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/come-on-well-fight-you-manga-op09020-premium-booster-the-best-vol-2",
+   "max": 387.26,
+   "market": 387.26,
+   "note": "in stock, listed 21% over market"
+  },
+  {
+   "name": "Zoro-Juurou ST18-004 SP",
+   "product_url": "https://elementalarcade.com.au/products/zorojuurou-sp-st18004-legacy-of-the-master",
+   "max": 322.65,
+   "market": 322.65,
+   "note": "in stock, listed 21% over market"
+  },
+  {
+   "name": "Shanks OP13-028 SP",
+   "product_url": "https://tcg.goodgames.com.au/products/shanks-sp-the-worlds-strongest-warriors",
+   "max": 353.05,
+   "market": 353.05,
+   "note": "in stock, listed 22% over market"
+  },
+  {
+   "name": "Benn.Beckman OP09-009 SP",
+   "product_url": "https://tcg.goodgames.com.au/products/benn-beckman-sp-carrying-on-his-will",
+   "max": 64.4,
+   "market": 64.4,
+   "note": "in stock, listed 23% over market"
+  },
+  {
+   "name": "Yasopp OP17-031 Alternate Art",
+   "product_url": "https://tcg.goodgames.com.au/products/yasopp-alternate-art-the-worlds-strongest-warriors",
+   "max": 14.37,
+   "market": 14.37,
+   "note": "sold out, listed 57% under market"
+  },
+  {
+   "name": "Sabo OP13-120 Regular",
+   "product_url": "https://elementalarcade.com.au/products/sabo-op13120-sp-carrying-on-his-will",
+   "max": 7.72,
+   "market": 7.72,
+   "note": "sold out, listed 31% under market"
+  },
+  {
+   "name": "Monkey.D.Luffy OP15-098 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/monkeydluffy-op15098-alternate-art-adventure-on-kamis-island",
+   "max": 112.42,
+   "market": 112.42,
+   "note": "sold out, listed 29% under market"
+  },
+  {
+   "name": "Sabo OP13-120 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/sabo-op13120-parallel-carrying-on-his-will",
+   "max": 27.29,
+   "market": 27.29,
+   "note": "sold out, listed 25% under market"
+  },
+  {
+   "name": "Monkey.D.Dragon OP07-015 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/monkeyddragon-op07015-parallel-500-years-in-the-future",
+   "max": 16.48,
+   "market": 16.48,
+   "note": "sold out, listed 19% under market"
+  },
+  {
+   "name": "Boa Hancock OP16-032 Regular",
+   "product_url": "https://elementalarcade.com.au/products/boa-hancock-op16032-the-time-of-battle",
+   "max": 2.45,
+   "market": 2.45,
+   "note": "sold out, listed 18% under market"
+  },
+  {
+   "name": "Zehahahahaha! OP16-116 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/zehahahahaha-alternate-art-op16116-the-time-of-battle",
+   "max": 81.34,
+   "market": 81.34,
+   "note": "sold out, listed 13% under market"
+  },
+  {
+   "name": "Gum-Gum Golden Rifle OP15-116 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/gumgum-golden-rifle-alternate-art-op15116-adventure-on-kamis-island",
+   "max": 77.17,
+   "market": 77.17,
+   "note": "sold out, listed 10% under market"
+  },
+  {
+   "name": "Roronoa Zoro OP13-037 SP",
+   "product_url": "https://elementalarcade.com.au/products/roronoa-zoro-op13037-adventure-on-kamis-island",
+   "max": 287.88,
+   "market": 287.88,
+   "note": "sold out, listed 9% under market"
+  },
+  {
+   "name": "Monkey.D.Dragon OP12-094 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/monkeyddragon-alternate-art-op12094-legacy-of-the-master",
+   "max": 10.33,
+   "market": 10.33,
+   "note": "sold out, listed 9% under market"
+  },
+  {
+   "name": "Prisoner of Impel Down OP16-042 Regular",
+   "product_url": "https://elementalarcade.com.au/products/prisoner-of-impel-down-op16042-the-time-of-battle",
+   "max": 3.51,
+   "market": 3.51,
+   "note": "sold out, listed 9% under market"
+  },
+  {
+   "name": "Nami OP15-086 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/nami-op15086-alternate-art-adventure-on-kamis-island",
+   "max": 138.08,
+   "market": 138.08,
+   "note": "sold out, listed 6% under market"
+  },
+  {
+   "name": "Emporio.Ivankov OP16-026 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/emporioivankov-op16026-alternate-art-the-time-of-battle",
+   "max": 5.29,
+   "market": 5.29,
+   "note": "sold out, listed 4% under market"
+  },
+  {
+   "name": "Rocks.D.Xebec OP17-039 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/rocksdxebec-op17039-alternate-art-the-worlds-strongest-warriors",
+   "max": 63.18,
+   "market": 63.18,
+   "note": "sold out, listed 3% under market"
+  },
+  {
+   "name": "Monkey.D.Luffy OP16-022 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/monkeydluffy-op16022-alternate-art-the-time-of-battle",
+   "max": 53.05,
+   "market": 53.05,
+   "note": "sold out, listed 2% under market"
+  },
+  {
+   "name": "Kaido OP17-062 Super Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/kaido-op17062-super-alternate-art-the-worlds-strongest-warriors",
+   "max": 303.02,
+   "market": 303.02,
+   "note": "sold out, listed 2% under market"
+  },
+  {
+   "name": "Edward.Newgate OP17-040 Treasure Rare",
+   "product_url": "https://elementalarcade.com.au/products/edwardnewgate-op17040-tr-the-worlds-strongest-warriors",
+   "max": 75.86,
+   "market": 75.86,
+   "note": "sold out, listed 0% over market"
+  },
+  {
+   "name": "Monkey.D.Garp OP12-056 SP",
+   "product_url": "https://elementalarcade.com.au/products/monkeydgarp-op12056-sp-the-worlds-strongest-warriors",
+   "max": 116.09,
+   "market": 116.09,
+   "note": "sold out, listed 1% over market"
+  },
+  {
+   "name": "Monkey.D.Luffy OP17-079 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/monkeydluffy-alternate-art-op17079-the-worlds-strongest-warriors",
+   "max": 70.68,
+   "market": 70.68,
+   "note": "sold out, listed 2% over market"
+  },
+  {
+   "name": "Monkey.D.Luffy OP13-118 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/monkeydluffy-op13118-parallel-carrying-on-his-will",
+   "max": 93.34,
+   "market": 93.34,
+   "note": "sold out, listed 2% over market"
+  },
+  {
+   "name": "Gol.D.Roger OP09-118 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/goldroger-alternate-art-op09118-emperors-in-the-new-world",
+   "max": 82.46,
+   "market": 82.46,
+   "note": "sold out, listed 3% over market"
+  },
+  {
+   "name": "Edward.Newgate OP13-042 SP",
+   "product_url": "https://elementalarcade.com.au/products/edwardnewgate-sp-op13042-adventure-on-kamis-island",
+   "max": 217.77,
+   "market": 217.77,
+   "note": "sold out, listed 4% over market"
+  },
+  {
+   "name": "Boa Hancock OP16-032 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/boa-hancock-alternate-art-op16032-the-time-of-battle",
+   "max": 34.82,
+   "market": 34.82,
+   "note": "sold out, listed 5% over market"
+  },
+  {
+   "name": "Brook OP15-032 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/brook-op15032-alternate-art-adventure-on-kamis-island",
+   "max": 43.6,
+   "market": 43.6,
+   "note": "sold out, listed 5% over market"
+  },
+  {
+   "name": "Loki OP17-119 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/loki-alternate-art-op17119-the-worlds-strongest-warriors",
+   "max": 71.7,
+   "market": 71.7,
+   "note": "sold out, listed 6% over market"
+  },
+  {
+   "name": "Enel EB02-052 SP",
+   "product_url": "https://elementalarcade.com.au/products/enel-sp-eb02052-adventure-on-kamis-island",
+   "max": 150.11,
+   "market": 150.11,
+   "note": "sold out, listed 6% over market"
+  },
+  {
+   "name": "Portgas.D.Ace ST15-005 SP",
+   "product_url": "https://elementalarcade.com.au/products/portgasdace-sp-st15005-the-time-of-battle",
+   "max": 202.57,
+   "market": 202.57,
+   "note": "sold out, listed 7% over market"
+  },
+  {
+   "name": "Lightning Dragon OP15-077 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/lightning-dragon-alternate-art-op15077-adventure-on-kamis-island",
+   "max": 108.03,
+   "market": 108.03,
+   "note": "sold out, listed 8% over market"
+  },
+  {
+   "name": "Kaido OP17-062 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/kaido-op17062-alternate-art-the-worlds-strongest-warriors",
+   "max": 25.44,
+   "market": 25.44,
+   "note": "sold out, listed 8% over market"
+  },
+  {
+   "name": "Gol.D.Roger OP09-118 Regular",
+   "product_url": "https://elementalarcade.com.au/products/goldroger-op09118-emperors-in-the-new-world",
+   "max": 35.86,
+   "market": 35.86,
+   "note": "sold out, listed 9% over market"
+  },
+  {
+   "name": "Sabo PRB02-014 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/sabo-prb02014-alternate-art-premium-booster-the-best-vol-2",
+   "max": 21.86,
+   "market": 21.86,
+   "note": "sold out, listed 9% over market"
+  },
+  {
+   "name": "Silvers Rayleigh OP14-108 SP",
+   "product_url": "https://elementalarcade.com.au/products/silvers-rayleigh-op14108-sp-the-worlds-strongest-warriors",
+   "max": 122.25,
+   "market": 122.25,
+   "note": "sold out, listed 10% over market"
+  },
+  {
+   "name": "Marshall.D.Teach OP16-119 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/marshalldteach-op16119-alternate-art-the-time-of-battle",
+   "max": 55.94,
+   "market": 55.94,
+   "note": "sold out, listed 10% over market"
+  },
+  {
+   "name": "Shanks OP13-028 SP",
+   "product_url": "https://elementalarcade.com.au/products/shanks-op13028-sp-the-worlds-strongest-warriors",
+   "max": 353.05,
+   "market": 353.05,
+   "note": "sold out, listed 11% over market"
+  },
+  {
+   "name": "Boa Hancock OP14-041 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/boa-hancock-op14041-alternate-art-the-azure-seas-seven",
+   "max": 143.37,
+   "market": 143.37,
+   "note": "sold out, listed 11% over market"
+  },
+  {
+   "name": "Monkey.D.Luffy OP13-118 Manga",
+   "product_url": "https://elementalarcade.com.au/products/monkeydluffy-op13118-super-alternate-art-carrying-on-his-will",
+   "max": 3010.6,
+   "market": 3010.6,
+   "note": "sold out, listed 11% over market"
+  },
+  {
+   "name": "Yamato OP16-098 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/yamato-op16098-alternate-art-the-time-of-battle",
+   "max": 51.42,
+   "market": 51.42,
+   "note": "sold out, listed 11% over market"
+  },
+  {
+   "name": "Sabo OP13-120 Wanted",
+   "product_url": "https://elementalarcade.com.au/products/sabo-op13120-wanted-poster-carrying-on-his-will",
+   "max": 164.77,
+   "market": 164.77,
+   "note": "sold out, listed 12% over market"
+  },
+  {
+   "name": "Asura Blades Drawn Dead Man's Game OP12-037 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/demon-aura-nine-sword-style-asura-blades-drawn-dead-mans-game-alternate-art-op12037-legacy-of-the-master",
+   "max": 195.05,
+   "market": 195.05,
+   "note": "sold out, listed 13% over market"
+  },
+  {
+   "name": "Shanks OP06-007 SP",
+   "product_url": "https://elementalarcade.com.au/products/shanks-sp-op06007-premium-booster-the-best-vol-2",
+   "max": 265.32,
+   "market": 265.32,
+   "note": "sold out, listed 13% over market"
+  },
+  {
+   "name": "Ground Death OP14-096 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/ground-death-alternate-art-op14096-the-azure-seas-seven",
+   "max": 170.68,
+   "market": 170.68,
+   "note": "sold out, listed 13% over market"
+  },
+  {
+   "name": "You'll Frighten Me OP14-118 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/youll-frighten-me-alternate-art-op14118-the-azure-seas-seven",
+   "max": 227.12,
+   "market": 227.12,
+   "note": "sold out, listed 15% over market"
+  },
+  {
+   "name": "Sabo OP13-004 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/sabo-op13004-alternate-art-carrying-on-his-will",
+   "max": 37.95,
+   "market": 37.95,
+   "note": "sold out, listed 15% over market"
+  },
+  {
+   "name": "Trafalgar Law OP13-031 SP",
+   "product_url": "https://elementalarcade.com.au/products/trafalgar-law-sp-op13031-adventure-on-kamis-island",
+   "max": 415.14,
+   "market": 415.14,
+   "note": "sold out, listed 16% over market"
+  },
+  {
+   "name": "Monkey.D.Dragon OP12-094 Regular",
+   "product_url": "https://elementalarcade.com.au/products/monkeyddragon-op12094-legacy-of-the-master",
+   "max": 1.72,
+   "market": 1.72,
+   "note": "sold out, listed 16% over market"
+  },
+  {
+   "name": "Nico Robin OP17-087 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/nico-robin-alternate-art-op17087-the-worlds-strongest-warriors",
+   "max": 49.21,
+   "market": 49.21,
+   "note": "sold out, listed 18% over market"
+  },
+  {
+   "name": "Roronoa Zoro OP12-020 Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/roronoa-zoro-op12020-alternate-art-legacy-of-the-master",
+   "max": 78.48,
+   "market": 78.48,
+   "note": "sold out, listed 18% over market"
+  },
+  {
+   "name": "Charlotte Katakuri OP11-067 SP",
+   "product_url": "https://elementalarcade.com.au/products/charlotte-katakuri-sp-op11067-the-time-of-battle",
+   "max": 120.52,
+   "market": 120.52,
+   "note": "sold out, listed 18% over market"
+  },
+  {
+   "name": "Yamato OP16-098 SP",
+   "product_url": "https://elementalarcade.com.au/products/yamato-op16098-sp-the-worlds-strongest-warriors",
+   "max": 331.5,
+   "market": 331.5,
+   "note": "sold out, listed 19% over market"
+  },
+  {
+   "name": "Perona OP06-093 SP",
+   "product_url": "https://elementalarcade.com.au/products/perona-op06093-sp-the-azure-seas-seven",
+   "max": 194.66,
+   "market": 194.66,
+   "note": "sold out, listed 19% over market"
+  },
+  {
+   "name": "Boa Hancock OP12-014 SP",
+   "product_url": "https://elementalarcade.com.au/products/boa-hancock-sp-op12014-adventure-on-kamis-island",
+   "max": 683.85,
+   "market": 683.85,
+   "note": "sold out, listed 21% over market"
+  },
+  {
+   "name": "Monkey.D.Luffy OP13-118 Wanted",
+   "product_url": "https://elementalarcade.com.au/products/monkeydluffy-op13118-wanted-poster-carrying-on-his-will",
+   "max": 409.18,
+   "market": 409.18,
+   "note": "sold out, listed 24% over market"
+  },
+  {
+   "name": "Monkey.D.Luffy OP17-079 Super Alternate Art",
+   "product_url": "https://elementalarcade.com.au/products/monkeydluffy-op17079-super-leader-alternate-art-the-worlds-strongest-warriors",
+   "max": 2115.59,
+   "market": 2115.59,
+   "note": "sold out, listed 24% over market"
+  },
+  {
+   "name": "Marshall.D.Teach OP16-119 Regular",
+   "product_url": "https://elementalarcade.com.au/products/marshalldteach-op16119-the-time-of-battle",
+   "max": 30.19,
+   "market": 30.19,
+   "note": "sold out, listed 25% over market"
+  }
+ ]
+}

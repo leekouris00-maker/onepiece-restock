@@ -1,5 +1,5 @@
 {
- "date": "2026-10-14",
+ "date": "2026-10-17",
  "snapshot": {
   "list|Gumnut|one-piece-card-game-a-fist-of-divine-speed-booster-box-op-11": {
    "name": "One Piece Card Game - A Fist of Divine Speed - Booster Box (OP-11) (24) (One Per Customer)",
@@ -509,7 +509,7 @@
    "name": "One Piece Card Game - OP-18 The Dominance Of God - Booster Box - English",
    "shop": "TCGroup",
    "price": 499.99,
-   "available": false,
+   "available": true,
    "url": "https://www.tcgroupau.com.au/products/one-piece-card-game-op-18-the-dominance-of-god-booster-box-english"
   },
   "list|Pokebox|one-piece-card-game-premium-booster-prb-02-booster-box-english": {
@@ -554,6 +554,13 @@
    "available": false,
    "url": "https://www.pokebox.com.au/products/one-piece-card-game-extra-booster-eb-02-booster-box-english"
   },
+  "list|Pokebox|one-piece-card-game-extra-booster-heroines-edition-vol-2-eb-05-booster-box-english": {
+   "name": "One Piece Card Game: Extra Booster - Heroines Edition vol.2 [EB-05] Booster Box - English",
+   "shop": "Pokebox",
+   "price": 220.0,
+   "available": false,
+   "url": "https://www.pokebox.com.au/products/one-piece-card-game-extra-booster-heroines-edition-vol-2-eb-05-booster-box-english"
+  },
   "list|Pokebox|one-piece-card-game-carrying-on-his-will-op-13-booster-box-english": {
    "name": "One Piece Card Game: Carrying On His Will OP-13 Booster Box - English",
    "shop": "Pokebox",
@@ -567,13 +574,6 @@
    "price": 219.99,
    "available": false,
    "url": "https://www.pokebox.com.au/products/one-piece-card-game-the-time-of-battle-op-16-booster-box-english"
-  },
-  "list|Pokebox|one-piece-card-game-extra-booster-heroines-edition-vol-2-eb-05-booster-box-english": {
-   "name": "One Piece Card Game: Extra Booster - Heroines Edition vol.2 [EB-05] Booster Box - English",
-   "shop": "Pokebox",
-   "price": 220.0,
-   "available": false,
-   "url": "https://www.pokebox.com.au/products/one-piece-card-game-extra-booster-heroines-edition-vol-2-eb-05-booster-box-english"
   },
   "list|Pokebox|one-piece-card-game-royal-blood-op-10-booster-box-english": {
    "name": "One Piece Card Game - Royal Blood OP-10 Booster Box - English",
@@ -778,12 +778,26 @@
    "available": true,
    "url": "https://alphagaming.com.au/products/in-transit-one-piece-premium-booster-box-prb-02-limit-2-per-customer"
   },
-  "list|Grailborne|one-piece-card-game-op-18-booster-box-english": {
-   "name": "One Piece Card Game: [OP-18] Booster Box (English) (Releases 20 Nov 2026)",
+  "list|Grailborne|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-english": {
+   "name": "One Piece Card Game: The World's Strongest Warriors [OP-17] Booster Box (English)",
    "shop": "Grailborne",
    "price": 639.0,
    "available": true,
+   "url": "https://grailborne.com.au/products/one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-english"
+  },
+  "list|Grailborne|one-piece-card-game-op-18-booster-box-english": {
+   "name": "One Piece Card Game: [OP-18] Booster Box (English) (Releases 20 Nov 2026)",
+   "shop": "Grailborne",
+   "price": 599.0,
+   "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-op-18-booster-box-english"
+  },
+  "list|Grailborne|one-piece-card-game-op-13-carrying-on-his-will-booster-box-english": {
+   "name": "One Piece Card Game OP-13 Carrying on His Will Booster Box (English)",
+   "shop": "Grailborne",
+   "price": 999.0,
+   "available": true,
+   "url": "https://grailborne.com.au/products/one-piece-card-game-op-13-carrying-on-his-will-booster-box-english"
   },
   "list|Grailborne|one-piece-card-game-op-08-two-legends-booster-box-english": {
    "name": "One Piece Card Game OP-08 Two Legends Booster Box (English)",
@@ -799,19 +813,12 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-the-time-of-battle-op-16-booster-box-english"
   },
-  "list|Grailborne|one-piece-card-game-op-19-booster-box-releases-5-mar-2027": {
-   "name": "One Piece Card Game: OP-19 Booster Box (Releases 5 Mar 2027)",
+  "list|Grailborne|one-piece-card-game-adventure-on-kamis-island-op-15-sealed-booster-box-english": {
+   "name": "One Piece Card Game: Adventure on KAMI\u2019s Island (OP-15) Sealed Booster Box (English)",
    "shop": "Grailborne",
-   "price": 499.0,
+   "price": 459.0,
    "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-op-19-booster-box-releases-5-mar-2027"
-  },
-  "list|Grailborne|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-english": {
-   "name": "One Piece Card Game: The World's Strongest Warriors [OP-17] Booster Box (English)",
-   "shop": "Grailborne",
-   "price": 639.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-english"
+   "url": "https://grailborne.com.au/products/one-piece-card-game-adventure-on-kamis-island-op-15-sealed-booster-box-english"
   },
   "list|Grailborne|one-piece-card-game-op-14-the-azure-seas-seven-booster-box-english": {
    "name": "One Piece Card Game: OP-14 The Azure Sea's Seven Booster Box (English)",
@@ -820,33 +827,19 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-op-14-the-azure-seas-seven-booster-box-english"
   },
-  "list|Grailborne|one-piece-card-game-adventure-on-kamis-island-op-15-sealed-booster-box-english": {
-   "name": "One Piece Card Game: Adventure on KAMI\u2019s Island (OP-15) Sealed Booster Box (English)",
+  "list|Grailborne|one-piece-card-game-op-19-booster-box-releases-5-mar-2027": {
+   "name": "One Piece Card Game: OP-19 Booster Box (Releases 5 Mar 2027)",
    "shop": "Grailborne",
-   "price": 459.0,
+   "price": 499.0,
    "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-adventure-on-kamis-island-op-15-sealed-booster-box-english"
+   "url": "https://grailborne.com.au/products/one-piece-card-game-op-19-booster-box-releases-5-mar-2027"
   },
-  "list|Grailborne|one-piece-card-game-op-13-carrying-on-his-will-booster-box-english": {
-   "name": "One Piece Card Game OP-13 Carrying on His Will Booster Box (English)",
+  "list|Grailborne|one-piece-card-game-eb-05-extra-booster-heroines-edition-vol-2-booster-box": {
+   "name": "One Piece Card Game: EB-05 Extra Booster Heroines Edition Vol. 2 Booster Box (Releases 30 Oct 2026)",
    "shop": "Grailborne",
-   "price": 999.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-op-13-carrying-on-his-will-booster-box-english"
-  },
-  "list|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed": {
-   "name": "One Piece Card Game: Illustration Box Vol.7 (IB-07) - English Sealed",
-   "shop": "Grailborne",
-   "price": 89.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed"
-  },
-  "list|Grailborne|one-piece-card-game-gift-collection-heroines-gc-2026-display-6-sets": {
-   "name": "One Piece Card Game: Gift Collection - Heroines [GC 2026] - Display (6 Sets) (Releases 20 Nov 2026)",
-   "shop": "Grailborne",
-   "price": 2400.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-gift-collection-heroines-gc-2026-display-6-sets"
+   "price": 579.0,
+   "available": false,
+   "url": "https://grailborne.com.au/products/one-piece-card-game-eb-05-extra-booster-heroines-edition-vol-2-booster-box"
   },
   "list|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": {
    "name": "One Piece Card Game: Premium Card Collection - 29th Anniversary Edition (P-159 Monkey D. Luffy, 8 Cards) (Ships March 2027)",
@@ -855,13 +848,6 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-premium-card-collection-29th-anniversary-edition"
   },
-  "list|Grailborne|one-piece-card-game-double-pack-set-vol-13-dp-13": {
-   "name": "One Piece Card Game: Double Pack Set Vol.13 [DP-13] (Releases 20 Nov 2026)",
-   "shop": "Grailborne",
-   "price": 79.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-double-pack-set-vol-13-dp-13"
-  },
   "list|Collectible Madness|one-piece-card-game-tba-op-16-booster-box": {
    "name": "One Piece Card Game The Time of Battle [OP-16] Booster Box",
    "shop": "Collectible Madness",
@@ -869,19 +855,19 @@
    "available": true,
    "url": "https://collectiblemadness.com.au/products/one-piece-card-game-tba-op-16-booster-box"
   },
-  "card|Elemental Arcade|OP05-015|belo-betty-op05015-awakening-of-the-new-era": {
-   "name": "Belo Betty OP05-015",
-   "shop": "Elemental Arcade",
-   "price": 0.5,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/belo-betty-op05015-awakening-of-the-new-era"
-  },
   "card|Elemental Arcade|OP05-015|belo-betty-op05015-reprint-premium-booster-the-best": {
    "name": "Belo Betty OP05-015",
    "shop": "Elemental Arcade",
    "price": 0.5,
    "available": true,
    "url": "https://elementalarcade.com.au/products/belo-betty-op05015-reprint-premium-booster-the-best"
+  },
+  "card|Elemental Arcade|OP05-015|belo-betty-op05015-awakening-of-the-new-era": {
+   "name": "Belo Betty OP05-015",
+   "shop": "Elemental Arcade",
+   "price": 0.5,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/belo-betty-op05015-awakening-of-the-new-era"
   },
   "card|Elemental Arcade|OP05-015|belo-betty-jolly-roger-foil-op05015-premium-booster-the-best": {
    "name": "Belo Betty OP05-015",
@@ -914,7 +900,7 @@
   "card|Elemental Arcade|OP13-016|monkeydgarp-op13016-carrying-on-his-will": {
    "name": "Monkey.D.Garp OP13-016",
    "shop": "Elemental Arcade",
-   "price": 0.55,
+   "price": 0.5,
    "available": true,
    "url": "https://elementalarcade.com.au/products/monkeydgarp-op13016-carrying-on-his-will"
   },
@@ -945,6 +931,48 @@
    "price": 0.8,
    "available": true,
    "url": "https://tcg.goodgames.com.au/products/revolutionary-army-hq-reprint-premium-booster-the-best-vol-2"
+  },
+  "card|pick|https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will": {
+   "name": "Sabo OP13-004 Regular",
+   "shop": "Elemental Arcade",
+   "price": 1.0,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will"
+  },
+  "card|pick|https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future": {
+   "name": "Monkey.D.Dragon OP07-015 Regular",
+   "shop": "Elemental Arcade",
+   "price": 2.0,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future"
+  },
+  "card|pick|https://tcg.goodgames.com.au/products/benn-beckman-alternate-art-the-worlds-strongest-warriors": {
+   "name": "Benn.Beckman OP17-027 Alternate Art",
+   "shop": "Good Games",
+   "price": 17.4,
+   "available": true,
+   "url": "https://tcg.goodgames.com.au/products/benn-beckman-alternate-art-the-worlds-strongest-warriors"
+  },
+  "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island": {
+   "name": "Brook OP15-022 Alternate Art",
+   "shop": "Elemental Arcade",
+   "price": 84.1,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island"
+  },
+  "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle": {
+   "name": "Moby Dick OP16-021 Alternate Art",
+   "shop": "Elemental Arcade",
+   "price": 22.6,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle"
+  },
+  "card|pick|https://elementalarcade.com.au/products/kaido-op17062-super-alternate-art-the-worlds-strongest-warriors": {
+   "name": "Kaido OP17-062 Super Alternate Art",
+   "shop": "Elemental Arcade",
+   "price": 301.3,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/kaido-op17062-super-alternate-art-the-worlds-strongest-warriors"
   }
  }
 }

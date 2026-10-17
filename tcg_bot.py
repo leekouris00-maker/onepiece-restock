@@ -97,6 +97,11 @@ from collections import Counter, OrderedDict, defaultdict, deque
 from concurrent.futures import Future, ThreadPoolExecutor
 from datetime import datetime, timedelta
 
+try:
+    import ebay_watch          # eBay watch list (ebay_watch.json); optional
+except ImportError:            # ebay_watch.py not next to the bot: eBay is skipped, everything else as normal
+    ebay_watch = None
+
 VERSION = "2.0.2"
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -2322,6 +2327,8 @@ def run_recap(cfg, now=None, post=True, save=True):
     now = now or datetime.now()
     print(f"\n=== Daily recap - {now:%a %d %b %Y %I:%M %p} ===")
     (box_finds, by_shop), singles = run_checks(cfg)
+    if ebay_watch:
+        singles += ebay_watch.check(cfg, {}, force=True).finds
 
     # today's snapshot: every box / watched listing (in stock or not) plus in-stock singles
     snap = {}
@@ -2461,10 +2468,14 @@ def run_once(cfg, args, drop=None):
     if do_sealed and cfg.get("new_listings", True):
         known = load_known()
         listed = new_listings(by_shop, known, box_finds, status.setdefault("pages_seen", {}))
+    ebay = None
     if do_singles:
         finds += singles
         if getattr(args, "loop", None):
             status["singles_ts"] = round(time.time())
+        if ebay_watch:
+            ebay = ebay_watch.check(cfg, status, force=args.all)
+            finds += ebay.finds
 
     state = load_state()
     show = finds if args.all else new_only(finds, state)
@@ -2478,7 +2489,8 @@ def run_once(cfg, args, drop=None):
     if do_singles:
         checked.add("Single")
     kept = {k: v for k, v in state.items()
-            if not ((k.startswith(("box|", "sealed|")) and "Booster box" in checked) or (k.startswith("card|") and "Single" in checked))}
+            if not ((k.startswith(("box|", "sealed|")) and "Booster box" in checked) or (k.startswith("card|") and "Single" in checked)
+                    or (k.startswith("ebay|") and ebay is not None and ebay.ran))}
     kept.update({f["id"]: f["price"] for f in finds})
 
     role = heartbeat_role(cfg)
@@ -2490,6 +2502,10 @@ def run_once(cfg, args, drop=None):
         status["last_check"] = f"{datetime.now():%Y-%m-%d %H:%M:%S}"
         status["last_found"] = len(finds)
     posts = shop_health(cfg, status)
+    if ebay_watch:
+        msg = ebay_watch.status_message(status, ebay)
+        if msg:
+            posts.append(msg)
     if role == "listen":
         before = status.get("pc_on")
         if before is True and not pc_on:

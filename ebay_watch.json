@@ -1,0 +1,15 @@
+{
+  "_help": "Cards the bot watches on eBay (eBay Australia, Buy It Now, posts to Australia). 'max' is the most you'd pay in AUD delivered: item + postage + the 10% GST eBay adds on items from overseas. 'search' is typed into eBay; every 'must_have' entry has to be in the listing title ('a|b' means either); any 'exclude' word skips the listing. Set 'enabled' to false to stop watching a card. Needs a free eBay key: see the top of ebay_watch.py.",
+  "every_minutes": 15,
+  "cards": [
+    {
+      "name": "Luffy ST10-006 One Piece Day '24 (Japanese) PSA 10",
+      "max": 550,
+      "search": ["luffy one piece day psa 10", "ST10-006 psa 10"],
+      "must_have": ["psa 10|psa10|psa gem mt 10|psa gem mint 10", "luffy", "one piece day|onepiece day|op day", "006|st10006"],
+      "exclude": ["dallas", "2025", "p-110", "english version", "chinese", "korean", "anniversary", "proxy", "custom", "fan art", "orica", "replica", "reprint", "lot", "bundle", "candidate", "potential", "worthy", "case only", "slab only", "empty"],
+      "note": "Typical price (Oct 2026): about A$470-580 for a PSA 10 on SNKRDUNK, A$650-700 on eBay.",
+      "enabled": true
+    }
+  ]
+}
