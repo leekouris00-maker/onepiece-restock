@@ -11,6 +11,8 @@ where py >nul 2>&1 && set PY=py -3
 exit /b
 
 :loop
+rem Keep the log from growing forever: past about 5 MB it moves to commands_output.old.log
+if exist commands_output.log for %%A in (commands_output.log) do if %%~zA GTR 5000000 move /y commands_output.log commands_output.old.log >nul
 echo [%date% %time%] starting commands >> commands_output.log
 %PY% -u commands_bot.py >> commands_output.log 2>&1
 echo [%date% %time%] commands stopped (code %errorlevel%), restarting in 60s >> commands_output.log

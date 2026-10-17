@@ -48,5 +48,11 @@ jobs:
           for f in seen.json known_products.json status.json; do [ -f "$f" ] && git add "$f"; done
           if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
           git commit -m "Update bot memory"
-          git pull --rebase
-          git push
+          # Another push may have landed meanwhile (a recap, a code update). Rebase onto it, letting this
+          # run's fresh state win any clash in these JSON files, and try a few times before giving up.
+          for i in 1 2 3; do
+            if git pull --rebase -X theirs && git push; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          echo "::warning::Couldn't save the bot's memory this run; the next run will try again."

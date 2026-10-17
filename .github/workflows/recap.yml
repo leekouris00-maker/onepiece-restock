@@ -45,5 +45,10 @@ jobs:
           [ -f recap.json ] && git add recap.json
           if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
           git commit -m "Daily recap snapshot"
-          git pull --rebase
-          git push
+          # A restock check may have pushed meanwhile; rebase onto it (this recap's file wins) and retry.
+          for i in 1 2 3; do
+            if git pull --rebase -X theirs && git push; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          echo "::warning::Couldn't save recap.json this time; tomorrow's recap will compare with the last saved one."

@@ -1,5 +1,14 @@
 # Never commit the PC copy's local files: logs, locks, and anything with secrets
 *.log
+*.log.1
 *.lock
+*.tmp
 __pycache__/
 secrets.json
+config.json.bak
+controls.json
+# v2 working files (each copy keeps its own)
+latest.json
+price_history.json
+events.jsonl
+events.jsonl.1

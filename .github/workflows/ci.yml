@@ -1,0 +1,33 @@
+# Runs the bot's test suite on every push and pull request (what GitHub Actions is meant for).
+# The tests use local mock shops only - they never contact a real shop, Discord or ntfy.
+name: Tests
+
+on:
+  push:
+    paths-ignore: ["seen.json", "known_products.json", "status.json", "recap.json", "market_picks.json"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.14"]   # the cloud copy runs 3.12, the PC 3.14 (3.9 is end-of-life)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Test-only packages (the bot itself needs none)
+        run: pip install cryptography "discord.py>=2.3"
+
+      - name: Run the tests
+        run: python -m unittest discover -s tests -v
