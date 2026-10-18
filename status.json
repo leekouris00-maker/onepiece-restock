@@ -1,150 +1,5 @@
 {
- "held": {
-  "card|Elemental Arcade|OP04-016|bad-manners-kick-course-reprint-op04016-premium-booster-the-best-vol-2": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54899499401507:2",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP04-016|bad-manners-kick-course-reprint-op04016-premium-booster-the-best-vol-2",
-    "kind": "Single",
-    "name": "Bad Manners Kick Course OP04-016",
-    "note": "Bad Manners Kick Course (Reprint) - OP04-016 [Premium Booster -The Best- Vol. 2]",
-    "price": 0.6,
-    "priority": false,
-    "qty": 2,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/bad-manners-kick-course-reprint-op04016-premium-booster-the-best-vol-2"
-   },
-   "t": 1792322351
-  },
-  "card|Elemental Arcade|OP17-083|jinbe-op17083-the-worlds-strongest-warriors": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55487967985955:2",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP17-083|jinbe-op17083-the-worlds-strongest-warriors",
-    "kind": "Single",
-    "name": "Jinbe OP17-083",
-    "note": "Jinbe - OP17-083 [The World's Strongest Warriors]",
-    "price": 0.25,
-    "priority": false,
-    "qty": 2,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/jinbe-op17083-the-worlds-strongest-warriors"
-   },
-   "t": 1792322351
-  },
-  "card|Elemental Arcade|OP17-084|tony-tonychopper-the-worlds-strongest-warriors": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55451297841443:4",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP17-084|tony-tonychopper-the-worlds-strongest-warriors",
-    "kind": "Single",
-    "name": "Tony Tony.Chopper OP17-084",
-    "note": "Tony Tony.Chopper - OP17-084 [The World's Strongest Warriors]",
-    "price": 0.35,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/tony-tonychopper-the-worlds-strongest-warriors"
-   },
-   "t": 1792322351
-  },
-  "card|Elemental Arcade|OP17-087|nico-robin-op17087-the-worlds-strongest-warriors": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55451286634787:2",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP17-087|nico-robin-op17087-the-worlds-strongest-warriors",
-    "kind": "Single",
-    "name": "Nico Robin OP17-087",
-    "note": "Nico Robin - OP17-087 [The World's Strongest Warriors]",
-    "price": 0.5,
-    "priority": false,
-    "qty": 2,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/nico-robin-op17087-the-worlds-strongest-warriors"
-   },
-   "t": 1792322351
-  },
-  "card|Elemental Arcade|OP17-088|hajrudin-op17088-the-worlds-strongest-warriors": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55503431074083:4",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP17-088|hajrudin-op17088-the-worlds-strongest-warriors",
-    "kind": "Single",
-    "name": "Hajrudin OP17-088",
-    "note": "Hajrudin - OP17-088 [The World's Strongest Warriors]",
-    "price": 0.25,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/hajrudin-op17088-the-worlds-strongest-warriors"
-   },
-   "t": 1792322351
-  },
-  "card|Elemental Arcade|OP17-088|hajrudin-pandaman-art-op17088-the-worlds-strongest-warriors": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55503421276451:4",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP17-088|hajrudin-pandaman-art-op17088-the-worlds-strongest-warriors",
-    "kind": "Single",
-    "name": "Hajrudin OP17-088",
-    "note": "Hajrudin (Pandaman Art) - OP17-088 [The World's Strongest Warriors]",
-    "price": 0.55,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/hajrudin-pandaman-art-op17088-the-worlds-strongest-warriors"
-   },
-   "t": 1792322351
-  },
-  "card|Elemental Arcade|OP17-089|jaguardsaul-op17089-the-worlds-strongest-warriors": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55451295449379:4",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP17-089|jaguardsaul-op17089-the-worlds-strongest-warriors",
-    "kind": "Single",
-    "name": "Jaguar.D.Saul OP17-089",
-    "note": "Jaguar.D.Saul - OP17-089 [The World's Strongest Warriors]",
-    "price": 0.5,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/jaguardsaul-op17089-the-worlds-strongest-warriors"
-   },
-   "t": 1792322351
-  },
-  "card|Elemental Arcade|OP17-095|roronoa-zoro-op17095-the-worlds-strongest-warriors": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55487957631267:4",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP17-095|roronoa-zoro-op17095-the-worlds-strongest-warriors",
-    "kind": "Single",
-    "name": "Roronoa Zoro OP17-095",
-    "note": "Roronoa Zoro - OP17-095 [The World's Strongest Warriors]",
-    "price": 0.25,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/roronoa-zoro-op17095-the-worlds-strongest-warriors"
-   },
-   "t": 1792322351
-  },
-  "card|Elemental Arcade|OP17-098|gumgum-kong-gun-op17098-the-worlds-strongest-warriors": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55503433040163:2",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP17-098|gumgum-kong-gun-op17098-the-worlds-strongest-warriors",
-    "kind": "Single",
-    "name": "Gum-Gum Kong Gun OP17-098",
-    "note": "Gum-Gum Kong Gun - OP17-098 [The World's Strongest Warriors]",
-    "price": 0.25,
-    "priority": false,
-    "qty": 2,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/gumgum-kong-gun-op17098-the-worlds-strongest-warriors"
-   },
-   "t": 1792322351
-  }
- },
+ "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
  "offline_streak": 0,
@@ -3180,9 +3035,7 @@
    "t": 1792322326.3555577
   }
  },
- "shop_down": [
-  "www.jtoys.com.au"
- ],
+ "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "collectiblemadness.com.au": 0,
@@ -3193,14 +3046,12 @@
   "tcg.goodgames.com.au": 0,
   "www.gameology.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 3,
+  "www.jtoys.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
   "www.pokebox.com.au": 0,
   "www.tcgroupau.com.au": 0
  },
  "shop_locked": [],
- "shop_retry": {
-  "www.jtoys.com.au": 1792323252
- }
+ "shop_retry": {}
 }
