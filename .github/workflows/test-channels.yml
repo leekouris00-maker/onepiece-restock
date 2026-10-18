@@ -1,0 +1,51 @@
+# Manual check: can the cloud copy post to the eBay and bot-status channels?
+# Actions > "Test Discord channels" > Run workflow. Posts one short message (no ping) to each channel.
+# A red step means that secret is missing or the webhook link is wrong.
+name: Test Discord channels
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Write the test script
+        run: |
+          cat > post.py <<'EOF'
+          import json, os, sys, urllib.request, urllib.error
+          name, label = sys.argv[1], sys.argv[2]
+          hook = os.environ.get(name, "").strip()
+          if not hook:
+              sys.exit(f"::error::{name} isn't set in GitHub Secrets")
+          if not hook.startswith("https://discord.com/api/webhooks/"):
+              sys.exit(f"::error::{name} doesn't look like a Discord webhook link")
+          body = json.dumps({"username": "One Piece Restock (cloud)", "allowed_mentions": {"parse": []},
+                             "content": f"✅ The cloud copy can post to {label}."}).encode()
+          req = urllib.request.Request(hook + "?wait=true", data=body, method="POST",
+                                       headers={"Content-Type": "application/json", "User-Agent": "onepiece-restock"})
+          try:
+              urllib.request.urlopen(req, timeout=15).read()
+          except urllib.error.HTTPError as e:
+              sys.exit(f"::error::{name}: Discord answered HTTP {e.code} (404 = the webhook was deleted or mistyped)")
+          print(f"{name}: posted")
+          EOF
+
+      - name: eBay channel
+        env:
+          DISCORD_WEBHOOK_EBAY: ${{ secrets.DISCORD_WEBHOOK_EBAY }}
+        run: python post.py DISCORD_WEBHOOK_EBAY "#ebay-resale"
+
+      - name: Bot-status channel
+        if: always()
+        env:
+          DISCORD_WEBHOOK_STATUS: ${{ secrets.DISCORD_WEBHOOK_STATUS }}
+        run: python post.py DISCORD_WEBHOOK_STATUS "#bot-status"
