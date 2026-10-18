@@ -14,7 +14,15 @@ import urllib.parse
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import ebay_watch as ew  # noqa: E402
 
-CARD_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ebay_watch.json")
+REAL_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ebay_watch.json")
+# The check tests count eBay calls, so they run against the Luffy card alone (the first card in the
+# real list), not however many cards the list holds today.
+with open(REAL_FILE, encoding="utf-8") as _f:
+    _real = json.load(_f)
+_real["cards"] = _real["cards"][:1]
+CARD_FILE = os.path.join(tempfile.mkdtemp(), "ebay_watch.json")
+with open(CARD_FILE, "w", encoding="utf-8") as _f:
+    json.dump(_real, _f)
 SECRET = "SBX-cert-secret-value-123"
 
 
@@ -289,3 +297,31 @@ class CheckTests(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RealListTests(unittest.TestCase):
+    def test_every_card_in_the_real_list_loads(self):
+        with open(REAL_FILE, encoding="utf-8") as f:
+            wanted = [c for c in json.load(f)["cards"] if c.get("enabled", True)]
+        cards, _ = ew.load_watch(REAL_FILE)
+        self.assertEqual(len(cards), len(wanted))
+
+    def test_nike_shoe_size_filter(self):
+        cards, _ = ew.load_watch(REAL_FILE)
+        g = next(c for c in cards if "Gomu Gomu - US 10" in c["name"])
+        self.assertTrue(ew.title_matches("Nike Air Max Plus TN One Piece Gomu Gomu IR0968-500 US 10", g))
+        self.assertTrue(ew.title_matches("Nike TN Air Max Plus One Piece Gomu Gomu UK9 / US10", g))
+        self.assertFalse(ew.title_matches("Nike Air Max Plus One Piece Gomu Gomu US 10.5", g))
+        self.assertFalse(ew.title_matches("Nike Air Max Plus One Piece Gomu Gomu Womens US 10", g))
+        self.assertFalse(ew.title_matches("One Piece x Nike Air Max Plus Gomu Gomu DON!! Promo Card", g))
+
+    def test_nike_don_cards(self):
+        cards, _ = ew.load_watch(REAL_FILE)
+        en = next(c for c in cards if c["name"] == "Nike x One Piece Gomu Gomu DON!! card (English)")
+        jp = next(c for c in cards if c["name"] == "Nike x One Piece Gomu Gomu DON!! card (Japanese)")
+        t = "One Piece x Nike Air Max Plus Gomu Gomu DON!! Promo Card (English)"
+        self.assertTrue(ew.title_matches(t, en))
+        self.assertFalse(ew.title_matches(t, jp))
+        self.assertTrue(ew.title_matches("Nike Air Max Plus Gomu Gomu DON!! Promo Card Japanese", jp))
+        self.assertFalse(ew.title_matches("Nike Gomu Gomu DON card English PSA 10", en))
+        self.assertFalse(ew.title_matches("Nike Premium Card Collection 34 card set Japanese Gomu DON", jp))
