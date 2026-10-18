@@ -1,117 +1,723 @@
 {
-    "_help":  "Edit this file to change what the bot watches. \u0027max\u0027 is the most you\u0027d pay (AUD, near-mint). Set \u0027enabled\u0027 to false to stop watching a card. \u0027handles\u0027 are product URL endings at Mayhem/Good Games; leave them out and the bot searches by name (or by \u0027search\u0027) and checks the card number itself.",
-    "alerts":  {
-                   "ntfy_topic":  "",
-                   "_help":  "CLOUD COPY: Discord webhooks and heartbeat topic are stored in GitHub Actions Secrets, not this public file."
-               },
-    "sealed":  {
-                   "max_price":  260,
-                   "shopify_collections":  [
-                                               {
-                                                   "name":  "Gumnut",
-                                                   "url":  "https://www.gumnut.com.au/collections/one-piece-card-game/products.json?limit=250"
-                                               },
-                                               {
-                                                   "name":  "Good Games (sealed)",
-                                                   "url":  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250"
-                                               },
-                                               {
-                                                   "name":  "Gameology",
-                                                   "url":  "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
-                                               },
-                                               {
-                                                   "name":  "TCGroup",
-                                                   "url":  "https://www.tcgroupau.com.au/collections/one-piece-booster-box/products.json?limit=250"
-                                               },
-                                               {
-                                                   "name":  "Pokebox",
-                                                   "url":  "https://www.pokebox.com.au/collections/one-piece-card-game-booster-boxes-english/products.json?limit=250"
-                                               },
-                                               {
-                                                   "name":  "Pocket Games",
-                                                   "url":  "https://pocketgames.com.au/collections/one-piece-tcg-cards/products.json?limit=250"
-                                               }
-                                           ],
-                   "shopify_products":  [
-                                            {
-                                                "name":  "Pokebox",
-                                                "url":  "https://www.pokebox.com.au/products/one-piece-card-game-extra-booster-heroines-edition-vol-2-eb-05-booster-box-english.js"
-                                            }
-                                        ],
-                   "woocommerce":  [
-                                       {
-                                           "name":  "JToys",
-                                           "url":  "https://www.jtoys.com.au/wp-json/wc/store/v1/products?search=booster%20box\u0026per_page=50"
-                                       },
-                                       {
-                                           "name":  "M-G",
-                                           "url":  "https://www.m-g.com.au/wp-json/wc/store/v1/products?search=one%20piece%20booster%20box\u0026per_page=50"
-                                       }
-                                   ]
-               },
-    "singles":  {
-                    "_help":  "Mint Collectables is left out on purpose (about $20 shipping).",
-                    "shops":  {
-                                  "Elemental Arcade":  "https://elementalarcade.com.au",
-                                  "Mayhem":  "https://www.mayhemcollectables.com.au",
-                                  "Good Games":  "https://tcg.goodgames.com.au"
-                              },
-                    "cards":  [
-                                  {
-                                      "name":  "Sabo",
-                                      "num":  "OP13-120",
-                                      "qty":  4,
-                                      "max":  12,
-                                      "deck":  "Sabo",
-                                      "priority":  true,
-                                      "enabled":  true,
-                                      "exclude":  [
-                                                      "super alternate",
-                                                      "red ",
-                                                      "wanted",
-                                                      "treasure",
-                                                      "manga",
-                                                      "anniversary",
-                                                      "promotion",
-                                                      "japanese",
-                                                      "pre-release",
-                                                      "release event"
-                                                  ],
-                                      "handles":  {
-                                                      "Good Games":  [
-                                                                         "sabo-sp-carrying-on-his-will",
-                                                                         "sabo-parallel-carrying-on-his-will"
-                                                                     ]
-                                                  },
-                                      "note":  "SEC: regular/SP or Parallel only. Mayhem \u0027sabo-carrying-on-his-will\u0027 is the LEADER, not this."
-                                  },
-                                  {
-                                      "name":  "Belo Betty",
-                                      "num":  "OP05-015",
-                                      "qty":  4,
-                                      "max":  1.5,
-                                      "deck":  "Sabo",
-                                      "priority":  false,
-                                      "enabled":  true
-                                  },
-                                  {
-                                      "name":  "Monkey.D.Garp",
-                                      "num":  "OP13-016",
-                                      "qty":  4,
-                                      "max":  1.5,
-                                      "deck":  "Sabo",
-                                      "priority":  false,
-                                      "enabled":  true
-                                  },
-                                  {
-                                      "name":  "Revolutionary Army HQ",
-                                      "num":  "OP05-021",
-                                      "qty":  3,
-                                      "max":  1,
-                                      "deck":  "Sabo",
-                                      "priority":  false,
-                                      "enabled":  true
-                                  }
-                              ]
+    "_help": "Edit this file to change what the bot watches. 'max' is the most you'd pay (AUD, near-mint). Set 'enabled' to false to stop watching a card. 'handles' are product URL endings at Mayhem/Good Games; leave them out and the bot searches by name (or by 'search') and checks the card number itself.",
+    "drop_windows": [
+        {
+            "name": "EB-05 eve",
+            "start": "2026-10-29 18:00",
+            "end": "2026-10-29 23:59",
+            "every_seconds": 60
+        },
+        {
+            "name": "EB-05 release day",
+            "start": "2026-10-30 08:00",
+            "end": "2026-10-30 14:00",
+            "every_seconds": 60
+        },
+        {
+            "name": "OP-18 eve",
+            "start": "2026-11-19 18:00",
+            "end": "2026-11-19 23:59",
+            "every_seconds": 60
+        },
+        {
+            "name": "OP-18 release day",
+            "start": "2026-11-20 08:00",
+            "end": "2026-11-20 14:00",
+            "every_seconds": 60
+        },
+        {
+            "name": "EB-06 eve",
+            "start": "2027-01-28 18:00",
+            "end": "2027-01-28 23:59",
+            "every_seconds": 60
+        },
+        {
+            "name": "EB-06 release day",
+            "start": "2027-01-29 08:00",
+            "end": "2027-01-29 14:00",
+            "every_seconds": 60
+        },
+        {
+            "name": "OP-19 eve",
+            "start": "2027-03-04 18:00",
+            "end": "2027-03-04 23:59",
+            "every_seconds": 60
+        },
+        {
+            "name": "OP-19 release day",
+            "start": "2027-03-05 08:00",
+            "end": "2027-03-05 14:00",
+            "every_seconds": 60
+        }
+    ],
+    "alerts": {
+        "ntfy_topic": "",
+        "_help": "CLOUD COPY: Discord webhooks and heartbeat topic are stored in GitHub Actions Secrets, not this public file."
+    },
+    "sealed": {
+        "max_price": 260,
+        "shopify_collections": [
+            {
+                "name": "Gumnut",
+                "url": "https://www.gumnut.com.au/collections/one-piece-card-game/products.json?limit=250"
+            },
+            {
+                "name": "Good Games (sealed)",
+                "url": "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250"
+            },
+            {
+                "name": "Gameology",
+                "url": "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
+            },
+            {
+                "name": "TCGroup",
+                "url": "https://www.tcgroupau.com.au/collections/one-piece-booster-box/products.json?limit=250"
+            },
+            {
+                "name": "Pokebox",
+                "url": "https://www.pokebox.com.au/collections/one-piece-card-game-booster-boxes-english/products.json?limit=250"
+            },
+            {
+                "name": "Pocket Games",
+                "url": "https://pocketgames.com.au/collections/one-piece-tcg-cards/products.json?limit=250"
+            }
+        ],
+        "shopify_products": [
+            {
+                "name": "Pokebox",
+                "url": "https://www.pokebox.com.au/products/one-piece-card-game-extra-booster-heroines-edition-vol-2-eb-05-booster-box-english.js"
+            }
+        ],
+        "woocommerce": [
+            {
+                "name": "JToys",
+                "url": "https://www.jtoys.com.au/wp-json/wc/store/v1/products?search=booster%20box&per_page=50"
+            },
+            {
+                "name": "M-G",
+                "url": "https://www.m-g.com.au/wp-json/wc/store/v1/products?search=one%20piece%20booster%20box&per_page=50"
+            }
+        ]
+    },
+    "singles": {
+        "_help": "Mint Collectables is left out on purpose (about $20 shipping).",
+        "shops": {
+            "Elemental Arcade": "https://elementalarcade.com.au",
+            "Mayhem": "https://www.mayhemcollectables.com.au",
+            "Good Games": "https://tcg.goodgames.com.au"
+        },
+        "cards": [
+            {
+                "name": "Sabo",
+                "num": "OP13-120",
+                "qty": 4,
+                "max": 12,
+                "deck": "Sabo",
+                "priority": true,
+                "enabled": true,
+                "exclude": [
+                    "super alternate",
+                    "red ",
+                    "wanted",
+                    "treasure",
+                    "manga",
+                    "anniversary",
+                    "promotion",
+                    "japanese",
+                    "pre-release",
+                    "release event"
+                ],
+                "handles": {
+                    "Good Games": [
+                        "sabo-sp-carrying-on-his-will",
+                        "sabo-parallel-carrying-on-his-will"
+                    ]
+                },
+                "note": "SEC: regular/SP or Parallel only. Mayhem 'sabo-carrying-on-his-will' is the LEADER, not this."
+            },
+            {
+                "name": "Sabo",
+                "num": "PRB02-014",
+                "qty": 4,
+                "max": 5,
+                "deck": "Sabo",
+                "priority": true,
+                "enabled": false,
+                "search": "sabo premium booster"
+            },
+            {
+                "name": "Belo Betty",
+                "num": "OP05-015",
+                "qty": 4,
+                "max": 1.5,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": false,
+                "note": "Not in the OP-17 Sabo lists (Oct 2026); switched off 18 Oct. Set enabled true to watch again."
+            },
+            {
+                "name": "Monkey.D.Garp",
+                "num": "OP13-016",
+                "qty": 4,
+                "max": 1.5,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true
+            },
+            {
+                "name": "Revolutionary Army HQ",
+                "num": "OP05-021",
+                "qty": 3,
+                "max": 1,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": false,
+                "note": "Not in the OP-17 Sabo lists (Oct 2026); switched off 18 Oct. Set enabled true to watch again."
+            },
+            {
+                "name": "Usopp",
+                "num": "OP17-080",
+                "qty": 4,
+                "max": 2.5,
+                "deck": "Sabo",
+                "priority": true,
+                "enabled": true,
+                "search": "Usopp The World's Strongest Warriors"
+            },
+            {
+                "name": "Jaguar.D.Saul",
+                "num": "OP17-089",
+                "qty": 4,
+                "max": 1,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Roronoa Zoro",
+                "num": "OP17-095",
+                "qty": 4,
+                "max": 1,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Monkey.D.Luffy",
+                "num": "OP17-093",
+                "qty": 4,
+                "max": 4,
+                "deck": "Sabo",
+                "priority": true,
+                "enabled": true,
+                "search": "Monkey.D.Luffy The World's Strongest Warriors"
+            },
+            {
+                "name": "Tony Tony.Chopper",
+                "num": "OP17-084",
+                "qty": 4,
+                "max": 1,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Nami",
+                "num": "OP17-086",
+                "qty": 3,
+                "max": 1,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Nico Robin",
+                "num": "OP17-087",
+                "qty": 2,
+                "max": 1.5,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Jinbe",
+                "num": "OP17-083",
+                "qty": 2,
+                "max": 1,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Hajrudin",
+                "num": "OP17-088",
+                "qty": 4,
+                "max": 1,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Gum-Gum Kong Gun",
+                "num": "OP17-098",
+                "qty": 2,
+                "max": 1,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Bad Manners Kick Course",
+                "num": "OP04-016",
+                "qty": 2,
+                "max": 1.5,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Pirates Docking Six",
+                "num": "OP15-088",
+                "qty": 4,
+                "max": 8,
+                "deck": "Sabo",
+                "priority": true,
+                "enabled": true,
+                "search": "Pirates Docking Six"
+            },
+            {
+                "name": "Roronoa Zoro",
+                "num": "EB04-007",
+                "qty": 3,
+                "max": 15,
+                "deck": "Sabo",
+                "priority": true,
+                "enabled": true,
+                "search": "Roronoa Zoro Adventure on Kami's Island"
+            },
+            {
+                "name": "Portgas.D.Ace",
+                "num": "OP16-118",
+                "qty": 4,
+                "max": 22,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false,
+                "exclude": [
+                    "super alternate",
+                    "red ",
+                    "wanted",
+                    "treasure",
+                    "manga",
+                    "anniversary",
+                    "promotion",
+                    "japanese",
+                    "pre-release",
+                    "release event"
+                ],
+                "handles": {
+                    "Mayhem": [
+                        "portgas-d-ace-the-time-of-battle-1"
+                    ],
+                    "Good Games": [
+                        "portgas-d-ace-the-time-of-battle-1"
+                    ]
                 }
+            },
+            {
+                "name": "Jewelry Bonney",
+                "num": "OP12-118",
+                "qty": 2,
+                "max": 14,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false,
+                "exclude": [
+                    "super alternate",
+                    "red ",
+                    "wanted",
+                    "treasure",
+                    "manga",
+                    "anniversary",
+                    "promotion",
+                    "japanese",
+                    "pre-release",
+                    "release event"
+                ],
+                "handles": {
+                    "Mayhem": [
+                        "jewelry-bonney-legacy-of-the-master"
+                    ],
+                    "Good Games": [
+                        "jewelry-bonney-legacy-of-the-master"
+                    ]
+                }
+            },
+            {
+                "name": "Monkey.D.Luffy",
+                "num": "ST21-014",
+                "qty": 2,
+                "max": 20,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false
+            },
+            {
+                "name": "Trafalgar Law",
+                "num": "OP13-031",
+                "qty": 4,
+                "max": 2.5,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "trafalgar-law-carrying-on-his-will"
+                    ],
+                    "Good Games": [
+                        "trafalgar-law-carrying-on-his-will"
+                    ]
+                }
+            },
+            {
+                "name": "Luffy & Ace",
+                "num": "ST30-001",
+                "qty": 1,
+                "max": 5,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "luffy-ace-starter-deck-ex-gear-5"
+                    ],
+                    "Good Games": [
+                        "luffy-ace-starter-deck-ex-gear-5"
+                    ]
+                }
+            },
+            {
+                "name": "Mr.3(Galdino)",
+                "num": "ST30-014",
+                "qty": 6,
+                "max": 4,
+                "deck": "both Luffy decks",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Good Games": [
+                        "mr-3galdino-starter-deck-ex-gear-5"
+                    ],
+                    "Mayhem": [
+                        "mr-3galdino-starter-deck-ex-gear-5"
+                    ]
+                }
+            },
+            {
+                "name": "Prisoner of Impel Down",
+                "num": "OP16-042",
+                "qty": 7,
+                "max": 4.5,
+                "deck": "Green/Blue Luffy",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "prisoner-of-impel-down-the-time-of-battle"
+                    ],
+                    "Good Games": [
+                        "prisoner-of-impel-down-the-time-of-battle"
+                    ]
+                }
+            },
+            {
+                "name": "Mr.3(Galdino)",
+                "num": "OP16-056",
+                "qty": 3,
+                "max": 10,
+                "deck": "Green/Blue Luffy",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "mr-3galdino-the-time-of-battle-1"
+                    ],
+                    "Good Games": [
+                        "mr-3galdino-the-time-of-battle-1"
+                    ]
+                }
+            },
+            {
+                "name": "Gravity Blade Raging Tiger",
+                "num": "OP06-058",
+                "qty": 2,
+                "max": 8.5,
+                "deck": "Green/Blue Luffy",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "gravity-blade-raging-tiger-wings-of-the-captain"
+                    ],
+                    "Good Games": [
+                        "gravity-blade-raging-tiger-wings-of-the-captain"
+                    ]
+                }
+            },
+            {
+                "name": "Brook",
+                "num": "OP15-032",
+                "qty": 3,
+                "max": 6.5,
+                "deck": "both Luffy decks",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "brook-adventure-on-kamis-island-1"
+                    ],
+                    "Good Games": [
+                        "brook-adventure-on-kamis-island-1"
+                    ]
+                }
+            },
+            {
+                "name": "Boa Hancock",
+                "num": "OP16-032",
+                "qty": 2,
+                "max": 3,
+                "deck": "Green/Blue Luffy",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "boa-hancock-the-time-of-battle"
+                    ],
+                    "Good Games": [
+                        "boa-hancock-the-time-of-battle"
+                    ]
+                }
+            },
+            {
+                "name": "Monkey.D.Luffy",
+                "num": "OP16-015",
+                "qty": 3,
+                "max": 4,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false
+            },
+            {
+                "name": "Monkey.D.Luffy",
+                "num": "ST30-012",
+                "qty": 4,
+                "max": 6,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "monkey-d-luffy-starter-deck-ex-gear-5"
+                    ],
+                    "Good Games": [
+                        "monkey-d-luffy-starter-deck-ex-gear-5"
+                    ]
+                }
+            },
+            {
+                "name": "Perona",
+                "num": "OP14-033",
+                "qty": 2,
+                "max": 6,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "perona-the-azure-seas-seven"
+                    ],
+                    "Good Games": [
+                        "perona-the-azure-seas-seven"
+                    ]
+                }
+            },
+            {
+                "name": "Inazuma",
+                "num": "ST30-002",
+                "qty": 4,
+                "max": 1,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "inazuma-starter-deck-ex-gear-5"
+                    ],
+                    "Good Games": [
+                        "inazuma-starter-deck-ex-gear-5"
+                    ]
+                }
+            },
+            {
+                "name": "Emporio.Ivankov",
+                "num": "ST30-004",
+                "qty": 4,
+                "max": 1,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "emporio-ivankov-starter-deck-ex-gear-5"
+                    ],
+                    "Good Games": [
+                        "emporio-ivankov-starter-deck-ex-gear-5"
+                    ]
+                }
+            },
+            {
+                "name": "Can You Still Fight, Luffy?! Of Course!!",
+                "num": "ST30-016",
+                "qty": 4,
+                "max": 1,
+                "deck": "Luffy & Ace",
+                "priority": true,
+                "enabled": false
+            },
+            {
+                "name": "Buggy",
+                "num": "OP16-048",
+                "qty": 3,
+                "max": 1.5,
+                "deck": "Green/Blue Luffy",
+                "priority": false,
+                "enabled": false
+            },
+            {
+                "name": "Emporio.Ivankov",
+                "num": "OP16-026",
+                "qty": 3,
+                "max": 1.5,
+                "deck": "Green/Blue Luffy",
+                "priority": false,
+                "enabled": false
+            },
+            {
+                "name": "Monkey.D.Luffy",
+                "num": "OP16-034",
+                "qty": 1,
+                "max": 1.5,
+                "deck": "Green/Blue Luffy",
+                "priority": false,
+                "enabled": false,
+                "handles": {
+                    "Mayhem": [
+                        "monkey-d-luffy-the-time-of-battle"
+                    ],
+                    "Good Games": [
+                        "monkey-d-luffy-the-time-of-battle"
+                    ]
+                }
+            },
+            {
+                "name": "Jinbe",
+                "num": "OP16-027",
+                "qty": 1,
+                "max": 1.5,
+                "deck": "Green/Blue Luffy",
+                "priority": false,
+                "enabled": false
+            },
+            {
+                "name": "Asura Blades Drawn Dead Man's Game",
+                "num": "OP12-037",
+                "qty": 1,
+                "max": 11,
+                "deck": "Green/Blue Luffy",
+                "priority": false,
+                "enabled": false
+            },
+            {
+                "name": "I Know You're Strong",
+                "num": "OP13-040",
+                "qty": 2,
+                "max": 2,
+                "deck": "both Luffy decks",
+                "priority": false,
+                "enabled": false
+            },
+            {
+                "name": "Jewelry Bonney",
+                "num": "OP07-026",
+                "qty": 2,
+                "max": 2,
+                "deck": "Luffy & Ace",
+                "priority": false,
+                "enabled": false
+            },
+            {
+                "name": "Edward.Newgate",
+                "num": "OP12-002",
+                "qty": 4,
+                "max": 1,
+                "deck": "Luffy & Ace",
+                "priority": false,
+                "enabled": false
+            },
+            {
+                "name": "Edward.Newgate",
+                "num": "ST30-003",
+                "qty": 2,
+                "max": 1,
+                "deck": "Luffy & Ace",
+                "priority": false,
+                "enabled": false
+            },
+            {
+                "name": "Electrical Luna",
+                "num": "OP08-036",
+                "qty": 2,
+                "max": 5,
+                "deck": "Luffy & Ace",
+                "priority": false,
+                "enabled": false
+            },
+            {
+                "name": "ST10-006",
+                "num": "ST10-006",
+                "qty": 1,
+                "max": 1.0,
+                "deck": "",
+                "priority": false,
+                "enabled": true
+            }
+        ]
+    }
 }

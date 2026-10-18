@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-One Piece TCG restock bot (Lee's version)
-=========================================
+One Piece TCG restock bot (Lee's version) - v2
+==============================================
 
 Checks Australian shops for:
   1. English One Piece booster boxes in stock (or buyable on pre-order) at or under your max price
@@ -9,8 +9,8 @@ Checks Australian shops for:
   3. Other English sealed products on a watch list (starter decks, double packs, illustration boxes,
      premium collections...) at or under their max price - see DEFAULT_SEALED_WATCH
   4. NEW listings: a box or watched product a shop has just added, even before it's buyable
-  5. eBay: cards in ebay_watch.json listed at or under your max, delivered (needs a free eBay key,
-     see the top of ebay_watch.py; without one this part is simply off)
+  5. eBay: cards and collectibles in ebay_watch.json (e.g. the Nike x One Piece TNs and DON!! cards) listed
+     at or under your max, delivered (needs a free eBay key, see the top of ebay_watch.py)
 
 Every find comes with a one-tap "Buy" link that puts it straight into your cart at
 checkout. You still press pay yourself - the bot never buys anything or logs in.
@@ -24,6 +24,34 @@ Only needs Python 3.8+ (no extra installs).
     python tcg_bot.py --singles       only check singles
     python tcg_bot.py --test-discord  post a test message to your Discord channel and stop
     python tcg_bot.py --recap         post the daily recap (the GitHub copy does this every morning)
+    python tcg_bot.py --dry-run       check and print, but post nothing and save nothing (safe to test with)
+    python tcg_bot.py --self-test     check config.json, file access and one shop, then stop
+
+What's new in v2 (all optional settings go in config.json; nothing to change if you're happy):
+  * Much faster checks: connections to each shop are kept open and reused, replies are gzip-
+    compressed, duplicate requests within a check are shared, singles and boxes are checked at the
+    same time, and a shop that refuses the bot (401/403) isn't asked again in the same check.
+  * Alerts can't get lost: posts wait out Discord's rate limits and retry; anything that still
+    doesn't reach Discord is tried again next check instead of being marked as seen. More than 10
+    finds go out over several messages instead of being cut off.
+  * Shops with more than 250 products are read page by page (page 2, 3...), so nothing is missed.
+  * Singles found at the same shop get one combined cart link ("🧺 one cart"), to save on shipping.
+  * Box alerts show the lowest price the bot has seen (price_history.json); /history and /stats in
+    Discord use it too.
+  * Instant Discord commands: every check saves its results to latest.json.
+  * Polite by default: follows each shop's robots.txt ("respect_robots": false to switch off), at
+    most 4 requests at once per shop, and a shop that's been down 3 checks in a row is retried every
+    15 minutes instead of every check ("down_retry_minutes").
+  * "singles_every_minutes": 15  - in --loop, check singles less often than boxes (boxes stay fast)
+  * "auto_drop_windows": true    - drop mode turns itself on for booster releases in the release list
+                                   (the evening before 6pm-midnight, release day 8am-2pm), on top of
+                                   any "drop_windows" you add yourself
+  * "alerts": {"quiet_hours": "23:00-07:00"} - no @ping or phone push in those hours (still posted),
+                                   except booster boxes; /mute in Discord silences pings for a while
+  * Webhooks and the bot token can live in secrets.json (same keys as "alerts"), which is never
+    committed, instead of config.json.
+  * config.json is checked when loaded: a wrong value turns that one item off with a warning
+    instead of stopping the bot, and a Notepad "BOM" no longer breaks it.
 
 Drop-day mode (in --loop only): add "drop_windows" to config.json, e.g.
     "drop_windows": [
@@ -35,6 +63,8 @@ Between start and end (your computer's local time) it checks booster boxes every
 
 New-listing alerts are on by default. To switch them off: "new_listings": false
 
+eBay finds (ebay_watch.json) go to "discord_webhook_ebay" if set, otherwise the singles channel.
+
 Status posts (no ping) go to "discord_webhook_status" if set, otherwise the boxes channel:
 bot online, drop mode on/off, a shop not loading for 3 checks / loading again, config.json
 typos, failed checks, and (cloud copy) the PC going quiet or coming back.
@@ -42,51 +72,71 @@ typos, failed checks, and (cloud copy) the PC going quiet or coming back.
 No double posts: give both copies the same private "heartbeat_topic" (in "alerts" on the PC,
 the HEARTBEAT_TOPIC secret in the cloud, plus HEARTBEAT_ROLE=listen there). The PC copy says
 "I'm on" through ntfy.sh every 15 minutes; the cloud copy keeps checking and remembering, but
-only posts while it hasn't heard from the PC for 20 minutes.
+only posts while it hasn't heard from the PC for 20 minutes. When the PC goes quiet, the cloud
+copy also posts anything it saw after the PC's last "I'm on", so nothing falls in the gap.
 
 Alert settings can also come from environment variables, which win over config.json.
 The cloud copy (GitHub Actions) uses these so the webhooks stay secret:
     DISCORD_WEBHOOK, DISCORD_WEBHOOK_BOXES, DISCORD_WEBHOOK_SINGLES, DISCORD_WEBHOOK_SEALED, DISCORD_PING,
+    DISCORD_WEBHOOK_EBAY, DISCORD_WEBHOOK_STATUS, DISCORD_WEBHOOK_RECAP,
     NTFY_TOPIC, BOT_NAME (the name the Discord posts show, e.g. "One Piece Restock (cloud)"),
     HEARTBEAT_TOPIC, HEARTBEAT_ROLE
 """
 import argparse
+import base64
+import gzip
+import http.client
 import json
 import os
+import random
 import re
+import ssl
 import sys
 import threading
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
+import zlib
+from collections import Counter, OrderedDict, defaultdict, deque
+from concurrent.futures import Future, ThreadPoolExecutor
+from datetime import datetime, timedelta
 
 try:
     import ebay_watch          # eBay watch list (ebay_watch.json); optional
 except ImportError:            # ebay_watch.py not next to the bot: eBay is skipped, everything else as normal
     ebay_watch = None
 
+VERSION = "2.0.2"
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(HERE, "config.json")
+SECRETS_PATH = os.path.join(HERE, "secrets.json")        # optional; same keys as "alerts"; never commit it
 STATE_PATH = os.path.join(HERE, "seen.json")
 KNOWN_PATH = os.path.join(HERE, "known_products.json")
 STATUS_PATH = os.path.join(HERE, "status.json")
 RECAP_PATH = os.path.join(HERE, "recap.json")          # yesterday's prices, for the daily recap
 PICKS_PATH = os.path.join(HERE, "market_picks.json")   # optional: value picks from the market ledger
+SNAPSHOT_PATH = os.path.join(HERE, "latest.json")      # last check's results, so Discord commands answer instantly
+HISTORY_PATH = os.path.join(HERE, "price_history.json")  # one price per listing per day ("lowest seen", /history)
+EVENTS_PATH = os.path.join(HERE, "events.jsonl")       # restocks, sell-outs and new listings, for /stats
+CONTROLS_PATH = os.path.join(HERE, "controls.json")    # switches set from Discord (e.g. /mute)
 # The ledger saves its picks (and the cloud copy its recap snapshot) to the GitHub repo; the PC copy
 # reads them from there. Override with "repo_raw_url" in config.json.
 REPO_RAW_URL = "https://raw.githubusercontent.com/leekouris00-maker/onepiece-restock/master"
 _remote_cache = {}
 LOG_PATH = os.path.join(HERE, "finds.log")
+LOG_MAX_BYTES = 1_000_000       # finds.log rolls over to finds.log.1 past this size
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
 
 MIN_DROP_SECONDS = 30
 SHOP_DOWN_AFTER = 3             # a shop that fails this many checks in a row gets a "can't reach" status post
-OFFLINE_SHARE = 0.8             # if this share of shops fail in the same check, it's the bot's connection, not the shops
+OFFLINE_SHARE = 0.8             # if this share of shops fail in the same check, it's the bot's side, not the shops
 OFFLINE_MIN_SHOPS = 4           # ...but only judge that when at least this many shops were checked
+SINGLES_EVERY_DEFAULT = 15       # singles (3 shops, lots of product pages) every 15 min; boxes every check
+DOWN_RETRY_MIN = 15             # ...and is then retried every 15 minutes instead of every check
 
 # per-run record of which shop websites answered: host -> [ok, failed]
 _host_results = {}
@@ -102,6 +152,8 @@ ENV_ALERTS = {
     "NTFY_TOPIC": "ntfy_topic",
     "BOT_NAME": "bot_name",
     "DISCORD_WEBHOOK_RECAP": "discord_webhook_recap",
+    "DISCORD_WEBHOOK_STATUS": "discord_webhook_status",
+    "DISCORD_WEBHOOK_EBAY": "discord_webhook_ebay",
     "LEDGER_URL": "ledger_url",
     "HEARTBEAT_TOPIC": "heartbeat_topic",
     "HEARTBEAT_ROLE": "heartbeat_role",
@@ -161,41 +213,821 @@ EXTRA_SHOPIFY_COLLECTIONS = [
 EXTRA_SHOPIFY_SEARCH = [
     {"name": "Grailborne", "base": "https://grailborne.com.au"},
     {"name": "Collectible Madness", "base": "https://collectiblemadness.com.au"},
-    {"name": "Friendly Collectibles", "base": "https://friendlycollectibles.com.au"},
+    # Friendly Collectibles was removed in Oct 2026: its search refused the bot (HTTP 401) on every check.
 ]
 SEARCH_QUERIES = ["one piece booster box", "one piece booster display", "one piece card game"]
 
 WATCH_EXCLUDE = ["japanese", "(jp)", " jp ", "chinese", "korean", "asia", "simplified", "traditional"]
 
+MAX_PAGES = 4                   # Shopify collections: read up to 4 pages of 250 (1,000 products)
+PREORDER_RE = re.compile(r"\bpre[\s_-]?(?:orders?|sale)\b", re.I)
+
+
+# ================================================================ fast, polite HTTP (stdlib only)
+# Python's urllib opens a brand-new connection (TCP + TLS handshake) for every request and doesn't
+# ask for compression. This small client keeps one warm connection per shop, asks for gzip, shares
+# identical requests made within a few seconds, retries only what's worth retrying (with jittered
+# backoff, honouring Retry-After), and follows robots.txt.
+HTTP_TIMEOUT = 15               # seconds to connect / for each read (v1: 25)
+HTTP_TRIES = 2                  # attempts per GET (a retry only for timeouts, 5xx, 408, 425, 429)
+PER_HOST = 2                    # most requests in flight to one shop at once (v1 reached 4-5 at Good Games)
+HOST_GAP = 0.5                  # at least this many seconds between two requests to the same shop
+COOL_MIN = 120                  # a shop that answers 429 is left alone for at least 2 minutes...
+COOL_MAX = 30 * 60              # ...doubling each time it happens again, up to 30 minutes
+IDLE_MAX = 20                   # seconds an idle kept-alive connection is trusted for reuse
+RETRY_STATUSES = {408, 425, 500, 502, 503, 504}   # 429 is never retried straight away (see cooldown)
+MAX_RETRY_AFTER = 8             # a shop asking us to wait longer than this is left until next check
+MEMO_TTL = 15                   # identical GETs within 15 s share one request (drop mode is never faster than 30 s)
+REFUSED_TTL = 60                # after a 401/403, the same shop+path isn't asked again for a minute
+COND_CACHE_BYTES = 24 * 1024 * 1024   # bodies kept for If-None-Match / If-Modified-Since in --loop
+ROBOTS_TTL = 24 * 3600          # RFC 9309: don't trust a cached robots.txt for more than 24 hours
+ROBOT_TOKEN = "onepiecerestockbot"
+# Shops whose bot protection refuses a browser-looking User-Agent from a script, but whose robots.txt
+# welcomes bots: tell them honestly what we are. Add more in config.json "user_agent_by_shop".
+BOT_UA = f"Mozilla/5.0 (compatible; {ROBOT_TOKEN}/2.0; personal stock checker, a few requests every 5 min)"
+UA_BY_HOST = {"www.jtoys.com.au": BOT_UA}
+JOB_WORKERS = 16                # shop-level jobs in parallel
+LEAF_WORKERS = 24               # individual requests inside a job (product pages, search queries)
+
+
+class HttpError(Exception):
+    """A reply we can't use. Only 'try again later' codes are retried."""
+
+    def __init__(self, status, reason="", retry_after=None):
+        super().__init__(status, reason)
+        self.status, self.reason, self.retry_after = status, reason, retry_after
+
+    def __str__(self):
+        return f"HTTP Error {self.status}: {self.reason}" if self.reason else f"HTTP Error {self.status}"
+
+
+class SkipHost(Exception):
+    """This shop failed several checks in a row and is in its quiet period (down_retry_minutes)."""
+
+
+class RobotsDisallowed(Exception):
+    """The shop's robots.txt asks bots not to read this address."""
+
+    def __init__(self, url, unreachable=False):
+        super().__init__(url)
+        self.url, self.unreachable = url, unreachable
+
+
+def _retry_after(headers, body=b""):
+    """Seconds a server asked us to wait (Retry-After header, or Discord's JSON retry_after)."""
+    v = (headers or {}).get("retry-after")
+    if v:
+        try:
+            return max(0.0, float(v))
+        except ValueError:
+            try:
+                from email.utils import parsedate_to_datetime
+                when = parsedate_to_datetime(v)
+                return max(0.0, (when - datetime.now(when.tzinfo)).total_seconds())
+            except Exception:  # noqa: BLE001
+                pass
+    try:
+        ra = json.loads(body or b"{}").get("retry_after")
+        if ra is not None:
+            return max(0.0, float(ra))
+    except Exception:  # noqa: BLE001
+        pass
+    return None
+
+
+def parse_robots(text, token=ROBOT_TOKEN):
+    """RFC 9309 robots.txt -> [[allow 1/0, pattern], ...] for our token's group(s), else the '*' group(s)."""
+    groups, agents, rules, in_rules = [], [], [], False
+    for raw in text.splitlines()[:20000]:
+        line = raw.split("#", 1)[0].strip()
+        if ":" not in line:
+            continue
+        key, val = (s.strip() for s in line.split(":", 1))
+        key = key.lower()
+        if key == "user-agent":
+            if in_rules:
+                groups.append((agents, rules))
+                agents, rules, in_rules = [], [], False
+            agents.append(val.lower())
+        elif key in ("allow", "disallow") and agents:
+            in_rules = True
+            if val:
+                rules.append([1 if key == "allow" else 0, val])
+    if agents:
+        groups.append((agents, rules))
+    if any(token in a for a, _ in groups):
+        return [r for a, rs in groups if token in a for r in rs]
+    return [r for a, rs in groups if "*" in a for r in rs]
+
+
+_robots_re_cache = {}
+
+
+def _robots_match(pattern, path):
+    rx = _robots_re_cache.get(pattern)
+    if rx is None:
+        end = pattern.endswith("$")
+        body = re.escape(pattern[:-1] if end else pattern).replace(r"\*", ".*")
+        rx = _robots_re_cache[pattern] = re.compile(body + ("$" if end else ""))
+    return rx.match(path) is not None
+
+
+def robots_allows(rules, path):
+    """Longest matching rule wins; on a tie, allow wins (RFC 9309 section 2.2.2)."""
+    best, allowed = -1, True
+    for allow, pat in rules:
+        if _robots_match(pat, path) and (len(pat) > best or (len(pat) == best and allow)):
+            best, allowed = len(pat), bool(allow)
+    return allowed
+
+
+def tls_context(cafile=None):
+    """The same TLS handshake urllib (and so v1) sends: ALPN "http/1.1" plus post-handshake auth.
+    A bare ssl.create_default_context() leaves both out, and the shops' bot protection answered
+    that handshake with 403 Forbidden for every request on 14 Oct 2026."""
+    ctx = ssl.create_default_context(cafile=cafile)
+    ctx.set_alpn_protocols(["http/1.1"])
+    if ctx.post_handshake_auth is not None:
+        ctx.post_handshake_auth = True
+    return ctx
+
+
+class _Http:
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.idle = defaultdict(list)       # (scheme, host, port) -> [(conn, idle since)]
+        self.sems = {}
+        self.memo = {}                      # url -> (expires, Future)
+        self.cond = OrderedDict()           # url -> (validators, body)
+        self.cond_bytes = 0
+        self.refused = {}                   # (host, first path part) -> (until, HttpError)
+        self.cool = {}                    # host -> [until, strikes]: shops that said 429, left alone
+        self.next_at = {}                 # host -> earliest time for its next request (HOST_GAP)
+        self.skip_hosts = set()
+        self.robots = {}                    # host -> {"t": fetched at, "rules": [[allow, pattern], ...]}
+        self.robots_on = True
+        self.user_agent = UA
+        self.classic = True                 # send requests the v1 way (see _exchange_classic)
+        self.ua_by_host = dict(UA_BY_HOST)
+        self.timeout = HTTP_TIMEOUT
+        self._ctx = None
+        self.reset_metrics()
+
+    # ------------------------------------------------------------ bookkeeping
+    def reset_metrics(self):
+        with self.lock:
+            self.m = Counter()
+            self.lat = defaultdict(lambda: deque(maxlen=500))   # bounded: the commands bot never resets
+            self.refused.clear()
+
+    @property
+    def ctx(self):
+        if self._ctx is None:
+            self._ctx = tls_context()
+        return self._ctx
+
+    def _sem(self, host):
+        with self.lock:
+            s = self.sems.get(host)
+            if s is None:
+                s = self.sems[host] = threading.BoundedSemaphore(PER_HOST)
+            return s
+
+    # ------------------------------------------------------------ connections
+    def _new_conn(self, scheme, host, port):
+        proxy = None
+        try:
+            proxy = urllib.request.getproxies().get(scheme)
+            if proxy and urllib.request.proxy_bypass(host):
+                proxy = None
+        except Exception:  # noqa: BLE001
+            proxy = None
+        if proxy and scheme == "https":     # same proxy settings urllib would have used
+            p = urllib.parse.urlsplit(proxy if "://" in proxy else "http://" + proxy)
+            hdrs = {}
+            if p.username:
+                cred = f"{urllib.parse.unquote(p.username)}:{urllib.parse.unquote(p.password or '')}"
+                hdrs["Proxy-Authorization"] = "Basic " + base64.b64encode(cred.encode()).decode()
+            conn = http.client.HTTPSConnection(p.hostname, p.port or 8080, timeout=self.timeout, context=self.ctx)
+            conn.set_tunnel(host, port, headers=hdrs)
+            return conn
+        if scheme == "https":
+            return http.client.HTTPSConnection(host, port, timeout=self.timeout, context=self.ctx)
+        return http.client.HTTPConnection(host, port, timeout=self.timeout)
+
+    def _checkout(self, key):
+        now = time.time()
+        stale = []
+        with self.lock:
+            pool = self.idle.get(key)
+            while pool:
+                conn, since = pool.pop()
+                if now - since <= IDLE_MAX:
+                    self.m["reused"] += 1
+                    for c in stale:
+                        c.close()
+                    return conn, True
+                stale.append(conn)
+            self.m["connections"] += 1
+        for c in stale:
+            c.close()
+        return self._new_conn(*key), False
+
+    def _checkin(self, key, conn):
+        with self.lock:
+            pool = self.idle[key]
+            if len(pool) <= PER_HOST:
+                pool.append((conn, time.time()))
+                return
+        conn.close()
+
+    def close_idle(self):
+        with self.lock:
+            pools, self.idle = self.idle, defaultdict(list)
+        for pool in pools.values():
+            for conn, _ in pool:
+                try:
+                    conn.close()
+                except Exception:  # noqa: BLE001
+                    pass
+
+    def _drop_idle(self, key):
+        with self.lock:
+            pool = self.idle.pop(key, [])
+        for conn, _ in pool:
+            try:
+                conn.close()
+            except Exception:  # noqa: BLE001
+                pass
+
+    def _exchange(self, method, url, body=None, headers=None):
+        """One request on a pooled connection -> (status, headers, body). If a kept-alive connection
+        turns out to have been closed by the shop while idle, the request is resent once on a new one."""
+        u = urllib.parse.urlsplit(url)
+        scheme = (u.scheme or "https").lower()
+        host = (u.hostname or "").lower()
+        port = u.port or (443 if scheme == "https" else 80)
+        if self.classic and method == "GET" and body is None:
+            return self._exchange_classic(url, host, headers)
+        target = (u.path or "/") + (("?" + u.query) if u.query else "")
+        h = {"User-Agent": self.user_agent, "Accept-Encoding": "gzip, deflate",
+             "Accept": "application/json, text/plain, */*"}
+        h.update(headers or {})
+        key = (scheme, host, port)
+        with self._sem(host):
+            if method == "GET":
+                self._pace(host)
+            for fresh in (False, True):
+                conn, reused = self._checkout(key)
+                t0 = time.perf_counter()
+                try:
+                    conn.request(method, target, body=body, headers=h)
+                    resp = conn.getresponse()
+                    raw = resp.read()
+                except (http.client.RemoteDisconnected, http.client.CannotSendRequest, http.client.BadStatusLine,
+                        ConnectionResetError, BrokenPipeError, ssl.SSLEOFError):
+                    conn.close()
+                    if reused and not fresh:
+                        self._drop_idle(key)     # the idle connection had gone stale; so have its siblings
+                        continue
+                    raise
+                except BaseException:
+                    conn.close()
+                    raise
+                ms = (time.perf_counter() - t0) * 1000
+                hdrs = {k.lower(): v for k, v in resp.getheaders()}
+                if resp.will_close:
+                    conn.close()
+                else:
+                    self._checkin(key, conn)
+                enc = hdrs.get("content-encoding", "").lower()
+                data = raw
+                if raw and enc == "gzip":
+                    data = gzip.decompress(raw)
+                elif raw and enc == "deflate":
+                    try:
+                        data = zlib.decompress(raw)
+                    except zlib.error:
+                        data = zlib.decompress(raw, -zlib.MAX_WBITS)
+                with self.lock:
+                    self.m["requests"] += 1
+                    self.m["bytes_wire"] += len(raw)
+                    self.m["bytes"] += len(data)
+                    self.lat[host].append(ms)
+                return resp.status, hdrs, data
+        raise http.client.HTTPException("unreachable")  # pragma: no cover
+
+    def _exchange_classic(self, url, host, headers=None):
+        """One GET sent exactly the way v1 sent it (urllib: same headers, one connection per request).
+        The shops' bot protection refused v2's own request style with 403 on 14-15 Oct 2026 while the
+        same PC loaded the same pages fine in a browser and v1 had been fine, so this is the default.
+        Set "classic_requests": false in config.json to go back to v2's pooled connections."""
+        ua = self.ua_by_host.get(host) or self.ua_by_host.get(host.removeprefix("www.")) or self.user_agent
+        h = {"User-Agent": ua, "Accept": "application/json"}
+        h.update(headers or {})
+        with self._sem(host):
+            self._pace(host)
+            t0 = time.perf_counter()
+            req = urllib.request.Request(url, headers=h)
+            try:
+                with urllib.request.urlopen(req, timeout=self.timeout, context=self.ctx) as r:
+                    status, hdrs, raw = r.status, {k.lower(): v for k, v in r.getheaders()}, r.read()
+            except urllib.error.HTTPError as e:
+                status, hdrs = e.code, {k.lower(): v for k, v in (e.headers or {}).items()}
+                try:
+                    raw = e.read()
+                except Exception:  # noqa: BLE001
+                    raw = b""
+            except urllib.error.URLError as e:
+                reason = e.reason
+                raise reason if isinstance(reason, OSError) else OSError(str(reason))
+            ms = (time.perf_counter() - t0) * 1000
+            with self.lock:
+                self.m["requests"] += 1
+                self.m["connections"] += 1
+                self.m["bytes_wire"] += len(raw)
+                self.m["bytes"] += len(raw)
+                self.lat[host].append(ms)
+            return status, hdrs, raw
+
+    # ------------------------------------------------------------ GET with the works
+    def fetch(self, url, tries=HTTP_TRIES, conditional=True, robots=True, memo=True):
+        """GET -> body bytes. Raises HttpError, SkipHost, RobotsDisallowed or a network error."""
+        host = (urllib.parse.urlsplit(url).hostname or "").lower()
+        if host in self.skip_hosts:
+            raise SkipHost(host)
+        if robots and self.robots_on and not self.allowed(url):
+            raise RobotsDisallowed(url, self.robots.get(host, {}).get("unreachable", False))
+        if not memo:
+            return self._fetch(url, tries, conditional)
+        now = time.time()
+        with self.lock:
+            hit = self.memo.get(url)
+            if hit and hit[0] > now:
+                fut, owner = hit[1], False
+                self.m["shared"] += 1
+            else:
+                fut, owner = Future(), True
+                self.memo[url] = (now + MEMO_TTL, fut)
+                if len(self.memo) > 4000:
+                    for k in [k for k, v in self.memo.items() if v[0] <= now]:
+                        self.memo.pop(k, None)
+        if not owner:
+            return fut.result()
+        try:
+            data = self._fetch(url, tries, conditional)
+        except BaseException as e:
+            fut.set_exception(e)
+            raise
+        fut.set_result(data)
+        return data
+
+    def _fetch(self, url, tries, conditional):
+        u = urllib.parse.urlsplit(url)
+        host = (u.hostname or "").lower()
+        rkey = (host, (u.path.split("/") + [""])[1])
+        with self.lock:
+            cool = self.cool.get(host)
+        if cool and cool[0] > time.time():
+            with self.lock:
+                self.m["cooling_skips"] += 1
+            raise HttpError(429, f"Too Many Requests - shop asked us to slow down, trying again in "
+                                 f"{int(cool[0] - time.time()) // 60 + 1} min", cool[0] - time.time())
+        with self.lock:
+            hit = self.refused.get(rkey)
+        if hit and hit[0] > time.time():
+            raise hit[1]               # the shop said no to this a moment ago - don't ask again
+        last = None
+        for attempt in range(max(1, tries)):
+            hdrs, cached = {}, None
+            if conditional:
+                with self.lock:
+                    cached = self.cond.get(url)
+                if cached:
+                    if cached[0].get("etag"):
+                        hdrs["If-None-Match"] = cached[0]["etag"]
+                    if cached[0].get("last-modified"):
+                        hdrs["If-Modified-Since"] = cached[0]["last-modified"]
+            try:
+                status, h, data = self._get_following(url, hdrs)
+            except (OSError, http.client.HTTPException, ssl.SSLError) as e:
+                last = e
+                with self.lock:
+                    self.m["net_errors"] += 1
+                if attempt + 1 < tries:
+                    self._backoff(attempt, None)
+                    continue
+                raise
+            if 200 <= status < 300:
+                self._calm(host)
+                if conditional:
+                    self._remember(url, h, data)
+                return data
+            if status == 304 and cached:
+                with self.lock:
+                    self.m["not_modified"] += 1
+                    if url in self.cond:
+                        self.cond.move_to_end(url)
+                return cached[1]
+            ra = _retry_after(h, data if status == 429 else b"")
+            if status == 429:
+                wait = self._cool_down(host, ra)
+                raise HttpError(429, f"Too Many Requests - leaving this shop alone for {int(wait) // 60 + (wait % 60 > 0)} min", wait)
+            err = HttpError(status, http.client.responses.get(status, ""), ra)
+            if status in RETRY_STATUSES and attempt + 1 < tries and (ra is None or ra <= MAX_RETRY_AFTER):
+                last = err
+                self._backoff(attempt, ra)
+                continue
+            if status in (401, 403, 451) or (status == 429 and (ra or 0) > MAX_RETRY_AFTER):
+                with self.lock:
+                    self.refused[rkey] = (time.time() + REFUSED_TTL, err)
+            raise err
+        raise last  # pragma: no cover
+
+    def _cool_down(self, host, retry_after):
+        """The shop said 429: stop asking it anything (every page) until it's had a rest.
+        Honours Retry-After; otherwise 2, 4, 8 ... up to 30 minutes for repeat 429s."""
+        with self.lock:
+            until, strikes = self.cool.get(host, [0, 0])
+            wait = min(COOL_MAX, max(float(retry_after or 0), COOL_MIN * (2 ** strikes)))
+            self.cool[host] = [time.time() + wait, strikes + 1]
+            self.m["rate_limited"] += 1
+        return wait
+
+    def _calm(self, host):
+        """A good answer: the shop is happy again, so the next 429 starts back at 2 minutes."""
+        with self.lock:
+            c = self.cool.get(host)
+            if c and c[0] <= time.time():
+                del self.cool[host]
+
+    def cooling(self):
+        """{host: seconds left} for shops currently being left alone after a 429."""
+        now = time.time()
+        with self.lock:
+            return {h: c[0] - now for h, c in self.cool.items() if c[0] > now}
+
+    def _pace(self, host):
+        """Space requests to one shop at least HOST_GAP seconds apart (call while holding its slot)."""
+        with self.lock:
+            now = time.time()
+            at = max(now, self.next_at.get(host, 0))
+            self.next_at[host] = at + HOST_GAP
+        if at > now:
+            time.sleep(at - now)
+
+    def _get_following(self, url, hdrs):
+        for _ in range(6):                       # urllib followed redirects; so do we (up to 5)
+            status, h, data = self._exchange("GET", url, headers=hdrs)
+            loc = h.get("location")
+            if status in (301, 302, 303, 307, 308) and loc:
+                url = urllib.parse.urljoin(url, loc)
+                hdrs = {k: v for k, v in hdrs.items() if not k.startswith("If-")}
+                continue
+            return status, h, data
+        return status, h, data
+
+    def _backoff(self, attempt, retry_after):
+        with self.lock:
+            self.m["retries"] += 1
+        # exponential backoff with full jitter (AWS Builders' Library), or exactly what the server asked
+        time.sleep(retry_after if retry_after is not None else random.uniform(0.25, 0.6 * (2 ** attempt)))
+
+    def _remember(self, url, h, data):
+        v = {k: h[k] for k in ("etag", "last-modified") if h.get(k)}
+        if not v:
+            return
+        with self.lock:
+            old = self.cond.pop(url, None)
+            if old:
+                self.cond_bytes -= len(old[1])
+            self.cond[url] = (v, data)
+            self.cond_bytes += len(data)
+            while self.cond_bytes > COND_CACHE_BYTES and self.cond:
+                _, (_, d) = self.cond.popitem(last=False)
+                self.cond_bytes -= len(d)
+
+    def post(self, url, data, headers=None):
+        """One POST, no automatic retry (callers decide what's safe to resend)."""
+        return self._exchange("POST", url, body=data, headers=headers)
+
+    # ------------------------------------------------------------ robots.txt
+    def allowed(self, url):
+        u = urllib.parse.urlsplit(url)
+        if u.path == "/robots.txt":
+            return True
+        host = (u.hostname or "").lower()
+        e = self._robots_entry((u.scheme or "https").lower(), host, u.port)
+        return robots_allows(e.get("rules") or [], (u.path or "/") + (("?" + u.query) if u.query else ""))
+
+    def _robots_entry(self, scheme, host, port):
+        now = time.time()
+        with self.lock:
+            old = self.robots.get(host)
+        if old and now - old.get("t", 0) < ROBOTS_TTL:
+            return old
+        url = f"{scheme}://{host}{':' + str(port) if port else ''}/robots.txt"
+        try:
+            text = self.fetch(url, tries=1, conditional=False, robots=False).decode("utf-8", "replace")
+            e = {"t": now, "rules": parse_robots(text)}
+        except HttpError as err:
+            if 400 <= err.status < 500:
+                e = {"t": now, "rules": []}      # no robots.txt: everything is allowed (RFC 9309 2.3.1.3)
+            else:
+                e = self._robots_unreachable(old, now)
+        except SkipHost:
+            raise
+        except Exception:  # noqa: BLE001
+            e = self._robots_unreachable(old, now)
+        with self.lock:
+            self.robots[host] = e
+        return e
+
+    @staticmethod
+    def _robots_unreachable(old, now):
+        if old and not old.get("unreachable"):   # keep using the last good copy for now
+            return dict(old, t=now - ROBOTS_TTL + 3600)
+        # never read it: RFC 9309 says assume "disallow all"; look again in 10 minutes
+        return {"t": now - ROBOTS_TTL + 600, "rules": [[0, "/"]], "unreachable": True}
+
+
+HTTP = _Http()
+_pool_lock = threading.Lock()
+_POOLS = {}
+_run_t0 = [time.perf_counter()]
+_seen_errors = set()
+DRY_RUN = [False]
+
+
+def _pool(name, n):
+    with _pool_lock:
+        p = _POOLS.get(name)
+        if p is None:
+            p = _POOLS[name] = ThreadPoolExecutor(max_workers=n, thread_name_prefix=f"restock-{name}")
+        return p
+
+
+def pmap(fn, items, leaf=True):
+    """fn over items in parallel, results in order. Leaf work (single requests) uses its own pool so a
+    shop-level job can fan out without ever waiting on its own pool."""
+    items = list(items)
+    if len(items) <= 1:
+        return [fn(x) for x in items]
+    return list(_pool("leaf" if leaf else "jobs", LEAF_WORKERS if leaf else JOB_WORKERS).map(fn, items))
+
+
+def begin_check(cfg, status=None, drop=None, skip_down=True):
+    """Reset the per-check counters and apply settings (user agent, robots, shops in their quiet period)."""
+    with _host_lock:
+        _host_results.clear()
+    _seen_errors.clear()
+    HTTP.reset_metrics()
+    HTTP.user_agent = (cfg or {}).get("user_agent") or UA
+    HTTP.classic = bool((cfg or {}).get("classic_requests", True))
+    HTTP.ua_by_host = {**UA_BY_HOST, **{str(k).lower(): v for k, v in
+                                        ((cfg or {}).get("user_agent_by_shop") or {}).items() if v}}
+    HTTP.robots_on = bool((cfg or {}).get("respect_robots", True))
+    status = load_status() if status is None else status
+    for host, e in (status.get("robots") or {}).items():
+        if isinstance(e, dict) and e.get("t", 0) > HTTP.robots.get(host, {}).get("t", 0):
+            HTTP.robots[host] = e
+    now = time.time()
+    retry = status.get("shop_retry") or {}
+    HTTP.skip_hosts = set() if (drop or not skip_down) else {h for h, t in retry.items() if float(t) > now}
+    hints = status.get("page_hints")
+    if isinstance(hints, dict):
+        PAGE_HINTS.update(hints)
+    _run_t0[0] = time.perf_counter()
+    return status
+
+
+def run_metrics():
+    m = HTTP.m
+    hosts = {}
+    with HTTP.lock:
+        for h, v in HTTP.lat.items():
+            v = sorted(v)
+            hosts[h] = {"n": len(v), "p50_ms": round(v[len(v) // 2]), "max_ms": round(v[-1])}
+    return {"secs": round(time.perf_counter() - _run_t0[0], 2), "requests": m["requests"], "shared": m["shared"],
+            "new_connections": m["connections"], "reused": m["reused"], "kb_wire": round(m["bytes_wire"] / 1024),
+            "kb": round(m["bytes"] / 1024), "not_modified": m["not_modified"], "retries": m["retries"],
+            "skipped_hosts": sorted(HTTP.skip_hosts), "hosts": hosts}
+
 
 # ---------------------------------------------------------------- helpers
+def read_json(path, default=None):
+    """A JSON file, or `default` if it's missing or unreadable (a Notepad BOM is fine)."""
+    try:
+        with open(path, encoding="utf-8-sig") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return default
+    except (ValueError, OSError) as e:
+        print(f"   ! {os.path.basename(path)} couldn't be read ({e}); starting it fresh")
+        return default
+
+
+def atomic_write_json(path, obj, indent=1, sort_keys=False, ensure_ascii=True):
+    """Write JSON so a crash or a reader never sees half a file: temp file, flush, then rename over."""
+    if DRY_RUN[0]:
+        return
+    data = json.dumps(obj, indent=indent, sort_keys=sort_keys, ensure_ascii=ensure_ascii)
+    tmp = f"{path}.{os.getpid()}.{threading.get_ident()}.tmp"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as f:
+        f.write(data)
+        f.flush()
+        try:
+            os.fsync(f.fileno())
+        except OSError:
+            pass
+    for i in range(10):
+        try:
+            os.replace(tmp, path)
+            return
+        except PermissionError:          # Windows: another program has it open for a moment
+            time.sleep(0.05 * (i + 1))
+    try:
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            f.write(data)
+    finally:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+
+
+def append_text(path, text, max_bytes=LOG_MAX_BYTES):
+    """Append to a log file, rolling it over to <name>.1 once it's past max_bytes."""
+    if DRY_RUN[0]:
+        return
+    try:
+        if os.path.getsize(path) > max_bytes:
+            os.replace(path, path + ".1")
+    except OSError:
+        pass
+    with open(path, "a", encoding="utf-8") as fh:
+        fh.write(text)
+
+
+_REDACT = [(re.compile(r"(discord(?:app)?\.com/api/webhooks/\d+/)[\w-]+"), r"\1***"),
+           (re.compile(r"\b[MN][\w-]{23,25}\.[\w-]{6}\.[\w-]{27,40}\b"), "***bot-token***")]
+
+
+def redact(text):
+    """Hide webhook tokens and bot tokens before anything is printed or posted."""
+    text = str(text)
+    for rx, rep in _REDACT:
+        text = rx.sub(rep, text)
+    return text
+
+
+def _num(x):
+    if isinstance(x, bool):
+        return None
+    if isinstance(x, (int, float)):
+        return float(x)
+    try:
+        return float(str(x).strip().replace("$", "").replace(",", ""))
+    except (TypeError, ValueError):
+        return None
+
+
+KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
+                  "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
+                  "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
+                  "classic_requests", "user_agent_by_shop"}
+CONFIG_WARNINGS = []
+
+
+def check_config(cfg):
+    """Fix what can be fixed (numbers typed as text) and switch off what can't, with a warning each,
+    so one bad value never stops the whole bot. Returns the warnings."""
+    w = []
+    for k in list(cfg):
+        if k not in KNOWN_SETTINGS and not k.startswith("_"):
+            import difflib                 # only needed when there's a typo to explain
+            close = difflib.get_close_matches(k, KNOWN_SETTINGS, 1)
+            w.append(f'unknown setting "{k}"' + (f' (did you mean "{close[0]}"?)' if close else ""))
+    sealed = cfg.get("sealed")
+    if not isinstance(sealed, dict):
+        w.append('"sealed" section is missing, so booster boxes aren\'t checked')
+        sealed = cfg["sealed"] = {"max_price": 0}
+    mp = _num(sealed.get("max_price"))
+    if mp is None:
+        w.append(f'sealed "max_price" should be a number (it\'s {sealed.get("max_price")!r}); box price alerts are off')
+        mp = 0.0
+    sealed["max_price"] = mp
+    for key, need in (("shopify_collections", "url"), ("shopify_products", "url"), ("woocommerce", "url"),
+                      ("shopify_search", "base")):
+        keep = []
+        for shop in sealed.get(key) or []:
+            if isinstance(shop, dict) and shop.get("name") and str(shop.get(need, "")).startswith("https://"):
+                keep.append(shop)
+            else:
+                w.append(f'sealed "{key}" entry {shop!r} needs a "name" and an https:// "{need}"; skipped')
+        if key in sealed:
+            sealed[key] = keep
+    singles = cfg.get("singles")
+    if not isinstance(singles, dict):
+        singles = cfg["singles"] = {"shops": {}, "cards": []}
+    shops = singles.get("shops") or {}
+    singles["shops"] = {n: u.rstrip("/") for n, u in shops.items() if isinstance(u, str) and u.startswith("https://")}
+    for n in set(shops) - set(singles["shops"]):
+        w.append(f'singles shop "{n}" needs an https:// address; skipped')
+    cards = singles.get("cards") or []
+    for c in cards:
+        if not isinstance(c, dict):
+            continue
+        label = f"{c.get('name', '?')} {c.get('num', '')}".strip()
+        mx, qty = _num(c.get("max")), _num(c.get("qty", 1))
+        if not c.get("num") or mx is None:
+            if c.get("enabled", True):
+                w.append(f'card "{label}" needs a "num" and a number for "max"; switched off')
+            c["enabled"] = False
+            c["max"] = mx or 0.0
+        else:
+            c["max"] = mx
+        c["qty"] = max(1, int(qty or 1))
+        c.setdefault("name", c.get("num", ""))
+    singles["cards"] = [c for c in cards if isinstance(c, dict)]
+    watch = cfg.get("sealed_watch")
+    if watch is not None:
+        good = []
+        for x in watch if isinstance(watch, list) else []:
+            if isinstance(x, dict) and x.get("match") and _num(x.get("max")) is not None:
+                x["max"] = _num(x["max"])
+                x["match"] = [x["match"]] if isinstance(x["match"], str) else list(x["match"])
+                x.setdefault("name", x["match"][0])
+                good.append(x)
+            else:
+                w.append(f"sealed_watch entry {x!r} needs \"match\" and a number for \"max\"; skipped")
+        cfg["sealed_watch"] = good
+    alerts = cfg.get("alerts") or {}
+    for k, v in alerts.items():
+        if k.startswith("discord_webhook") and v and not re.match(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/", str(v)):
+            w.append(f'alerts "{k}" doesn\'t look like a Discord webhook address')
+    qh = alerts.get("quiet_hours")
+    if qh and not re.fullmatch(r"\s*\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}\s*", str(qh)):
+        w.append(f'alerts "quiet_hours" should look like "23:00-07:00" (it\'s {qh!r}); ignored')
+        alerts.pop("quiet_hours", None)
+    return w
+
+
 def load_config():
-    """Read config.json, then let environment variables override the alert settings."""
-    cfg = json.load(open(CONFIG_PATH, encoding="utf-8"))
+    """Read config.json (+ secrets.json), then let environment variables override the alert settings."""
+    with open(CONFIG_PATH, encoding="utf-8-sig") as f:
+        cfg = json.load(f)
     alerts = cfg.setdefault("alerts", {})
+    secrets = read_json(SECRETS_PATH, {}) or {}
+    for k, v in (secrets.get("alerts", secrets) if isinstance(secrets, dict) else {}).items():
+        if v and not str(k).startswith("_"):
+            alerts[k] = v
     for env, k in ENV_ALERTS.items():
         val = os.environ.get(env, "").strip()
         if val:
             alerts[k] = val
+    CONFIG_WARNINGS[:] = check_config(cfg)
     return cfg
 
 
-def fetch_json(url, tries=2):
-    """GET a URL and parse JSON. Returns None on failure (and prints why)."""
-    last = None
-    for i in range(tries):
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"})
-            with urllib.request.urlopen(req, timeout=25) as r:
-                data = json.loads(r.read().decode("utf-8", "replace"))
-            _note_host(url, True)
-            return data
-        except Exception as e:  # noqa: BLE001
-            last = e
-            time.sleep(1.5 * (i + 1))
-    print(f"   ! couldn't read {short(url)} ({last})")
+def fetch_json(url, tries=HTTP_TRIES):
+    """GET a URL and parse JSON. Returns None on failure (and says why, once per shop per check)."""
+    try:
+        data = json.loads(HTTP.fetch(url, tries=tries).decode("utf-8", "replace"))
+    except SkipHost:
+        return None
+    except RobotsDisallowed as e:
+        if e.unreachable:
+            _fail(url, "its robots.txt couldn't be read, so the bot is holding off")
+        else:
+            _say_once(("robots", short(url)), f"   ! skipped {short(url)}: the shop's robots.txt asks bots not to read it")
+        return None
+    except (HttpError, OSError, http.client.HTTPException, ssl.SSLError, ValueError, EOFError, zlib.error) as e:
+        _fail(url, e)
+        return None
+    _note_host(url, True)
+    return data
+
+
+def _say_once(key, text):
+    with _host_lock:
+        if key in _seen_errors:
+            return
+        if len(_seen_errors) > 500:      # long-running commands bot: don't grow forever
+            _seen_errors.clear()
+        _seen_errors.add(key)
+    print(text)
+
+
+def _fail(url, err):
+    host = urllib.parse.urlparse(url).netloc
+    if isinstance(err, HttpError) and err.status == 429:
+        # Rate-limited: the shop is up, it just wants fewer requests. Say so once per check and don't
+        # count it as the shop being down (no "hasn't loaded" posts, no "can't reach the shops" alarm).
+        _say_once((host, 429), f"   ~ {host} asked the bot to slow down ({redact(err)})")
+        return
+    _say_once((host, str(err)), f"   ! couldn't read {short(url)} ({redact(err)})")
     _note_host(url, False)
-    return None
 
 
 def _note_host(url, ok):
@@ -230,6 +1062,12 @@ def is_excluded(title, words):
 def is_box_title(title):
     t = (title or "").lower()
     return ("booster box" in t or "booster display" in t) and not is_excluded(title, BOX_EXCLUDE)
+
+
+def is_preorder(title, tags=""):
+    """Pre-order / pre-sale wording in the title or tags (v1 matched any 'pre', e.g. 'PREmium')."""
+    blob = (json.dumps(tags) if not isinstance(tags, str) else tags) + " " + (title or "")
+    return bool(PREORDER_RE.search(blob))
 
 
 def watch_item(title, watch):
@@ -277,15 +1115,62 @@ def cheapest_available(variants, cents):
 
 
 # ---------------------------------------------------------------- sealed
+PAGE_HINTS = {}                 # collection URL -> pages it filled last check (kept in status.json "page_hints")
+
+
+def shopify_collection(url, max_pages=MAX_PAGES):
+    """Every product in a Shopify collection: page 1, then page=2, 3... while pages come back full
+    (v1 only ever saw the first 250). The pages a collection filled last time are asked for together,
+    which saves a round trip per extra page. -> (products, {handle: page}) or (None, {}) if page 1 failed."""
+    q = dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(url).query))
+    try:
+        limit = max(1, int(q.get("limit", 30)))
+    except ValueError:
+        limit = 30
+
+    def page_url(n):
+        return url if n == 1 else url + ("&" if "?" in url else "?") + f"page={n}"
+
+    try:
+        hint = 1 if "page" in q else max(1, min(max_pages, int(PAGE_HINTS.get(url, 1))))
+    except (TypeError, ValueError):
+        hint = 1
+    first_pages = pmap(lambda n: fetch_json(page_url(n)), range(1, hint + 1))
+    if not isinstance(first_pages[0], dict):
+        return None, {}
+    products, pages, page, batch = [], {}, 0, []
+    for data in first_pages:
+        page += 1
+        batch = (data or {}).get("products") or [] if isinstance(data, dict) else []
+        new = [p for p in batch if p.get("handle") not in pages]
+        for p in new:
+            pages[p.get("handle")] = page
+        products.extend(new)
+        if len(batch) < limit or (page > 1 and not new):
+            break
+    while len(batch) >= limit and page < max_pages and "page" not in q:
+        page += 1
+        nxt = fetch_json(page_url(page))
+        batch = (nxt or {}).get("products") or [] if isinstance(nxt, dict) else []
+        new = [p for p in batch if p.get("handle") not in pages]
+        if not new:
+            break
+        for p in new:
+            pages[p.get("handle")] = page
+        products.extend(new)
+    PAGE_HINTS[url] = max(pages.values(), default=1)
+    return products, pages
+
+
 def shopify_boxes(shop_name, url, max_price, watch=()):
     """Returns (finds, listings). listings is None if the shop couldn't be read.
     Covers booster boxes and the other sealed products in the watch list."""
-    data = fetch_json(url)
-    if not data:
+    products, pages = shopify_collection(url)
+    if products is None:
         return [], None
     base = origin(url)
     finds, listings = [], []
-    for p in data.get("products", []):
+    for p in products:
         title = p.get("title", "")
         w = None if is_box_title(title) else watch_item(title, watch)
         if not is_box_title(title) and not w:
@@ -294,7 +1179,7 @@ def shopify_boxes(shop_name, url, max_price, watch=()):
         limit = w["max"] if w else max_price
         handle = p.get("handle")
         page = f"{base}/products/{handle}"
-        is_pre = "pre" in (json.dumps(p.get("tags", "")) + title).lower()
+        is_pre = is_preorder(title, p.get("tags", ""))
         variants = p.get("variants", [])
         price, vid = cheapest_available(variants, cents=False)
         all_prices = [float(v["price"]) for v in variants if v.get("price")]
@@ -305,7 +1190,7 @@ def shopify_boxes(shop_name, url, max_price, watch=()):
             "price": price if price is not None else (min(all_prices) if all_prices else 0.0),
             "available": price is not None, "url": page,
             "cart": shopify_cart_link(base, vid) if vid else "",
-            "note": note, "max": limit,
+            "note": note, "max": limit, "page": pages.get(handle, 1),
         })
         if price is None or price > limit:
             continue
@@ -316,14 +1201,18 @@ def shopify_boxes(shop_name, url, max_price, watch=()):
     return finds, listings
 
 
+def _suggest_url(base, q):
+    return (f"{base}/search/suggest.json?q={urllib.parse.quote(q)}"
+            f"&resources[type]=product&resources[limit]=10")
+
+
 def shopify_search_boxes(shop_name, base, max_price, watch=()):
     """For shops without a One Piece section: read their search results instead.
     Returns (finds, listings) like shopify_boxes; listings is None if every search failed."""
     base = base.rstrip("/")
+    results = pmap(lambda q: fetch_json(_suggest_url(base, q)), SEARCH_QUERIES)   # all three at once
     products, any_ok = {}, False
-    for q in SEARCH_QUERIES:
-        data = fetch_json(f"{base}/search/suggest.json?q={urllib.parse.quote(q)}"
-                          f"&resources[type]=product&resources[limit]=10")
+    for data in results:
         if data is None:
             continue
         any_ok = True
@@ -331,7 +1220,7 @@ def shopify_search_boxes(shop_name, base, max_price, watch=()):
             products.setdefault(p.get("handle"), p)
     if not any_ok:
         return [], None
-    finds, listings = [], []
+    rows = []
     for handle, p in products.items():
         title = p.get("title", "")
         if "one piece" not in title.lower():
@@ -339,22 +1228,26 @@ def shopify_search_boxes(shop_name, base, max_price, watch=()):
         w = None if is_box_title(title) else watch_item(title, watch)
         if not is_box_title(title) and not w:
             continue
-        kind, prefix, group = ("Sealed", "sealed", "watch") if w else ("Booster box", "box", "box")
         limit = w["max"] if w else max_price
-        page = f"{base}/products/{handle}"
-        available = bool(p.get("available"))
         price = float(p.get("price") or p.get("price_min") or 0)
-        is_pre = "pre" in (json.dumps(p.get("tags", "")) + title).lower()
-        note = ", ".join(x for x in ((w["name"] if w else ""), ("pre-order" if is_pre else "")) if x)
+        rows.append((handle, p, w, limit, price, bool(p.get("available"))))
+    # only look up cart IDs for what's worth alerting, all at once
+    want = [r[0] for r in rows if r[5] and 0 < r[4] <= r[3]]
+    carts = dict(zip(want, pmap(lambda h: product_js(base, h) or {}, want)))
+    finds, listings = [], []
+    for handle, p, w, limit, price, available in rows:
+        title = p.get("title", "")
+        kind, prefix, group = ("Sealed", "sealed", "watch") if w else ("Booster box", "box", "box")
+        page = f"{base}/products/{handle}"
+        note = ", ".join(x for x in ((w["name"] if w else ""), ("pre-order" if is_preorder(title, p.get("tags", "")) else "")) if x)
         cart = ""
-        if available and 0 < price <= limit:      # only look up the cart ID when it's worth alerting
-            js = product_js(base, handle) or {}
-            _, vid = cheapest_available(js.get("variants"), cents=True)
+        if handle in carts:
+            _, vid = cheapest_available(carts[handle].get("variants"), cents=True)
             cart = shopify_cart_link(base, vid)
         listings.append({"id": f"list|{shop_name}|{handle}", "box_id": f"{prefix}|{shop_name}|{handle}",
                          "group": group, "kind": "New listing", "name": title, "shop": shop_name,
                          "price": price, "available": available, "url": page, "cart": cart,
-                         "note": note, "max": limit})
+                         "note": note, "max": limit, "page": 1})
         if available and 0 < price <= limit:
             finds.append({"id": f"{prefix}|{shop_name}|{handle}", "kind": kind, "name": title,
                           "shop": shop_name, "price": price, "url": page, "cart": cart, "note": note})
@@ -409,7 +1302,7 @@ def woo_boxes(shop_name, url, max_price, watch=()):
         listings.append({
             "id": f"list|{shop_name}|{p.get('id')}", "box_id": f"{prefix}|{shop_name}|{p.get('id')}",
             "group": group, "kind": "New listing", "name": name, "shop": shop_name, "price": price,
-            "available": buyable, "url": p.get("permalink"), "cart": link, "note": note, "max": limit,
+            "available": buyable, "url": p.get("permalink"), "cart": link, "note": note, "max": limit, "page": 1,
         })
         if not buyable or price <= 0 or price > limit:
             continue
@@ -432,8 +1325,7 @@ def check_sealed(cfg):
         jobs.append((woo_boxes, shop["name"], shop["url"], mx, watch))
     for shop in search:
         jobs.append((shopify_search_boxes, shop["name"], shop["base"], mx, watch))
-    with ThreadPoolExecutor(max_workers=8) as ex:
-        results = list(ex.map(lambda j: (j, j[0](*j[1:])), jobs))
+    results = pmap(lambda j: (j, j[0](*j[1:])), jobs, leaf=False)
     finds, by_shop = [], {}
     for job, (f, listings) in results:
         finds += f
@@ -455,19 +1347,18 @@ def check_sealed(cfg):
 
 # ---------------------------------------------------------------- new listings
 def load_known():
-    try:
-        return json.load(open(KNOWN_PATH, encoding="utf-8"))
-    except Exception:  # noqa: BLE001
-        return {}
+    return read_json(KNOWN_PATH, {}) or {}
 
 
 def save_known(known):
-    json.dump(known, open(KNOWN_PATH, "w", encoding="utf-8"), indent=1, sort_keys=True)
+    atomic_write_json(KNOWN_PATH, known, indent=1, sort_keys=True)
 
 
-def new_listings(by_shop, known, box_finds):
+def new_listings(by_shop, known, box_finds, pages_seen=None):
     """Listings never seen before at that shop. The first good read of a shop only remembers
-    what's there (no alerts), so a fresh install doesn't flood you."""
+    what's there (no alerts), so a fresh install doesn't flood you. The same goes for products the
+    bot reads for the first time because it now reads past page 1 of a big shop."""
+    pages_seen = {} if pages_seen is None else pages_seen
     finds_ids = {f["id"] for f in box_finds}
     out = []
     groups = {}
@@ -478,31 +1369,41 @@ def new_listings(by_shop, known, box_finds):
             key = shop if l.get("group", "box") == "box" else f"{shop} (other sealed)"
             groups.setdefault(key, []).append(l)
         groups.setdefault(shop, [])              # a shop with no boxes still gets remembered
+    deepest = {}
+    for shop, listings in groups.items():
+        base_shop = shop.replace(" (other sealed)", "")
+        for l in listings:
+            deepest[base_shop] = max(deepest.get(base_shop, 1), int(l.get("page", 1)))
     for shop, listings in groups.items():
         ids = {l["id"] for l in listings}
+        base_shop = shop.replace(" (other sealed)", "")
         if shop not in known:
             what = "other sealed" if shop.endswith("(other sealed)") else "box"
-            print(f"   (remembering {len(ids)} existing {what} listing(s) at {shop.replace(' (other sealed)', '')}; new ones will alert)")
+            print(f"   (remembering {len(ids)} existing {what} listing(s) at {base_shop}; new ones will alert)")
             known[shop] = sorted(ids)
             continue
         before = set(known[shop])
+        read_to = int(pages_seen.get(base_shop, 1))
         for l in listings:
             if l["id"] in before or l["box_id"] in finds_ids:
                 continue            # already known, or already alerting as a buyable box
+            if int(l.get("page", 1)) > read_to:
+                continue            # first time we've read this deep into the shop: just remember it
             status = ("in stock" if l["available"] else "listed, not buyable yet")
             if l["available"] and l["price"] > l["max"]:
                 status += f" (over your {money(l['max'])} max)"
             l = dict(l, note=(l["note"] + ", " if l["note"] else "") + status)
             out.append(l)
         known[shop] = sorted(before | ids)
+    for shop, page in deepest.items():
+        if page > int(pages_seen.get(shop, 1)):
+            pages_seen[shop] = page
     return out
 
 
 # ---------------------------------------------------------------- singles
 def suggest(base, q):
-    url = (f"{base}/search/suggest.json?q={urllib.parse.quote(q)}"
-           f"&resources[type]=product&resources[limit]=10")
-    data = fetch_json(url)
+    data = fetch_json(_suggest_url(base, q))
     if not data:
         return []
     return data.get("resources", {}).get("results", {}).get("products", [])
@@ -515,7 +1416,7 @@ def product_js(base, handle):
 def elemental_card(card, base):
     """Elemental titles include the card number, e.g. 'Sabo - OP13-120 [Carrying On His Will]'."""
     excl = card.get("exclude", DEFAULT_EXCLUDE)
-    out = []
+    hits = []
     for p in suggest(base, card["num"]):
         title = p.get("title", "")
         if not any(n in title.lower() or n in p.get("handle", "") for n in card_num_variants(card["num"])):
@@ -529,9 +1430,13 @@ def elemental_card(card, base):
             continue
         # search results don't always carry variant IDs; the product .js always does
         _, vid = cheapest_available(p.get("variants"), cents=False)
+        hits.append((p, title, price, vid))
+    need = [p["handle"] for p, _, _, vid in hits if not vid]
+    js = dict(zip(need, pmap(lambda h: product_js(base, h) or {}, need)))
+    out = []
+    for p, title, price, vid in hits:
         if not vid:
-            js = product_js(base, p["handle"]) or {}
-            _, vid = cheapest_available(js.get("variants"), cents=True)
+            _, vid = cheapest_available(js.get(p["handle"], {}).get("variants"), cents=True)
         out.append(single_find(card, "Elemental Arcade", price, base + "/products/" + p["handle"], title,
                                shopify_cart_link(base, vid, card.get("qty", 1))))
     return out
@@ -560,9 +1465,9 @@ def handle_shop_card(card, shop_name, base):
             if not is_excluded(p.get("title", ""), excl):
                 handles.append(p["handle"])
         handles = handles[:8]
+    pages = pmap(lambda h: product_js(base, h), handles)      # all product pages at once (v1: one by one)
     out = []
-    for h in handles:
-        p = product_js(base, h)
+    for h, p in zip(handles, pages):
         if not p or not js_matches_number(p, card["num"]):
             continue
         if is_excluded(p.get("title", ""), excl):
@@ -582,7 +1487,9 @@ def single_find(card, shop, price, url, title, cart=""):
             "priority": card.get("priority", False)}
 
 
-MAX_VALUE_PICKS = 80              # the ledger sends every listing worth watching (up to ~70); each is re-checked every singles check
+MAX_VALUE_PICKS = 80              # the ledger sends every listing worth watching (up to ~80)
+VALUE_PICKS_PER_RUN = 15          # ...but each singles check only looks at 15 of them, taking turns,
+_pick_turn = [0]                  # so every pick is still seen about once an hour without flooding the shops
 
 
 def repo_json(cfg, name, max_age=1800):
@@ -591,11 +1498,8 @@ def repo_json(cfg, name, max_age=1800):
     hit = _remote_cache.get(url)
     if hit and time.time() - hit[0] < max_age:
         return hit[1]
-    data = None
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": UA, "Cache-Control": "no-cache"})
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode("utf-8", "replace"))
+        data = json.loads(HTTP.fetch(url, tries=1, robots=False).decode("utf-8", "replace"))
     except Exception:  # noqa: BLE001
         data = None      # not there yet (e.g. before the ledger's first run) - that's fine
     _remote_cache[url] = (time.time(), data)
@@ -605,17 +1509,13 @@ def repo_json(cfg, name, max_age=1800):
 def load_picks_file(cfg=None):
     """market_picks.json: the local copy if it's today's (the cloud copy has it from the repo),
     otherwise the latest one from GitHub (the PC copy)."""
-    local = None
-    try:
-        local = json.load(open(PICKS_PATH, encoding="utf-8"))
-    except Exception:  # noqa: BLE001
-        pass
+    local = read_json(PICKS_PATH, None)
     if isinstance(local, dict) and local.get("date") == f"{datetime.now():%Y-%m-%d}":
         return local
     remote = repo_json(cfg, "market_picks.json")
     if isinstance(remote, dict):
         try:
-            json.dump(remote, open(PICKS_PATH, "w", encoding="utf-8"), indent=1)
+            atomic_write_json(PICKS_PATH, remote, indent=1)
         except Exception:  # noqa: BLE001
             pass
         return remote
@@ -633,7 +1533,7 @@ def load_value_picks(cfg=None):
         try:
             if x["product_url"].startswith("https://") and float(x["max"]) > 0:
                 out.append(x)
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError, AttributeError):
             continue
     return out
 
@@ -662,39 +1562,90 @@ def value_pick_card(pick):
     return [f]
 
 
+def picks_this_turn(picks, n):
+    """The next n value picks, wrapping round, so all of them get checked over a few singles checks."""
+    if len(picks) <= n:
+        return picks
+    start = _pick_turn[0] % len(picks)
+    _pick_turn[0] = start + n
+    return (picks + picks)[start:start + n]
+
+
 def check_singles(cfg):
     shops = cfg["singles"]["shops"]
     cards = [c for c in cfg["singles"]["cards"] if c.get("enabled", True)]
     jobs = []
     for c in cards:
-        if "Elemental Arcade" in shops:
+        only = c.get("shops")          # optional per card, e.g. ["Elemental Arcade"]: check just those shops
+        want = set(only) if isinstance(only, list) and only else None
+        if "Elemental Arcade" in shops and (want is None or "Elemental Arcade" in want):
             jobs.append((elemental_card, c, shops["Elemental Arcade"]))
         for name in ("Mayhem", "Good Games"):
-            if name in shops:
+            if name in shops and (want is None or name in want):
                 jobs.append((handle_shop_card, c, name, shops[name]))
     if cfg.get("value_picks", True):
-        for pick in load_value_picks(cfg):
+        for pick in picks_this_turn(load_value_picks(cfg), int(_num(cfg.get("value_picks_per_check")) or VALUE_PICKS_PER_RUN)):
             jobs.append((value_pick_card, pick))
-    with ThreadPoolExecutor(max_workers=6) as ex:
-        results = list(ex.map(lambda j: j[0](*j[1:]), jobs))
+    results = pmap(lambda j: j[0](*j[1:]), jobs, leaf=False)
     return [f for r in results for f in r]
 
 
+def run_checks(cfg, sealed=True, singles=True):
+    """Boxes and singles at the same time (v1 did one after the other). -> ((finds, by_shop) | None, singles | None)"""
+    ex = _pool("phases", 4)
+    fs = ex.submit(check_sealed, cfg) if sealed else None
+    fg = ex.submit(check_singles, cfg) if singles else None
+    return (fs.result() if fs else None), (fg.result() if fg else None)
+
+
 # ---------------------------------------------------------------- drop-day mode
+AUTO_DROP_RE = re.compile(r"\b(OP|EB|PRB)-?(\d{1,2})\b", re.I)
+
+
+def auto_windows(cfg, now=None):
+    """Drop windows for booster releases in the release list: the evening before (6pm-midnight) and
+    release morning (8am-2pm), checking every 60 seconds. Off with "auto_drop_windows": false."""
+    if not cfg.get("auto_drop_windows", True):
+        return []
+    now = now or datetime.now()
+    out = []
+    for r in cfg.get("releases", DEFAULT_RELEASES) or []:
+        m = AUTO_DROP_RE.search(r.get("name", "") if isinstance(r, dict) else "")
+        if not m:
+            continue
+        try:
+            d = datetime.strptime(r["date"], "%Y-%m-%d")
+        except (KeyError, ValueError, TypeError):
+            continue
+        if "approx" in r.get("name", "").lower() or d.date() < now.date() - timedelta(days=1):
+            continue
+        code = f"{m.group(1).upper()}-{int(m.group(2)):02d}"
+        out.append({"name": f"{code} eve (auto)", "start": d - timedelta(hours=6), "end": d - timedelta(minutes=1),
+                    "every": 60, "sealed_only": True})
+        out.append({"name": f"{code} release day (auto)", "start": d + timedelta(hours=8), "end": d + timedelta(hours=14),
+                    "every": 60, "sealed_only": True})
+    return out
+
+
 def parse_windows(cfg):
     out = []
     for w in cfg.get("drop_windows", []) or []:
         try:
             start = datetime.strptime(w["start"], "%Y-%m-%d %H:%M")
             end = datetime.strptime(w["end"], "%Y-%m-%d %H:%M")
-        except (KeyError, ValueError) as e:
-            print(f"   ! drop window {w.get('name', '?')} skipped: use \"YYYY-MM-DD HH:MM\" ({e})")
+        except (KeyError, ValueError, TypeError) as e:
+            print(f"   ! drop window {w.get('name', '?') if isinstance(w, dict) else w} skipped: use \"YYYY-MM-DD HH:MM\" ({e})")
             continue
         if end <= start:
             continue
-        every = max(MIN_DROP_SECONDS, int(w.get("every_seconds", 60)))
+        every = max(MIN_DROP_SECONDS, int(_num(w.get("every_seconds", 60)) or 60))
         out.append({"name": w.get("name", "drop"), "start": start, "end": end, "every": every,
                     "sealed_only": w.get("sealed_only", True)})
+    have = [(w["start"], w["end"]) for w in out]
+    for w in auto_windows(cfg):        # yours win where they overlap
+        if not any(w["start"] < e and s < w["end"] for s, e in have):
+            out.append(w)
+    out.sort(key=lambda w: w["start"])
     return out
 
 
@@ -729,34 +1680,45 @@ def heartbeat_role(cfg):
     return (a.get("heartbeat_role") or "send").lower()
 
 
-def send_heartbeat(cfg):
-    """PC copy: tell the cloud copy we're on (at most every 15 minutes)."""
+def send_heartbeat(cfg, force=False):
+    """PC copy: tell the cloud copy we're on (every 15 minutes, and straight after posting finds, at most
+    once a minute: ntfy.sh allows 250 messages a day)."""
     global _last_heartbeat
-    if time.time() - _last_heartbeat < HEARTBEAT_EVERY:
+    gap = time.time() - _last_heartbeat
+    if DRY_RUN[0] or gap < (60 if force else HEARTBEAT_EVERY):
         return
     topic = cfg["alerts"]["heartbeat_topic"]
     try:
-        req = urllib.request.Request(f"https://ntfy.sh/{topic}", data=b"pc-on",
-                                     headers={"User-Agent": UA, "Cache": "yes"})
-        urllib.request.urlopen(req, timeout=15).read()
+        status, _, _ = HTTP.post(f"https://ntfy.sh/{urllib.parse.quote(topic)}", b"pc-on", {"Cache": "yes"})
+        if status >= 400:
+            raise HttpError(status)
         _last_heartbeat = time.time()
     except Exception as e:  # noqa: BLE001
         print(f"   ! couldn't tell the cloud copy the PC is on ({e})")
 
 
-def pc_is_on(cfg):
-    """Cloud copy: has the PC copy checked in recently? If ntfy can't be read, assume not
-    (a doubled alert is better than a missed one)."""
+def pc_last_seen(cfg):
+    """Cloud copy: when did the PC copy last check in (unix time), or None if not in the last 20 minutes.
+    If ntfy can't be read, None (a doubled alert is better than a missed one)."""
     topic = cfg["alerts"]["heartbeat_topic"]
     try:
-        req = urllib.request.Request(f"https://ntfy.sh/{topic}/json?poll=1&since={HEARTBEAT_FRESH}",
-                                     headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=15) as r:
-            lines = r.read().decode("utf-8", "replace").splitlines()
-        return any(json.loads(l).get("event") == "message" for l in lines if l.strip())
+        body = HTTP.fetch(f"https://ntfy.sh/{urllib.parse.quote(topic)}/json?poll=1&since={HEARTBEAT_FRESH}",
+                          tries=1, conditional=False, robots=False, memo=False)
+        times = []
+        for line in body.decode("utf-8", "replace").splitlines():
+            if line.strip():
+                m = json.loads(line)
+                if m.get("event") == "message":
+                    times.append(float(m.get("time") or time.time()))
+        return max(times) if times else None
     except Exception as e:  # noqa: BLE001
         print(f"   ! couldn't check whether the PC is on ({e}), posting anyway")
-        return False
+        return None
+
+
+def pc_is_on(cfg):
+    """Cloud copy: has the PC copy checked in recently? (kept for older callers)"""
+    return pc_last_seen(cfg) is not None
 
 
 # ---------------------------------------------------------------- status posts
@@ -766,32 +1728,25 @@ GREEN, AMBER, RED, BLUE, GREY = 0x2A9D8F, 0xF4A261, 0xE63946, 0x457B9D, 0x6C757D
 
 
 def load_status():
-    try:
-        return json.load(open(STATUS_PATH, encoding="utf-8"))
-    except Exception:  # noqa: BLE001
-        return {}
+    return read_json(STATUS_PATH, {}) or {}
 
 
 def save_status(status):
-    json.dump(status, open(STATUS_PATH, "w", encoding="utf-8"), indent=1, sort_keys=True)
+    atomic_write_json(STATUS_PATH, status, indent=1, sort_keys=True)
 
 
 def post_status(cfg, text, color=GREY):
     alerts = (cfg or {}).get("alerts") or {}
     hook = alerts.get("discord_webhook_status") or alerts.get("discord_webhook_boxes") or alerts.get("discord_webhook")
+    text = redact(text)
     print(f"   [status] {text}")
-    if not hook:
+    if not hook or DRY_RUN[0]:
         return
     payload = {"username": alerts.get("bot_name") or "One Piece Restock",
                "embeds": [{"description": text[:4000], "color": color,
                            "footer": {"text": f"Sent by the {copy_label(cfg)}"}}],
                "allowed_mentions": {"parse": []}}
-    try:
-        req = urllib.request.Request(hook, data=json.dumps(payload).encode("utf-8"),
-                                     headers={"Content-Type": "application/json", "User-Agent": UA})
-        urllib.request.urlopen(req, timeout=15).read()
-    except Exception as e:  # noqa: BLE001
-        print(f"   ! status post failed: {e}")
+    discord_send(alerts, hook, payload)
 
 
 def copy_label(cfg):
@@ -811,61 +1766,96 @@ def shop_names(cfg):
     return names
 
 
+def store_locked(host):
+    """True if a Shopify shop has put its whole store behind a password page (closed, 'opening soon'
+    or members-only). Its product feeds then answer 401, which isn't a fault the bot can get round."""
+    try:
+        req = urllib.request.Request(f"https://{host}/", headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            return urllib.parse.urlsplit(r.geturl()).path.rstrip("/") == "/password"
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def shop_health(cfg, status):
     """Compare this run's shop results with earlier runs. Returns (text, color) posts for
-    shops that just went down (failed SHOP_DOWN_AFTER checks in a row) or just came back."""
+    shops that just went down (failed SHOP_DOWN_AFTER checks in a row) or just came back.
+    A shop that's down is then retried every down_retry_minutes instead of every check."""
     names = shop_names(cfg)
     fails = status.setdefault("shop_fails", {})
+    retry = status.setdefault("shop_retry", {})
     down = set(status.get("shop_down", []))
+    locked = set(status.get("shop_locked", []))
+    gap = 60 * float(_num(cfg.get("down_retry_minutes", DOWN_RETRY_MIN)) or 0)
     posts = []
     with _host_lock:
         results = dict(_host_results)
 
-    # Nearly every shop failing in the same check means the bot lost its connection (or got
-    # blocked), not that the shops went down. Post one message about that instead of one per shop,
-    # and leave the per-shop counters alone so they don't all fire once the connection is back.
+    # A shop taken off the list (e.g. Friendly Collectibles) shouldn't stay "down" in /status forever.
+    for host in [h for h in set(down) | set(fails) | set(retry) if h not in names and h not in results]:
+        down.discard(host)
+        locked.discard(host)
+        fails.pop(host, None)
+        retry.pop(host, None)
+
+    # Nearly every shop failing in the same check means the bot lost its connection or is being
+    # blocked, not that the shops went down. Post one message instead of one per shop, and leave the
+    # per-shop counters alone so every shop keeps being checked and recovery is spotted straight away.
     failed = [h for h, (ok, bad) in results.items() if bad and not ok]
     if len(results) >= OFFLINE_MIN_SHOPS and len(failed) >= OFFLINE_SHARE * len(results):
         streak = status.get("offline_streak", 0) + 1
         status["offline_streak"] = streak
         if streak == SHOP_DOWN_AFTER:
             posts.append((f"📡 **The bot can't reach the shops.** {len(failed)} of {len(results)} sites failed "
-                          f"for {streak} checks in a row, so this is the bot's internet connection (or it's being "
-                          f"blocked), not the shops. Stock isn't being watched until it's back. You'll get a post "
-                          f"when it is.", RED))
+                          f"for {streak} checks in a row, so the problem is on the bot's side (no internet, or "
+                          f"the shops are blocking it), not the shops. Stock isn't being watched until it's "
+                          f"back. You'll get a post when it is.", RED))
         status["shop_down"] = sorted(down)
         return posts
-    if status.get("offline_streak", 0) >= SHOP_DOWN_AFTER:
-        posts.append(("📡 **Connection is back**, so the bot can see the shops again.", GREEN))
-    status["offline_streak"] = 0
+    if any(ok for ok, bad in results.values()):
+        if status.get("offline_streak", 0) >= SHOP_DOWN_AFTER:
+            posts.append(("📡 **Connection is back**, so the bot can see the shops again.", GREEN))
+        status["offline_streak"] = 0
 
     for host, (ok, bad) in results.items():
         name = names.get(host, host)
         if ok:
             fails[host] = 0
+            retry.pop(host, None)
             if host in down:
                 down.discard(host)
-                posts.append((f"✅ **{name}** is loading again, so it's back on watch.", GREEN))
+                if host in locked:
+                    posts.append((f"🔓 **{name}** has opened its store (no more password page), so it's on watch now.", GREEN))
+                else:
+                    posts.append((f"✅ **{name}** is loading again, so it's back on watch.", GREEN))
+            locked.discard(host)
         elif bad:
-            fails[host] = fails.get(host, 0) + 1
-            if fails[host] >= SHOP_DOWN_AFTER and host not in down:
-                down.add(host)
-                posts.append((f"⚠️ **{name}** hasn't loaded for {fails[host]} checks in a row, so the bot "
-                              f"can't see its stock right now. You'll get a post when it's back.", AMBER))
+            fails[host] = min(fails.get(host, 0) + 1, SHOP_DOWN_AFTER)   # stops counting once it's down
+            if fails[host] >= SHOP_DOWN_AFTER:
+                if host not in down:
+                    down.add(host)
+                    if store_locked(host):
+                        locked.add(host)
+                        posts.append((f"🔒 **{name}** has locked its whole store behind a password (closed, opening "
+                                      f"soon, or members only), so nobody can see its stock. The bot keeps checking "
+                                      f"and will post when it opens.", GREY))
+                    else:
+                        posts.append((f"⚠️ **{name}** hasn't loaded for {fails[host]} checks in a row, so the bot "
+                                      f"can't see its stock right now. You'll get a post when it's back.", AMBER))
+                if gap > 0:
+                    retry[host] = round(time.time() + gap)
+    status["shop_locked"] = sorted(locked & down)
     status["shop_down"] = sorted(down)
     return posts
 
 
 # ---------------------------------------------------------------- state + alerts
 def load_state():
-    try:
-        return json.load(open(STATE_PATH))
-    except Exception:  # noqa: BLE001
-        return {}
+    return read_json(STATE_PATH, {}) or {}
 
 
 def save_state(state):
-    json.dump(state, open(STATE_PATH, "w"), indent=1, sort_keys=True)
+    atomic_write_json(STATE_PATH, state, indent=1, sort_keys=True)
 
 
 def new_only(finds, state):
@@ -878,38 +1868,153 @@ def new_only(finds, state):
     return out
 
 
+def read_controls():
+    return read_json(CONTROLS_PATH, {}) or {}
+
+
+def _in_quiet_hours(spec, now=None):
+    try:
+        a, b = [datetime.strptime(x.strip(), "%H:%M").time() for x in str(spec).split("-")]
+    except ValueError:
+        return False
+    t = (now or datetime.now()).time()
+    return (a <= t < b) if a <= b else (t >= a or t < b)
+
+
+def ping_allowed(cfg, finds, now=None):
+    """@ping and phone push allowed right now? /mute silences everything; quiet hours silence all but boxes."""
+    if float(read_controls().get("mute_until", 0) or 0) > time.time():
+        return False
+    alerts = cfg.get("alerts") or {}
+    qh = alerts.get("quiet_hours")
+    if qh and _in_quiet_hours(qh, now):
+        boxes = any(f.get("kind") == "Booster box" for f in finds)
+        return boxes and alerts.get("quiet_hours_ping_boxes", True)
+    return True
+
+
 def push_phone(cfg, title, body):
     topic = (cfg.get("alerts") or {}).get("ntfy_topic")
-    if not topic:
+    if not topic or DRY_RUN[0]:
         return
     try:
-        req = urllib.request.Request(f"https://ntfy.sh/{topic}", data=body.encode("utf-8"),
-                                     headers={"Title": title, "User-Agent": UA})
-        urllib.request.urlopen(req, timeout=15).read()
+        status, _, _ = HTTP.post(f"https://ntfy.sh/{urllib.parse.quote(topic)}", body.encode("utf-8"),
+                                 {"Title": title.encode("latin-1", "replace").decode("latin-1")})
+        if status >= 400:
+            raise HttpError(status)
         print("   (sent to your phone via ntfy)")
     except Exception as e:  # noqa: BLE001
         print(f"   ! phone alert failed: {e}")
 
 
-def push_discord(cfg, title, body, finds=None):
+_hook_pace = {}            # webhook -> earliest time the next post may go (from Discord's rate-limit headers)
+_buttons_ok = [True]
+
+
+def _hook_url(hook, components=False):
+    sep = "&" if "?" in hook else "?"
+    return f"{hook}{sep}wait=true" + ("&with_components=true" if components else "")
+
+
+def discord_send(alerts, hook, payload, tries=3):
+    """One webhook message. Waits out Discord's rate limits, retries its server errors, and returns True
+    only once Discord confirms the message was saved (?wait=true)."""
+    comps = bool(payload.get("components")) and _buttons_ok[0]
+    if not comps:
+        payload = {k: v for k, v in payload.items() if k != "components"}
+    last = None
+    for attempt in range(tries):
+        wait = _hook_pace.get(hook, 0) - time.time()
+        if wait > 0:
+            time.sleep(min(wait, 10))
+        try:
+            status, h, body = HTTP.post(_hook_url(hook, comps), json.dumps(payload).encode("utf-8"),
+                                        {"Content-Type": "application/json"})
+        except (OSError, http.client.HTTPException, ssl.SSLError) as e:
+            last = e
+            time.sleep(1.0 + attempt)
+            continue
+        if h.get("x-ratelimit-remaining") == "0" and h.get("x-ratelimit-reset-after"):
+            try:
+                _hook_pace[hook] = time.time() + float(h["x-ratelimit-reset-after"])
+            except ValueError:
+                pass
+        if 200 <= status < 300:
+            return True
+        if status == 429:
+            ra = _retry_after(h, body) or 1.0
+            last = f"rate limited for {ra:.1f}s"
+            if ra > 60:
+                break
+            time.sleep(ra + 0.05)
+            continue
+        if status == 400 and comps:            # buttons not accepted on this webhook: plain message
+            _buttons_ok[0] = comps = False
+            payload = {k: v for k, v in payload.items() if k != "components"}
+            last = "HTTP 400 with buttons"
+            continue
+        if status >= 500:
+            last = f"HTTP {status}"
+            time.sleep(1.5 * (attempt + 1))
+            continue
+        last = f"HTTP {status}: {body[:200].decode('utf-8', 'replace')}"
+        if status == 404:
+            last += " (this webhook was deleted - make a new one)"
+        break
+    print(f"   ! Discord post failed: {redact(last)}")
+    return False
+
+
+EMBED_BUDGET = 5600       # Discord allows 6000 characters across a message's embeds; keep a margin
+MAX_MESSAGES = 6          # per channel per check; anything past that is summed up in the last one
+
+
+def _embed_size(e):
+    return len(json.dumps(e, ensure_ascii=False))
+
+
+def _chunks(items):
+    """[(embed, ids)] -> messages of at most 10 embeds and EMBED_BUDGET characters."""
+    out, cur, size = [], [], 0
+    for e, ids in items:
+        n = _embed_size(e)
+        if cur and (len(cur) == 10 or size + n > EMBED_BUDGET):
+            out.append(cur)
+            cur, size = [], 0
+        cur.append((e, ids))
+        size += n
+    if cur:
+        out.append(cur)
+    return out
+
+
+def push_discord(cfg, title, body, finds=None, ping=True):
     """Post to Discord through webhook URLs. Boxes and new listings go to the boxes channel,
-    singles to the singles channel. One embed per find (up to 10, Discord's limit)."""
+    singles to the singles channel. True if everything was delivered."""
+    return push_discord_detailed(cfg, title, body, finds, ping)[0]
+
+
+def push_discord_detailed(cfg, title, body, finds=None, ping=True):
+    """Like push_discord, and also returns the set of find ids Discord confirmed."""
     alerts = cfg.get("alerts") or {}
     default = alerts.get("discord_webhook")
     boxes_hook = alerts.get("discord_webhook_boxes") or default
     singles_hook = alerts.get("discord_webhook_singles") or default
     sealed_hook = alerts.get("discord_webhook_sealed") or boxes_hook
+    ebay_hook = alerts.get("discord_webhook_ebay") or singles_hook   # eBay resale finds: their own channel if set up
     if not (default or boxes_hook or singles_hook):
-        return False
+        return False, set()
     if finds is None:  # test message: post to every channel that's set up
         ok = True
-        for hook in dict.fromkeys(h for h in (boxes_hook, singles_hook, sealed_hook, default) if h):
+        for hook in dict.fromkeys(h for h in (boxes_hook, singles_hook, sealed_hook, ebay_hook, default) if h):
             ok = _discord_post(alerts, hook, title, [{"title": title[:256], "description": body[:4000],
                                                        "color": 0x2A9D8F}], 0) and ok
-        return ok
+        return ok, set()
     groups = {}
     for f in finds:
-        if f["kind"] == "Sealed" or (f["kind"] == "New listing" and f.get("group") == "watch"):
+        if f.get("ebay"):
+            hook = ebay_hook                 # eBay watch (ebay_watch.json): Nike TNs, promos, graded cards
+        elif f["kind"] == "Sealed" or (f["kind"] == "New listing" and f.get("group") == "watch"):
             hook = sealed_hook               # other sealed products: their own channel if set up
         elif f["kind"] in BOX_KINDS:
             hook = boxes_hook
@@ -917,25 +2022,97 @@ def push_discord(cfg, title, body, finds=None):
             hook = singles_hook
         if hook:
             groups.setdefault(hook, []).append(f)
-    ok = True
+    ok, delivered = True, set()
     for hook, group in groups.items():
         n_box = sum(1 for f in group if f["kind"] == "Booster box")
         n_new = sum(1 for f in group if f["kind"] == "New listing")
         t = f"{len(group)} new find(s)" + (f", {n_box} box(es)" if n_box else "") + \
             (f", {n_new} new listing(s)" if n_new else "")
-        ok = _discord_post(alerts, hook, t, _discord_embeds(group), max(0, len(group) - 10)) and ok
-    return ok
+        items = [(e, {f["id"]}) for e, f in zip(_discord_embeds(group, cfg), group)]
+        carts = combined_carts(group)
+        if carts:     # the one-cart links go first: they're the quickest way to buy the lot
+            items = [(_cart_embed(c), set()) for c in carts] + items
+        msgs = _chunks(items)
+        overflow = msgs[MAX_MESSAGES:]
+        msgs = msgs[:MAX_MESSAGES]
+        for i, msg in enumerate(msgs):
+            more = sum(len(m) for m in overflow) if i == len(msgs) - 1 else 0
+            label = t + (f" ({i + 1}/{len(msgs)})" if len(msgs) > 1 else "")
+            if more:
+                label += f" (+{more} more - see /deals)"
+            content = ((alerts.get("discord_ping", "") + " ") if (ping and i == 0) else "") + label
+            payload = {"username": alerts.get("bot_name") or "One Piece Restock", "content": content.strip()[:2000],
+                       "embeds": [e for e, _ in msg],
+                       "allowed_mentions": {"parse": ["roles", "users", "everyone"]} if (ping and i == 0) else {"parse": []}}
+            if len(msg) == 1:            # a single find gets big tap-friendly buttons
+                f = next((x for x in group if x["id"] in msg[0][1]), None)
+                if f and f.get("cart"):
+                    payload["components"] = [{"type": 1, "components": [
+                        {"type": 2, "style": 5, "label": "⚡ Buy now", "url": f["cart"][:512]},
+                        {"type": 2, "style": 5, "label": "Open listing", "url": (f.get("url") or f["cart"])[:512]}]}]
+            if discord_send(alerts, hook, payload):
+                for _, ids in msg:
+                    delivered |= ids
+                if more:
+                    for m in overflow:
+                        for _, ids in m:
+                            delivered |= ids     # summed up in the label; don't retry them forever
+                print("   (posted to Discord)")
+            else:
+                ok = False
+    return ok, delivered
 
 
-def _discord_embeds(finds):
+def combined_carts(finds):
+    """One Shopify cart per shop holding the cheapest in-stock copy of each wanted single there,
+    so you can buy them all in one order (one shipping fee). Only shops with 2+ different cards."""
+    best = {}
+    for f in finds:
+        if f.get("kind") != "Single" or f.get("value_pick"):
+            continue
+        m = re.match(r"(https?://[^/]+)/cart/(\d+):(\d+)$", f.get("cart") or "")
+        if not m:
+            continue
+        key = (f["shop"], m.group(1), f["name"])
+        if key not in best or f["price"] < best[key][0]["price"]:
+            best[key] = (f, m.group(2), int(m.group(3)))
+    by_shop = {}
+    for (shop, base, _), (f, vid, qty) in best.items():
+        by_shop.setdefault((shop, base), []).append((f, vid, qty))
+    out = []
+    for (shop, base), items in by_shop.items():
+        if len(items) < 2:
+            continue
+        items.sort(key=lambda x: (not x[0].get("priority"), x[0]["name"]))
+        out.append({"shop": shop, "link": f"{base}/cart/" + ",".join(f"{vid}:{qty}" for _, vid, qty in items),
+                    "n": len(items), "total": sum(f["price"] * qty for f, _, qty in items),
+                    "names": [f"{f['name']} x{qty}" for f, _, qty in items]})
+    return out
+
+
+def _cart_embed(c):
+    return {"title": f"🧺 One cart at {c['shop']}: {c['n']} cards, {money(c['total'])}"[:256], "url": c["link"],
+            "color": 0x2A9D8F, "description": ("Cheapest in-stock copy of each, quantities from your want list, "
+                                               "all in one checkout (one shipping fee).\n" + "\n".join(c["names"]))[:2000],
+            "fields": [{"name": "⚡ Buy", "value": f"[Add them all to cart → checkout]({c['link']})", "inline": False}]}
+
+
+def _discord_embeds(finds, cfg=None):
     embeds = []
-    for f in finds[:10]:
+    hist = None
+    for f in finds:
         kind = f["kind"]
         fields = [{"name": "Price", "value": money(f["price"]), "inline": True},
                   {"name": "Shop", "value": f["shop"], "inline": True}]
         if kind == "Single":
             fields.append({"name": "Want", "value": f"x{f['qty']}" + (f" ({f['deck']})" if f.get("deck") else ""),
                            "inline": True})
+        if kind in ("Booster box", "Sealed"):
+            hist = read_json(HISTORY_PATH, {}) if hist is None else hist
+            low = lowest_seen(hist, f["id"])
+            if low:
+                tag = " (today's price is the lowest yet)" if f["price"] <= low[0] + 0.001 else ""
+                fields.append({"name": "Lowest seen", "value": f"{money(low[0])} on {low[1]}{tag}", "inline": True})
         if f.get("cart"):
             qty = f" (x{f['qty']})" if kind == "Single" and f.get("qty", 1) > 1 else ""
             fields.append({"name": "⚡ Buy", "value": f"[Add to cart → checkout{qty}]({f['cart']})", "inline": False})
@@ -961,20 +2138,17 @@ def _discord_post(alerts, hook, title, embeds, extra):
     if extra > 0:
         content += f" (+{extra} more, see finds.log)"
     payload = {"username": alerts.get("bot_name") or "One Piece Restock",
-               "content": content.strip()[:2000], "embeds": embeds,
+               "content": content.strip()[:2000], "embeds": embeds[:10],
                "allowed_mentions": {"parse": ["roles", "users", "everyone"]}}
-    try:
-        req = urllib.request.Request(hook, data=json.dumps(payload).encode("utf-8"),
-                                     headers={"Content-Type": "application/json", "User-Agent": UA})
-        urllib.request.urlopen(req, timeout=15).read()
+    ok = discord_send(alerts, hook, payload)
+    if ok:
         print("   (posted to Discord)")
-        return True
-    except Exception as e:  # noqa: BLE001
-        print(f"   ! Discord alert failed: {e}")
-        return False
+    return ok
 
 
 def desktop_beep():
+    if DRY_RUN[0]:
+        return
     try:
         if sys.platform.startswith("win"):
             import winsound
@@ -1034,11 +2208,122 @@ def report(finds, label):
             if f.get("cart"):
                 lines.append(f"    BUY: {f['cart']}")
         b = best_single_shop(singles)
+        carts = {c["shop"]: c for c in combined_carts(singles)}
         if b and b[1] > 1:
-            lines.append(f"  Tip: {b[0]} has {b[1]} of these cards - one order saves shipping.")
+            tip = f"  Tip: {b[0]} has {b[1]} of these cards - one order saves shipping."
+            if b[0] in carts:
+                tip += f"\n    ONE CART ({money(carts[b[0]]['total'])}): {carts[b[0]]['link']}"
+            lines.append(tip)
     if not lines:
         return f"{label}: nothing new in stock."
     return f"{label}:\n" + "\n".join(lines)
+
+
+# ---------------------------------------------------------------- snapshot, price history, events
+def write_snapshot(sealed=None, singles=None, metrics=None):
+    """latest.json: what the last check saw, so Discord commands can answer straight away."""
+    if DRY_RUN[0]:
+        return
+    snap = read_json(SNAPSHOT_PATH, {}) or {}
+    now = time.time()
+    if sealed is not None:
+        finds, by_shop = sealed
+        snap["sealed"] = {"ts": now, "finds": finds,
+                          "listings": [l for ls in by_shop.values() for l in (ls or [])],
+                          "down": sorted(n for n, ls in by_shop.items() if ls is None)}
+    if singles is not None:
+        snap["singles"] = {"ts": now, "finds": singles}
+    snap.update(version=2, ts=now, updated=f"{datetime.now():%Y-%m-%d %H:%M:%S}")
+    if metrics:
+        snap["metrics"] = metrics
+    atomic_write_json(SNAPSHOT_PATH, snap, indent=None, ensure_ascii=False)
+
+
+HISTORY_DAYS = 180
+
+
+def lowest_seen(hist, key, days=90):
+    """(price, 'DD Mon') of the lowest in-stock price in the last `days` days, or None."""
+    h = (hist or {}).get(key)
+    if not h:
+        return None
+    cutoff = f"{datetime.now() - timedelta(days=days):%Y-%m-%d}"
+    pts = [p for p in h.get("points", []) if p[0] >= cutoff and p[2] and p[1] > 0]
+    if not pts:
+        return None
+    p = min(pts, key=lambda p: (p[1], p[0]))
+    return p[1], datetime.strptime(p[0], "%Y-%m-%d").strftime("%d %b")
+
+
+def record_history(by_shop, now=None):
+    """price_history.json: one point per listing per day ([date, price, in stock]) plus a line in
+    events.jsonl whenever something comes into or goes out of stock."""
+    if DRY_RUN[0] or not by_shop:
+        return
+    now = now or datetime.now()
+    day, ts = f"{now:%Y-%m-%d}", round(time.time())
+    hist = read_json(HISTORY_PATH, {}) or {}
+    events, changed = [], False
+    for listings in by_shop.values():
+        for l in listings or []:
+            key = l["box_id"]
+            price, avail = round(float(l.get("price") or 0), 2), bool(l.get("available"))
+            h = hist.get(key)
+            if h is None:
+                h = hist[key] = {"name": l["name"], "shop": l["shop"], "url": l["url"], "points": [],
+                                 "avail": avail, "since": ts}
+                changed = True
+            elif h.get("avail") != avail:
+                events.append({"t": ts, "event": "in_stock" if avail else "sold_out", "id": key, "name": l["name"],
+                               "shop": l["shop"], "price": price, "was": round(ts - h.get("since", ts))})
+                h["avail"], h["since"] = avail, ts
+                changed = True
+            pts = h["points"]
+            if pts and pts[-1][0] == day:
+                p = pts[-1]
+                if avail and (not p[2] or price < p[1]):
+                    p[1], p[2] = price, True
+                    changed = True
+                elif not avail and not p[2] and p[1] != price:
+                    p[1] = price
+                    changed = True
+            else:
+                pts.append([day, price, avail])
+                del pts[:-400]
+                changed = True
+            if h.get("seen") != day:
+                h["seen"] = day
+                changed = True
+    cutoff = f"{now - timedelta(days=HISTORY_DAYS):%Y-%m-%d}"
+    for k in [k for k, h in hist.items() if h.get("seen", "") < cutoff]:
+        hist.pop(k)
+        changed = True
+    if changed:
+        atomic_write_json(HISTORY_PATH, hist, indent=None, ensure_ascii=False)
+    log_events(events)
+
+
+def log_events(events):
+    if events and not DRY_RUN[0]:
+        append_text(EVENTS_PATH, "".join(json.dumps(e, ensure_ascii=False) + "\n" for e in events), 2_000_000)
+
+
+def read_events(days=30):
+    cutoff = time.time() - days * 86400
+    out = []
+    for path in (EVENTS_PATH + ".1", EVENTS_PATH):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                for line in fh:
+                    try:
+                        e = json.loads(line)
+                    except ValueError:
+                        continue
+                    if e.get("t", 0) >= cutoff:
+                        out.append(e)
+        except OSError:
+            continue
+    return out
 
 
 # ---------------------------------------------------------------- daily recap
@@ -1060,8 +2345,7 @@ def run_recap(cfg, now=None, post=True, save=True):
     Returns the embed (the /recap command replies with it instead of posting)."""
     now = now or datetime.now()
     print(f"\n=== Daily recap - {now:%a %d %b %Y %I:%M %p} ===")
-    box_finds, by_shop = check_sealed(cfg)
-    singles = check_singles(cfg)
+    (box_finds, by_shop), singles = run_checks(cfg)
     if ebay_watch:
         singles += ebay_watch.check(cfg, {}, force=True).finds
 
@@ -1074,9 +2358,10 @@ def run_recap(cfg, now=None, post=True, save=True):
     for f in singles:
         snap[f["id"]] = {"name": f["name"], "shop": f["shop"], "price": round(f["price"], 2),
                          "available": True, "url": f["url"]}
-    try:
-        prev = json.load(open(RECAP_PATH, encoding="utf-8")).get("snapshot", {})
-    except Exception:  # noqa: BLE001
+    prev_file = read_json(RECAP_PATH, None)
+    if isinstance(prev_file, dict):
+        prev = prev_file.get("snapshot", {})
+    else:
         remote = repo_json(cfg, "recap.json")       # the PC copy compares with the cloud's last recap
         prev = remote.get("snapshot") if isinstance(remote, dict) else None
 
@@ -1087,6 +2372,8 @@ def run_recap(cfg, now=None, post=True, save=True):
     icon = {"Booster box": "📦", "Sealed": "🎁", "Single": "🃏"}
     lines = [f"{icon[f['kind']]} [{_short(f['name'])}]({f.get('cart') or f['url']}) **{money(f['price'])}** · {f['shop']}"
              for f in buy]
+    for c in combined_carts(singles):
+        lines.insert(0, f"🧺 [One cart at {c['shop']}: {c['n']} cards]({c['link']}) **{money(c['total'])}**")
     fields.append({"name": f"🛒 Buyable now within your limits ({len(buy)})",
                    "value": _lines(lines) if lines else "Nothing on your list is in stock under your max right now."})
 
@@ -1132,7 +2419,7 @@ def run_recap(cfg, now=None, post=True, save=True):
     for r in cfg.get("releases", DEFAULT_RELEASES) or []:
         try:
             d = datetime.strptime(r["date"], "%Y-%m-%d")
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, TypeError):
             continue
         days = (d.date() - now.date()).days
         if 0 <= days <= RECAP_DAYS_AHEAD:
@@ -1160,44 +2447,51 @@ def run_recap(cfg, now=None, post=True, save=True):
         alerts.get("discord_webhook_boxes") or alerts.get("discord_webhook")
     for fld in fields:
         print(f"\n{fld['name']}\n{fld['value']}")
-    if hook and post:
+    if hook and post and not DRY_RUN[0]:
         payload = {"username": alerts.get("bot_name") or "One Piece Restock", "embeds": [embed],
                    "allowed_mentions": {"parse": []}}
-        try:
-            req = urllib.request.Request(hook, data=json.dumps(payload).encode("utf-8"),
-                                         headers={"Content-Type": "application/json", "User-Agent": UA})
-            urllib.request.urlopen(req, timeout=15).read()
+        if discord_send(alerts, hook, payload):
             print("\n   (recap posted to Discord)")
-        except Exception as e:  # noqa: BLE001
-            print(f"\n   ! recap post failed: {e}")
+        else:
+            print("\n   ! recap post failed")
     if save:
-        json.dump({"date": f"{now:%Y-%m-%d}", "snapshot": snap}, open(RECAP_PATH, "w", encoding="utf-8"), indent=1)
+        atomic_write_json(RECAP_PATH, {"date": f"{now:%Y-%m-%d}", "snapshot": snap}, indent=1)
+        write_snapshot((box_finds, by_shop), singles)
     return embed
 
 
 # ---------------------------------------------------------------- main
+IN_ACTIONS = bool(os.environ.get("GITHUB_ACTIONS"))
+
+
 def run_once(cfg, args, drop=None):
     stamp = datetime.now().strftime("%a %d %b %Y %I:%M:%S %p")
-    with _host_lock:
-        _host_results.clear()
+    status = load_status()
+    begin_check(cfg, status, drop, skip_down=not args.all)
     tag = f" [DROP MODE: {drop['name']}]" if drop else ""
     print(f"\n=== One Piece restock check - {stamp}{tag} ===")
     do_sealed = not args.singles
     do_singles = not args.sealed and not (drop and drop["sealed_only"])
-    finds, listed = [], []
-    status = load_status()
-    ebay = None
+    every = _num(cfg.get("singles_every_minutes", SINGLES_EVERY_DEFAULT)) or 0
+    if do_singles and do_sealed and every > 0 and getattr(args, "loop", None) and not args.all:
+        if time.time() - float(status.get("singles_ts", 0) or 0) < every * 60 - 20:
+            do_singles = False         # boxes this time; singles when they're due
     if do_sealed:
         print(" checking booster boxes...")
-        box_finds, by_shop = check_sealed(cfg)
-        finds += box_finds
-        if cfg.get("new_listings", True):
-            known = load_known()
-            listed = new_listings(by_shop, known, box_finds)
-            save_known(known)
     if do_singles:
         print(" checking singles...")
-        finds += check_singles(cfg)
+    sealed_res, singles = run_checks(cfg, do_sealed, do_singles)
+    finds, listed, known = [], [], None
+    box_finds, by_shop = sealed_res if sealed_res else ([], {})
+    finds += box_finds
+    if do_sealed and cfg.get("new_listings", True):
+        known = load_known()
+        listed = new_listings(by_shop, known, box_finds, status.setdefault("pages_seen", {}))
+    ebay = None
+    if do_singles:
+        finds += singles
+        if getattr(args, "loop", None):
+            status["singles_ts"] = round(time.time())
         if ebay_watch:
             ebay = ebay_watch.check(cfg, status, force=args.all)
             finds += ebay.finds
@@ -1217,16 +2511,15 @@ def run_once(cfg, args, drop=None):
             if not ((k.startswith(("box|", "sealed|")) and "Booster box" in checked) or (k.startswith("card|") and "Single" in checked)
                     or (k.startswith("ebay|") and ebay is not None and ebay.ran))}
     kept.update({f["id"]: f["price"] for f in finds})
-    save_state(kept)
 
     role = heartbeat_role(cfg)
-    if role == "send":
-        send_heartbeat(cfg)
-    pc_on = pc_is_on(cfg) if role == "listen" else False
+    pc_seen = pc_last_seen(cfg) if role == "listen" else None
+    pc_on = pc_seen is not None
 
-    # status posts: shop health, the eBay watch, and (cloud copy) the PC going quiet or coming back
-    status["last_check"] = f"{datetime.now():%Y-%m-%d %H:%M:%S}"
-    status["last_found"] = len(finds)
+    # status posts: shop health, and (cloud copy) the PC going quiet or coming back
+    if not IN_ACTIONS:         # the cloud copy commits status.json; keep it free of per-run noise
+        status["last_check"] = f"{datetime.now():%Y-%m-%d %H:%M:%S}"
+        status["last_found"] = len(finds)
     posts = shop_health(cfg, status)
     if ebay_watch:
         msg = ebay_watch.status_message(status, ebay)
@@ -1239,28 +2532,123 @@ def run_once(cfg, args, drop=None):
         elif before is False and pc_on:
             post_status(cfg, "🖥️ Your PC copy is back on and posting alerts. The cloud copy is going quiet.", BLUE)
         status["pc_on"] = pc_on
-    save_status(status)
     if not pc_on:            # while the PC is on, it reports these itself
-        for text, color in posts:
-            post_status(cfg, text, color)
+        for msg, color in posts:
+            post_status(cfg, msg, color)
+    if CONFIG_WARNINGS:
+        print("   ! config.json: " + "; ".join(CONFIG_WARNINGS))
 
-    if show and not args.all and pc_on:
-        print("   (your PC copy is on and posts these itself - cloud copy staying quiet)")
-        return
-
+    deliver = []
     if show and not args.all:
+        if pc_on:
+            print("   (your PC copy is on and posts these itself - cloud copy staying quiet)")
+        else:
+            deliver = list(show)
+    if role == "listen":
+        # Hold what we saw while the PC was on. Once the PC checks in after we first saw something,
+        # it has posted it. If the PC goes quiet first, post what it may have missed.
+        held = status.get("held") or {}
+        nowts = time.time()
+        if pc_on:
+            for f in show if not args.all else []:
+                held.setdefault(f["id"], {"t": int(nowts), "f": f})
+        in_stock = {f["id"] for f in finds}
+        looked = {"Single": do_singles, "Booster box": do_sealed, "Sealed": do_sealed}
+        for k, v in list(held.items()):
+            f = v.get("f") or {}
+            if v.get("t", 0) <= (pc_seen or 0) or nowts - v.get("t", 0) > 6 * 3600 or \
+                    (looked.get(f.get("kind"), False) and k not in in_stock):
+                held.pop(k)
+        if not pc_on and held:
+            have = {f["id"] for f in deliver}
+            deliver += [v["f"] for k, v in held.items() if k not in have]
+        status["held"] = held
+
+    undelivered = set()
+    if deliver and not args.all:
         desktop_beep()
-        with open(LOG_PATH, "a", encoding="utf-8") as fh:
-            fh.write(f"\n--- {stamp} ---\n{text}\n")
-        n_box = sum(1 for f in show if f["kind"] in ("Booster box", "Sealed"))
-        n_new = sum(1 for f in show if f["kind"] == "New listing")
-        title = f"One Piece: {len(show)} new find(s)" + (f", {n_box} box(es)" if n_box else "") + \
+        dtext = text if deliver == show else report(deliver, "New since the PC copy went quiet")
+        append_text(LOG_PATH, f"\n--- {stamp} ---\n{dtext}\n")
+        n_box = sum(1 for f in deliver if f["kind"] in ("Booster box", "Sealed"))
+        n_new = sum(1 for f in deliver if f["kind"] == "New listing")
+        title = f"One Piece: {len(deliver)} new find(s)" + (f", {n_box} box(es)" if n_box else "") + \
             (f", {n_new} new listing(s)" if n_new else "")
-        push_phone(cfg, title, text[:3500])
-        # boxes first, then new listings, then priority singles, so the important ones fill Discord's 10 slots
+        ping = ping_allowed(cfg, deliver)
+        if ping:
+            push_phone(cfg, title, dtext[:3500])
+        # boxes first, then new listings, then priority singles, so the important ones fill the first message
         order = {"Booster box": 0, "Sealed": 1, "New listing": 2, "Single": 3}
-        ordered = sorted(show, key=lambda f: (order[f["kind"]], not f.get("priority"), f["price"]))
-        push_discord(cfg, title, text, ordered)
+        ordered = sorted(deliver, key=lambda f: (order[f["kind"]], not f.get("priority"), f["price"]))
+        alerts = cfg.get("alerts") or {}
+        if any(alerts.get(k) for k in ("discord_webhook", "discord_webhook_boxes", "discord_webhook_singles")) \
+                and not DRY_RUN[0]:
+            _, delivered = push_discord_detailed(cfg, title, dtext, ordered, ping=ping)
+            undelivered = {f["id"] for f in ordered} - delivered
+        if role == "listen":
+            for k in [k for k in status.get("held", {}) if k not in undelivered]:
+                status["held"].pop(k)
+    if role == "send":
+        send_heartbeat(cfg, force=bool(deliver) and not undelivered)
+    if undelivered:
+        # not marked as seen, so the next check tries again (a doubled alert beats a missed one)
+        for k in undelivered:
+            kept.pop(k, None)
+        if known is not None:
+            for f in deliver:
+                if f["id"] in undelivered and f["kind"] == "New listing":
+                    for shop in (f["shop"], f"{f['shop']} (other sealed)"):
+                        if shop in known and f["id"] in known[shop]:
+                            known[shop].remove(f["id"])
+        print(f"   ! {len(undelivered)} alert(s) didn't reach Discord - they'll go out next check")
+
+    metrics = run_metrics()
+    if not DRY_RUN[0]:
+        save_state(kept)
+        if known is not None:
+            save_known(known)
+        status["robots"] = {h: e for h, e in HTTP.robots.items() if time.time() - e.get("t", 0) < 7 * 86400}
+        status["page_hints"] = {u: n for u, n in PAGE_HINTS.items() if n > 1}
+        if not IN_ACTIONS:
+            status["last_run"] = metrics
+        save_status(status)
+        write_snapshot(sealed_res if do_sealed else None, singles if do_singles else None, metrics)
+        if do_sealed and cfg.get("history", True):
+            record_history(by_shop)
+    print(f"   (checked in {metrics['secs']:.1f}s · {metrics['requests']} requests, "
+          f"{metrics['new_connections']} new connections, {metrics['kb_wire']} KB"
+          + (f", skipped {len(metrics['skipped_hosts'])} down shop(s)" if metrics["skipped_hosts"] else "") + ")")
+
+
+def self_test(cfg):
+    """Quick health check before going live: config, file access, one shop, alert settings."""
+    ok = True
+    print(f"One Piece restock bot v{VERSION} self-test\n")
+    print("config.json:", "OK" if not CONFIG_WARNINGS else "")
+    for w in CONFIG_WARNINGS:
+        print("   !", w)
+    try:
+        probe = os.path.join(HERE, ".write-test.json")
+        atomic_write_json(probe, {"ok": True})
+        os.remove(probe)
+        print("files: OK (can save state next to the bot)")
+    except OSError as e:
+        ok = False
+        print(f"files: CAN'T WRITE in {HERE} ({e})")
+    cols = sealed_shops(cfg)[0]
+    if cols:
+        t0 = time.perf_counter()
+        products, _ = shopify_collection(cols[0]["url"], max_pages=1)
+        ms = (time.perf_counter() - t0) * 1000
+        if products is None:
+            ok = False
+            print(f"network: couldn't read {cols[0]['name']}")
+        else:
+            print(f"network: OK ({cols[0]['name']}: {len(products)} products in {ms:.0f} ms)")
+    alerts = cfg.get("alerts") or {}
+    hooks = [k for k in alerts if k.startswith("discord_webhook") and alerts[k]]
+    print("discord:", ", ".join(hooks) if hooks else "no webhooks set (finds are only printed)")
+    print("\nPASS" if ok else "\nFAIL")
+    return ok
 
 
 def main():
@@ -1270,14 +2658,17 @@ def main():
             stream.reconfigure(encoding="utf-8", errors="replace")
         except Exception:  # noqa: BLE001
             pass
-    ap = argparse.ArgumentParser(description="One Piece TCG restock bot")
+    ap = argparse.ArgumentParser(description=f"One Piece TCG restock bot v{VERSION}")
     ap.add_argument("--all", action="store_true", help="show everything matching, not just new finds")
     ap.add_argument("--loop", type=float, metavar="MINUTES", help="keep checking every N minutes")
     ap.add_argument("--sealed", action="store_true", help="only booster boxes")
     ap.add_argument("--singles", action="store_true", help="only singles")
     ap.add_argument("--test-discord", action="store_true", help="post a test message to Discord and stop")
     ap.add_argument("--recap", action="store_true", help="post the daily recap to Discord and stop")
+    ap.add_argument("--dry-run", action="store_true", help="check and print, but post and save nothing")
+    ap.add_argument("--self-test", action="store_true", help="check config, files and one shop, then stop")
     args = ap.parse_args()
+    DRY_RUN[0] = args.dry_run
 
     try:
         cfg = load_config()
@@ -1285,6 +2676,9 @@ def main():
         sys.exit(f"config.json not found next to {os.path.basename(__file__)}")
     except json.JSONDecodeError as e:
         sys.exit(f"config.json has a typo: {e}")
+
+    if args.self_test:
+        sys.exit(0 if self_test(cfg) else 1)
 
     if args.test_discord:
         if not any((cfg.get("alerts") or {}).get(k) for k in ("discord_webhook", "discord_webhook_boxes", "discord_webhook_singles")):
@@ -1294,6 +2688,7 @@ def main():
         sys.exit(0 if ok else 1)
 
     if args.recap:
+        begin_check(cfg)
         run_recap(cfg)
         return
 
@@ -1304,9 +2699,9 @@ def main():
     every = f"{args.loop:g} minute" + ("" if args.loop == 1 else "s")
     windows = [w for w in parse_windows(cfg) if w["end"] > datetime.now()]
     nxt = f" Next drop window: **{windows[0]['name']}**, {windows[0]['start']:%a %d %b %I:%M %p}." if windows else ""
-    post_status(cfg, f"🟢 **Bot online** ({'PC' if heartbeat_role(cfg) != 'listen' else 'cloud'}). "
+    post_status(cfg, f"🟢 **Bot online** ({'PC' if heartbeat_role(cfg) != 'listen' else 'cloud'}, v{VERSION}). "
                      f"Checking every {every}.{nxt}", GREEN)
-    good_cfg, was_dropping, problem = cfg, None, None
+    good_cfg, was_dropping, problem, warned = cfg, None, None, ""
     while True:
         try:
             try:
@@ -1321,6 +2716,12 @@ def main():
                 continue
             if problem == "config":
                 post_status(cfg, "✅ config.json is fixed. Checking again.", GREEN)
+            sig = "; ".join(CONFIG_WARNINGS)
+            if sig != warned:
+                if sig:
+                    post_status(cfg, "⚠️ **config.json needs a look** (the bot skips just these and keeps going):\n• "
+                                     + "\n• ".join(CONFIG_WARNINGS)[:1500], AMBER)
+                warned = sig
             good_cfg = cfg
             drop = active_window(cfg)
             if drop and was_dropping != drop["name"]:
@@ -1340,12 +2741,14 @@ def main():
         except KeyboardInterrupt:
             raise
         except Exception as e:  # noqa: BLE001
-            print(f"   ! check failed: {e}")
+            print(f"   ! check failed: {redact(e)}")
             if problem != "crash":
                 post_status(good_cfg, f"⚠️ **A check failed:** `{str(e)[:300]}`\nIt'll keep retrying every {every}.", RED)
             problem = "crash"
             wait = args.loop * 60
         sys.stdout.flush()
+        if wait > IDLE_MAX:
+            HTTP.close_idle()        # shops drop idle connections anyway; don't hold sockets open for nothing
         time.sleep(wait)
 
 
@@ -1353,4 +2756,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
+        HTTP.close_idle()
         print("\nStopped.")
