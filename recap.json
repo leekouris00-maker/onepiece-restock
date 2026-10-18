@@ -1,5 +1,5 @@
 {
- "date": "2026-10-18",
+ "date": "2026-10-19",
  "snapshot": {
   "list|Gumnut|one-piece-card-game-a-fist-of-divine-speed-booster-box-op-11": {
    "name": "One Piece Card Game - A Fist of Divine Speed - Booster Box (OP-11) (24) (One Per Customer)",
@@ -263,7 +263,7 @@
   "list|Gameology|one-piece-card-game-op-12-booster-box": {
    "name": "One Piece Card Game OP-12 Legacy Of The Master Booster Box",
    "shop": "Gameology",
-   "price": 559.95,
+   "price": 579.95,
    "available": true,
    "url": "https://www.gameology.com.au/products/one-piece-card-game-op-12-booster-box"
   },
@@ -509,7 +509,7 @@
    "name": "One Piece Card Game - OP-18 The Dominance Of God - Booster Box - English",
    "shop": "TCGroup",
    "price": 499.99,
-   "available": true,
+   "available": false,
    "url": "https://www.tcgroupau.com.au/products/one-piece-card-game-op-18-the-dominance-of-god-booster-box-english"
   },
   "list|Pokebox|one-piece-card-game-premium-booster-prb-02-booster-box-english": {
@@ -778,6 +778,34 @@
    "available": true,
    "url": "https://alphagaming.com.au/products/in-transit-one-piece-premium-booster-box-prb-02-limit-2-per-customer"
   },
+  "list|JToys|78683": {
+   "name": "One Piece Card Game PRB02 Premium Booster Box",
+   "shop": "JToys",
+   "price": 649.99,
+   "available": true,
+   "url": "https://www.jtoys.com.au/product/one-piece-card-game-prb02-premium-booster-box/"
+  },
+  "list|JToys|88102": {
+   "name": "One Piece Card Game OP17 The World&#8217;s Strongest Warriors Booster Box",
+   "shop": "JToys",
+   "price": 599.99,
+   "available": true,
+   "url": "https://www.jtoys.com.au/product/one-piece-card-game-op17-the-worlds-strongest-warriors-booster-box/"
+  },
+  "list|JToys|83985": {
+   "name": "One Piece OP15 Booster Box &#8211; Adventure on Kami&#8217;s Island",
+   "shop": "JToys",
+   "price": 379.99,
+   "available": false,
+   "url": "https://www.jtoys.com.au/product/one-piece-card-game-op15-adventure-on-kamis-island-booster-box/"
+  },
+  "list|JToys|83988": {
+   "name": "One Piece Card Game EB03 Heroines Edition Booster Box",
+   "shop": "JToys",
+   "price": 589.99,
+   "available": true,
+   "url": "https://www.jtoys.com.au/product/one-piece-card-game-extra-booster-box-eb03/"
+  },
   "list|Grailborne|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-english": {
    "name": "One Piece Card Game: The World's Strongest Warriors [OP-17] Booster Box (English)",
    "shop": "Grailborne",
@@ -834,19 +862,19 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-op-19-booster-box-releases-5-mar-2027"
   },
-  "list|Grailborne|one-piece-card-game-eb-05-extra-booster-heroines-edition-vol-2-booster-box": {
-   "name": "One Piece Card Game: EB-05 Extra Booster Heroines Edition Vol. 2 Booster Box (Releases 30 Oct 2026)",
-   "shop": "Grailborne",
-   "price": 579.0,
-   "available": false,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-eb-05-extra-booster-heroines-edition-vol-2-booster-box"
-  },
   "list|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": {
    "name": "One Piece Card Game: Premium Card Collection - 29th Anniversary Edition (P-159 Monkey D. Luffy, 8 Cards) (Ships March 2027)",
    "shop": "Grailborne",
    "price": 400.0,
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-premium-card-collection-29th-anniversary-edition"
+  },
+  "list|Grailborne|one-piece-card-game-gift-collection-heroines-gc-2026": {
+   "name": "One Piece Card Game: Gift Collection - Heroines [GC 2026] (Releases 20 Nov 2026)",
+   "shop": "Grailborne",
+   "price": 289.0,
+   "available": true,
+   "url": "https://grailborne.com.au/products/one-piece-card-game-gift-collection-heroines-gc-2026"
   },
   "list|Collectible Madness|one-piece-card-game-tba-op-16-booster-box": {
    "name": "One Piece Card Game The Time of Battle [OP-16] Booster Box",
@@ -855,48 +883,6 @@
    "available": true,
    "url": "https://collectiblemadness.com.au/products/one-piece-card-game-tba-op-16-booster-box"
   },
-  "card|Elemental Arcade|OP05-015|belo-betty-op05015-reprint-premium-booster-the-best": {
-   "name": "Belo Betty OP05-015",
-   "shop": "Elemental Arcade",
-   "price": 0.5,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/belo-betty-op05015-reprint-premium-booster-the-best"
-  },
-  "card|Elemental Arcade|OP05-015|belo-betty-op05015-awakening-of-the-new-era": {
-   "name": "Belo Betty OP05-015",
-   "shop": "Elemental Arcade",
-   "price": 0.5,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/belo-betty-op05015-awakening-of-the-new-era"
-  },
-  "card|Elemental Arcade|OP05-015|belo-betty-jolly-roger-foil-op05015-premium-booster-the-best": {
-   "name": "Belo Betty OP05-015",
-   "shop": "Elemental Arcade",
-   "price": 0.65,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/belo-betty-jolly-roger-foil-op05015-premium-booster-the-best"
-  },
-  "card|Good Games|OP05-015|belo-betty-alternate-art-extra-booster-memorial-collection": {
-   "name": "Belo Betty OP05-015",
-   "shop": "Good Games",
-   "price": 1.5,
-   "available": true,
-   "url": "https://tcg.goodgames.com.au/products/belo-betty-alternate-art-extra-booster-memorial-collection"
-  },
-  "card|Good Games|OP05-015|belo-betty-op05-015-reprint-premium-booster-the-best": {
-   "name": "Belo Betty OP05-015",
-   "shop": "Good Games",
-   "price": 1.5,
-   "available": true,
-   "url": "https://tcg.goodgames.com.au/products/belo-betty-op05-015-reprint-premium-booster-the-best"
-  },
-  "card|Good Games|OP05-015|belo-betty-awakening-of-the-new-era-1": {
-   "name": "Belo Betty OP05-015",
-   "shop": "Good Games",
-   "price": 1.5,
-   "available": true,
-   "url": "https://tcg.goodgames.com.au/products/belo-betty-awakening-of-the-new-era-1"
-  },
   "card|Elemental Arcade|OP13-016|monkeydgarp-op13016-carrying-on-his-will": {
    "name": "Monkey.D.Garp OP13-016",
    "shop": "Elemental Arcade",
@@ -904,33 +890,68 @@
    "available": true,
    "url": "https://elementalarcade.com.au/products/monkeydgarp-op13016-carrying-on-his-will"
   },
-  "card|Elemental Arcade|OP05-021|revolutionary-army-hq-op05021-awakening-of-the-new-era": {
-   "name": "Revolutionary Army HQ OP05-021",
+  "card|Elemental Arcade|OP17-089|jaguardsaul-op17089-the-worlds-strongest-warriors": {
+   "name": "Jaguar.D.Saul OP17-089",
+   "shop": "Elemental Arcade",
+   "price": 0.5,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/jaguardsaul-op17089-the-worlds-strongest-warriors"
+  },
+  "card|Elemental Arcade|OP17-095|roronoa-zoro-op17095-the-worlds-strongest-warriors": {
+   "name": "Roronoa Zoro OP17-095",
+   "shop": "Elemental Arcade",
+   "price": 0.25,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/roronoa-zoro-op17095-the-worlds-strongest-warriors"
+  },
+  "card|Elemental Arcade|OP17-084|tony-tonychopper-the-worlds-strongest-warriors": {
+   "name": "Tony Tony.Chopper OP17-084",
    "shop": "Elemental Arcade",
    "price": 0.35,
    "available": true,
-   "url": "https://elementalarcade.com.au/products/revolutionary-army-hq-op05021-awakening-of-the-new-era"
+   "url": "https://elementalarcade.com.au/products/tony-tonychopper-the-worlds-strongest-warriors"
   },
-  "card|Elemental Arcade|OP05-021|revolutionary-army-hq-reprint-op05021-premium-booster-the-best-vol-2": {
-   "name": "Revolutionary Army HQ OP05-021",
+  "card|Elemental Arcade|OP17-087|nico-robin-op17087-the-worlds-strongest-warriors": {
+   "name": "Nico Robin OP17-087",
    "shop": "Elemental Arcade",
-   "price": 0.35,
+   "price": 0.5,
    "available": true,
-   "url": "https://elementalarcade.com.au/products/revolutionary-army-hq-reprint-op05021-premium-booster-the-best-vol-2"
+   "url": "https://elementalarcade.com.au/products/nico-robin-op17087-the-worlds-strongest-warriors"
   },
-  "card|Elemental Arcade|OP05-021|revolutionary-army-hq-pirate-foil-op05021-premium-booster-the-best-vol-2": {
-   "name": "Revolutionary Army HQ OP05-021",
+  "card|Elemental Arcade|OP17-083|jinbe-op17083-the-worlds-strongest-warriors": {
+   "name": "Jinbe OP17-083",
    "shop": "Elemental Arcade",
-   "price": 0.35,
+   "price": 0.25,
    "available": true,
-   "url": "https://elementalarcade.com.au/products/revolutionary-army-hq-pirate-foil-op05021-premium-booster-the-best-vol-2"
+   "url": "https://elementalarcade.com.au/products/jinbe-op17083-the-worlds-strongest-warriors"
   },
-  "card|Good Games|OP05-021|revolutionary-army-hq-reprint-premium-booster-the-best-vol-2": {
-   "name": "Revolutionary Army HQ OP05-021",
-   "shop": "Good Games",
-   "price": 0.8,
+  "card|Elemental Arcade|OP17-088|hajrudin-op17088-the-worlds-strongest-warriors": {
+   "name": "Hajrudin OP17-088",
+   "shop": "Elemental Arcade",
+   "price": 0.25,
    "available": true,
-   "url": "https://tcg.goodgames.com.au/products/revolutionary-army-hq-reprint-premium-booster-the-best-vol-2"
+   "url": "https://elementalarcade.com.au/products/hajrudin-op17088-the-worlds-strongest-warriors"
+  },
+  "card|Elemental Arcade|OP17-088|hajrudin-pandaman-art-op17088-the-worlds-strongest-warriors": {
+   "name": "Hajrudin OP17-088",
+   "shop": "Elemental Arcade",
+   "price": 0.55,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/hajrudin-pandaman-art-op17088-the-worlds-strongest-warriors"
+  },
+  "card|Elemental Arcade|OP17-098|gumgum-kong-gun-op17098-the-worlds-strongest-warriors": {
+   "name": "Gum-Gum Kong Gun OP17-098",
+   "shop": "Elemental Arcade",
+   "price": 0.25,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/gumgum-kong-gun-op17098-the-worlds-strongest-warriors"
+  },
+  "card|Elemental Arcade|OP04-016|bad-manners-kick-course-reprint-op04016-premium-booster-the-best-vol-2": {
+   "name": "Bad Manners Kick Course OP04-016",
+   "shop": "Elemental Arcade",
+   "price": 0.6,
+   "available": true,
+   "url": "https://elementalarcade.com.au/products/bad-manners-kick-course-reprint-op04016-premium-booster-the-best-vol-2"
   },
   "card|pick|https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will": {
    "name": "Sabo OP13-004 Regular",
@@ -966,27 +987,6 @@
    "price": 22.8,
    "available": true,
    "url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle"
-  },
-  "card|pick|https://elementalarcade.com.au/products/rocksdxebec-op17039-alternate-art-the-worlds-strongest-warriors": {
-   "name": "Rocks.D.Xebec OP17-039 Alternate Art",
-   "shop": "Elemental Arcade",
-   "price": 59.9,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/rocksdxebec-op17039-alternate-art-the-worlds-strongest-warriors"
-  },
-  "card|pick|https://elementalarcade.com.au/products/kaido-op17062-super-alternate-art-the-worlds-strongest-warriors": {
-   "name": "Kaido OP17-062 Super Alternate Art",
-   "shop": "Elemental Arcade",
-   "price": 293.5,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/kaido-op17062-super-alternate-art-the-worlds-strongest-warriors"
-  },
-  "card|pick|https://elementalarcade.com.au/products/monkeydluffy-alternate-art-op17079-the-worlds-strongest-warriors": {
-   "name": "Monkey.D.Luffy OP17-079 Alternate Art",
-   "shop": "Elemental Arcade",
-   "price": 68.0,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/monkeydluffy-alternate-art-op17079-the-worlds-strongest-warriors"
   }
  }
 }
