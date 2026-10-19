@@ -74,5 +74,25 @@ class CloudSettings(unittest.TestCase):
         self.assertFalse(any("friendlycollectibles" in s["base"] for s in tb.EXTRA_SHOPIFY_SEARCH))
 
 
+
+class OwnedCards(unittest.TestCase):
+    CFG = {"singles": {"cards": [{"name": "Sabo", "num": "OP13-120", "qty": 4, "owned": 4},
+                                 {"name": "Sabo", "num": "PRB02-014", "qty": 4, "owned": 4},
+                                 {"name": "Garp", "num": "OP13-016", "qty": 4, "owned": 2}]}}
+
+    def test_owned_playsets_skip_their_value_picks(self):
+        own = lambda n, u="": tb.is_owned_pick(self.CFG, n, u)  # noqa: E731
+        self.assertTrue(own("Sabo OP13-120 Regular"))
+        self.assertTrue(own("Sabo OP13-120 Alternate Art"))
+        self.assertTrue(own("Sabo PRB02-014 Alternate Art"))
+        self.assertTrue(own("Sabo SP", "https://elementalarcade.com.au/products/sabo-op13120-sp-carrying-on-his-will"))
+        self.assertFalse(own("Sabo OP13-120 Wanted"))           # collector version: still shown
+        self.assertFalse(own("Sabo OP13-004 Regular"))          # a different card
+        self.assertFalse(own("Monkey.D.Garp OP13-016 Regular"))  # only 2 of 4 owned
+
+    def test_nothing_owned_means_nothing_skipped(self):
+        self.assertFalse(tb.is_owned_pick({}, "Sabo OP13-120 Regular"))
+
+
 if __name__ == "__main__":
     unittest.main()

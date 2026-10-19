@@ -1522,6 +1522,36 @@ def load_picks_file(cfg=None):
     return local
 
 
+# Cards you already have enough of: give a want-list card "owned": 4 (as many as its "qty") and the
+# bot skips it, including the daily ledger's value picks for that card number. Collector versions
+# with one of these words in the name are still shown, in case you want one as a pickup.
+COLLECTOR_WORDS = ("wanted", "manga", "treasure", "super alternate", "serial", "signed", "championship")
+
+
+def _flat(s):
+    return re.sub(r"[^a-z0-9]", "", str(s or "").lower())
+
+
+def owned_nums(cfg):
+    """Card numbers (flattened, e.g. "op13120") you have at least "qty" copies of."""
+    out = set()
+    for c in ((cfg or {}).get("singles") or {}).get("cards") or []:
+        if isinstance(c, dict) and c.get("num"):
+            have = _num(c.get("owned")) or 0
+            if have > 0 and have >= (_num(c.get("qty", 1)) or 1):
+                out.add(_flat(c["num"]))
+    return out
+
+
+def is_owned_pick(cfg, name, url="", owned=None):
+    """True for a value pick of a card you already own enough of (collector versions excepted)."""
+    owned = owned_nums(cfg) if owned is None else owned
+    if not owned or any(w in str(name or "").lower() for w in COLLECTOR_WORDS):
+        return False
+    text = _flat(name) + " " + _flat(url)
+    return any(n in text for n in owned)
+
+
 def load_value_picks(cfg=None):
     """Cards the daily market ledger thinks are good value, from market_picks.json:
     {"watch": [{"name", "product_url", "max", "market", "note"}, ...]}. Missing file = none."""
@@ -1529,8 +1559,11 @@ def load_value_picks(cfg=None):
     if not data:
         return []
     out = []
+    owned = owned_nums(cfg)
     for x in (data.get("watch", []) if isinstance(data, dict) else [])[:MAX_VALUE_PICKS]:
         try:
+            if is_owned_pick(cfg, x.get("name"), x.get("product_url"), owned):
+                continue
             if x["product_url"].startswith("https://") and float(x["max"]) > 0:
                 out.append(x)
         except (KeyError, TypeError, ValueError, AttributeError):
@@ -2408,7 +2441,8 @@ def run_recap(cfg, now=None, post=True, save=True):
         if isinstance(picks, dict):
             picks = picks.get("picks", [])
         pl = [f"⭐ [{_short(x['name'])}]({x.get('url', '')}) **{money(float(x['price']))}** · {x.get('shop', '')}"
-              + (f" · {x['note']}" if x.get("note") else "") for x in picks if x.get("name") and x.get("price")]
+              + (f" · {x['note']}" if x.get("note") else "") for x in picks if x.get("name") and x.get("price")
+              and not is_owned_pick(cfg, x.get("name"), x.get("url", ""))]
         if pl:
             fields.append({"name": "📊 Worth a look (vs US market)", "value": _lines(pl, 6)})
     except Exception:  # noqa: BLE001
