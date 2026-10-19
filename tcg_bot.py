@@ -2732,9 +2732,11 @@ def run_once(cfg, args, drop=None):
         known = load_known()
         listed = new_listings(by_shop, known, box_finds, status.setdefault("pages_seen", {}))
     alerts = cfg.get("alerts") or {}
-    poke_ok, intro = set(), []
+    poke_ok, poke_secs, poke_shops, intro = set(), set(), set(), []
     if poke is not None and not poke.problem:
         poke_ok = poke.ok_pairs
+        poke_secs = set(poke.sections)
+        poke_shops = {shop for shop, _ in poke.listings}    # every shop asked, whether it answered or not
         finds += poke.finds
         if cfg.get("new_listings", True):
             known = load_known() if known is None else known
@@ -2782,7 +2784,11 @@ def run_once(cfg, args, drop=None):
             return ebay is not None and ebay.ran
         if k.startswith("poke|"):
             parts = k.split("|", 3)
-            return len(parts) == 4 and (parts[2], parts[1]) in poke_ok
+            if len(parts) != 4:
+                return False
+            slug, shop = parts[1], parts[2]
+            # checked just now, or a shop that's no longer on the Pokémon list
+            return (shop, slug) in poke_ok or (slug in poke_secs and shop not in poke_shops)
         return False
 
     kept = {k: v for k, v in state.items() if not forget(k)}

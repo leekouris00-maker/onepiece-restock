@@ -107,6 +107,7 @@ class Patched(unittest.TestCase):
         tb.discord_send = lambda alerts, hook, payload, tries=3: self.sent.append((hook, payload)) or True
         self.shops = stock()
         tb.fetch_json = self.shops
+        pw._followups.clear()
         tb.begin_check({}, {})
 
     def tearDown(self):
@@ -269,6 +270,11 @@ class Checking(Patched):
         self.assertEqual(len(b_calls), 1 + len(pw.CROWDED_WORDS))
         a_calls = [u for u in self.shops.calls if "a.test/search" in u]
         self.assertEqual(len(a_calls), 1)                  # a shop with a short list: one search
+
+        self.shops.calls.clear()                           # next check (drop mode, a minute later)
+        res = pw.check(base_cfg(), tb, only={"delta-reign"})
+        self.assertIn("plist|delta-reign|ShopB|dr-etb-b", {l["id"] for l in res.all_listings()})
+        self.assertEqual(len([u for u in self.shops.calls if "b.test/search" in u]), 1)   # follow-ups reused
 
     def test_shop_read_through_its_collection_feeds(self):
         def feed(handle, title, price, available=True):
@@ -689,6 +695,14 @@ class FullRuns(Patched):
         read({"alerts": {"heartbeat_topic": "t"}})
         self.assertFalse(tb.PC_INFO["pokemon"])                                   # the latest message decides
         tb.PC_INFO.update(pokemon=False, posted=set())
+
+    def test_a_shop_taken_off_the_list_is_forgotten(self):
+        cfg = self.live_cfg()
+        self.run_bot(cfg)
+        self.assertIn("poke|delta-reign|ShopA|dr-etb", tb.load_state())
+        cfg["pokemon"]["shops"] = [x for x in cfg["pokemon"]["shops"] if x["name"] != "ShopA"]
+        self.run_bot(cfg)
+        self.assertFalse([k for k in tb.load_state() if k.startswith("poke|") and "|ShopA|" in k])
 
     def test_snapshot_and_history_include_pokemon(self):
         self.run_bot(self.live_cfg())

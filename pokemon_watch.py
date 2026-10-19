@@ -480,9 +480,13 @@ def _keep(pc, section, title):
 
 
 SEARCH_LIMIT = 10              # a Shopify shop's search returns at most 10 products per query
-# When a search comes back full (once a set is out, its singles fill the results), the bot searches again
-# for each kind of sealed product, so a box or ETB can't get pushed out of the top 10 by singles.
+# When a search comes back full (lots of products for one set, or its singles), the bot searches again
+# for each kind of sealed product, so a box or ETB can't get pushed out of the top 10.
 CROWDED_WORDS = ["box", "bundle", "collection", "tin", "blister", "deck"]
+# Those follow-up searches are reused for 10 minutes, so drop mode (a check every minute) asks each shop
+# once or twice a minute, not seven times. The top 10 are always fresh.
+FOLLOWUP_EVERY = 10 * 60
+_followups = {}                # (shop address, release) -> (time, {handle: product}) in a running bot
 
 
 def _shopify(tb, pc, shop, section):
@@ -505,7 +509,15 @@ def _shopify(tb, pc, shop, section):
     if not state["ok"]:
         return None
     if state["full"]:
-        take([f"{section['queries'][0]} {w}" for w in CROWDED_WORDS])
+        key = (base, section["slug"])
+        hit = _followups.get(key)
+        if hit and time.time() - hit[0] < FOLLOWUP_EVERY:
+            for h, p in hit[1].items():
+                products.setdefault(h, p)            # what this check saw itself wins
+        else:
+            top = set(products)
+            take([f"{section['queries'][0]} {w}" for w in CROWDED_WORDS])
+            _followups[key] = (time.time(), {h: p for h, p in products.items() if h not in top})
     rows = []
     for handle, p in products.items():
         title = html.unescape(str(p.get("title") or "")).strip()
