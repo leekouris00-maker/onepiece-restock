@@ -133,7 +133,7 @@
                         "sabo-parallel-carrying-on-his-will"
                     ]
                 },
-                "note": "SEC: regular/SP or Parallel only. Mayhem 'sabo-carrying-on-his-will' is the LEADER, not this. Owned x4 (picked up 19 Oct 2026).",
+                "note": "SEC: regular/SP or Parallel only. Mayhem 'sabo-carrying-on-his-will' is the LEADER, not this.  Owned x4 (picked up 19 Oct 2026).",
                 "owned": 4
             },
             {
@@ -155,8 +155,7 @@
                 "max": 1.5,
                 "deck": "Sabo",
                 "priority": false,
-                "enabled": false,
-                "note": "Not in the OP-17 Sabo lists (Oct 2026); switched off 18 Oct. Set enabled true to watch again."
+                "enabled": true
             },
             {
                 "name": "Monkey.D.Garp",
@@ -174,17 +173,104 @@
                 "max": 1,
                 "deck": "Sabo",
                 "priority": false,
-                "enabled": false,
-                "note": "Not in the OP-17 Sabo lists (Oct 2026); switched off 18 Oct. Set enabled true to watch again."
+                "enabled": true
+            },
+            {
+                "name": "Koala",
+                "num": "EB03-042",
+                "qty": 4,
+                "max": 1.5,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Koala",
+                "num": "OP12-086",
+                "qty": 3,
+                "max": 1,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Koala",
+                "num": "OP05-006",
+                "qty": 1,
+                "max": 1.5,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ],
+                "note": "Stand-in for promo P-069 (same deck slot)"
+            },
+            {
+                "name": "Sabo",
+                "num": "OP04-083",
+                "qty": 3,
+                "max": 1.5,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "search": "Sabo Kingdoms of Intrigue",
+                "exclude": [
+                    "alternate art",
+                    "manga",
+                    "sealed battle",
+                    "anniversary",
+                    "promotion",
+                    "japanese",
+                    "parallel"
+                ],
+                "note": "Stand-in for promo P-105 (same deck slot)"
+            },
+            {
+                "name": "Stussy",
+                "num": "OP07-085",
+                "qty": 2,
+                "max": 5,
+                "deck": "Sabo",
+                "priority": true,
+                "enabled": true,
+                "search": "Stussy 500 Years in the Future"
+            },
+            {
+                "name": "Monkey.D.Dragon",
+                "num": "OP13-017",
+                "qty": 1,
+                "max": 1,
+                "deck": "Sabo",
+                "priority": false,
+                "enabled": true,
+                "shops": [
+                    "Elemental Arcade"
+                ]
+            },
+            {
+                "name": "Ground Death",
+                "num": "OP14-096",
+                "qty": 1,
+                "max": 10,
+                "deck": "Sabo",
+                "priority": true,
+                "enabled": true
             },
             {
                 "name": "Usopp",
                 "num": "OP17-080",
                 "qty": 4,
                 "max": 2.5,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": true,
-                "enabled": true,
+                "enabled": false,
                 "search": "Usopp The World's Strongest Warriors"
             },
             {
@@ -192,9 +278,9 @@
                 "num": "OP17-089",
                 "qty": 4,
                 "max": 1,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": false,
-                "enabled": true,
+                "enabled": false,
                 "shops": [
                     "Elemental Arcade"
                 ]
@@ -204,9 +290,9 @@
                 "num": "OP17-095",
                 "qty": 4,
                 "max": 1,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": false,
-                "enabled": true,
+                "enabled": false,
                 "shops": [
                     "Elemental Arcade"
                 ]
@@ -216,9 +302,9 @@
                 "num": "OP17-093",
                 "qty": 4,
                 "max": 4,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": true,
-                "enabled": true,
+                "enabled": false,
                 "search": "Monkey.D.Luffy The World's Strongest Warriors"
             },
             {
@@ -226,9 +312,9 @@
                 "num": "OP17-084",
                 "qty": 4,
                 "max": 1,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": false,
-                "enabled": true,
+                "enabled": false,
                 "shops": [
                     "Elemental Arcade"
                 ]
@@ -238,9 +324,9 @@
                 "num": "OP17-086",
                 "qty": 3,
                 "max": 1,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": false,
-                "enabled": true,
+                "enabled": false,
                 "shops": [
                     "Elemental Arcade"
                 ]
@@ -250,9 +336,9 @@
                 "num": "OP17-087",
                 "qty": 2,
                 "max": 1.5,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": false,
-                "enabled": true,
+                "enabled": false,
                 "shops": [
                     "Elemental Arcade"
                 ]
@@ -262,9 +348,9 @@
                 "num": "OP17-083",
                 "qty": 2,
                 "max": 1,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": false,
-                "enabled": true,
+                "enabled": false,
                 "shops": [
                     "Elemental Arcade"
                 ]
@@ -274,9 +360,9 @@
                 "num": "OP17-088",
                 "qty": 4,
                 "max": 1,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": false,
-                "enabled": true,
+                "enabled": false,
                 "shops": [
                     "Elemental Arcade"
                 ]
@@ -286,9 +372,9 @@
                 "num": "OP17-098",
                 "qty": 2,
                 "max": 1,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": false,
-                "enabled": true,
+                "enabled": false,
                 "shops": [
                     "Elemental Arcade"
                 ]
@@ -298,9 +384,9 @@
                 "num": "OP04-016",
                 "qty": 2,
                 "max": 1.5,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": false,
-                "enabled": true,
+                "enabled": false,
                 "shops": [
                     "Elemental Arcade"
                 ]
@@ -310,9 +396,9 @@
                 "num": "OP15-088",
                 "qty": 4,
                 "max": 8,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": true,
-                "enabled": true,
+                "enabled": false,
                 "search": "Pirates Docking Six"
             },
             {
@@ -320,9 +406,9 @@
                 "num": "EB04-007",
                 "qty": 3,
                 "max": 15,
-                "deck": "Sabo",
+                "deck": "Sabo (OP-17 build, off)",
                 "priority": true,
-                "enabled": true,
+                "enabled": false,
                 "search": "Roronoa Zoro Adventure on Kami's Island"
             },
             {
