@@ -1,23 +1,5 @@
 {
- "held": {
-  "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55204140941603:1",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
-    "kind": "Single",
-    "name": "Moby Dick OP16-021 Alternate Art",
-    "note": "Moby Dick (Alternate Art) - OP16-021 [The Time of Battle] \u00b7 US market \u2248 $22.93 \u00b7 in stock, listed 11% over market",
-    "price": 22.6,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
-    "value_pick": true
-   },
-   "t": 1792415871
-  }
- },
+ "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
  "offline_streak": 0,
@@ -25,7 +7,8 @@
   "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 2
  },
  "pages_seen": {},
- "pc_on": true,
+ "pc_on": false,
+ "pokemon_state": "quiet",
  "robots": {
   "alphagaming.com.au": {
    "rules": [
@@ -2353,6 +2336,263 @@
    ],
    "t": 1792415847.7088363
   },
+  "www.kollecter.com.au": {
+   "rules": [
+    [
+     1,
+     "/"
+    ],
+    [
+     1,
+     "/products/account"
+    ],
+    [
+     1,
+     "/products/orders"
+    ],
+    [
+     1,
+     "/products/checkout"
+    ],
+    [
+     1,
+     "/*/products/account"
+    ],
+    [
+     1,
+     "/*/products/orders"
+    ],
+    [
+     1,
+     "/*/products/checkout"
+    ],
+    [
+     1,
+     "/collections/account"
+    ],
+    [
+     1,
+     "/collections/orders"
+    ],
+    [
+     1,
+     "/collections/checkout"
+    ],
+    [
+     1,
+     "/*/collections/account"
+    ],
+    [
+     1,
+     "/*/collections/orders"
+    ],
+    [
+     1,
+     "/*/collections/checkout"
+    ],
+    [
+     1,
+     "/pages/checkout"
+    ],
+    [
+     1,
+     "/*/pages/checkout"
+    ],
+    [
+     1,
+     "/blogs/*account"
+    ],
+    [
+     1,
+     "/blogs/*orders"
+    ],
+    [
+     1,
+     "/blogs/*checkout"
+    ],
+    [
+     1,
+     "/*/blogs/*account"
+    ],
+    [
+     1,
+     "/*/blogs/*orders"
+    ],
+    [
+     1,
+     "/*/blogs/*checkout"
+    ],
+    [
+     0,
+     "/admin"
+    ],
+    [
+     0,
+     "/cart/"
+    ],
+    [
+     0,
+     "/*/cart/"
+    ],
+    [
+     0,
+     "/checkout"
+    ],
+    [
+     0,
+     "/*/checkout"
+    ],
+    [
+     0,
+     "/checkouts/"
+    ],
+    [
+     0,
+     "/*/checkouts/"
+    ],
+    [
+     0,
+     "/orders"
+    ],
+    [
+     0,
+     "/*/orders"
+    ],
+    [
+     1,
+     "/account/login"
+    ],
+    [
+     1,
+     "/*/account/login"
+    ],
+    [
+     0,
+     "/account"
+    ],
+    [
+     0,
+     "/*/account"
+    ],
+    [
+     0,
+     "/59635990685"
+    ],
+    [
+     0,
+     "/cdn/wpm/*.js"
+    ],
+    [
+     0,
+     "/services"
+    ],
+    [
+     0,
+     "/sf_*"
+    ],
+    [
+     0,
+     "/cart.js"
+    ],
+    [
+     0,
+     "/*/cart.js"
+    ],
+    [
+     0,
+     "/recommendations/products"
+    ],
+    [
+     0,
+     "/*/recommendations/products"
+    ],
+    [
+     0,
+     "/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/*/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/collections/*+*"
+    ],
+    [
+     0,
+     "/collections/*%2B*"
+    ],
+    [
+     0,
+     "/collections/*%2b*"
+    ],
+    [
+     0,
+     "/*/collections/*+*"
+    ],
+    [
+     0,
+     "/*/collections/*%2B*"
+    ],
+    [
+     0,
+     "/*/collections/*%2b*"
+    ],
+    [
+     0,
+     "/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/*/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/blogs/*+*"
+    ],
+    [
+     0,
+     "/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*/blogs/*+*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*?*ls=*&ls=*"
+    ],
+    [
+     0,
+     "/*?*ls%3*ls%3*"
+    ],
+    [
+     0,
+     "/*?*oseid=*"
+    ],
+    [
+     0,
+     "/*?*preview_theme_id=*"
+    ],
+    [
+     0,
+     "/*?*preview_script_id=*"
+    ]
+   ],
+   "t": 1792419277.3274932
+  },
   "www.m-g.com.au": {
    "rules": [
     [
@@ -2642,6 +2882,10 @@
     ]
    ],
    "t": 1792415848.3769443
+  },
+  "www.monstermart.com.au": {
+   "rules": [],
+   "t": 1792419277.5071127
   },
   "www.pokebox.com.au": {
    "rules": [
@@ -3074,8 +3318,10 @@
   "www.gameology.com.au": 0,
   "www.gumnut.com.au": 0,
   "www.jtoys.com.au": 0,
+  "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
+  "www.monstermart.com.au": 0,
   "www.pokebox.com.au": 0,
   "www.tcgroupau.com.au": 0
  },

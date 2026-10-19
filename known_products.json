@@ -13,9 +13,39 @@
   "list|Alpha Gaming|preoder-eta-mar-2024-one-piece-booster-box-wings-of-the-captain-op-06",
   "list|Alpha Gaming|preoder-eta-sep-2023-one-piece-booster-box-kingdom-of-intrigue-op-04"
  ],
+ "Alpha Gaming (pokemon:30th-celebration)": [],
+ "Alpha Gaming (pokemon:delta-reign)": [],
  "Collectible Madness": [
   "list|Collectible Madness|one-piece-card-game-tba-op-16-booster-box"
  ],
+ "Collectible Madness (pokemon:30th-celebration)": [
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-battle-deck-umbreon-ex",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-binder-collection",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-booster-bundle",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-elite-trainer-box",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-greninja-ex-box",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-knock-out-collection",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-poster-collection",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-sylveon-ex-box",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-tech-sticker-collection",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-tin",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-ultra-premium-collection-night"
+ ],
+ "Collectible Madness (pokemon:delta-reign)": [
+  "plist|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-box",
+  "plist|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-bundle",
+  "plist|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-elite-trainer-box"
+ ],
+ "Elemental Arcade (pokemon:30th-celebration)": [
+  "plist|30th-celebration|Elemental Arcade|arceus-vstar-123172-me-30th-celebration-classic-collection",
+  "plist|30th-celebration|Elemental Arcade|charizard-4102-me-30th-celebration-classic-collection",
+  "plist|30th-celebration|Elemental Arcade|dark-tyranitar-19109-me-30th-celebration-classic-collection",
+  "plist|30th-celebration|Elemental Arcade|darkrai-cresselia-legend-top-99102-me-30th-celebration-classic-collection",
+  "plist|30th-celebration|Elemental Arcade|eevee-116128-30th-celebration-blister-exclusives",
+  "plist|30th-celebration|Elemental Arcade|lugia-149147-me-30th-celebration-classic-collection",
+  "plist|30th-celebration|Elemental Arcade|palkia-lvx-106106-me-30th-celebration-classic-collection"
+ ],
+ "Elemental Arcade (pokemon:delta-reign)": [],
  "Gameology": [
   "list|Gameology|one-piece-card-game-500-years-in-the-future-op-07-booster-box",
   "list|Gameology|one-piece-card-game-awakening-of-the-new-era-op-05-booster-box",
@@ -53,6 +83,16 @@
   "list|Gameology|one-piece-card-game-starter-deck-st-37",
   "list|Gameology|one-piece-card-game-starter-deck-st-38"
  ],
+ "Gameology (pokemon:30th-celebration)": [],
+ "Gameology (pokemon:delta-reign)": [],
+ "Good Games (pokemon:30th-celebration)": [],
+ "Good Games (pokemon:delta-reign)": [
+  "plist|delta-reign|Good Games|pokemon-tcg-delta-reign-booster-box",
+  "plist|delta-reign|Good Games|pokemon-tcg-delta-reign-booster-bundle",
+  "plist|delta-reign|Good Games|pokemon-tcg-delta-reign-build-and-battle-box",
+  "plist|delta-reign|Good Games|pokemon-tcg-delta-reign-elite-trainer-box",
+  "plist|delta-reign|Good Games|pokemon-tcg-delta-reign-three-booster-blister"
+ ],
  "Good Games (sealed)": [
   "list|Good Games (sealed)|one-piece-card-game-awakening-of-the-new-era-op-05-booster-box",
   "list|Good Games (sealed)|one-piece-card-game-booster-box-tba-op-19",
@@ -82,7 +122,29 @@
   "list|Grailborne|one-piece-card-game-illustration-box-vol-10-ib-10-english-sealed",
   "list|Grailborne|one-piece-card-game-illustration-box-vol-2-ib-02-english-sealed",
   "list|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed",
+  "list|Grailborne|one-piece-card-game-illustration-box-vol-8-ib-08-english-sealed",
   "list|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition"
+ ],
+ "Grailborne (pokemon:30th-celebration)": [
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-4-booster-tin-assorted",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-booster-bundle",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-build-battle-espeon-ex-umbreon-ex-deck-assorted",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-ditto-premium-collection",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-elite-trainer-box",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-ex-box-assorted",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-figure-collection-mew-mewtwo",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-knock-out-collection",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-mini-tin-assorted",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-mini-tin-sealed-display-10-tins-releases-2-oct-2026",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-poster-box",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-sticker-blister-assorted",
+  "plist|30th-celebration|Grailborne|pokemon-tcg-30th-celebration-ultra-premium-collection-day-night"
+ ],
+ "Grailborne (pokemon:delta-reign)": [
+  "plist|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-booster-box",
+  "plist|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-booster-bundle",
+  "plist|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-checklane-blister-releases-6-nov-2026",
+  "plist|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box"
  ],
  "Gumnut": [
   "list|Gumnut|one-piece-card-game-500-years-in-the-future-booster-box-24-op-07",
@@ -96,16 +158,62 @@
   "list|Gumnut|one-piece-card-game-two-legends-booster-box-op-08-24",
   "list|Gumnut|one-piece-card-game-wings-of-the-captain-booster-box-op-06-24"
  ],
+ "Gumnut (pokemon:30th-celebration)": [],
+ "Gumnut (pokemon:delta-reign)": [],
  "JToys": [
   "list|JToys|78683",
   "list|JToys|83985",
   "list|JToys|83988",
   "list|JToys|88102"
  ],
+ "JToys (pokemon:30th-celebration)": [],
+ "JToys (pokemon:delta-reign)": [
+  "plist|delta-reign|JToys|88614"
+ ],
+ "Kollecter (pokemon:30th-celebration)": [],
+ "Kollecter (pokemon:delta-reign)": [
+  "plist|delta-reign|Kollecter|pokemon-tcg-mega-evolution-delta-reign-build-battle-box",
+  "plist|delta-reign|Kollecter|pokemon-tcg-mega-evolution-delta-reign-checklane-blister-1"
+ ],
  "M-G": [],
+ "M-G (pokemon:30th-celebration)": [
+  "plist|30th-celebration|M-G|127826",
+  "plist|30th-celebration|M-G|127827",
+  "plist|30th-celebration|M-G|127828",
+  "plist|30th-celebration|M-G|127829",
+  "plist|30th-celebration|M-G|127830",
+  "plist|30th-celebration|M-G|127831",
+  "plist|30th-celebration|M-G|127832",
+  "plist|30th-celebration|M-G|127833",
+  "plist|30th-celebration|M-G|127834",
+  "plist|30th-celebration|M-G|127835",
+  "plist|30th-celebration|M-G|127836",
+  "plist|30th-celebration|M-G|127837",
+  "plist|30th-celebration|M-G|127887"
+ ],
+ "M-G (pokemon:delta-reign)": [
+  "plist|delta-reign|M-G|133239",
+  "plist|delta-reign|M-G|133253",
+  "plist|delta-reign|M-G|133258",
+  "plist|delta-reign|M-G|133259",
+  "plist|delta-reign|M-G|133260"
+ ],
+ "Mayhem (pokemon:30th-celebration)": [
+  "plist|30th-celebration|Mayhem|buzzwole-gx-57-111-me-30th-celebration-classic-collection-holofoil",
+  "plist|30th-celebration|Mayhem|darkrai-and-cresselia-legend-bottom-100-102-me-30th-celebration-classic-collection-holofoil",
+  "plist|30th-celebration|Mayhem|delcatty-5-109-me-30th-celebration-classic-collection-holofoil",
+  "plist|30th-celebration|Mayhem|gengar-prime-94-102-me-30th-celebration-classic-collection-holofoil",
+  "plist|30th-celebration|Mayhem|magikarp-203-193-me-30th-celebration-classic-collection-holofoil",
+  "plist|30th-celebration|Mayhem|mew-vmax-114-264-me-30th-celebration-classic-collection-holofoil"
+ ],
+ "Mayhem (pokemon:delta-reign)": [],
+ "Monster Mart (pokemon:30th-celebration)": [],
+ "Monster Mart (pokemon:delta-reign)": [],
  "Pocket Games": [
   "list|Pocket Games|one-piece-op15-sky-island-booster-box"
  ],
+ "Pocket Games (pokemon:30th-celebration)": [],
+ "Pocket Games (pokemon:delta-reign)": [],
  "Pokebox": [
   "list|Pokebox|one-piece-card-game-500-years-in-the-future-op-07-booster-box-english",
   "list|Pokebox|one-piece-card-game-a-fist-of-divine-speed-op-11-booster-box-english",
@@ -133,6 +241,25 @@
   "list|Pokebox|one-piece-card-game-wave-2-500-years-in-the-future-op-07-booster-box-english",
   "list|Pokebox|one-piece-card-game-wings-of-the-captain-op-06-booster-box-english"
  ],
+ "Pokebox (pokemon:30th-celebration)": [
+  "plist|30th-celebration|Pokebox|30th-celebration-figure-collection-mew-mewtwo-assorted",
+  "plist|30th-celebration|Pokebox|pokemon-30th-celebration-pokemon-center-exclusive-elite-trainer-box-etb",
+  "plist|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-binder-collection",
+  "plist|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-booster-bundle",
+  "plist|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-ditto-premium-collection",
+  "plist|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-elite-trainer-box-etb",
+  "plist|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-knock-out-collection",
+  "plist|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-poster-collection",
+  "plist|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-sylveon-ex-box-greninja-ex-box-assorted",
+  "plist|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-tech-sticker-collection-assorted",
+  "plist|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-ultra-premium-collection-day-espeon",
+  "plist|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-ultra-premium-collection-night-umbreon"
+ ],
+ "Pokebox (pokemon:delta-reign)": [
+  "plist|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-3-booster-blister",
+  "plist|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-booster-box",
+  "plist|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-elite-trainer-box-etb"
+ ],
  "TCGroup": [
   "list|TCGroup|one-piece-awakening-of-the-new-era-op-05-booster-box-english",
   "list|TCGroup|one-piece-card-game-500-years-in-the-future-op-07-booster-box-english",
@@ -155,5 +282,24 @@
   "list|TCGroup|one-piece-card-game-two-legends-op-08-booster-box-english",
   "list|TCGroup|one-piece-card-game-wings-of-the-captain-op-06-booster-box-english",
   "list|TCGroup|one-piece-memorial-collection-extra-booster-eb-01-booster-box-english"
+ ],
+ "TCGroup (pokemon:30th-celebration)": [
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-binder-collection",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-booster-bundle-english",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-booster-tin",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-ditto-premium-collection",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-elite-trainer-box-etb",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-figure-collection-mew",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-figure-collection-mewtwo",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-knock-out-collection",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-mini-tin-assorted",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-poster-collection",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-sylveon-ex-greninja-ex-box-assorted",
+  "plist|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-tech-sticker-collection-assorted"
+ ],
+ "TCGroup (pokemon:delta-reign)": [
+  "plist|delta-reign|TCGroup|pokemon-trading-card-game-mega-evolution-me06-delta-reign-booster-box-english",
+  "plist|delta-reign|TCGroup|pokemon-trading-card-game-mega-evolution-me06-delta-reign-elite-trainer-box-etb-english",
+  "plist|delta-reign|TCGroup|pokemon-trading-card-game-mega-evolution-me06-delta-reign-three-booster-blister-english"
  ]
 }
