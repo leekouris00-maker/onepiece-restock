@@ -83,8 +83,18 @@
   "list|Gameology|one-piece-card-game-starter-deck-st-37",
   "list|Gameology|one-piece-card-game-starter-deck-st-38"
  ],
- "Gameology (pokemon:30th-celebration)": [],
- "Gameology (pokemon:delta-reign)": [],
+ "Gameology (pokemon:30th-celebration)": [
+  "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-booster-bundle",
+  "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-elite-trainer-box",
+  "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-mini-tin-random-select",
+  "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-poster-collection"
+ ],
+ "Gameology (pokemon:delta-reign)": [
+  "plist|delta-reign|Gameology|pokemon-tcg-mega-evolution-delta-reign-booster-box",
+  "plist|delta-reign|Gameology|pokemon-tcg-mega-evolution-delta-reign-booster-bundle",
+  "plist|delta-reign|Gameology|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box",
+  "plist|delta-reign|Gameology|pokemon-tcg-mega-evolution-delta-reign-three-booster-blister"
+ ],
  "Good Games (pokemon:30th-celebration)": [],
  "Good Games (pokemon:delta-reign)": [
   "plist|delta-reign|Good Games|pokemon-tcg-delta-reign-booster-box",
