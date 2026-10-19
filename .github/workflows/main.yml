@@ -38,6 +38,8 @@ jobs:
           HEARTBEAT_TOPIC: ${{ secrets.HEARTBEAT_TOPIC }}
           EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}           # eBay watch (ebay_watch.json); off until set
           EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
+          POKEMON_WEBHOOKS: ${{ secrets.POKEMON_WEBHOOKS }}       # Pokémon channels (one line of JSON); quiet until set
+          POKEMON_PING: ${{ secrets.POKEMON_PING }}               # the Pokémon Ping role
           HEARTBEAT_ROLE: listen          # stay quiet while the PC copy is on
           BOT_NAME: "One Piece Restock (cloud)"
           TZ: Australia/Melbourne

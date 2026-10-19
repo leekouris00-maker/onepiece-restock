@@ -11,6 +11,9 @@ Checks Australian shops for:
   4. NEW listings: a box or watched product a shop has just added, even before it's buyable
   5. eBay: cards and collectibles in ebay_watch.json (e.g. the Nike x One Piece TNs and DON!! cards) listed
      at or under your max, delivered (needs a free eBay key, see the top of ebay_watch.py)
+  6. Pokémon (pokemon_watch.py): the upcoming English releases, each in its own Discord channel - new
+     listings and pre-orders, stock at or under your max, and in-store release-day posts. Nothing posts
+     until the Pokémon channels exist (add_pokemon_channels.bat, or /pokemon setup in Discord).
 
 Every find comes with a one-tap "Buy" link that puts it straight into your cart at
 checkout. You still press pay yourself - the bot never buys anything or logs in.
@@ -22,6 +25,7 @@ Only needs Python 3.8+ (no extra installs).
     python tcg_bot.py --loop 30       keep running, check every 30 minutes
     python tcg_bot.py --sealed        only check booster boxes
     python tcg_bot.py --singles       only check singles
+    python tcg_bot.py --pokemon       only check Pokémon (try: --pokemon --all --dry-run)
     python tcg_bot.py --test-discord  post a test message to your Discord channel and stop
     python tcg_bot.py --recap         post the daily recap (the GitHub copy does this every morning)
     python tcg_bot.py --dry-run       check and print, but post nothing and save nothing (safe to test with)
@@ -80,7 +84,7 @@ The cloud copy (GitHub Actions) uses these so the webhooks stay secret:
     DISCORD_WEBHOOK, DISCORD_WEBHOOK_BOXES, DISCORD_WEBHOOK_SINGLES, DISCORD_WEBHOOK_SEALED, DISCORD_PING,
     DISCORD_WEBHOOK_EBAY, DISCORD_WEBHOOK_STATUS, DISCORD_WEBHOOK_RECAP,
     NTFY_TOPIC, BOT_NAME (the name the Discord posts show, e.g. "One Piece Restock (cloud)"),
-    HEARTBEAT_TOPIC, HEARTBEAT_ROLE
+    HEARTBEAT_TOPIC, HEARTBEAT_ROLE, POKEMON_WEBHOOKS (one line of JSON), POKEMON_PING
 """
 import argparse
 import base64
@@ -106,8 +110,14 @@ try:
     import ebay_watch          # eBay watch list (ebay_watch.json); optional
 except ImportError:            # ebay_watch.py not next to the bot: eBay is skipped, everything else as normal
     ebay_watch = None
+try:
+    import pokemon_watch       # Pokémon releases; optional
+except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
+    pokemon_watch = None
 
-VERSION = "2.0.2"
+VERSION = "2.2.0"
+POKE = "pokemon"
+ONE_PIECE = "onepiece"
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(HERE, "config.json")
@@ -157,6 +167,8 @@ ENV_ALERTS = {
     "LEDGER_URL": "ledger_url",
     "HEARTBEAT_TOPIC": "heartbeat_topic",
     "HEARTBEAT_ROLE": "heartbeat_role",
+    "POKEMON_WEBHOOKS": "pokemon_webhooks",     # {"<release>": link, "restocks": link, "in-store": link} as JSON
+    "POKEMON_PING": "pokemon_ping",
 }
 
 # PC and cloud copies share a private ntfy topic. The PC says "I'm on" there now and then;
@@ -895,7 +907,8 @@ def _num(x):
 KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
                   "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
-                  "classic_requests", "user_agent_by_shop"}
+                  "classic_requests", "user_agent_by_shop", "pokemon"}
+DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
 
@@ -964,12 +977,32 @@ def check_config(cfg):
         cfg["sealed_watch"] = good
     alerts = cfg.get("alerts") or {}
     for k, v in alerts.items():
-        if k.startswith("discord_webhook") and v and not re.match(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/", str(v)):
+        if k.startswith("discord_webhook") and v and not DISCORD_HOOK_RE.match(str(v)):
             w.append(f'alerts "{k}" doesn\'t look like a Discord webhook address')
+    ph = alerts.get("pokemon_webhooks")
+    if isinstance(ph, str) and ph.strip():
+        try:
+            ph = alerts["pokemon_webhooks"] = json.loads(ph)       # the cloud copy gets it as one line of JSON
+        except ValueError:
+            w.append('alerts "pokemon_webhooks" (POKEMON_WEBHOOKS) isn\'t valid JSON, so Pokémon alerts are off')
+            ph = alerts["pokemon_webhooks"] = {}
+    if ph is not None and not isinstance(ph, dict):
+        w.append('alerts "pokemon_webhooks" should be {"<channel>": "<webhook link>", ...}; Pokémon alerts are off')
+        alerts["pokemon_webhooks"] = {}
+    elif isinstance(ph, dict):
+        for k, v in list(ph.items()):
+            if not DISCORD_HOOK_RE.match(str(v or "")):
+                w.append(f'alerts "pokemon_webhooks" → "{k}" doesn\'t look like a Discord webhook address; skipped')
+                ph.pop(k)
     qh = alerts.get("quiet_hours")
     if qh and not re.fullmatch(r"\s*\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}\s*", str(qh)):
         w.append(f'alerts "quiet_hours" should look like "23:00-07:00" (it\'s {qh!r}); ignored')
         alerts.pop("quiet_hours", None)
+    for d in cfg.get("drop_windows") or []:
+        if isinstance(d, dict) and str(d.get("game", ONE_PIECE)).lower() not in (ONE_PIECE, POKE, "one piece", "pokémon"):
+            w.append(f'drop window "{d.get("name", "?")}": "game" should be "onepiece" or "pokemon"')
+    if pokemon_watch:
+        w += pokemon_watch.warnings(cfg)
     return w
 
 
@@ -1623,12 +1656,25 @@ def check_singles(cfg):
     return [f for r in results for f in r]
 
 
+def _me():
+    """This module, whether it's running as the bot (__main__) or imported (commands_bot.py, tests)."""
+    return sys.modules[__name__]
+
+
 def run_checks(cfg, sealed=True, singles=True):
     """Boxes and singles at the same time (v1 did one after the other). -> ((finds, by_shop) | None, singles | None)"""
+    s, g, _ = run_checks_all(cfg, sealed, singles, False)
+    return s, g
+
+
+def run_checks_all(cfg, sealed=True, singles=True, pokemon=True, poke_only=None):
+    """Boxes, singles and Pokémon at the same time.
+    -> ((finds, by_shop) | None, singles | None, pokemon_watch.Result | None)"""
     ex = _pool("phases", 4)
     fs = ex.submit(check_sealed, cfg) if sealed else None
     fg = ex.submit(check_singles, cfg) if singles else None
-    return (fs.result() if fs else None), (fg.result() if fg else None)
+    fp = ex.submit(pokemon_watch.check, cfg, _me(), poke_only) if (pokemon and pokemon_watch) else None
+    return (fs.result() if fs else None), (fg.result() if fg else None), (fp.result() if fp else None)
 
 
 # ---------------------------------------------------------------- drop-day mode
@@ -1660,34 +1706,65 @@ def auto_windows(cfg, now=None):
     return out
 
 
+def _game(x):
+    """"pokemon" / "Pokémon" -> "pokemon"; anything else (or nothing) -> "onepiece"."""
+    g = str(x or ONE_PIECE).lower().replace("é", "e")
+    return POKE if g.startswith("poke") else ONE_PIECE
+
+
 def parse_windows(cfg):
     out = []
     for w in cfg.get("drop_windows", []) or []:
         try:
             start = datetime.strptime(w["start"], "%Y-%m-%d %H:%M")
             end = datetime.strptime(w["end"], "%Y-%m-%d %H:%M")
-        except (KeyError, ValueError, TypeError) as e:
+        except (KeyError, ValueError, TypeError, AttributeError) as e:
             print(f"   ! drop window {w.get('name', '?') if isinstance(w, dict) else w} skipped: use \"YYYY-MM-DD HH:MM\" ({e})")
             continue
         if end <= start:
             continue
         every = max(MIN_DROP_SECONDS, int(_num(w.get("every_seconds", 60)) or 60))
         out.append({"name": w.get("name", "drop"), "start": start, "end": end, "every": every,
-                    "sealed_only": w.get("sealed_only", True)})
-    have = [(w["start"], w["end"]) for w in out]
-    for w in auto_windows(cfg):        # yours win where they overlap
-        if not any(w["start"] < e and s < w["end"] for s, e in have):
+                    "sealed_only": w.get("sealed_only", True), "games": [_game(w.get("game"))],
+                    "sections": [str(x) for x in w.get("sections") or []]})
+    mine = list(out)
+    autos = [dict(w, games=w.get("games") or [ONE_PIECE]) for w in auto_windows(cfg)]
+    if pokemon_watch:
+        try:
+            autos += pokemon_watch.auto_windows(cfg)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! Pokémon drop windows skipped ({e})")
+    for w in autos:                    # yours win where they overlap (for the same game)
+        g = w["games"][0]
+        if not any(g in x["games"] and w["start"] < x["end"] and x["start"] < w["end"] for x in mine):
             out.append(w)
     out.sort(key=lambda w: w["start"])
     return out
 
 
 def active_window(cfg, now=None):
+    """The drop window on now. If several overlap (e.g. a One Piece and a Pokémon release), one merged
+    window: the fastest pace, every game and Pokémon release in any of them."""
     now = now or datetime.now()
-    for w in parse_windows(cfg):
-        if w["start"] <= now < w["end"]:
-            return w
-    return None
+    act = [w for w in parse_windows(cfg) if w["start"] <= now < w["end"]]
+    if len(act) <= 1:
+        return act[0] if act else None
+    op = [w for w in act if ONE_PIECE in w.get("games", [ONE_PIECE])]
+    pk = [w for w in act if POKE in w.get("games", [])]
+    return {"name": " + ".join(dict.fromkeys(w["name"] for w in act)), "start": min(w["start"] for w in act),
+            "end": max(w["end"] for w in act), "every": min(w["every"] for w in act),
+            "sealed_only": all(w.get("sealed_only", True) for w in op) if op else True,
+            "games": sorted({g for w in act for g in w.get("games", [ONE_PIECE])}),
+            # a Pokémon window without "sections" means every Pokémon release
+            "sections": [] if any(not w.get("sections") for w in pk) else sorted({s for w in pk for s in w["sections"]})}
+
+
+def drop_label(drop):
+    """What a drop window checks every minute, for the status posts."""
+    games = set(drop.get("games") or [ONE_PIECE])
+    if games == {POKE}:
+        return "Pokémon"
+    return "booster boxes" + (" and Pokémon" if POKE in games else "")
 
 
 def seconds_until_next_check(cfg, normal_minutes, now=None):
@@ -1713,7 +1790,20 @@ def heartbeat_role(cfg):
     return (a.get("heartbeat_role") or "send").lower()
 
 
-def send_heartbeat(cfg, force=False):
+def heartbeat_body(cfg, status=None):
+    """What the PC copy tells the cloud copy: "pc-on", plus "pokemon" if the PC posts Pokémon alerts itself,
+    plus "r=<key>,..." for the release-day posts it made in the last half hour."""
+    body = "pc-on"
+    alerts = cfg.get("alerts") or {}
+    if pokemon_watch and pokemon_watch.enabled(cfg) and pokemon_watch.hooks(alerts):
+        body += " pokemon"
+        recent = pokemon_watch.recently_sent(status or {})
+        if recent:
+            body += " r=" + ",".join(recent)
+    return body
+
+
+def send_heartbeat(cfg, force=False, status=None):
     """PC copy: tell the cloud copy we're on (every 15 minutes, and straight after posting finds, at most
     once a minute: ntfy.sh allows 250 messages a day)."""
     global _last_heartbeat
@@ -1722,28 +1812,43 @@ def send_heartbeat(cfg, force=False):
         return
     topic = cfg["alerts"]["heartbeat_topic"]
     try:
-        status, _, _ = HTTP.post(f"https://ntfy.sh/{urllib.parse.quote(topic)}", b"pc-on", {"Cache": "yes"})
-        if status >= 400:
-            raise HttpError(status)
+        status_code, _, _ = HTTP.post(f"https://ntfy.sh/{urllib.parse.quote(topic)}",
+                                      heartbeat_body(cfg, status).encode("utf-8"), {"Cache": "yes"})
+        if status_code >= 400:
+            raise HttpError(status_code)
         _last_heartbeat = time.time()
     except Exception as e:  # noqa: BLE001
         print(f"   ! couldn't tell the cloud copy the PC is on ({e})")
+
+
+# What the PC copy's latest "I'm on" said (cloud copy): does it post Pokémon itself, and which
+# release-day posts has it made. Filled in by pc_last_seen().
+PC_INFO = {"pokemon": False, "posted": set()}
 
 
 def pc_last_seen(cfg):
     """Cloud copy: when did the PC copy last check in (unix time), or None if not in the last 20 minutes.
     If ntfy can't be read, None (a doubled alert is better than a missed one)."""
     topic = cfg["alerts"]["heartbeat_topic"]
+    PC_INFO.update(pokemon=False, posted=set())
     try:
         body = HTTP.fetch(f"https://ntfy.sh/{urllib.parse.quote(topic)}/json?poll=1&since={HEARTBEAT_FRESH}",
                           tries=1, conditional=False, robots=False, memo=False)
-        times = []
+        msgs = []
         for line in body.decode("utf-8", "replace").splitlines():
             if line.strip():
                 m = json.loads(line)
                 if m.get("event") == "message":
-                    times.append(float(m.get("time") or time.time()))
-        return max(times) if times else None
+                    msgs.append((float(m.get("time") or time.time()), str(m.get("message") or "")))
+        if not msgs:
+            return None
+        msgs.sort()
+        PC_INFO["pokemon"] = "pokemon" in msgs[-1][1].split()
+        for _, text in msgs:
+            for word in text.split():
+                if word.startswith("r="):
+                    PC_INFO["posted"].update(k for k in word[2:].split(",") if k)
+        return msgs[-1][0]
     except Exception as e:  # noqa: BLE001
         print(f"   ! couldn't check whether the PC is on ({e}), posting anyway")
         return None
@@ -1796,6 +1901,12 @@ def shop_names(cfg):
             names.setdefault(urllib.parse.urlparse(shop.get("url") or shop.get("base")).netloc, shop["name"])
     for name, base in cfg.get("singles", {}).get("shops", {}).items():
         names.setdefault(urllib.parse.urlparse(base).netloc, name)
+    if pokemon_watch:
+        try:
+            for s in pokemon_watch.shops(cfg, _me()):
+                names.setdefault(urllib.parse.urlparse(s["base"]).netloc, s["name"])
+        except Exception:  # noqa: BLE001
+            pass
     return names
 
 
@@ -2028,24 +2139,37 @@ def push_discord(cfg, title, body, finds=None, ping=True):
 
 
 def push_discord_detailed(cfg, title, body, finds=None, ping=True):
-    """Like push_discord, and also returns the set of find ids Discord confirmed."""
+    """Like push_discord, and also returns the set of find ids Discord confirmed. Pokémon finds go to
+    their release's channel (or the catch-all Pokémon channel); with no Pokémon channels set up yet they
+    aren't posted anywhere and count as done, so they aren't retried every check."""
     alerts = cfg.get("alerts") or {}
     default = alerts.get("discord_webhook")
     boxes_hook = alerts.get("discord_webhook_boxes") or default
     singles_hook = alerts.get("discord_webhook_singles") or default
     sealed_hook = alerts.get("discord_webhook_sealed") or boxes_hook
     ebay_hook = alerts.get("discord_webhook_ebay") or singles_hook   # eBay resale finds: their own channel if set up
-    if not (default or boxes_hook or singles_hook):
+    poke_hooks = pokemon_watch.hooks(alerts) if pokemon_watch else {}
+    if not (default or boxes_hook or singles_hook or poke_hooks):
         return False, set()
     if finds is None:  # test message: post to every channel that's set up
         ok = True
         for hook in dict.fromkeys(h for h in (boxes_hook, singles_hook, sealed_hook, ebay_hook, default) if h):
             ok = _discord_post(alerts, hook, title, [{"title": title[:256], "description": body[:4000],
                                                        "color": 0x2A9D8F}], 0) and ok
+        for hook in dict.fromkeys(poke_hooks.values()):
+            ok = discord_send(alerts, hook, {"username": pokemon_watch.bot_name(alerts), "allowed_mentions": {"parse": []},
+                                             "embeds": [{"title": title[:256], "description": body[:4000],
+                                                         "color": pokemon_watch.YELLOW}]}) and ok
         return ok, set()
-    groups = {}
+    groups, poke_group, delivered = {}, set(), set()
     for f in finds:
-        if f.get("ebay"):
+        if f.get("game") == POKE:
+            hook = pokemon_watch.hook_for(alerts, f.get("section")) if pokemon_watch else None
+            if not hook:
+                delivered.add(f["id"])        # no Pokémon channel yet: nowhere to post it, so don't retry it
+                continue
+            poke_group.add(hook)
+        elif f.get("ebay"):
             hook = ebay_hook                 # eBay watch (ebay_watch.json): Nike TNs, promos, graded cards
         elif f["kind"] == "Sealed" or (f["kind"] == "New listing" and f.get("group") == "watch"):
             hook = sealed_hook               # other sealed products: their own channel if set up
@@ -2055,12 +2179,18 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
             hook = singles_hook
         if hook:
             groups.setdefault(hook, []).append(f)
-    ok, delivered = True, set()
+    ok = True
     for hook, group in groups.items():
         n_box = sum(1 for f in group if f["kind"] == "Booster box")
         n_new = sum(1 for f in group if f["kind"] == "New listing")
-        t = f"{len(group)} new find(s)" + (f", {n_box} box(es)" if n_box else "") + \
-            (f", {n_new} new listing(s)" if n_new else "")
+        is_poke = hook in poke_group
+        if is_poke:
+            t = f"⚡ {len(group)} new Pokémon find(s)" + (f", {n_new} new listing(s)" if n_new else "")
+        else:
+            t = f"{len(group)} new find(s)" + (f", {n_box} box(es)" if n_box else "") + \
+                (f", {n_new} new listing(s)" if n_new else "")
+        role = pokemon_watch.ping(alerts) if is_poke else alerts.get("discord_ping", "")
+        username = pokemon_watch.bot_name(alerts) if is_poke else (alerts.get("bot_name") or "One Piece Restock")
         items = [(e, {f["id"]}) for e, f in zip(_discord_embeds(group, cfg), group)]
         carts = combined_carts(group)
         if carts:     # the one-cart links go first: they're the quickest way to buy the lot
@@ -2072,9 +2202,9 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
             more = sum(len(m) for m in overflow) if i == len(msgs) - 1 else 0
             label = t + (f" ({i + 1}/{len(msgs)})" if len(msgs) > 1 else "")
             if more:
-                label += f" (+{more} more - see /deals)"
-            content = ((alerts.get("discord_ping", "") + " ") if (ping and i == 0) else "") + label
-            payload = {"username": alerts.get("bot_name") or "One Piece Restock", "content": content.strip()[:2000],
+                label += f" (+{more} more - see {'/pokemon stock' if is_poke else '/deals'})"
+            content = ((role + " ") if (ping and i == 0 and role) else "") + label
+            payload = {"username": username, "content": content.strip()[:2000],
                        "embeds": [e for e, _ in msg],
                        "allowed_mentions": {"parse": ["roles", "users", "everyone"]} if (ping and i == 0) else {"parse": []}}
             if len(msg) == 1:            # a single find gets big tap-friendly buttons
@@ -2135,8 +2265,12 @@ def _discord_embeds(finds, cfg=None):
     hist = None
     for f in finds:
         kind = f["kind"]
-        fields = [{"name": "Price", "value": money(f["price"]), "inline": True},
+        fields = [{"name": "Price", "value": money(f["price"]) if f.get("price") else "not set yet", "inline": True},
                   {"name": "Shop", "value": f["shop"], "inline": True}]
+        poke = f.get("game") == POKE and pokemon_watch
+        if poke:
+            p_icon, p_color, p_fields = pokemon_watch.embed_extras(f)
+            fields += p_fields
         if kind == "Single":
             fields.append({"name": "Want", "value": f"x{f['qty']}" + (f" ({f['deck']})" if f.get("deck") else ""),
                            "inline": True})
@@ -2152,7 +2286,9 @@ def _discord_embeds(finds, cfg=None):
         if f.get("note"):
             fields.append({"name": "Status" if kind == "New listing" else "Listing",
                            "value": str(f["note"])[:1000], "inline": False})
-        if kind == "Booster box":
+        if poke:
+            icon, color = (("🆕 " if kind == "New listing" else "") + p_icon + " "), p_color
+        elif kind == "Booster box":
             icon, color = "📦 ", 0xF4A261
         elif kind == "Sealed":
             icon, color = "🎁 ", 0x2A9D8F
@@ -2204,6 +2340,8 @@ def best_single_shop(finds):
 
 
 def report(finds, label):
+    poke = [f for f in finds if f.get("game") == POKE]
+    finds = [f for f in finds if f.get("game") != POKE]
     boxes = [f for f in finds if f["kind"] == "Booster box"]
     sealed = [f for f in finds if f["kind"] == "Sealed"]
     listed = [f for f in finds if f["kind"] == "New listing"]
@@ -2247,13 +2385,22 @@ def report(finds, label):
             if b[0] in carts:
                 tip += f"\n    ONE CART ({money(carts[b[0]]['total'])}): {carts[b[0]]['link']}"
             lines.append(tip)
+    if poke:
+        lines.append("POKÉMON")
+        for f in sorted(poke, key=lambda f: (f.get("section_name", ""), f["kind"] == "New listing", f["price"])):
+            tag = "NEW LISTING " if f["kind"] == "New listing" else ""
+            lines.append(f"  [{f.get('section_name', '')}] {tag}{f['name']}  {money(f['price'])}  @ {f['shop']}"
+                         + (f"  ({f['note']})" if f.get("note") else ""))
+            lines.append(f"    {f['url']}")
+            if f.get("cart"):
+                lines.append(f"    BUY: {f['cart']}")
     if not lines:
         return f"{label}: nothing new in stock."
     return f"{label}:\n" + "\n".join(lines)
 
 
 # ---------------------------------------------------------------- snapshot, price history, events
-def write_snapshot(sealed=None, singles=None, metrics=None):
+def write_snapshot(sealed=None, singles=None, metrics=None, pokemon=None):
     """latest.json: what the last check saw, so Discord commands can answer straight away."""
     if DRY_RUN[0]:
         return
@@ -2266,6 +2413,14 @@ def write_snapshot(sealed=None, singles=None, metrics=None):
                           "down": sorted(n for n, ls in by_shop.items() if ls is None)}
     if singles is not None:
         snap["singles"] = {"ts": now, "finds": singles}
+    if pokemon is not None and pokemon.sections and not pokemon.problem:
+        prev = snap.get("pokemon") or {}
+        checked = set(pokemon.sections)          # a drop-mode check may cover just one release: keep the rest
+        snap["pokemon"] = {"ts": now,
+                           "finds": [f for f in prev.get("finds", []) if f.get("section") not in checked] + pokemon.finds,
+                           "listings": [l for l in prev.get("listings", []) if l.get("section") not in checked]
+                           + pokemon.all_listings(),
+                           "down": sorted({shop for (shop, _), ls in pokemon.listings.items() if ls is None})}
     snap.update(version=2, ts=now, updated=f"{datetime.now():%Y-%m-%d %H:%M:%S}")
     if metrics:
         snap["metrics"] = metrics
@@ -2378,7 +2533,8 @@ def run_recap(cfg, now=None, post=True, save=True):
     Returns the embed (the /recap command replies with it instead of posting)."""
     now = now or datetime.now()
     print(f"\n=== Daily recap - {now:%a %d %b %Y %I:%M %p} ===")
-    (box_finds, by_shop), singles = run_checks(cfg)
+    (box_finds, by_shop), singles, poke = run_checks_all(cfg, True, True,
+                                                          bool(pokemon_watch and pokemon_watch.enabled(cfg)))
     if ebay_watch:
         singles += ebay_watch.check(cfg, {}, force=True).finds
 
@@ -2409,6 +2565,13 @@ def run_recap(cfg, now=None, post=True, save=True):
         lines.insert(0, f"🧺 [One cart at {c['shop']}: {c['n']} cards]({c['link']}) **{money(c['total'])}**")
     fields.append({"name": f"🛒 Buyable now within your limits ({len(buy)})",
                    "value": _lines(lines) if lines else "Nothing on your list is in stock under your max right now."})
+    if poke is not None and poke.sections and not poke.problem:
+        pk = sorted(poke.finds, key=lambda f: (f.get("section_name", ""), f["price"]))
+        pl = [f"{pokemon_watch.TYPE_ICON.get(f.get('ptype'), '⚡')} [{_short(f['name'])}]({f.get('cart') or f['url']}) "
+              f"**{money(f['price'])}** · {f['shop']}" for f in pk]
+        fields.append({"name": f"⚡ Pokémon within your max ({len(pl)})",
+                       "value": _lines(pl, 6) if pl else "Nothing from the watched Pokémon releases is in stock at or "
+                                                         "under your max right now."})
 
     # 2. price moves, restocks and new listings since the last recap
     if prev is not None:
@@ -2458,6 +2621,11 @@ def run_recap(cfg, now=None, post=True, save=True):
         days = (d.date() - now.date()).days
         if 0 <= days <= RECAP_DAYS_AHEAD:
             soon.append((d, f"📅 **{d:%a %d %b}** {r['name']}" + (" (today!)" if days == 0 else f" (in {days} days)")))
+    if pokemon_watch:
+        try:
+            soon += pokemon_watch.short_calendar(cfg, now, RECAP_DAYS_AHEAD)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! Pokémon release dates skipped ({e})")
     for w in parse_windows(cfg):
         if now < w["end"] and (w["start"] - now).days <= RECAP_DAYS_AHEAD:
             soon.append((w["start"], f"🚨 Drop mode: {w['name']}, {w['start']:%a %d %b %I:%M %p}"))
@@ -2477,6 +2645,7 @@ def run_recap(cfg, now=None, post=True, save=True):
     if ledger:
         embed["description"] = f"Full market report (US prices, PSA, movers): [Grand Line Ledger]({ledger})"
         embed["url"] = ledger
+    fit_embed(embed)
     hook = alerts.get("discord_webhook_recap") or alerts.get("discord_webhook_status") or \
         alerts.get("discord_webhook_boxes") or alerts.get("discord_webhook")
     for fld in fields:
@@ -2490,7 +2659,27 @@ def run_recap(cfg, now=None, post=True, save=True):
             print("\n   ! recap post failed")
     if save:
         atomic_write_json(RECAP_PATH, {"date": f"{now:%Y-%m-%d}", "snapshot": snap}, indent=1)
-        write_snapshot((box_finds, by_shop), singles)
+        write_snapshot((box_finds, by_shop), singles, None, poke)
+    return embed
+
+
+EMBED_TOTAL_MAX = 5900          # Discord refuses an embed whose title + fields add up to more than 6,000 characters
+
+
+def fit_embed(embed, limit=EMBED_TOTAL_MAX):
+    """Shorten the longest field values (whole lines at a time) until the embed fits Discord's limit."""
+    def size():
+        return (len(embed.get("title", "")) + len(embed.get("description", ""))
+                + sum(len(f["name"]) + len(f["value"]) for f in embed.get("fields", [])))
+    while size() > limit:
+        f = max(embed.get("fields", []), key=lambda f: len(f["value"]), default=None)
+        if f is None or len(f["value"]) < 80:
+            break
+        lines = f["value"].split("\n")
+        if len(lines) > 2:
+            f["value"] = "\n".join(lines[:-2] + ["…"])
+        else:
+            f["value"] = f["value"][: len(f["value"]) // 2] + "…"
     return embed
 
 
@@ -2504,27 +2693,66 @@ def run_once(cfg, args, drop=None):
     begin_check(cfg, status, drop, skip_down=not args.all)
     tag = f" [DROP MODE: {drop['name']}]" if drop else ""
     print(f"\n=== One Piece restock check - {stamp}{tag} ===")
-    do_sealed = not args.singles
-    do_singles = not args.sealed and not (drop and drop["sealed_only"])
+    loop = getattr(args, "loop", None)
+    only_poke = bool(getattr(args, "pokemon", False))
+    games = set(drop.get("games") or [ONE_PIECE]) if drop else set()
+    op_drop = drop if (drop and ONE_PIECE in games) else None      # a Pokémon-only window leaves One Piece alone
+    do_sealed = not args.singles and not only_poke
+    do_singles = not args.sealed and not only_poke and not (op_drop and op_drop["sealed_only"])
+    if do_sealed and drop and not op_drop and loop and not args.all:
+        # a Pokémon drop window runs the loop every minute: One Piece boxes stay at their normal pace
+        if time.time() - float(status.get("sealed_ts", 0) or 0) < loop * 60 - 20:
+            do_sealed = False
     every = _num(cfg.get("singles_every_minutes", SINGLES_EVERY_DEFAULT)) or 0
-    if do_singles and do_sealed and every > 0 and getattr(args, "loop", None) and not args.all:
+    if do_singles and not args.singles and every > 0 and loop and not args.all:
         if time.time() - float(status.get("singles_ts", 0) or 0) < every * 60 - 20:
             do_singles = False         # boxes this time; singles when they're due
+    poke_on = bool(pokemon_watch) and not args.sealed and not args.singles and pokemon_watch.enabled(cfg)
+    poke_only = None
+    if poke_on and loop and not args.all:
+        due = time.time() - float(status.get("pokemon_ts", 0) or 0) >= pokemon_watch.every_minutes(cfg) * 60 - 20
+        if drop and POKE in games:
+            if not due and drop.get("sections"):
+                poke_only = set(drop["sections"])      # the releases out today every minute; the rest when due
+        elif not due:
+            poke_on = False
     if do_sealed:
         print(" checking booster boxes...")
     if do_singles:
         print(" checking singles...")
-    sealed_res, singles = run_checks(cfg, do_sealed, do_singles)
+    if poke_on:
+        print(" checking Pokémon..." + (f" ({', '.join(sorted(poke_only))})" if poke_only else ""))
+    sealed_res, singles, poke = run_checks_all(cfg, do_sealed, do_singles, poke_on, poke_only)
     finds, listed, known = [], [], None
     box_finds, by_shop = sealed_res if sealed_res else ([], {})
     finds += box_finds
+    if do_sealed and loop:
+        status["sealed_ts"] = round(time.time())
     if do_sealed and cfg.get("new_listings", True):
         known = load_known()
         listed = new_listings(by_shop, known, box_finds, status.setdefault("pages_seen", {}))
+    alerts = cfg.get("alerts") or {}
+    poke_ok, intro = set(), []
+    if poke is not None and not poke.problem:
+        poke_ok = poke.ok_pairs
+        finds += poke.finds
+        if cfg.get("new_listings", True):
+            known = load_known() if known is None else known
+            listed += pokemon_watch.new_listings(poke, known, {f["id"] for f in poke.finds})
+        if loop and poke_only is None:
+            status["pokemon_ts"] = round(time.time())
+        if not args.all:
+            # a release channel that's just been set up gets one post listing everything the shops have,
+            # instead of a separate alert for each of them (by the PC copy; the cloud copy just notes it)
+            intro = pokemon_watch.intro_posts(cfg, poke, status, alerts)
+            if heartbeat_role(cfg) == "listen":
+                for slug, _, _ in intro:
+                    pokemon_watch.mark_intro(status, slug)
+                intro = []
     ebay = None
     if do_singles:
         finds += singles
-        if getattr(args, "loop", None):
+        if loop:
             status["singles_ts"] = round(time.time())
         if ebay_watch:
             ebay = ebay_watch.check(cfg, status, force=args.all)
@@ -2533,22 +2761,42 @@ def run_once(cfg, args, drop=None):
     state = load_state()
     show = finds if args.all else new_only(finds, state)
     show = show + listed
+    if intro:
+        new_sections = {slug for slug, _, _ in intro}
+        show = [f for f in show if not (f.get("game") == POKE and f.get("section") in new_sections)]
     text = report(show, "Everything currently matching" if args.all else "New since last check")
     print("\n" + text)
 
     # remember what's in stock now (items that sold out drop off, so a restock counts as new).
-    # Keep entries for whatever this run didn't check (e.g. singles during drop mode).
+    # Keep entries for whatever this run didn't check (e.g. singles during drop mode, a shop that failed).
     checked = {"Booster box"} if do_sealed else set()
     if do_singles:
         checked.add("Single")
-    kept = {k: v for k, v in state.items()
-            if not ((k.startswith(("box|", "sealed|")) and "Booster box" in checked) or (k.startswith("card|") and "Single" in checked)
-                    or (k.startswith("ebay|") and ebay is not None and ebay.ran))}
+
+    def forget(k):
+        if k.startswith(("box|", "sealed|")):
+            return "Booster box" in checked
+        if k.startswith("card|"):
+            return "Single" in checked
+        if k.startswith("ebay|"):
+            return ebay is not None and ebay.ran
+        if k.startswith("poke|"):
+            parts = k.split("|", 3)
+            return len(parts) == 4 and (parts[2], parts[1]) in poke_ok
+        return False
+
+    kept = {k: v for k, v in state.items() if not forget(k)}
     kept.update({f["id"]: f["price"] for f in finds})
 
     role = heartbeat_role(cfg)
     pc_seen = pc_last_seen(cfg) if role == "listen" else None
     pc_on = pc_seen is not None
+    pc_poke = pc_on and PC_INFO["pokemon"]        # the PC copy says it posts Pokémon alerts itself
+    poke_live = bool(pokemon_watch and pokemon_watch.hooks(alerts))
+
+    def pc_does(f):
+        """Cloud copy: the PC copy is on and posts this one itself."""
+        return pc_on and (f.get("game") != POKE or pc_poke)
 
     # status posts: shop health, and (cloud copy) the PC going quiet or coming back
     if not IN_ACTIONS:         # the cloud copy commits status.json; keep it free of per-run noise
@@ -2559,6 +2807,8 @@ def run_once(cfg, args, drop=None):
         msg = ebay_watch.status_message(status, ebay)
         if msg:
             posts.append(msg)
+    if poke is not None:
+        posts += pokemon_status_posts(cfg, status, poke)
     if role == "listen":
         before = status.get("pc_on")
         if before is True and not pc_on:
@@ -2571,58 +2821,66 @@ def run_once(cfg, args, drop=None):
             post_status(cfg, msg, color)
     if CONFIG_WARNINGS:
         print("   ! config.json: " + "; ".join(CONFIG_WARNINGS))
+    poke_posted = pokemon_posts(cfg, status, intro, role, pc_poke) if not args.all else []
 
-    deliver = []
+    deliver, from_held = [], False
     if show and not args.all:
-        if pc_on:
+        deliver = [f for f in show if not pc_does(f)]
+        if len(deliver) < len(show):
             print("   (your PC copy is on and posts these itself - cloud copy staying quiet)")
-        else:
-            deliver = list(show)
     if role == "listen":
         # Hold what we saw while the PC was on. Once the PC checks in after we first saw something,
         # it has posted it. If the PC goes quiet first, post what it may have missed.
         held = status.get("held") or {}
         nowts = time.time()
-        if pc_on:
-            for f in show if not args.all else []:
+        for f in show if not args.all else []:
+            if pc_does(f):
                 held.setdefault(f["id"], {"t": int(nowts), "f": f})
         in_stock = {f["id"] for f in finds}
         looked = {"Single": do_singles, "Booster box": do_sealed, "Sealed": do_sealed}
+
+        def was_looked(f):
+            if f.get("game") == POKE:
+                return (f.get("shop"), f.get("section")) in poke_ok and f.get("kind") != "New listing"
+            return looked.get(f.get("kind"), False)
+
         for k, v in list(held.items()):
             f = v.get("f") or {}
             if v.get("t", 0) <= (pc_seen or 0) or nowts - v.get("t", 0) > 6 * 3600 or \
-                    (looked.get(f.get("kind"), False) and k not in in_stock):
+                    (was_looked(f) and k not in in_stock):
                 held.pop(k)
-        if not pc_on and held:
-            have = {f["id"] for f in deliver}
-            deliver += [v["f"] for k, v in held.items() if k not in have]
+        have = {f["id"] for f in deliver}
+        extra = [v["f"] for k, v in held.items() if k not in have and not pc_does(v.get("f") or {})]
+        deliver += extra
+        from_held = bool(extra)
         status["held"] = held
+    if not poke_live and deliver:
+        # no Pokémon channels yet: remembered as seen, but not posted, pushed or logged anywhere
+        deliver = [f for f in deliver if f.get("game") != POKE]
 
     undelivered = set()
     if deliver and not args.all:
         desktop_beep()
-        dtext = text if deliver == show else report(deliver, "New since the PC copy went quiet")
+        dtext = text if deliver == show else report(deliver, "New since the PC copy went quiet" if from_held
+                                                    else "New since last check")
         append_text(LOG_PATH, f"\n--- {stamp} ---\n{dtext}\n")
-        n_box = sum(1 for f in deliver if f["kind"] in ("Booster box", "Sealed"))
-        n_new = sum(1 for f in deliver if f["kind"] == "New listing")
-        title = f"One Piece: {len(deliver)} new find(s)" + (f", {n_box} box(es)" if n_box else "") + \
-            (f", {n_new} new listing(s)" if n_new else "")
+        title = finds_title(deliver)
         ping = ping_allowed(cfg, deliver)
         if ping:
             push_phone(cfg, title, dtext[:3500])
         # boxes first, then new listings, then priority singles, so the important ones fill the first message
         order = {"Booster box": 0, "Sealed": 1, "New listing": 2, "Single": 3}
-        ordered = sorted(deliver, key=lambda f: (order[f["kind"]], not f.get("priority"), f["price"]))
-        alerts = cfg.get("alerts") or {}
-        if any(alerts.get(k) for k in ("discord_webhook", "discord_webhook_boxes", "discord_webhook_singles")) \
-                and not DRY_RUN[0]:
+        ordered = sorted(deliver, key=lambda f: (order.get(f["kind"], 4), not f.get("priority"), f["price"]))
+        if (any(alerts.get(k) for k in ("discord_webhook", "discord_webhook_boxes", "discord_webhook_singles"))
+                or (pokemon_watch and pokemon_watch.hooks(alerts))) and not DRY_RUN[0]:
             _, delivered = push_discord_detailed(cfg, title, dtext, ordered, ping=ping)
             undelivered = {f["id"] for f in ordered} - delivered
         if role == "listen":
-            for k in [k for k in status.get("held", {}) if k not in undelivered]:
-                status["held"].pop(k)
+            for f in deliver:
+                if f["id"] not in undelivered:
+                    status.get("held", {}).pop(f["id"], None)
     if role == "send":
-        send_heartbeat(cfg, force=bool(deliver) and not undelivered)
+        send_heartbeat(cfg, force=(bool(deliver) and not undelivered) or bool(poke_posted), status=status)
     if undelivered:
         # not marked as seen, so the next check tries again (a doubled alert beats a missed one)
         for k in undelivered:
@@ -2630,7 +2888,9 @@ def run_once(cfg, args, drop=None):
         if known is not None:
             for f in deliver:
                 if f["id"] in undelivered and f["kind"] == "New listing":
-                    for shop in (f["shop"], f"{f['shop']} (other sealed)"):
+                    keys = ((pokemon_watch.known_key(f["shop"], f.get("section")),) if f.get("game") == POKE
+                            else (f["shop"], f"{f['shop']} (other sealed)"))
+                    for shop in keys:
                         if shop in known and f["id"] in known[shop]:
                             known[shop].remove(f["id"])
         print(f"   ! {len(undelivered)} alert(s) didn't reach Discord - they'll go out next check")
@@ -2645,12 +2905,120 @@ def run_once(cfg, args, drop=None):
         if not IN_ACTIONS:
             status["last_run"] = metrics
         save_status(status)
-        write_snapshot(sealed_res if do_sealed else None, singles if do_singles else None, metrics)
-        if do_sealed and cfg.get("history", True):
-            record_history(by_shop)
+        write_snapshot(sealed_res if do_sealed else None, singles if do_singles else None, metrics, poke)
+        if cfg.get("history", True):
+            hist_src = dict(by_shop) if do_sealed else {}
+            if poke is not None and not poke.problem:
+                for (shop, slug), ls in poke.listings.items():
+                    hist_src[f"pokemon|{shop}|{slug}"] = ls
+            if hist_src:
+                record_history(hist_src)
     print(f"   (checked in {metrics['secs']:.1f}s · {metrics['requests']} requests, "
           f"{metrics['new_connections']} new connections, {metrics['kb_wire']} KB"
           + (f", skipped {len(metrics['skipped_hosts'])} down shop(s)" if metrics["skipped_hosts"] else "") + ")")
+
+
+def finds_title(finds):
+    """'One Piece: 2 new find(s), 1 box(es) · Pokémon: 3 new' for the phone push and the log."""
+    op = [f for f in finds if f.get("game") != POKE]
+    pk = [f for f in finds if f.get("game") == POKE]
+    parts = []
+    if op:
+        n_box = sum(1 for f in op if f["kind"] in ("Booster box", "Sealed"))
+        n_new = sum(1 for f in op if f["kind"] == "New listing")
+        parts.append(f"One Piece: {len(op)} new find(s)" + (f", {n_box} box(es)" if n_box else "")
+                     + (f", {n_new} new listing(s)" if n_new else ""))
+    if pk:
+        n_new = sum(1 for f in pk if f["kind"] == "New listing")
+        parts.append(f"Pokémon: {len(pk)} new" + (f" ({n_new} new listing(s))" if n_new else ""))
+    return " · ".join(parts) or "No new finds"
+
+
+def pokemon_status_posts(cfg, status, poke):
+    """(text, colour) status posts about the Pokémon watch: on (quietly, or live) and problems."""
+    posts = []
+    alerts = cfg.get("alerts") or {}
+    prob = poke.problem or ""
+    if prob != status.get("pokemon_problem", ""):
+        if prob:
+            posts.append((f"⚠️ **The Pokémon check hit a snag**, so Pokémon is skipped until it's sorted (One Piece "
+                          f"checks carry on): `{redact(prob)[:250]}`", AMBER))
+        elif status.get("pokemon_problem"):
+            posts.append(("✅ The Pokémon check is working again.", GREEN))
+        status["pokemon_problem"] = prob
+    if prob or not poke.sections:
+        return posts
+    live = bool(pokemon_watch.hooks(alerts))
+    now_state = "live" if live else "quiet"
+    if status.get("pokemon_state") != now_state:
+        status["pokemon_state"] = now_state
+        pc = pokemon_watch.settings(cfg)
+        names = ", ".join(s["name"] for s in pc["sections"] if s["enabled"] and s["queries"])
+        n = len(pokemon_watch.shops(cfg, _me(), pc))
+        if live:
+            posts.append((f"⚡ **Pokémon alerts are live**: {names} at {n} shops. New listings, pre-orders and stock "
+                          f"at or under your max go to each release's channel; release-day posts go to "
+                          f"#pokemon-in-store.", GREEN))
+        else:
+            posts.append((f"⚡ **Pokémon watch is on, quietly.** It's checking {n} shops for {names}, but won't post "
+                          f"anything until the Pokémon channels exist. Set them up with `/pokemon setup` in Discord "
+                          f"(or add_pokemon_channels.bat on the PC).", BLUE))
+    return posts
+
+
+def pokemon_posts(cfg, status, intro, role=None, pc_posts_pokemon=False):
+    """Release-day posts in #pokemon-in-store, and the first post in a newly set-up release channel
+    (intro is always empty on the cloud copy). Returns the keys of the release-day posts made.
+
+    Hand-off between the copies: the PC copy says in its "I'm on" message which release-day posts it
+    made; the cloud copy marks those as done, waits while the PC copy posts Pokémon itself, and posts
+    them when the PC is off. The PC copy skips any the cloud copy already posted (the repo's status.json)."""
+    if not pokemon_watch:
+        return []
+    alerts = cfg.get("alerts") or {}
+    name = pokemon_watch.bot_name(alerts)
+    for slug, hook, emb in intro:
+        if DRY_RUN[0]:
+            print(f"   [dry run] would post the first {slug} channel post: {emb['title']}")
+        elif discord_send(alerts, hook, {"username": name, "embeds": [emb], "allowed_mentions": {"parse": []}}):
+            pokemon_watch.mark_intro(status, slug)
+    try:
+        due = pokemon_watch.reminders_due(cfg, status)
+    except Exception as e:  # noqa: BLE001
+        print(f"   ! Pokémon release-day posts skipped ({e})")
+        return []
+    if not due:
+        return []
+    hook = pokemon_watch.instore_hook(alerts)
+    if not hook:
+        return []           # no Pokémon channel yet: it goes out once there is one, if it's still that day
+    if role == "listen":
+        done = PC_INFO["posted"]
+        if pc_posts_pokemon:
+            done = done | {r["key"] for r in due}       # the PC copy is on and posts them
+    elif role == "send":
+        remote = repo_json(cfg, "status.json", max_age=300)
+        done = remote.get("pokemon_reminders") if isinstance(remote, dict) else None
+        done = set(done) if isinstance(done, dict) else set()
+    else:
+        done = set()
+    posted = []
+    for r in due:
+        if r["key"] in done:
+            if role != "listen" or r["key"] in PC_INFO["posted"]:
+                pokemon_watch.mark_sent(status, r["key"])   # the other copy posted it
+            continue
+        ping = pokemon_watch.ping(alerts) if (r["ping"] and ping_allowed(cfg, [])) else ""
+        if DRY_RUN[0]:
+            print(f"   [dry run] would post in #pokemon-in-store: {r['embed']['title']}" + (" (with ping)" if ping else ""))
+            continue
+        payload = {"username": name, "content": ping, "embeds": [r["embed"]],
+                   "allowed_mentions": {"parse": ["roles"]} if ping else {"parse": []}}
+        if discord_send(alerts, hook, payload):
+            pokemon_watch.mark_sent(status, r["key"])
+            posted.append(r["key"])
+            print(f"   (posted in #pokemon-in-store: {r['embed']['title']})")
+    return posted
 
 
 def self_test(cfg):
@@ -2681,6 +3049,15 @@ def self_test(cfg):
     alerts = cfg.get("alerts") or {}
     hooks = [k for k in alerts if k.startswith("discord_webhook") and alerts[k]]
     print("discord:", ", ".join(hooks) if hooks else "no webhooks set (finds are only printed)")
+    if pokemon_watch:
+        pc = pokemon_watch.settings(cfg)
+        secs = [s["name"] for s in pc["sections"] if s["enabled"] and s["queries"]]
+        ph = pokemon_watch.hooks(alerts)
+        print(f"pokemon: {'on' if pc['enabled'] and secs else 'off'} · {', '.join(secs) or 'no releases to search'} · "
+              f"{len(pokemon_watch.shops(cfg, _me(), pc))} shops · "
+              + (f"channels: {', '.join(ph)}" if ph else "no Pokémon channels yet (quiet: run add_pokemon_channels.bat)"))
+    else:
+        print("pokemon: off (pokemon_watch.py isn't next to the bot)")
     print("\nPASS" if ok else "\nFAIL")
     return ok
 
@@ -2697,6 +3074,7 @@ def main():
     ap.add_argument("--loop", type=float, metavar="MINUTES", help="keep checking every N minutes")
     ap.add_argument("--sealed", action="store_true", help="only booster boxes")
     ap.add_argument("--singles", action="store_true", help="only singles")
+    ap.add_argument("--pokemon", action="store_true", help="only Pokémon")
     ap.add_argument("--test-discord", action="store_true", help="post a test message to Discord and stop")
     ap.add_argument("--recap", action="store_true", help="post the daily recap to Discord and stop")
     ap.add_argument("--dry-run", action="store_true", help="check and print, but post and save nothing")
@@ -2715,7 +3093,9 @@ def main():
         sys.exit(0 if self_test(cfg) else 1)
 
     if args.test_discord:
-        if not any((cfg.get("alerts") or {}).get(k) for k in ("discord_webhook", "discord_webhook_boxes", "discord_webhook_singles")):
+        alerts = cfg.get("alerts") or {}
+        if not any(alerts.get(k) for k in ("discord_webhook", "discord_webhook_boxes", "discord_webhook_singles")) \
+                and not (pokemon_watch and pokemon_watch.hooks(alerts)):
             sys.exit('No "discord_webhook" in the "alerts" section of config.json yet.')
         ok = push_discord(cfg, "Test from your One Piece restock bot",
                           "If you can see this, Discord alerts are working.")
@@ -2733,8 +3113,11 @@ def main():
     every = f"{args.loop:g} minute" + ("" if args.loop == 1 else "s")
     windows = [w for w in parse_windows(cfg) if w["end"] > datetime.now()]
     nxt = f" Next drop window: **{windows[0]['name']}**, {windows[0]['start']:%a %d %b %I:%M %p}." if windows else ""
+    poke = ""
+    if pokemon_watch and pokemon_watch.enabled(cfg):
+        poke = f" Pokémon every {pokemon_watch.every_minutes(cfg):g} minutes."
     post_status(cfg, f"🟢 **Bot online** ({'PC' if heartbeat_role(cfg) != 'listen' else 'cloud'}, v{VERSION}). "
-                     f"Checking every {every}.{nxt}", GREEN)
+                     f"Checking every {every}.{poke}{nxt}", GREEN)
     good_cfg, was_dropping, problem, warned = cfg, None, None, ""
     while True:
         try:
@@ -2761,7 +3144,7 @@ def main():
             if drop and was_dropping != drop["name"]:
                 print(f"\n>>> DROP MODE ON: {drop['name']} until {drop['end']:%I:%M %p}, "
                       f"checking every {drop['every']}s")
-                post_status(cfg, f"🚨 **Drop mode ON: {drop['name']}.** Checking booster boxes every "
+                post_status(cfg, f"🚨 **Drop mode ON: {drop['name']}.** Checking {drop_label(drop)} every "
                                  f"{drop['every']}s until {drop['end']:%I:%M %p}.", RED)
             elif not drop and was_dropping:
                 print(f"\n>>> DROP MODE OFF, back to every {args.loop:g} minutes")

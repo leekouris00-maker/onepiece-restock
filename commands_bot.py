@@ -16,10 +16,18 @@ Type these in your Discord server:
     /status           is the bot healthy? last check, speed, shops not loading
     /help             this list
 
+  Pokémon (pokemon_watch.py):
+    /pokemon releases        upcoming releases and in-store days
+    /pokemon stock           what the shops have for the watched releases (✅ within your max)
+    /pokemon report          spotted stock in a store? posts it in #pokemon-in-store and pings Pokémon Ping
+    /pokemon instore         sightings from the last 24 hours
+
   Admin only (people with Manage Server, or listed in "admin_user_ids" under "alerts"):
     /want list | add | remove | enable   change the singles want list without editing config.json
     /boxmax <price>                      change the booster box max price
     /mute <hours>, /unmute               no @pings or phone pushes for a while (finds still post)
+    /pokemon max <type> <price>          the most you'd pay for a Pokémon product type
+    /pokemon setup                       make the Pokémon role and channels (safe to run again)
 
 v2: /deals, /boxes and /sealed answer instantly from the restock bot's last check (latest.json,
 at most a few minutes old) and say how old it is. Add fresh:True to check the shops live; live
@@ -34,6 +42,7 @@ Runs on your PC next to tcg_bot.py (start_bot_hidden.vbs starts both). It only
 reads shop websites - it never buys anything or logs in anywhere.
 """
 import asyncio
+import io
 import json
 import os
 import re
@@ -43,6 +52,7 @@ import threading
 import time
 from collections import Counter
 from datetime import datetime
+from typing import Optional
 
 try:
     import discord
@@ -51,6 +61,15 @@ except ImportError:
     sys.exit("discord.py isn't installed. Run:  py -3 -m pip install discord.py")
 
 import tcg_bot as tb
+
+try:
+    import pokemon_watch as pw
+except ImportError:          # no pokemon_watch.py next to the bot: no /pokemon commands
+    pw = None
+try:
+    import add_pokemon_channels as apc
+except ImportError:
+    apc = None
 
 if not hasattr(tb, "VERSION"):
     sys.exit("This commands_bot.py needs the v2 tcg_bot.py next to it - copy both files.")
@@ -274,10 +293,12 @@ def build_drops(cfg):
                                         f"every {w['every']}s{live}"))
     soon.sort(key=lambda x: x[0])
     windows.sort(key=lambda x: x[0])
-    return embed("🗓️ Coming up", [
-        lines_field("Releases (next 4 months)", [x[1] for x in soon], "Nothing in the next 4 months.", 12),
-        lines_field("Drop-mode windows (PC checks every minute)", [x[1] for x in windows], "None set.", 8),
-    ], PURPLE)
+    fields = [lines_field("Releases (next 4 months)", [x[1] for x in soon], "Nothing in the next 4 months.", 12)]
+    if pw:
+        fields.append(lines_field("⚡ Pokémon in-store days", [x[1] for x in pw.calendar_lines(cfg, now, 120)],
+                                  "None in the next 4 months.", 8))
+    fields.append(lines_field("Drop-mode windows (PC checks every minute)", [x[1] for x in windows], "None set.", 8))
+    return embed("🗓️ Coming up", fields, PURPLE)
 
 
 def build_recap(cfg):
@@ -326,6 +347,13 @@ def build_status(cfg):
          (f"Next: {nxt[0]['name']}, {nxt[0]['start']:%a %d %b %I:%M %p}" if nxt else "No windows set")},
         {"name": "Pings", "value": f"🔕 muted until {datetime.fromtimestamp(mute):%a %I:%M %p}" if mute > time.time() else "🔔 on"},
     ]
+    if pw:
+        pc = pw.settings(cfg)
+        secs = [s["name"] for s in pc["sections"] if s["enabled"] and s["queries"]]
+        live = bool(pw.hooks(cfg.get("alerts") or {}))
+        fields.append({"name": "Pokémon", "value": (f"{', '.join(secs)} · last check {ago((snap.get('pokemon') or {}).get('ts'))} · "
+                                                     if pc["enabled"] and secs else "off · ")
+                       + ("channels live ✅" if live else "quiet: no Pokémon channels yet (`/pokemon setup`)")})
     if tb.CONFIG_WARNINGS:
         fields.append({"name": "⚠️ config.json", "value": "\n".join("• " + w for w in tb.CONFIG_WARNINGS)[:1000]})
     return embed(f"🩺 Bot status (PC, v{tb.VERSION})", fields, GREY)
@@ -397,7 +425,9 @@ HELP = (
     "`/recap` the daily recap, right now\n"
     "`/status` last check, speed, shops not loading, drop mode\n\n"
     "`/deals`, `/boxes` and `/sealed` answer instantly from the last check; add `fresh:True` to check the shops now.\n\n"
-    "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`."
+    "⚡ **Pokémon**: `/pokemon releases` · `/pokemon stock` · `/pokemon report` (spotted stock in a store? it pings "
+    "everyone in #pokemon-in-store) · `/pokemon instore`\n\n"
+    "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`."
 )
 
 
@@ -735,6 +765,276 @@ async def unmute_cmd(inter: discord.Interaction):
     controls.pop("mute_until", None)
     tb.atomic_write_json(tb.CONTROLS_PATH, controls)
     await inter.response.send_message("🔔 Pings are back on.", ephemeral=True)
+
+
+# ---------------------------------------------------------------- Pokémon
+POKE_YELLOW = 0xFFCB05
+POKE_STALE = 30 * 60             # a Pokémon snapshot older than this gets a live check instead
+REPORTS_PATH = os.path.join(tb.HERE, "instore_reports.jsonl")
+REPORT_COOLDOWN = 120            # seconds between two /pokemon report posts from the same person
+_report_cd = {}
+
+
+class PokeLive(Live):
+    """A live Pokémon check, shared by everyone asking at the same time."""
+
+    def _run(self, cfg):
+        tb.begin_check(cfg, None, skip_down=False)
+        res = pw.check(cfg, tb)
+        self.result = {"finds": res.finds, "listings": res.all_listings(),
+                       "down": sorted({shop for (shop, _), ls in res.listings.items() if ls is None})}
+        self.t = time.time()
+        return self.result
+
+
+POKE_LIVE = PokeLive()
+
+
+async def poke_data(cfg, fresh, user_id):
+    snap = snapshot().get("pokemon") or {}
+    if not fresh and snap.get("ts") and time.time() - snap["ts"] < POKE_STALE:
+        return snap, snap["ts"], "snapshot", ""
+    note = "" if fresh else "The restock bot hasn't checked Pokémon in the last half hour, so this is a live check."
+    if fresh:
+        left = _cooldown.get(("poke", user_id), 0) - time.time()
+        if left > 0 and POKE_LIVE.result is not None:
+            return POKE_LIVE.result, POKE_LIVE.t, "live", f"Fresh checks are limited to one per {FRESH_COOLDOWN}s each."
+        _cooldown[("poke", user_id)] = time.time() + FRESH_COOLDOWN
+    data, t = await POKE_LIVE.get(cfg)
+    return data, t, "live", note
+
+
+def build_poke_stock(cfg, data, kind, ts, note=""):
+    pc = pw.settings(cfg)
+    listings = data.get("listings") or []
+    fields = []
+    for s in pc["sections"]:
+        if not (s["enabled"] and s["queries"]):
+            continue
+        rows = [l for l in listings if l.get("section") == s["slug"]]
+
+        def within(l):
+            return l.get("available") and 0 < l.get("price", 0) <= (l.get("max") or 0)
+
+        buy = sorted([l for l in rows if within(l)], key=lambda l: l["price"])
+        pre = sorted([l for l in rows if not l.get("available")], key=lambda l: (l.get("ptype", ""), l.get("price", 0)))
+        over = sorted([l for l in rows if l.get("available") and not within(l)], key=lambda l: l.get("price", 0))
+        lines = [f"✅ [{tb._short(l['name'], 55)}]({link(l)}) **{tb.money(l['price'])}** · {l['shop']}" for l in buy]
+        lines += [f"⏳ [{tb._short(l['name'], 55)}]({l['url']})" + (f" {tb.money(l['price'])}" if l.get("price") else "")
+                  + f" · {l['shop']}" for l in pre]
+        lines += [f"▫️ [{tb._short(l['name'], 55)}]({l['url']}) {tb.money(l['price'])} · {l['shop']}" for l in over]
+        fields.append(lines_field(f"{s['emoji']} {s['name']}: {len(buy)} within your max · {len(pre)} not buyable yet · "
+                                  f"{len(over)} over your max", lines, "Nothing listed at the shops yet.", 10))
+    down = data.get("down") or []
+    if down:
+        fields.append({"name": "⚠️ Couldn't check", "value": ", ".join(down)[:1000]})
+    desc = ("✅ in stock at or under your max (link goes to checkout) · ⏳ listed or pre-order, not buyable yet · "
+            "▫️ in stock over your max")
+    return embed("⚡ Pokémon at the shops", fields, POKE_YELLOW, desc + (f"\n{note}" if note else ""), footer(kind, ts))
+
+
+def build_poke_releases(cfg):
+    now = datetime.now()
+    lines = [x[1] for x in pw.calendar_lines(cfg, now, 180)]
+    wins = [w for w in tb.parse_windows(cfg) if tb.POKE in w.get("games", []) and w["end"] > now]
+    wl = [f"🚨 {w['name']}: {w['start']:%a %d %b %I:%M %p} to {w['end']:%I:%M %p}, every {w['every']}s" for w in wins]
+    return embed("⚡ Pokémon releases", [
+        lines_field("In-store days (next 6 months)", lines, "Nothing in the next 6 months.", 10),
+        lines_field("Drop mode (the PC copy checks those releases every minute)", wl, "None.", 6),
+    ], POKE_YELLOW, "Dates can change. #pokemon-in-store gets a post the night before and at 7am on the day.")
+
+
+def read_reports(hours=24):
+    cutoff = time.time() - hours * 3600
+    out = []
+    try:
+        with open(REPORTS_PATH, encoding="utf-8") as fh:
+            for line in fh:
+                try:
+                    r = json.loads(line)
+                except ValueError:
+                    continue
+                if r.get("t", 0) >= cutoff:
+                    out.append(r)
+    except OSError:
+        pass
+    return out
+
+
+def clean(text, n):
+    """One line of plain text: no @everyone/@here, no role or user mentions, no masked links."""
+    t = re.sub(r"\s+", " ", str(text or "")).strip()
+    t = re.sub(r"@(everyone|here)", r"@ \1", t)                # embeds never ping, but keep it tidy
+    t = re.sub(r"<@[!&]?\d+>", "@someone", t)
+    t = t.replace("](", "] (")
+    return t[:n]
+
+
+async def post_report(cfg, hook, user, store, what, price, photo):
+    """The sighting, as a Pokémon Restock post in #pokemon-in-store (with the photo, if one came with it)."""
+    import aiohttp       # comes with discord.py
+    alerts = cfg.get("alerts") or {}
+    role = pw.ping(alerts) if tb.ping_allowed(cfg, []) else ""
+    e = discord.Embed(title=f"📍 In store now: {what}"[:256], color=POKE_YELLOW,
+                      description=f"Reported <t:{int(time.time())}:R>. Stock goes fast, so it may be gone by the time "
+                                  f"you get there.")
+    e.add_field(name="Store", value=store or "-", inline=True)
+    if price:
+        e.add_field(name="Price", value=tb.money(price), inline=True)
+    e.add_field(name="Seen by", value=user.mention, inline=True)
+    e.set_footer(text="Spotted some? /pokemon report")
+    kwargs = {}
+    if photo is not None and (photo.content_type or "").startswith("image/") and photo.size <= 8 * 1024 * 1024:
+        name = re.sub(r"[^\w.-]", "_", photo.filename or "photo.jpg")[:60]
+        kwargs["file"] = discord.File(io.BytesIO(await photo.read()), filename=name)
+        e.set_image(url=f"attachment://{name}")
+    async with aiohttp.ClientSession() as session:
+        wh = discord.Webhook.from_url(hook, session=session)
+        await wh.send(content=role or None, embed=e, username=pw.bot_name(alerts), wait=True,
+                      allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=bool(role)), **kwargs)
+    return bool(role)
+
+
+if pw:
+    pokemon = app_commands.Group(name="pokemon", description="Pokémon releases, stock and in-store drops")
+
+    @pokemon.command(name="releases", description="Upcoming Pokémon releases and in-store days")
+    async def poke_releases_cmd(inter: discord.Interaction):
+        try:
+            await inter.response.send_message(embed=build_poke_releases(cfg_now()))
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+    @pokemon.command(name="stock", description="What the shops have for the watched Pokémon releases")
+    @app_commands.describe(fresh="Check the shops right now instead of using the last check")
+    async def poke_stock_cmd(inter: discord.Interaction, fresh: bool = False):
+        try:
+            cfg = cfg_now()
+            snap = snapshot().get("pokemon") or {}
+            if fresh or not (snap.get("ts") and time.time() - snap["ts"] < POKE_STALE):
+                await inter.response.defer(thinking=True)
+            data, t, kind, note = await poke_data(cfg, fresh, inter.user.id)
+            e = build_poke_stock(cfg, data, kind, t, note)
+            if inter.response.is_done():
+                await inter.followup.send(embed=e)
+            else:
+                await inter.response.send_message(embed=e)
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+    @pokemon.command(name="report", description="Spotted Pokémon stock in a store? Posts it in #pokemon-in-store and pings")
+    @app_commands.describe(store="Which store, e.g. Big W Box Hill", what="What's there, e.g. Delta Reign ETBs",
+                           price="Price each in AUD (optional)", photo="A photo of the shelf (optional)")
+    async def poke_report_cmd(inter: discord.Interaction, store: str, what: str, price: Optional[float] = None,
+                              photo: Optional[discord.Attachment] = None):
+        try:
+            cfg = cfg_now()
+            hook = pw.instore_hook(cfg.get("alerts") or {})
+            if not hook:
+                await inter.response.send_message("The Pokémon channels aren't set up yet. An admin can run "
+                                                  "`/pokemon setup`.", ephemeral=True)
+                return
+            left = _report_cd.get(inter.user.id, 0) - time.time()
+            if left > 0:
+                await inter.response.send_message(f"Hang on {int(left) + 1}s before your next report.", ephemeral=True)
+                return
+            store, what = clean(store, 80), clean(what, 120)
+            if not store or not what:
+                await inter.response.send_message("Say which store and what's there.", ephemeral=True)
+                return
+            price = price if price and 0 < price < 10000 else None
+            _report_cd[inter.user.id] = time.time() + REPORT_COOLDOWN
+            await inter.response.defer(ephemeral=True, thinking=True)
+            pinged = await post_report(cfg, hook, inter.user, store, what, price, photo)
+            tb.append_text(REPORTS_PATH, json.dumps({"t": int(time.time()), "user": str(inter.user), "user_id": inter.user.id,
+                                                     "store": store, "what": what, "price": price},
+                                                    ensure_ascii=False) + "\n", 1_000_000)
+            await inter.followup.send("✅ Posted in #pokemon-in-store" + (" and pinged Pokémon Ping." if pinged else ".")
+                                      + " Thanks!", ephemeral=True)
+        except Exception as e:  # noqa: BLE001
+            _report_cd.pop(inter.user.id, None)
+            await fail(inter, e)
+
+    @pokemon.command(name="instore", description="Pokémon in-store sightings from the last 24 hours")
+    async def poke_instore_cmd(inter: discord.Interaction):
+        try:
+            rows = sorted(read_reports(24), key=lambda r: -r.get("t", 0))
+            lines = [f"📍 **{r.get('what', '')}** at {r.get('store', '')}" + (f" · {tb.money(r['price'])}" if r.get("price") else "")
+                     + f" · {ago(r.get('t'))} · {r.get('user', '')}" for r in rows]
+            await inter.response.send_message(embed=embed("📍 In-store sightings, last 24 hours",
+                                                          [lines_field(f"Reports ({len(rows)})", lines,
+                                                                       "None yet. Spotted some? `/pokemon report`", 15)],
+                                                          POKE_YELLOW))
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+    @pokemon.command(name="max", description="Set the most you'd pay for one Pokémon product type (admins)")
+    @app_commands.describe(product="Which product type", price="Most you'd pay (AUD). 0 = never alert as buyable")
+    @app_commands.choices(product=[app_commands.Choice(name=t, value=t) for t in pw.TYPES])
+    async def poke_max_cmd(inter: discord.Interaction, product: app_commands.Choice[str], price: float):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        if not 0 <= price <= 5000:
+            await inter.response.send_message("Pick a price between $0 and $5,000.", ephemeral=True)
+            return
+
+        def change(raw):
+            p = raw.get("pokemon")
+            if p is False:
+                return False
+            if not isinstance(p, dict):
+                p = raw["pokemon"] = {}
+            mx = p.get("max") if isinstance(p.get("max"), dict) else {}
+            mx[product.value] = price
+            p["max"] = mx
+            return True
+        try:
+            ok, _ = await asyncio.to_thread(edit_config, change, f"{inter.user} ({inter.user.id})",
+                                            f"pokemon max {product.value}={price}")
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        if not ok:
+            await inter.response.send_message("Pokémon is switched off in config.json (\"pokemon\": false).", ephemeral=True)
+            return
+        await inter.response.send_message(f"✅ Pokémon **{product.value}** max is now **{tb.money(price)}**"
+                                          + (" (never alerts as buyable; new listings still post)." if price == 0 else ".")
+                                          + " The restock bot uses it from its next check.", ephemeral=True)
+
+    @pokemon.command(name="setup", description="Make the Pokémon role and channels (admins; safe to run again)")
+    async def poke_setup_cmd(inter: discord.Interaction):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        if apc is None:
+            await inter.response.send_message("add_pokemon_channels.py isn't next to the bot.", ephemeral=True)
+            return
+        token = os.environ.get("DISCORD_BOT_TOKEN") or (cfg.get("alerts") or {}).get("discord_bot_token")
+        await inter.response.defer(ephemeral=True, thinking=True)
+        try:
+            res = await asyncio.to_thread(apc.setup, token, inter.guild_id, cfg, lambda *a: None, False)
+            where = await asyncio.to_thread(apc.save, res["hooks"], res["ping"])
+        except apc.SetupError as e:
+            await inter.followup.send(f"⚠️ {e}", ephemeral=True)
+            return
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        tb.append_text(AUDIT_PATH, f"{datetime.now():%Y-%m-%d %H:%M:%S}  {inter.user} ({inter.user.id})  pokemon setup\n",
+                       500_000)
+        made = ", ".join(res["created"]) if res["created"] else "nothing new (it was all there already)"
+        vals = apc.github_values(res["hooks"], res["ping"])
+        await inter.followup.send(f"✅ **Pokémon section ready.** Made: {made}. Saved in {where}; the restock bot posts "
+                                  f"there from its next check. Give yourself the **Pokémon Ping** role to get pinged.",
+                                  ephemeral=True)
+        await inter.followup.send("For the **cloud copy**, add these two GitHub secrets (repo Settings > Secrets and "
+                                  "variables > Actions > New repository secret). Keep them private: anyone with a "
+                                  "link can post in that channel.\n**POKEMON_PING**\n```" + vals["POKEMON_PING"] + "```"
+                                  "\n**POKEMON_WEBHOOKS**", ephemeral=True)
+        await inter.followup.send("```" + vals["POKEMON_WEBHOOKS"][:1990] + "```", ephemeral=True)
+
+    bot.tree.add_command(pokemon)
 
 
 def main():

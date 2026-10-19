@@ -35,6 +35,8 @@ jobs:
           DISCORD_WEBHOOK_RECAP: ${{ secrets.DISCORD_WEBHOOK_RECAP }}   # optional: its own channel
           EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}                 # eBay watch in "buyable now"
           EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
+          POKEMON_WEBHOOKS: ${{ secrets.POKEMON_WEBHOOKS }}
+          POKEMON_PING: ${{ secrets.POKEMON_PING }}
           BOT_NAME: "One Piece Restock (cloud)"
           LEDGER_URL: "https://claude.ai/artifact/N7WhtLb9z9q1GeBUWxMaoN"
           TZ: Australia/Melbourne

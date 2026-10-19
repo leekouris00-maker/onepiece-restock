@@ -1,4 +1,4 @@
-# Manual check: can the cloud copy post to the eBay and bot-status channels?
+# Manual check: can the cloud copy post to the eBay, bot-status and Pokémon channels?
 # Actions > "Test Discord channels" > Run workflow. Posts one short message (no ping) to each channel.
 # A red step means that secret is missing or the webhook link is wrong.
 name: Test Discord channels
@@ -49,3 +49,33 @@ jobs:
         env:
           DISCORD_WEBHOOK_STATUS: ${{ secrets.DISCORD_WEBHOOK_STATUS }}
         run: python post.py DISCORD_WEBHOOK_STATUS "#bot-status"
+
+      - name: Pokémon channels
+        if: always()
+        env:
+          POKEMON_WEBHOOKS: ${{ secrets.POKEMON_WEBHOOKS }}
+        run: |
+          cat > poke.py <<'EOF'
+          import json, os, sys, urllib.request, urllib.error
+          raw = os.environ.get("POKEMON_WEBHOOKS", "").strip()
+          if not raw:
+              sys.exit("::error::POKEMON_WEBHOOKS isn't set in GitHub Secrets (add_pokemon_channels prints it)")
+          try:
+              hooks = json.loads(raw)
+          except ValueError:
+              sys.exit("::error::POKEMON_WEBHOOKS isn't valid JSON - paste the whole line add_pokemon_channels printed")
+          bad = 0
+          for name, hook in hooks.items():
+              body = json.dumps({"username": "Pokémon Restock (cloud)", "allowed_mentions": {"parse": []},
+                                 "content": f"✅ The cloud copy can post here ({name})."}).encode()
+              req = urllib.request.Request(hook + "?wait=true", data=body, method="POST",
+                                           headers={"Content-Type": "application/json", "User-Agent": "onepiece-restock"})
+              try:
+                  urllib.request.urlopen(req, timeout=15).read()
+                  print(f"{name}: posted")
+              except urllib.error.HTTPError as e:
+                  bad += 1
+                  print(f"::error::{name}: Discord answered HTTP {e.code} (404 = the webhook was deleted)")
+          sys.exit(1 if bad else 0)
+          EOF
+          python poke.py
