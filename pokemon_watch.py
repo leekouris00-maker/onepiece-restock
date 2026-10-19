@@ -60,18 +60,21 @@ REMINDER_KEEP_DAYS = 60
 # Most you'd pay (AUD) per product type before it alerts as "buyable". New listings and pre-orders
 # alert whatever the price (marked "over your max"). 0 = never alert as buyable. Change any of these
 # with "pokemon": {"max": {...}} in config.json or /pokemon max in Discord.
-# Starting points: EB Games' 2026 prices (Pitch Black: ETB $120, booster bundle $59, 3-pack blister $32,
-# premium collection $99, packs $9.95) and the 30th Celebration UPC at $439-449.
+# Starting points: normal Australian retail, so a restock at a fair price alerts and a marked-up one
+# doesn't. What the shops charged for Delta Reign in Oct 2026: booster boxes $319-350, ETBs $130-160,
+# booster bundles $59-70, Build & Battle $44-59, 3-pack blisters $28-35. EB Games (Pitch Black): ETB $120,
+# bundle $59, premium collection $99. 30th Celebration Ultra-Premium Collection: $439-449.
 DEFAULT_MAX = {
-    "Booster box": 320,
-    "Elite Trainer Box": 125,
-    "Pokémon Center ETB": 160,
-    "Booster bundle": 62,
-    "Build & Battle": 45,
+    "Booster box": 360,
+    "Elite Trainer Box": 160,
+    "Pokémon Center ETB": 220,
+    "Booster bundle": 70,
+    "Build & Battle": 60,
     "Ultra-Premium Collection": 460,
     "Collection": 100,
+    "Small collection": 50,
     "Tin": 45,
-    "Mini tin": 22,
+    "Mini tin": 25,
     "Blister": 35,
     "Battle deck": 50,
     "Booster pack": 0,
@@ -115,8 +118,10 @@ EXTRA_SHOPS = [
     {"name": "Kollecter", "base": "https://www.kollecter.com.au"},
     {"name": "Monster Mart", "base": "https://www.monstermart.com.au"},
 ]
-# One Piece shops that sell no sealed Pokémon worth searching (their sealed shop is searched instead).
-SKIP_HOSTS = {"tcg.goodgames.com.au"}
+# One Piece singles shops left out: their Pokémon search results were all singles in Oct 2026, and the
+# One Piece want list depends on them not getting busier (they rate-limited the bot before). Good Games'
+# sealed shop is searched instead of its singles shop. Add any back with "pokemon": {"shops": [...]}.
+SKIP_HOSTS = {"tcg.goodgames.com.au", "elementalarcade.com.au", "www.mayhemcollectables.com.au"}
 # Shops whose robots.txt asks bots not to use their search: their English sealed Pokémon collections are
 # read instead (one feed per product kind, shared by every release). Add more with "pokemon":
 # {"collections": [{"name": "...", "url": "https://.../collections/<handle>/products.json?limit=250"}]}.
@@ -132,7 +137,9 @@ NON_ENGLISH_RE = re.compile(r"\b(japanese|japan|jp|jpn|korean|kor|chinese|simpli
 # Opened or graded stuff, cases of several boxes, protectors: never what the bot is for.
 HARD_EXCLUDE_RE = re.compile(r"\b(toploaders?|top\s*loaders?|protectors?|acrylic|magnetic|storage|display\s*cases?|"
                              r"empty|opened|graded|psa|cgc|bgs|slab(bed)?|code\s*cards?|single\s*card|cases?|lots?|"
-                             r"bulk|proxy|custom|replica|art\s*print)\b")
+                             r"bulk|proxy|custom|replica|art\s*print|holofoil|holo|reverse\s*holo|non[\s-]*holo)\b"
+                             # a card number like 94/102 means a single card (e.g. the Classic Collection reprints)
+                             r"|\b\d{1,3}\s*/\s*\d{2,3}\b")
 # Accessories. Only checked when the title doesn't already say it's a sealed product, because an ETB's
 # title can mention its "65 card sleeves".
 SOFT_EXCLUDE_RE = re.compile(r"\b(sleeves?|deck\s*box(es)?|play\s*mats?|playmats?|portfolios?|binders?(?!\s*collection)|"
@@ -142,10 +149,11 @@ STRONG_TYPES = {"Booster box", "Elite Trainer Box", "Pokémon Center ETB", "Boos
 TYPE_RULES = [
     ("Pokémon Center ETB", r"pok[eé]?mon\s*cent(er|re).{0,40}(elite\s*trainer|etb)|\bpc\s*etb\b"),
     ("Elite Trainer Box", r"elite\s*trainer\s*box|\betb\b"),
-    ("Booster box", r"booster\s*(box|display)|display\s*box|\b36\s*(booster\s*)?packs?\b"),
+    ("Booster box", r"booster\W*(box|display)|display\s*box|\b36\s*(booster\s*)?packs?\b"),
     ("Booster bundle", r"booster\s*bundle"),
     ("Build & Battle", r"build\s*(&|and|n)\s*battle"),
     ("Ultra-Premium Collection", r"ultra[\s-]*premium|\bupc\b"),
+    ("Small collection", r"(poster|sticker|knock\s*out|pin)\s*(collection|box)"),
     ("Mini tin", r"mini\s*tins?\b"),
     ("Tin", r"\btins?\b"),
     ("Blister", r"blister|check\s*lane|\b[23][\s-]*packs?\b"),
@@ -155,7 +163,8 @@ TYPE_RULES = [
 ]
 TYPE_RULES = [(t, re.compile(rx, re.I)) for t, rx in TYPE_RULES]
 TYPE_ICON = {"Booster box": "📦", "Elite Trainer Box": "🎒", "Pokémon Center ETB": "🎒", "Booster bundle": "🧺",
-             "Build & Battle": "⚔️", "Ultra-Premium Collection": "👑", "Collection": "🎁", "Tin": "🥫",
+             "Build & Battle": "⚔️", "Ultra-Premium Collection": "👑", "Collection": "🎁", "Small collection": "🎁",
+             "Tin": "🥫",
              "Mini tin": "🥫", "Blister": "🃏", "Battle deck": "🛡️", "Booster pack": "🃏"}
 
 
@@ -260,6 +269,7 @@ def _type_name(k):
     aliases = {"etb": "Elite Trainer Box", "pcetb": "Pokémon Center ETB", "pokemoncenteretb": "Pokémon Center ETB",
                "box": "Booster box", "boosterbox": "Booster box", "bundle": "Booster bundle", "bb": "Build & Battle",
                "buildandbattle": "Build & Battle", "upc": "Ultra-Premium Collection", "pack": "Booster pack",
+               "small": "Small collection",
                "minitin": "Mini tin", "deck": "Battle deck"}
     if sq in aliases:
         return aliases[sq]

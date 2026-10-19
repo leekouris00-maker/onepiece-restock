@@ -87,12 +87,12 @@ def stock():
     return FakeShops(
         shopify={
             "a.test": [sp("dr-etb", "Pokemon TCG: Mega Evolution Delta Reign Elite Trainer Box", 120),
-                       sp("dr-box", "Delta Reign Booster Box (36 Packs)", 350),
+                       sp("dr-box", "Delta Reign Booster Box (36 Packs)", 390),
                        sp("dr-bundle", "Delta Reign Booster Bundle [Pre-Order]", 59, available=False, tags="pre-order"),
                        sp("dr-jp", "Delta Reign Booster Box (Japanese)", 150),
                        sp("dr-sleeves", "Delta Reign Card Sleeves", 15),
                        sp("upc-day", "Pokemon TCG: 30th Celebration Ultra-Premium Collection - Day", 449)],
-            "b.test": [sp("dr-etb-b", "Delta Reign ETB", 129)],
+            "b.test": [sp("dr-etb-b", "Delta Reign ETB", 169)],
         },
         woocommerce={"w.test": [woo(77, "Pokemon &#8211; Delta Reign &#8211; Elite Trainer Box", 139, in_stock=False)]})
 
@@ -147,6 +147,35 @@ class Filters(unittest.TestCase):
                   "Phantasmal Flames Elite Trainer Box"):
             self.assertIsNone(keep(t), t)
 
+    def test_real_titles_from_australian_shops(self):
+        """Titles the cloud copy saw on 20 Oct 2026."""
+        pc = pw.settings({})
+        sec = {s["slug"]: s for s in pc["sections"]}
+        singles = ["Gengar Prime 94/102 (ME: 30th Celebration Classic Collection)  - Holofoil",
+                   "Arceus VSTAR - 123/172 [ME: 30th Celebration Classic Collection]",
+                   "Eevee - 116/128 (30th Celebration) [Blister Exclusives]"]
+        for t in singles:
+            self.assertIsNone(pw._keep(pc, sec["30th-celebration"], t), t)
+        sealed = {"Pokemon – Delta Reign – Booster (Box)": "Booster box",
+                  "Pokémon Trading Card Game - Mega Evolution ME06 - Delta Reign - Booster Box - English": "Booster box",
+                  "Pokemon TCG: Mega Evolution Delta Reign - Checklane Blister": "Blister",
+                  "Pokemon TCG - Delta Reign Build and Battle Box": "Build & Battle",
+                  "Pokemon: 30th Celebration Pokemon Center Exclusive Elite Trainer Box (ETB)": "Pokémon Center ETB",
+                  "Pokémon TCG: 30th Celebration Poster Collection (Poster Box)": "Small collection",
+                  "Pokémon Trading Card Game - 30th Celebration - Tech Sticker Collection [Assorted]": "Small collection",
+                  "Pokemon TCG: 30th Celebration Ditto Premium Collection": "Collection",
+                  "Pokemon – 30th Celebration – Mini Tin (Single) – Limit 1": "Mini tin",
+                  "Pokémon TCG: 30th Celebration 4 Booster Tin (Assorted) (Releases Dec 2026)": "Tin"}
+        for t, want in sealed.items():
+            slug = "delta-reign" if "Delta" in t else "30th-celebration"
+            self.assertEqual(pw._keep(pc, sec[slug], t), want, t)
+
+    def test_singles_shops_are_left_out(self):
+        names = [s["name"] for s in pw.shops({"sealed": {"max_price": 1}, "singles": {"shops": {
+            "Elemental Arcade": "https://elementalarcade.com.au", "Mayhem": "https://www.mayhemcollectables.com.au",
+            "Good Games": "https://tcg.goodgames.com.au"}}}, tb)]
+        self.assertFalse({"Elemental Arcade", "Mayhem", "Good Games"} & set(names))
+
     def test_matching_ignores_case_spaces_and_dashes(self):
         s = {"match": ["Delta Reign"]}
         self.assertTrue(pw.matches("MEGA EVOLUTION - DELTA-REIGN ETB", s))
@@ -163,7 +192,7 @@ class Settings(unittest.TestCase):
         self.assertFalse(me07["queries"])          # no English name yet: calendar only, nothing searched
         self.assertFalse(me07["channel"])
         self.assertNotIn("Booster pack", pc["watch_types"])
-        self.assertEqual(pc["max"]["Elite Trainer Box"], 125)
+        self.assertEqual(pc["max"]["Elite Trainer Box"], 160)
 
     def test_config_changes(self):
         problems = []
@@ -209,8 +238,8 @@ class Checking(Patched):
         self.assertEqual((etb["kind"], etb["ptype"], etb["price"], etb["game"]), ("Sealed", "Elite Trainer Box", 120.0, "pokemon"))
         self.assertTrue(etb["cart"].startswith("https://a.test/cart/"))
         self.assertIn("poke|30th-celebration|ShopA|upc-day", finds)            # $449 UPC is under the $460 max
-        self.assertNotIn("poke|delta-reign|ShopA|dr-box", finds)               # $350 box: over the $320 max
-        self.assertNotIn("poke|delta-reign|ShopB|dr-etb-b", finds)             # $129 ETB: over the $125 max
+        self.assertNotIn("poke|delta-reign|ShopA|dr-box", finds)               # $390 box: over the $360 max
+        self.assertNotIn("poke|delta-reign|ShopB|dr-etb-b", finds)             # $169 ETB: over the $160 max
         listed = {l["id"]: l for l in res.all_listings()}
         self.assertIn("plist|delta-reign|ShopA|dr-box", listed)
         self.assertFalse(listed["plist|delta-reign|ShopA|dr-bundle"]["available"])
@@ -287,12 +316,12 @@ class Checking(Patched):
         res = pw.check(base_cfg(), tb)
         self.assertEqual(pw.new_listings(res, known, {f["id"] for f in res.finds}), [])
         self.assertIn("ShopA (pokemon:delta-reign)", known)
-        self.shops.shopify["a.test"].append(sp("dr-bb", "Delta Reign Build & Battle Box", 49))       # over $45: listing
+        self.shops.shopify["a.test"].append(sp("dr-bb", "Delta Reign Build & Battle Box", 65))       # over $60: listing
         self.shops.shopify["a.test"].append(sp("dr-blister", "Delta Reign 3 Pack Blister", 30))     # under $35: a find
         res = pw.check(base_cfg(), tb)
         new = pw.new_listings(res, known, {f["id"] for f in res.finds})
         self.assertEqual([l["id"] for l in new], ["plist|delta-reign|ShopA|dr-bb"])
-        self.assertIn("over your $45 max", new[0]["note"])
+        self.assertIn("over your $60 max", new[0]["note"])
 
 
 # ---------------------------------------------------------------- Discord
