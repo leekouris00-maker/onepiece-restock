@@ -1,0 +1,27 @@
+......................../home/runner/work/onepiece-restock/onepiece-restock/tests/test_pokemon.py:819: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmp3vy2kk54/secrets.json' mode='r' encoding='utf-8'>
+  sec = json.load(open(apc.SECRETS_PATH, encoding="utf-8"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/runner/work/onepiece-restock/onepiece-restock/tests/test_pokemon.py:821: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmp3vy2kk54/config.json' mode='r' encoding='utf-8'>
+  self.assertNotIn("pokemon_webhooks", json.load(open(apc.CONFIG_PATH, encoding="utf-8"))["alerts"])
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/runner/work/onepiece-restock/onepiece-restock/tests/test_pokemon.py:825: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmp3vy2kk54/secrets.json' mode='r' encoding='utf-8'>
+  sec = json.load(open(apc.SECRETS_PATH, encoding="utf-8"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..................................................................................................
+----------------------------------------------------------------------
+Ran 122 tests in 0.795s
+
+OK
+   ! ebay_watch.json couldn't be read (Expecting value: line 1 column 42 (char 41))
+   ! ebay_watch.json: "no max" needs a number for "max" and a "search", so it's skipped
+   (eBay watch: skipped a listing priced in USD instead of AUD)
+   (posted to Discord)
+   (posted to Discord)
+   (posted to Discord)
+   (posted to Discord)
+   (posted to Discord)
+   (posted to Discord)
+   (posted to Discord)
+   (posted to Discord)
+   (posted to Discord)
+   (posted to Discord)

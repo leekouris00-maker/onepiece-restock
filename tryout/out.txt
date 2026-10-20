@@ -1,0 +1,61 @@
+=== 1. Elemental want-list prices (in-stock copy) for the Sabo deck cards, any price
+OP05-015: in stock now -> Belo Betty - OP05-015 [Awakening of the New Era] $1.00 (NM), Belo Betty (OP05-015) (Reprint) [Premium Booster -The B $1.00 (NM), Belo Betty (Jolly Roger Foil) - OP05-015 [Premium Boost $1.30 (NM)
+    search said: [('Belo Betty - OP05-015 [Awakening of the New Era]', '0.50', True), ('Belo Betty (OP05-015) (Reprint) [Premium Booster -The Best-]', '0.50', True), ('Belo Betty (Jolly Roger Foil) - OP05-015 [Premium Booster -T', '0.65', True), ('Belo Betty - OP05-015 (Alternate Art) [Awakening of the New ', '5.85', False), ('Belo Betty (Full Art) - OP05-015 [Premium Booster -The Best-', '6.75', False), ('Belo Betty (Judge Pack Vol. 3) - OP05-015 [One Piece Promoti', '1.85', False), ('Belo Betty (Alternate Art) - OP05-015 [Premium Booster -The ', '22.35', False)]
+OP13-016: in stock now -> Monkey.D.Garp - OP13-016 [Carrying On His Will] $1.00 (NM)
+    search said: [('Monkey.D.Garp - OP13-016 [Carrying On His Will]', '0.50', True), ('Monkey.D.Garp (Alternate Art) - OP13-016 [Carrying On His Wi', '14.80', False), ('Monkey.D.Garp (Treasure Cup March 2026) - OP13-016 [One Piec', '558.95', False)]
+OP05-021: in stock now -> Revolutionary Army HQ - OP05-021 [Awakening of the New  $0.70 (NM), Revolutionary Army HQ (Reprint) - OP05-021 [Premium Boo $0.70 (NM), Revolutionary Army HQ (Pirate Foil) - OP05-021 [Premium $0.70 (NM)
+    search said: [('Revolutionary Army HQ - OP05-021 [Awakening of the New Era]', '0.35', True), ('Revolutionary Army HQ (Reprint) - OP05-021 [Premium Booster ', '0.35', True), ('Revolutionary Army HQ (Pirate Foil) - OP05-021 [Premium Boos', '0.35', True), ('Revolutionary Army HQ - OP05-021 [Awakening of the New Era: ', '13.50', False)]
+EB03-042: in stock now -> none
+    search said: [('Koala (SP) - EB03-042 [Extra Booster: One Piece Heroines Edi', '119.65', False), ('Koala - EB03-042 [Extra Booster: One Piece Heroines Edition]', '1.00', False), ('Koala (Alternate Art) - EB03-042 [Extra Booster: One Piece H', '3.60', False)]
+OP12-086: in stock now -> none
+    search said: [('Koala - OP12-086 (Alternate Art) [Legacy of the Master]', '3.35', False), ('Koala - OP12-086 [Legacy of the Master]', '0.50', False), ('Koala (Welcome Pack 2026 Vol.1) - OP12-086 [One Piece Promot', '0.50', False)]
+OP05-006: in stock now -> Koala - OP05-006 [Awakening of the New Era] $2.00 (NM)
+    search said: [('Koala - OP05-006 [Awakening of the New Era]', '1.00', True), ('Koala (Alternate Art) - OP05-006 [Awakening of the New Era]', '4.10', False), ('Koala (Reprint) - OP05-006 [Premium Booster -The Best-]', '1.00', False), ('Koala - OP05-006 [Extra Booster: One Piece Heroines Edition]', '1.65', False), ('Koala (Alternate Art) - OP05-006 [Premium Booster -The Best-', '14.05', False)]
+OP04-083: in stock now -> none
+    search said: [('Sabo - OP04-083 [Kingdoms of Intrigue]', '1.00', False), ('Sabo - OP04-083 (Reprint) [Premium Booster -The Best- Vol. 2', '1.00', False), ('Sabo (Alternate Art) - OP04-083 [Kingdoms of Intrigue]', '16.20', False), ('Sabo (Sealed Battle 2023 Vol. 1) - OP04-083 [One Piece Promo', '76.90', False), ('Sabo (Alternate Art) (Manga) - OP04-083 [Kingdoms of Intrigu', '589.50', False), ('Sabo (One Piece Japanese Version 2nd Anniversary Set) - OP04', '39.35', False), ('Sabo (OP04-083) (Manga) [Premium Booster -The Best-]', '538.20', False)]
+OP07-085: in stock now -> none
+    search said: [('Stussy - OP07-085 [500 Years in the Future]', '3.35', False), ('Stussy (Parallel) - OP07-085 [500 Years in the Future]', '14.35', False), ('Stussy (SP) - OP07-085 [A Fist of Divine Speed]', '111.85', False)]
+OP13-017: in stock now -> Monkey.D.Dragon - OP13-017 [Carrying On His Will] $1.00 (NM), Monkey.D.Dragon - OP13-017 [Starter Deck 35: RED/BLACK  $1.00 (NM)
+    search said: [('Monkey.D.Dragon - OP13-017 [Carrying On His Will]', '0.50', True), ('Monkey.D.Dragon - OP13-017 [Starter Deck 35: RED/BLACK Sabo]', '0.50', True)]
+OP14-096: in stock now -> none
+    search said: [('Girl (OP14 Release Event Winner) - P-096 [One Piece Promotio', '28.75', True), ("Ground Death - OP14-096 [The Azure Sea's Seven]", '8.45', False), ("Ground Death (Alternate Art) - OP14-096 [The Azure Sea's Sev", '103.20', False), ('Girl (OP14 Release Event) - P-096 [One Piece Promotion Cards', '3.50', False)]
+
+=== 2. Want-list check as the bot runs it (config.json max prices)
+  Belo Betty OP05-015 $1.00 (NM) @ Elemental Arcade  (max 1.5)
+  Belo Betty OP05-015 $1.00 (NM) @ Elemental Arcade  (max 1.5)
+  Belo Betty OP05-015 $1.30 (NM) @ Elemental Arcade  (max 1.5)
+  Belo Betty OP05-015 $1.50 (NM) @ Good Games  (max 1.5)
+  Belo Betty OP05-015 $1.50 (NM) @ Good Games  (max 1.5)
+  Belo Betty OP05-015 $1.50 (NM) @ Good Games  (max 1.5)
+  Monkey.D.Garp OP13-016 $1.00 (NM) @ Elemental Arcade  (max 1.5)
+  Revolutionary Army HQ OP05-021 $0.70 (NM) @ Elemental Arcade  (max 1.0)
+  Revolutionary Army HQ OP05-021 $0.70 (NM) @ Elemental Arcade  (max 1.0)
+  Revolutionary Army HQ OP05-021 $0.70 (NM) @ Elemental Arcade  (max 1.0)
+  Revolutionary Army HQ OP05-021 $0.80 (NM) @ Good Games  (max 1.0)
+  Monkey.D.Dragon OP13-017 $1.00 (NM) @ Elemental Arcade  (max 1.0)
+  Monkey.D.Dragon OP13-017 $1.00 (NM) @ Elemental Arcade  (max 1.0)
+  (26.2s)
+
+=== 3. Whole singles lists
+lists: ['https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250', 'https://tcg.goodgames.com.au/collections/one-piece-card-game-singles-in-stock/products.json?limit=250']
+Elemental Arcade: 3316 products, complete=True, pages=14, 14.5s, 14 requests, 967 KB on the wire, 14733 KB unpacked, 3316 with a price, 3288 NM in stock, 3316 changes
+   3316 have a Near Mint variant; variant titles seen: ['Damaged', 'Damaged Foil', 'Heavily Played', 'Heavily Played Foil', 'Lightly Played', 'Lightly Played Foil', 'Moderately Played', 'Moderately Played Foil', 'Near Mint', 'Near Mint Foil']
+   e.g. {'name': 'Monkey.D.Garp - OP13-016 [Carrying On His Will]', 'price': 1.0, 'avail': True, 'vid': 54900099973411}
+   e.g. {'name': 'Edward.Newgate - OP16-003 [The Time of Battle]', 'price': 2.2, 'avail': True, 'vid': 55167427772707}
+   e.g. {'name': "Shanks - OP14-027 [The Azure Sea's Seven]", 'price': 1.0, 'avail': True, 'vid': 54900389708067}
+   e.g. {'name': "Silvers Rayleigh - OP14-108 [The Azure Sea's Seven]", 'price': 1.0, 'avail': True, 'vid': 54900409729315}
+   names without a card number: 13 e.g. ["DON!! Card (Enel Lightning) (Double Pack Set Vol. 10) [Adventure on Kami's Island]", 'DON!! Card (Gol.D.Roger) [Carrying On His Will]', "DON!! Card (Alternate Art) (Luffy and Loki) [The World's Strongest Warriors]", "DON!! Card (Egghead) [The Azure Sea's Seven]", 'Yamato [The Time of Battle]']
+Good Games: 1266 products, complete=True, pages=6, 4.4s, 6 requests, 387 KB on the wire, 5808 KB unpacked, 1266 with a price, 1243 NM in stock, 1266 changes
+   1266 have a Near Mint variant; variant titles seen: ['Damaged', 'Damaged Foil', 'Heavily Played', 'Heavily Played Foil', 'Lightly Played', 'Lightly Played Foil', 'Moderately Played', 'Moderately Played Foil', 'Near Mint', 'Near Mint Foil']
+   e.g. {'name': 'Hody Jones [Wings of the Captain] (OP06-035)', 'price': 2.1, 'avail': True, 'vid': 43085143376051}
+   e.g. {'name': 'Monkey.D.Dragon (015) [500 Years in the Future] (OP07-015)', 'price': 1.5, 'avail': True, 'vid': 43362689253555}
+   e.g. {'name': 'Nami [Two Legends] (OP08-106)', 'price': 3.9, 'avail': True, 'vid': 44035924361395}
+   e.g. {'name': 'Kouzuki Hiyori [Wings of the Captain] (OP06-106)', 'price': 6.6, 'avail': True, 'vid': 43077706907827}
+   names without a card number: 15 e.g. ['DON!! Card (Paramount War Exclusive) [Paramount War]', 'DON!! Card (Trafalgar Law, Eustass Kid and Monkey.D.Luffy) (Double Pack Set Vol. 4) [500 Years in the Future]', 'DON!! Card (Magellan) [Premium Booster -The Best-]', 'DON!! Card (Yamato) [Premium Booster -The Best-]', 'DON!! Card (Enel) [Premium Booster -The Best-]']
+store: 4582 singles, 775,689 bytes
+
+=== 4. Read again a minute later (should be ~no changes), then best drops
+Elemental Arcade: 0 changes
+Good Games: 0 changes
+best drops now (window 6h): []
+{"title": "📉 Best single price drops · last 6 hours", "color": 2792847, "description": "No single in stock got 10% or more (and $1.00+) cheaper in the last 6 hours.", "footer": {"text": "Near-mint copies in stock now, vs. 9:26 PM · biggest % first · tracking 4,582 singles at Elemental Arcade, Good Games"}}

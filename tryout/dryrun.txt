@@ -1,0 +1,71 @@
+
+=== One Piece restock check - Wed 21 Oct 2026 03:26:43 AM ===
+ checking singles...
+   (eBay watch is waiting for an eBay key - see the top of ebay_watch.py)
+
+Everything currently matching:
+SINGLES
+  Belo Betty OP05-015 x4 [Sabo]  $1.00 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/belo-betty-op05015-awakening-of-the-new-era
+    BUY: https://elementalarcade.com.au/cart/54899525714211:4
+  Belo Betty OP05-015 x4 [Sabo]  $1.00 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/belo-betty-op05015-reprint-premium-booster-the-best
+    BUY: https://elementalarcade.com.au/cart/54899525910819:4
+  Belo Betty OP05-015 x4 [Sabo]  $1.30 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/belo-betty-jolly-roger-foil-op05015-premium-booster-the-best
+    BUY: https://elementalarcade.com.au/cart/54899524010275:4
+  Belo Betty OP05-015 x4 [Sabo]  $1.50 (NM)  @ Good Games
+    https://tcg.goodgames.com.au/products/belo-betty-alternate-art-extra-booster-memorial-collection
+    BUY: https://tcg.goodgames.com.au/cart/44164170678451:4
+  Belo Betty OP05-015 x4 [Sabo]  $1.50 (NM)  @ Good Games
+    https://tcg.goodgames.com.au/products/belo-betty-op05-015-reprint-premium-booster-the-best
+    BUY: https://tcg.goodgames.com.au/cart/44216183488691:4
+  Belo Betty OP05-015 x4 [Sabo]  $1.50 (NM)  @ Good Games
+    https://tcg.goodgames.com.au/products/belo-betty-awakening-of-the-new-era-1
+    BUY: https://tcg.goodgames.com.au/cart/43525005181107:4
+  Benn.Beckman OP17-027 Alternate Art x1 [value pick]  $17.40 (NM)  @ Good Games
+    https://tcg.goodgames.com.au/products/benn-beckman-alternate-art-the-worlds-strongest-warriors
+    BUY: https://tcg.goodgames.com.au/cart/46168833392819:1
+  Brook OP15-022 Alternate Art x1 [value pick]  $84.00 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island
+    BUY: https://elementalarcade.com.au/cart/54899576242467:1
+  Moby Dick OP16-021 Alternate Art x1 [value pick]  $22.20 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle
+    BUY: https://elementalarcade.com.au/cart/55204140941603:1
+  Monkey.D.Dragon OP07-015 Regular x1 [value pick]  $2.00 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future
+    BUY: https://elementalarcade.com.au/cart/54900095942947:1
+  Monkey.D.Dragon OP13-017 x1 [Sabo]  $1.00 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/monkeyddragon-op13017-carrying-on-his-will
+    BUY: https://elementalarcade.com.au/cart/54900096696611:1
+  Monkey.D.Dragon OP13-017 x1 [Sabo]  $1.00 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/monkeyddragon-op13017-starter-deck-35-redblack-sabo
+    BUY: https://elementalarcade.com.au/cart/55409371382051:1
+  Monkey.D.Garp OP13-016 x4 [Sabo]  $1.00 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/monkeydgarp-op13016-carrying-on-his-will
+    BUY: https://elementalarcade.com.au/cart/54900099973411:4
+  Revolutionary Army HQ OP05-021 x3 [Sabo]  $0.70 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/revolutionary-army-hq-op05021-awakening-of-the-new-era
+    BUY: https://elementalarcade.com.au/cart/54900291961123:3
+  Revolutionary Army HQ OP05-021 x3 [Sabo]  $0.70 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/revolutionary-army-hq-reprint-op05021-premium-booster-the-best-vol-2
+    BUY: https://elementalarcade.com.au/cart/54900292518179:3
+  Revolutionary Army HQ OP05-021 x3 [Sabo]  $0.70 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/revolutionary-army-hq-pirate-foil-op05021-premium-booster-the-best-vol-2
+    BUY: https://elementalarcade.com.au/cart/54900292354339:3
+  Revolutionary Army HQ OP05-021 x3 [Sabo]  $0.80 (NM)  @ Good Games
+    https://tcg.goodgames.com.au/products/revolutionary-army-hq-reprint-premium-booster-the-best-vol-2
+    BUY: https://tcg.goodgames.com.au/cart/45039276261555:3
+  Sabo OP13-004 Regular x1 [value pick]  $1.00 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will
+    BUY: https://elementalarcade.com.au/cart/54900326170915:1
+  Tashigi OP14-029 SP x1 [value pick]  $92.10 (NM)  @ Elemental Arcade
+    https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle
+    BUY: https://elementalarcade.com.au/cart/55204142121251:1
+  Tip: Elemental Arcade has 9 of these cards - one order saves shipping.
+    ONE CART ($11.10): https://elementalarcade.com.au/cart/54899525714211:4,54900096696611:1,54900099973411:4,54900291961123:3
+   (price drops: read 3,316 singles at Elemental Arcade)
+   (price drops: read 1,266 singles at Good Games)
+
+PRICE DROPS (last 6h): none of 10%+ yet.
+   (checked in 34.9s · 142 requests, 142 new connections, 2264 KB)
