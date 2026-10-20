@@ -269,7 +269,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792415847.6977272
+   "t": 1792511461.5963485
   },
   "collectiblemadness.com.au": {
    "rules": [
@@ -526,7 +526,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792415847.7228642
+   "t": 1792511461.6223707
   },
   "elementalarcade.com.au": {
    "rules": [
@@ -783,7 +783,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792415847.972864
+   "t": 1792511461.8807342
   },
   "grailborne.com.au": {
    "rules": [
@@ -1040,7 +1040,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792415847.715466
+   "t": 1792511461.6185622
   },
   "pocketgames.com.au": {
    "rules": [
@@ -1297,7 +1297,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792419798.4799454
+   "t": 1792511461.5930996
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -1554,7 +1554,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792415847.7074635
+   "t": 1792511461.6073606
   },
   "tcg.goodgames.com.au": {
    "rules": [
@@ -1811,7 +1811,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792415847.9721026
+   "t": 1792511462.3223498
   },
   "www.gameology.com.au": {
    "rules": [
@@ -2068,7 +2068,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792415847.692791
+   "t": 1792511461.5920978
   },
   "www.gumnut.com.au": {
    "rules": [
@@ -2325,277 +2325,15 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792415847.6918285
+   "t": 1792511461.591718
   },
   "www.jtoys.com.au": {
-   "rules": [
-    [
-     0,
-     "/wp-admin/"
-    ],
-    [
-     1,
-     "/wp-admin/admin-ajax.php"
-    ]
-   ],
-   "t": 1792415847.7088363
+   "rules": [],
+   "t": 1792511461.6013477
   },
   "www.kollecter.com.au": {
-   "rules": [
-    [
-     1,
-     "/"
-    ],
-    [
-     1,
-     "/products/account"
-    ],
-    [
-     1,
-     "/products/orders"
-    ],
-    [
-     1,
-     "/products/checkout"
-    ],
-    [
-     1,
-     "/*/products/account"
-    ],
-    [
-     1,
-     "/*/products/orders"
-    ],
-    [
-     1,
-     "/*/products/checkout"
-    ],
-    [
-     1,
-     "/collections/account"
-    ],
-    [
-     1,
-     "/collections/orders"
-    ],
-    [
-     1,
-     "/collections/checkout"
-    ],
-    [
-     1,
-     "/*/collections/account"
-    ],
-    [
-     1,
-     "/*/collections/orders"
-    ],
-    [
-     1,
-     "/*/collections/checkout"
-    ],
-    [
-     1,
-     "/pages/checkout"
-    ],
-    [
-     1,
-     "/*/pages/checkout"
-    ],
-    [
-     1,
-     "/blogs/*account"
-    ],
-    [
-     1,
-     "/blogs/*orders"
-    ],
-    [
-     1,
-     "/blogs/*checkout"
-    ],
-    [
-     1,
-     "/*/blogs/*account"
-    ],
-    [
-     1,
-     "/*/blogs/*orders"
-    ],
-    [
-     1,
-     "/*/blogs/*checkout"
-    ],
-    [
-     0,
-     "/admin"
-    ],
-    [
-     0,
-     "/cart/"
-    ],
-    [
-     0,
-     "/*/cart/"
-    ],
-    [
-     0,
-     "/checkout"
-    ],
-    [
-     0,
-     "/*/checkout"
-    ],
-    [
-     0,
-     "/checkouts/"
-    ],
-    [
-     0,
-     "/*/checkouts/"
-    ],
-    [
-     0,
-     "/orders"
-    ],
-    [
-     0,
-     "/*/orders"
-    ],
-    [
-     1,
-     "/account/login"
-    ],
-    [
-     1,
-     "/*/account/login"
-    ],
-    [
-     0,
-     "/account"
-    ],
-    [
-     0,
-     "/*/account"
-    ],
-    [
-     0,
-     "/59635990685"
-    ],
-    [
-     0,
-     "/cdn/wpm/*.js"
-    ],
-    [
-     0,
-     "/services"
-    ],
-    [
-     0,
-     "/sf_*"
-    ],
-    [
-     0,
-     "/cart.js"
-    ],
-    [
-     0,
-     "/*/cart.js"
-    ],
-    [
-     0,
-     "/recommendations/products"
-    ],
-    [
-     0,
-     "/*/recommendations/products"
-    ],
-    [
-     0,
-     "/collections/*sort_by*"
-    ],
-    [
-     0,
-     "/*/collections/*sort_by*"
-    ],
-    [
-     0,
-     "/collections/*+*"
-    ],
-    [
-     0,
-     "/collections/*%2B*"
-    ],
-    [
-     0,
-     "/collections/*%2b*"
-    ],
-    [
-     0,
-     "/*/collections/*+*"
-    ],
-    [
-     0,
-     "/*/collections/*%2B*"
-    ],
-    [
-     0,
-     "/*/collections/*%2b*"
-    ],
-    [
-     0,
-     "/collections/*filter*&*filter*"
-    ],
-    [
-     0,
-     "/*/collections/*filter*&*filter*"
-    ],
-    [
-     0,
-     "/blogs/*+*"
-    ],
-    [
-     0,
-     "/blogs/*%2B*"
-    ],
-    [
-     0,
-     "/blogs/*%2b*"
-    ],
-    [
-     0,
-     "/*/blogs/*+*"
-    ],
-    [
-     0,
-     "/*/blogs/*%2B*"
-    ],
-    [
-     0,
-     "/*/blogs/*%2b*"
-    ],
-    [
-     0,
-     "/*?*ls=*&ls=*"
-    ],
-    [
-     0,
-     "/*?*ls%3*ls%3*"
-    ],
-    [
-     0,
-     "/*?*oseid=*"
-    ],
-    [
-     0,
-     "/*?*preview_theme_id=*"
-    ],
-    [
-     0,
-     "/*?*preview_script_id=*"
-    ]
-   ],
-   "t": 1792419277.3274932
+   "rules": [],
+   "t": 1792511470.4637241
   },
   "www.m-g.com.au": {
    "rules": [
@@ -2628,7 +2366,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1792415847.709144
+   "t": 1792511461.6053388
   },
   "www.mayhemcollectables.com.au": {
    "rules": [
@@ -2885,11 +2623,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792415848.3769443
+   "t": 1792511462.1565535
   },
   "www.monstermart.com.au": {
    "rules": [],
-   "t": 1792419277.5071127
+   "t": 1792511470.5498874
   },
   "www.pokebox.com.au": {
    "rules": [
@@ -3050,7 +2788,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1792415847.7086446
+   "t": 1792511461.5993493
   },
   "www.tcgroupau.com.au": {
    "rules": [
@@ -3307,7 +3045,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792415847.6930811
+   "t": 1792511461.5923388
   }
  },
  "shop_down": [],
@@ -3321,7 +3059,7 @@
   "tcg.goodgames.com.au": 0,
   "www.gameology.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 1,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
