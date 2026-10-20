@@ -7,8 +7,12 @@
   "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 2
  },
  "pages_seen": {},
- "pc_on": false,
- "pokemon_state": "quiet",
+ "pc_on": true,
+ "pokemon_intro": {
+  "30th-celebration": 1792481167,
+  "delta-reign": 1792481167
+ },
+ "pokemon_state": "live",
  "robots": {
   "alphagaming.com.au": {
    "rules": [
@@ -3317,7 +3321,7 @@
   "tcg.goodgames.com.au": 0,
   "www.gameology.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 1,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
