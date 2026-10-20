@@ -1,4 +1,4 @@
-{"v":1,"shops":{"Elemental Arcade":{"base":"https://elementalarcade.com.au","n":3316,"scans":[1792513720,1792525203]},"Good Games":{"base":"https://tcg.goodgames.com.au","n":1266,"scans":[1792513720,1792525203]}},"items":{
+{"v":1,"shops":{"Elemental Arcade":{"base":"https://elementalarcade.com.au","n":3315,"scans":[1792513720,1792525203,1792535960]},"Good Games":{"base":"https://tcg.goodgames.com.au","n":1266,"scans":[1792513720,1792525203,1792535960]}},"items":{
 "Elemental Arcade|absalom-op06081-wings-of-the-captain":{"n":"Absalom - OP06-081 [Wings of the Captain]","v":54899468501283,"p":[[1792513720,1.0,1]]},
 "Elemental Arcade|absalom-op14100-the-azure-seas-seven":{"n":"Absalom - OP14-100 [The Azure Sea's Seven]","v":54899468665123,"p":[[1792513720,1.0,1]]},
 "Elemental Arcade|absalom-op15079-adventure-on-kamis-island":{"n":"Absalom - OP15-079 [Adventure on Kami's Island]","v":54899468828963,"p":[[1792513720,0.5,1]]},
@@ -3180,7 +3180,7 @@
 "Elemental Arcade|vista-op14053-the-azure-seas-seven-release-event-cards":{"n":"Vista - OP14-053 [The Azure Sea's Seven Release Event Cards]","v":54900554400035,"p":[[1792513720,0.9,1]]},
 "Elemental Arcade|vista-op16011-the-time-of-battle":{"n":"Vista - OP16-011 [The Time of Battle]","v":55204150640931,"p":[[1792513720,1.0,1]]},
 "Elemental Arcade|vista-st22009-starter-deck-22-ace-newgate":{"n":"Vista - ST22-009 [Starter Deck 22: Ace & Newgate]","v":54900554727715,"p":[[1792513720,0.5,1]]},
-"Elemental Arcade|vista-tr-op16011-the-time-of-battle":{"n":"Vista (TR) - OP16-011 [The Time of Battle]","v":55204142580003,"p":[[1792513720,22.7,1]]},
+"Elemental Arcade|vista-tr-op16011-the-time-of-battle":{"n":"Vista (TR) - OP16-011 [The Time of Battle]","v":55204142580003,"p":[[1792513720,22.7,1],[1792535960,22.7,0]],"gone":1792535960},
 "Elemental Arcade|vito-op11042-a-fist-of-divine-speed":{"n":"Vito - OP11-042 [A Fist of Divine Speed]","v":54900554891555,"p":[[1792513720,0.5,1]]},
 "Elemental Arcade|vito-op11042-a-fist-of-divine-speed-release-event-cards":{"n":"Vito - OP11-042 [A Fist of Divine Speed Release Event Cards]","v":54900555055395,"p":[[1792513720,0.7,1]]},
 "Elemental Arcade|vito-st02002-starter-deck-2-worst-generation":{"n":"Vito - ST02-002 [Starter Deck 2: Worst Generation]","v":54900555219235,"p":[[1792513720,0.5,1]]},
