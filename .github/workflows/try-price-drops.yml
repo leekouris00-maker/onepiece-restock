@@ -1,0 +1,35 @@
+# Test branch only: tries v2.3 against the real shops with no webhooks (nothing can post) and saves
+# what it printed to tryout/ on this branch. Not on master.
+name: Try price drops
+
+on:
+  push:
+    branches: [test/price-drops]
+    paths-ignore: ["tryout/*.txt", "tryout/*.json"]
+
+permissions:
+  contents: write
+
+jobs:
+  try:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Tests and a dry run against the shops
+        env:
+          TZ: Australia/Melbourne
+        run: |
+          python -m unittest discover -s tests > tryout/tests.txt 2>&1 || true
+          python tryout/run.py > tryout/out.txt 2>&1 || true
+          python tcg_bot.py --singles --all --dry-run > tryout/dryrun.txt 2>&1 || true
+      - name: Save the output on this branch
+        run: |
+          git config user.name "restock-bot"
+          git config user.email "restock-bot@users.noreply.github.com"
+          git add -f tryout/*.txt tryout/*.json
+          git commit -m "Try-out output [skip ci]" || exit 0
+          git push
