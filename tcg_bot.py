@@ -14,6 +14,14 @@ Checks Australian shops for:
   6. Pokémon (pokemon_watch.py): the upcoming English releases, each in its own Discord channel - new
      listings and pre-orders, stock at or under your max, and in-store release-day posts. Nothing posts
      until the Pokémon channels exist (add_pokemon_channels.bat, or /pokemon setup in Discord).
+  7. Price drops (v2.3): every hour it reads Elemental Arcade's and Good Games' whole One Piece singles
+     lists and remembers each card's near-mint price; every 6 hours (12am, 6am, 12pm, 6pm) it posts the
+     10 singles in stock that got the most cheaper over those 6 hours (10%+ and $1+ off). Settings:
+     "price_drops" in config.json; /pricedrops in Discord shows them any time.
+
+Singles prices are for near mint when it's in stock, otherwise the cheapest condition that is (the
+alert says which, e.g. "$2.00 (LP)"). Before v2.3 Elemental quoted its cheapest condition's price even
+when that copy was sold out.
 
 Every find comes with a one-tap "Buy" link that puts it straight into your cart at
 checkout. You still press pay yourself - the bot never buys anything or logs in.
@@ -115,7 +123,7 @@ try:
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
 
-VERSION = "2.2.0"
+VERSION = "2.3.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -164,6 +172,7 @@ ENV_ALERTS = {
     "DISCORD_WEBHOOK_RECAP": "discord_webhook_recap",
     "DISCORD_WEBHOOK_STATUS": "discord_webhook_status",
     "DISCORD_WEBHOOK_EBAY": "discord_webhook_ebay",
+    "DISCORD_WEBHOOK_DROPS": "discord_webhook_drops",      # optional: the 6-hourly price drops get their own channel
     "LEDGER_URL": "ledger_url",
     "HEARTBEAT_TOPIC": "heartbeat_topic",
     "HEARTBEAT_ROLE": "heartbeat_role",
@@ -379,6 +388,7 @@ class _Http:
         self.robots = {}                    # host -> {"t": fetched at, "rules": [[allow, pattern], ...]}
         self.robots_on = True
         self.user_agent = UA
+        self.gzip_urls = set()              # addresses (no ?query) also asked for gzip in classic mode: the big singles lists
         self.classic = True                 # send requests the v1 way (see _exchange_classic)
         self.ua_by_host = dict(UA_BY_HOST)
         self.timeout = HTTP_TIMEOUT
@@ -554,13 +564,22 @@ class _Http:
                 reason = e.reason
                 raise reason if isinstance(reason, OSError) else OSError(str(reason))
             ms = (time.perf_counter() - t0) * 1000
+            data = raw
+            enc = hdrs.get("content-encoding", "").lower()
+            if raw and enc == "gzip":         # only when asked for (see gzip_urls); urllib doesn't unpack it itself
+                data = gzip.decompress(raw)
+            elif raw and enc == "deflate":
+                try:
+                    data = zlib.decompress(raw)
+                except zlib.error:
+                    data = zlib.decompress(raw, -zlib.MAX_WBITS)
             with self.lock:
                 self.m["requests"] += 1
                 self.m["connections"] += 1
                 self.m["bytes_wire"] += len(raw)
-                self.m["bytes"] += len(raw)
+                self.m["bytes"] += len(data)
                 self.lat[host].append(ms)
-            return status, hdrs, raw
+            return status, hdrs, data
 
     # ------------------------------------------------------------ GET with the works
     def fetch(self, url, tries=HTTP_TRIES, conditional=True, robots=True, memo=True):
@@ -610,8 +629,11 @@ class _Http:
         if hit and hit[0] > time.time():
             raise hit[1]               # the shop said no to this a moment ago - don't ask again
         last = None
+        zipped = url.split("?", 1)[0] in self.gzip_urls
+        if zipped:
+            conditional = False              # big lists that change all the time: not worth keeping a copy of
         for attempt in range(max(1, tries)):
-            hdrs, cached = {}, None
+            hdrs, cached = ({"Accept-Encoding": "gzip"} if zipped else {}), None
             if conditional:
                 with self.lock:
                     cached = self.cond.get(url)
@@ -841,9 +863,13 @@ def read_json(path, default=None):
 
 def atomic_write_json(path, obj, indent=1, sort_keys=False, ensure_ascii=True):
     """Write JSON so a crash or a reader never sees half a file: temp file, flush, then rename over."""
+    atomic_write_text(path, json.dumps(obj, indent=indent, sort_keys=sort_keys, ensure_ascii=ensure_ascii))
+
+
+def atomic_write_text(path, data):
+    """atomic_write_json's file writing, for text that's already laid out."""
     if DRY_RUN[0]:
         return
-    data = json.dumps(obj, indent=indent, sort_keys=sort_keys, ensure_ascii=ensure_ascii)
     tmp = f"{path}.{os.getpid()}.{threading.get_ident()}.tmp"
     with open(tmp, "w", encoding="utf-8", newline="\n") as f:
         f.write(data)
@@ -907,7 +933,7 @@ def _num(x):
 KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
                   "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
-                  "classic_requests", "user_agent_by_shop", "pokemon"}
+                  "classic_requests", "user_agent_by_shop", "pokemon", "price_drops"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -1001,6 +1027,7 @@ def check_config(cfg):
     for d in cfg.get("drop_windows") or []:
         if isinstance(d, dict) and str(d.get("game", ONE_PIECE)).lower() not in (ONE_PIECE, POKE, "one piece", "pokémon"):
             w.append(f'drop window "{d.get("name", "?")}": "game" should be "onepiece" or "pokemon"')
+    w += check_drops_config(cfg)
     if pokemon_watch:
         w += pokemon_watch.warnings(cfg)
     return w
@@ -1081,6 +1108,11 @@ def origin(url):
 
 def money(x):
     return f"${x:,.2f}"
+
+
+def price_label(f):
+    """'$2.00' or, for a single in a known condition, '$2.00 (NM)'."""
+    return money(f["price"]) + (f" ({f['cond']})" if f.get("cond") else "")
 
 
 def norm(s):
@@ -1447,31 +1479,30 @@ def product_js(base, handle):
 
 
 def elemental_card(card, base):
-    """Elemental titles include the card number, e.g. 'Sabo - OP13-120 [Carrying On His Will]'."""
+    """Elemental titles include the card number, e.g. 'Sabo - OP13-120 [Carrying On His Will]'.
+    Its search results only give the cheapest condition's price, sold out or not (a Damaged copy at $1
+    when the only copy left is Near Mint at $2), so the price comes from the product page, by the same
+    rule as the other shops: near mint if it's in stock, otherwise the cheapest condition that is."""
     excl = card.get("exclude", DEFAULT_EXCLUDE)
     hits = []
     for p in suggest(base, card["num"]):
         title = p.get("title", "")
         if not any(n in title.lower() or n in p.get("handle", "") for n in card_num_variants(card["num"])):
             continue
-        if is_excluded(title, excl):
+        if is_excluded(title, excl) or not p.get("available"):
             continue
-        if not p.get("available"):
-            continue
-        price = float(p.get("price_min") or p.get("price") or 0)
-        if price <= 0 or price > card["max"]:
-            continue
-        # search results don't always carry variant IDs; the product .js always does
-        _, vid = cheapest_available(p.get("variants"), cents=False)
-        hits.append((p, title, price, vid))
-    need = [p["handle"] for p, _, _, vid in hits if not vid]
-    js = dict(zip(need, pmap(lambda h: product_js(base, h) or {}, need)))
+        cheapest = float(p.get("price_min") or p.get("price") or 0)
+        if cheapest <= 0 or cheapest > card["max"]:
+            continue                 # even its cheapest condition is over your max: no need to open the page
+        hits.append(p)
+    pages = pmap(lambda p: product_js(base, p["handle"]), hits)
     out = []
-    for p, title, price, vid in hits:
-        if not vid:
-            _, vid = cheapest_available(js.get(p["handle"], {}).get("variants"), cents=True)
-        out.append(single_find(card, "Elemental Arcade", price, base + "/products/" + p["handle"], title,
-                               shopify_cart_link(base, vid, card.get("qty", 1))))
+    for p, page in zip(hits, pages):
+        price, vid, cond = nm_copy((page or {}).get("variants"), cents=True)
+        if price is None or price > card["max"]:
+            continue                 # page didn't load, nothing left in stock, or the copy left is over your max
+        out.append(single_find(card, "Elemental Arcade", price, base + "/products/" + p["handle"],
+                               p.get("title", ""), shopify_cart_link(base, vid, card.get("qty", 1)), cond))
     return out
 
 
@@ -1480,14 +1511,32 @@ def js_matches_number(p, num):
     return any(n in blob for n in card_num_variants(num))
 
 
+CONDITIONS = (("near mint", "NM"), ("lightly played", "LP"), ("moderately played", "MP"),
+              ("heavily played", "HP"), ("damaged", "Damaged"))
+
+
+def condition(variant_title):
+    """'Lightly Played Foil' -> 'LP'; '' when the variant isn't a condition (e.g. 'Default Title')."""
+    t = str(variant_title or "").lower()
+    return next((short for word, short in CONDITIONS if word in t), "")
+
+
+def nm_copy(variants, cents):
+    """The copy of a single to quote: near mint if it's in stock, otherwise the cheapest condition that is.
+    -> (price in dollars, variant id, condition e.g. 'NM'), or (None, None, '') when none are in stock."""
+    avail = [v for v in variants or [] if v.get("available") and _num(v.get("price"))]
+    if not avail:
+        return None, None, ""
+    nm = [v for v in avail if "near mint" in str(v.get("title") or "").lower()]
+    v = min(nm or avail, key=lambda v: _num(v["price"]))
+    price = _num(v["price"])
+    return (price / 100 if cents else price), v.get("id"), condition(v.get("title"))
+
+
 def nm_price(p):
     """(near-mint available price in dollars, variant id). Mayhem/GG .js prices are cents."""
-    avail = [v for v in p.get("variants", []) if v.get("available")]
-    if not avail:
-        return None, None
-    nm = [v for v in avail if "near mint" in (v.get("title") or "").lower()]
-    v = min(nm or avail, key=lambda v: v["price"])
-    return v["price"] / 100, v.get("id")
+    price, vid, _ = nm_copy(p.get("variants", []), cents=True)
+    return price, vid
 
 
 def handle_shop_card(card, shop_name, base):
@@ -1505,19 +1554,20 @@ def handle_shop_card(card, shop_name, base):
             continue
         if is_excluded(p.get("title", ""), excl):
             continue
-        price, vid = nm_price(p)
+        price, vid, cond = nm_copy(p.get("variants"), cents=True)
         if price is None or price > card["max"]:
             continue
         out.append(single_find(card, shop_name, price, f"{base}/products/{h}", p.get("title", ""),
-                               shopify_cart_link(base, vid, card.get("qty", 1))))
+                               shopify_cart_link(base, vid, card.get("qty", 1)), cond))
     return out
 
 
-def single_find(card, shop, price, url, title, cart=""):
+def single_find(card, shop, price, url, title, cart="", cond=""):
+    """cond: the condition of the copy the price and Buy link are for ('NM', 'LP'...), if the shop says."""
     return {"id": f"card|{shop}|{card['num']}|{url.rsplit('/', 1)[-1]}", "kind": "Single",
             "name": f"{card['name']} {card['num']}".strip(), "deck": card.get("deck", ""), "qty": card.get("qty", 1),
             "shop": shop, "price": price, "url": url, "cart": cart, "note": title,
-            "priority": card.get("priority", False)}
+            "priority": card.get("priority", False), "cond": cond}
 
 
 MAX_VALUE_PICKS = 80              # the ledger sends every listing worth watching (up to ~80)
@@ -1610,7 +1660,7 @@ def value_pick_card(pick):
     p = fetch_json(url + ".js")
     if not p:
         return []
-    price, vid = nm_price(p)
+    price, vid, cond = nm_copy(p.get("variants"), cents=True)
     if price is None or price > float(pick["max"]):
         return []
     card = {"name": pick.get("name", p.get("title", "Value pick")), "num": "", "qty": 1, "max": float(pick["max"]),
@@ -1618,7 +1668,7 @@ def value_pick_card(pick):
     host = urllib.parse.urlparse(url).netloc
     shop = {"elementalarcade.com.au": "Elemental Arcade", "tcg.goodgames.com.au": "Good Games"}.get(
         host, "Mayhem" if "mayhem" in host else host)
-    f = single_find(card, shop, price, url, p.get("title", ""), shopify_cart_link(url, vid))
+    f = single_find(card, shop, price, url, p.get("title", ""), shopify_cart_link(url, vid), cond)
     f["id"] = f"card|pick|{url}"
     f["kind"] = "Single"
     f["value_pick"] = True
@@ -1654,6 +1704,394 @@ def check_singles(cfg):
             jobs.append((value_pick_card, pick))
     results = pmap(lambda j: j[0](*j[1:]), jobs, leaf=False)
     return [f for r in results for f in r]
+
+
+# ---------------------------------------------------------------- singles price drops
+# About once an hour the bot reads each singles shop's whole One Piece singles list (about 3,300 at
+# Elemental Arcade, 1,300 in stock at Good Games) and notes each card's near-mint price whenever it
+# changes (singles_prices.json). Every 6 hours (12am, 6am, 12pm, 6pm) it posts the singles in stock now
+# that got the most cheaper over those 6 hours. All optional, in config.json:
+#     "price_drops": {"every_hours": 6, "top": 10, "min_pct": 10, "min_drop": 1, "rank_by": "percent"}
+# "rank_by": "dollars" puts the biggest saving first; "price_drops": false switches it off. Posts go to
+# "discord_webhook_drops" if set (DISCORD_WEBHOOK_DROPS in the cloud), otherwise the singles channel.
+DROPS_PATH = os.path.join(HERE, "singles_prices.json")
+CATALOGS = {        # each singles shop's whole One Piece list (Mayhem's store is behind a password, so not Mayhem)
+    "Elemental Arcade": "/collections/one-piece-singles/products.json?limit=250",
+    "Good Games": "/collections/one-piece-card-game-singles-in-stock/products.json?limit=250",
+}
+DROPS_DEFAULTS = {"enabled": True, "every_hours": 6, "top": 10, "min_pct": 10.0, "min_drop": 1.0,
+                  "rank_by": "percent", "scan_every_minutes": 60, "shops": None}
+DROPS_HOURS = (1, 2, 3, 4, 6, 8, 12, 24)    # posts start on the hour from midnight, so it has to divide 24
+CATALOG_MAX_PAGES = 30          # 250 a page, so up to 7,500 singles per shop
+DROPS_KEEP_HOURS = 48           # price changes older than this are let go (the last one before stays as "before")
+DROPS_FORGET_DAYS = 14          # a single that's been off its shop's list this long is forgotten
+DROPS_FRESH = 15 * 60           # just before a post, a shop list read longer ago than this is read again
+CARD_NUM_RE = re.compile(r"\b(?:(?:OP|EB|ST|PRB)\d{2}|P)-\d{3}\b", re.I)
+
+
+def check_drops_config(cfg):
+    """Tidy "price_drops" in config.json in place; returns warnings for anything that had to be ignored."""
+    pd, w = cfg.get("price_drops"), []
+    if pd is None or isinstance(pd, bool):
+        return w
+    if not isinstance(pd, dict):
+        cfg["price_drops"] = {}
+        return ['"price_drops" should be {...} or false; using the defaults']
+    for k in [k for k in pd if k not in DROPS_DEFAULTS and not str(k).startswith("_")]:
+        w.append(f'price_drops: unknown setting "{k}"')
+        pd.pop(k)
+    for k in ("every_hours", "top", "min_pct", "min_drop", "scan_every_minutes"):
+        if k in pd:
+            v = _num(pd[k])
+            if v is None or v < 0:
+                w.append(f'price_drops "{k}" should be a number; using {DROPS_DEFAULTS[k]}')
+                pd.pop(k)
+            else:
+                pd[k] = v
+    if "every_hours" in pd and pd["every_hours"] not in DROPS_HOURS:
+        w.append(f'price_drops "every_hours" should be one of {", ".join(map(str, DROPS_HOURS))}; using 6')
+        pd.pop("every_hours")
+    if "rank_by" in pd and pd["rank_by"] not in ("percent", "dollars"):
+        w.append('price_drops "rank_by" should be "percent" or "dollars"; using "percent"')
+        pd.pop("rank_by")
+    if "enabled" in pd and not isinstance(pd["enabled"], bool):
+        w.append('price_drops "enabled" should be true or false')
+        pd.pop("enabled")
+    if pd.get("shops") is not None:
+        given = pd["shops"] if isinstance(pd["shops"], list) else []
+        good = [x for x in given if isinstance(x, dict) and x.get("name") and str(x.get("url", "")).startswith("https://")]
+        if len(good) != len(given) or not isinstance(pd["shops"], list):
+            w.append('price_drops "shops" entries need a "name" and an https:// "url" (a products.json list); '
+                     'skipped the rest')
+        pd["shops"] = good
+    return w
+
+
+def drops_settings(cfg):
+    """The price-drop settings: the defaults with config.json's "price_drops" on top. Unless "shops" is
+    given, the lists read are those of your singles shops that have one (see CATALOGS)."""
+    s = dict(DROPS_DEFAULTS)
+    user = (cfg or {}).get("price_drops")
+    if user is False:
+        s["enabled"] = False
+    elif isinstance(user, dict):
+        s.update({k: v for k, v in user.items() if k in DROPS_DEFAULTS})
+    if s["shops"] is None:
+        mine = ((cfg or {}).get("singles") or {}).get("shops") or {}
+        s["shops"] = [{"name": n, "url": str(b).rstrip("/") + CATALOGS[n]} for n, b in mine.items() if n in CATALOGS]
+    s["every_hours"] = int(s["every_hours"]) if s["every_hours"] in DROPS_HOURS else 6
+    return s
+
+
+def read_catalog(url, max_pages=CATALOG_MAX_PAGES):
+    """Every product in a shop's (big) collection, 250 a page -> (products, complete), or (None, False)
+    if the first page couldn't be read. complete is False if a later page failed or the list ran past
+    max_pages (products is then what was read). The number of pages from last time is asked for at once."""
+    q = dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(url).query))
+    try:
+        limit = max(1, int(q.get("limit", 30)))
+    except ValueError:
+        limit = 30
+
+    def page_url(n):
+        return url if n == 1 else url + ("&" if "?" in url else "?") + f"page={n}"
+
+    HTTP.gzip_urls.add(url.split("?", 1)[0])          # a page of 250 singles is ~1 MB, ~10x less zipped
+    try:
+        hint = max(1, min(max_pages, int(PAGE_HINTS.get(url, 1))))
+    except (TypeError, ValueError):
+        hint = 1
+    pages = pmap(lambda n: fetch_json(page_url(n)), range(1, hint + 1))
+    if not isinstance(pages[0], dict):
+        return None, False
+    products, handles, complete, n = [], set(), True, 0
+    while True:
+        if n >= max_pages:
+            complete = False                           # longer than max_pages: what's been read will do
+            break
+        data = pages[n] if n < len(pages) else fetch_json(page_url(n + 1))
+        n += 1
+        if not isinstance(data, dict):
+            complete = False                           # this page failed, so the rest is unknown
+            break
+        batch = data.get("products") or []
+        new = [p for p in batch if p.get("handle") and p["handle"] not in handles]
+        handles.update(p["handle"] for p in new)
+        products.extend(new)
+        if len(batch) < limit or not new:
+            break                                      # the last page (or a shop that ignores page=)
+    PAGE_HINTS[url] = n
+    return products, complete
+
+
+def catalog_entry(p):
+    """One single from a shop's product list -> {"name", "price", "avail", "vid"}, or None. The near-mint
+    copy is the one followed (it's listed in stock or not), so a price change is a real change and not
+    a different condition being cheapest."""
+    variants = [v for v in p.get("variants") or [] if (_num(v.get("price")) or 0) > 0]
+    if not variants:
+        return None
+    nm = [v for v in variants if "near mint" in str(v.get("title") or "").lower()]
+    v = nm[0] if nm else min(variants, key=lambda v: _num(v["price"]))
+    name = re.sub(r"\s+", " ", str(p.get("title") or p.get("handle") or "")).strip()
+    if not CARD_NUM_RE.search(name):                   # Good Games leaves the card number out of the title
+        m = CARD_NUM_RE.search(re.sub(r"<[^>]+>", " ", str(p.get("body_html") or "")))
+        if m:
+            name += f" ({m.group(0).upper()})"
+    return {"name": name, "price": round(_num(v["price"]), 2), "avail": bool(v.get("available")), "vid": v.get("id")}
+
+
+def load_drops_store():
+    s = read_json(DROPS_PATH, None)
+    if not isinstance(s, dict) or s.get("v") != 1 or not isinstance(s.get("items"), dict):
+        s = {"v": 1, "shops": {}, "items": {}}
+    if not isinstance(s.get("shops"), dict):
+        s["shops"] = {}
+    return s
+
+
+def save_drops_store(store):
+    """One single per line, so the cloud copy's commits of this file stay small."""
+    rows = ",\n".join(f"{json.dumps(k)}:{json.dumps(v, separators=(',', ':'))}" for k, v in sorted(store["items"].items()))
+    atomic_write_text(DROPS_PATH, '{"v":1,"shops":' + json.dumps(store.get("shops", {}), separators=(",", ":"),
+                                                                  sort_keys=True) + ',"items":{\n' + rows + "\n}}\n")
+
+
+def record_catalog(store, shop, base, products, complete, now=None):
+    """Note one read of a shop's singles list: a point [time, price, 1 in stock / 0 not] for each single
+    whose near-mint price or stock changed since the last read. A complete read also marks singles that
+    have left the list (sold out at Good Games) as not buyable. Returns how many changes there were."""
+    now = int(now or time.time())
+    items = store.setdefault("items", {})
+    sh = store.setdefault("shops", {}).setdefault(shop, {})
+    sh.update(base=base, n=len(products))
+    sh["scans"] = [t for t in sh.get("scans", []) if now - t < DROPS_KEEP_HOURS * 3600] + [now]
+    changes, seen = 0, set()
+    for p in products:
+        e = catalog_entry(p) if p.get("handle") else None
+        if not e:
+            continue
+        key = f"{shop}|{p['handle']}"
+        seen.add(key)
+        point = [now, e["price"], 1 if e["avail"] else 0]
+        it = items.get(key)
+        if it is None:
+            items[key] = {"n": e["name"], "v": e["vid"], "p": [point]}
+            changes += 1
+            continue
+        pts = it.setdefault("p", [])
+        if not pts or abs(pts[-1][1] - point[1]) >= 0.005 or pts[-1][2] != point[2]:
+            pts.append(point)
+            changes += 1
+        for k, val in (("n", e["name"]), ("v", e["vid"])):
+            if it.get(k) != val:
+                it[k] = val
+                changes += 1
+        if it.pop("gone", None) is not None:
+            changes += 1
+    if complete:
+        for key, it in items.items():
+            if key.startswith(shop + "|") and key not in seen:
+                if it.get("p") and it["p"][-1][2]:
+                    it["p"].append([now, it["p"][-1][1], 0])       # gone from the list: not buyable now
+                    changes += 1
+                if "gone" not in it:
+                    it["gone"] = now
+                    changes += 1
+    return changes + prune_drops(store, now)
+
+
+def prune_drops(store, now=None):
+    """Let go of price changes older than DROPS_KEEP_HOURS (keeping the last one before that, which is the
+    price going into any window) and of singles gone from their shop for DROPS_FORGET_DAYS."""
+    now = now or time.time()
+    cut, forget = now - DROPS_KEEP_HOURS * 3600, now - DROPS_FORGET_DAYS * 86400
+    items, changes = store.get("items", {}), 0
+    for key in list(items):
+        it = items[key]
+        if not it.get("p") or it.get("gone", now) < forget:
+            del items[key]
+            changes += 1
+            continue
+        pts, i = it["p"], 0
+        while i + 1 < len(pts) and pts[i + 1][0] <= cut:
+            i += 1
+        if i:
+            del pts[:i]
+            changes += 1
+    return changes
+
+
+def best_drops(store, now=None, hours=6, min_pct=10, min_drop=1.0, top=10, rank_by="percent"):
+    """Singles in stock now whose near-mint price fell the most over the last `hours`, compared with the
+    shop's last read before the window (or, when that's from long before because the bot was off, its
+    first read inside the window). -> [{"name", "shop", "was", "price", "drop", "pct", "url", "cart", "since"}]"""
+    now = float(now or time.time())
+    t0 = now - hours * 3600
+    slack = min(hours, 3) * 3600
+    shops = store.get("shops") or {}
+    before_read = {}
+    for shop, sh in shops.items():
+        scans = sorted(sh.get("scans") or [])
+        earlier = [t for t in scans if t <= t0]
+        inside = [t for t in scans if t0 < t <= now]
+        if earlier and t0 - earlier[-1] <= slack:
+            before_read[shop] = earlier[-1]
+        elif inside:
+            before_read[shop] = inside[0]
+    out = []
+    for key, it in (store.get("items") or {}).items():
+        shop, _, handle = key.partition("|")
+        b, pts = before_read.get(shop), it.get("p") or []
+        if b is None or not pts:
+            continue
+        cur = pts[-1]
+        if not cur[2] or cur[0] <= b:
+            continue                              # not buyable now, or no change since the "before" read
+        prev = None
+        for p in pts:
+            if p[0] > b:
+                break
+            prev = p
+        if prev is None:                          # first listed after the "before" read: its first price
+            prev = pts[0]
+            if prev is cur:
+                continue
+        was, price = prev[1], cur[1]
+        drop = round(was - price, 2)
+        if was <= 0 or drop < min_drop - 0.001:
+            continue
+        pct = drop / was * 100
+        if pct < min_pct - 0.001:
+            continue
+        base = (shops.get(shop) or {}).get("base", "")
+        out.append({"key": key, "name": it.get("n") or handle, "shop": shop, "was": was, "price": price,
+                    "drop": drop, "pct": pct, "since": b, "url": f"{base}/products/{handle}",
+                    "cart": shopify_cart_link(base, it.get("v")) if base and it.get("v") else ""})
+    if rank_by == "dollars":
+        out.sort(key=lambda d: (-d["drop"], -d["pct"], d["name"]))
+    else:
+        out.sort(key=lambda d: (-d["pct"], -d["drop"], d["name"]))
+    return out[:int(top)] if top else out
+
+
+def _clock(ts):
+    """6:00 PM -> '6:00 PM' (no leading zero, on Windows too)."""
+    return datetime.fromtimestamp(ts).strftime("%I:%M %p").lstrip("0")
+
+
+def drops_embed(drops, hours, store=None, settings=None, now=None):
+    """The Discord post (an embed dict) for best_drops()."""
+    s = settings or DROPS_DEFAULTS
+    now = float(now or time.time())
+    store = store or {}
+    lines, size = [], 0
+    for i, d in enumerate(drops, 1):
+        buy = f" · [⚡ Buy]({d['cart']})" if d.get("cart") else ""
+        line = (f"**{i}.** [{link_text(d['name'], 70)}]({d['url']}) **{money(d['price'])}** ~~{money(d['was'])}~~ "
+                f"· {d['pct']:.0f}% off ({money(d['drop'])}) · {d['shop']}{buy}")
+        if size + len(line) > 3900:
+            break
+        lines.append(line)
+        size += len(line) + 1
+    if not lines:
+        lines = [f"No single in stock got {float(s['min_pct']):g}% or more (and {money(float(s['min_drop']))}+) "
+                 f"cheaper in the last {hours} hours."]
+    since = min((d["since"] for d in drops), default=now - hours * 3600)
+    shops = sorted((store.get("shops") or {}))
+    rank = "biggest saving first" if s.get("rank_by") == "dollars" else "biggest % first"
+    n = len(store.get("items") or {})
+    return {"title": f"📉 Best single price drops · last {hours} hours", "color": GREEN,
+            "description": "\n".join(lines),
+            "footer": {"text": f"Near-mint copies in stock now, vs. {_clock(since)} · {rank} · tracking "
+                               f"{n:,} single{'' if n == 1 else 's'} at {', '.join(shops) or 'no shops yet'}"}}
+
+
+def pc_heard_since(cfg, ts):
+    """Cloud copy: has the PC copy said "I'm on" since unix time ts? (ntfy keeps messages 12 hours.)
+    False if ntfy can't be read."""
+    topic = (cfg.get("alerts") or {}).get("heartbeat_topic")
+    if not topic:
+        return False
+    try:
+        body = HTTP.fetch(f"https://ntfy.sh/{urllib.parse.quote(topic)}/json?poll=1&since={int(ts)}",
+                          tries=1, conditional=False, robots=False, memo=False)
+        return any(json.loads(line).get("event") == "message"
+                   for line in body.decode("utf-8", "replace").splitlines() if line.strip())
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def run_price_drops(cfg, status, show_all=False, role=None, pc_on=False, now=None):
+    """Read the singles shops' whole lists when they're due, note the price changes, and once per slot
+    (every 6 hours: 12am, 6am, 12pm, 6pm) post the best drops. -> the drops when a post was due or
+    show_all is set, else None."""
+    s = drops_settings(cfg)
+    if not s["enabled"] or not s["shops"]:
+        return None
+    now = float(now or time.time())
+    hours = s["every_hours"]
+    now_dt = datetime.fromtimestamp(now)
+    slot_dt = now_dt.replace(hour=now_dt.hour // hours * hours, minute=0, second=0, microsecond=0)
+    slot = f"{slot_dt:%Y-%m-%d %H}"
+    status.setdefault("drops_slot", slot)            # first run: the first post comes when the next slot starts
+    post_due = status["drops_slot"] != slot and not show_all
+    if post_due and role == "listen" and (pc_on or pc_heard_since(cfg, slot_dt.timestamp())):
+        status["drops_slot"] = slot                  # the PC copy is on (or was, this slot) and posts it itself
+        post_due = False
+
+    scans = status.setdefault("drops_scan", {})
+    gap = (DROPS_FRESH if post_due else float(s["scan_every_minutes"]) * 60) - 30
+    due = [sh for sh in s["shops"] if now - float(scans.get(sh["name"], 0) or 0) >= gap]
+    store = None
+    if due:
+        store = load_drops_store()
+        read = False
+        for sh, (products, complete) in pmap(lambda sh: (sh, read_catalog(sh["url"])), due, leaf=False):
+            if products is None:
+                print(f"   ! price drops: couldn't read {sh['name']}'s singles list; trying again next check")
+                continue
+            record_catalog(store, sh["name"], origin(sh["url"]), products, complete, now)
+            scans[sh["name"]] = round(now)
+            read = True
+            print(f"   (price drops: read {len(products):,} singles at {sh['name']}"
+                  + ("" if complete else ", not the whole list") + ")")
+        if read:
+            save_drops_store(store)
+    if not (post_due or show_all):
+        return None
+
+    store = store or load_drops_store()
+    drops = best_drops(store, now, hours, float(s["min_pct"]), float(s["min_drop"]), int(s["top"]), s["rank_by"])
+    if show_all:
+        return drops
+    alerts = cfg.get("alerts") or {}
+    hook = alerts.get("discord_webhook_drops") or alerts.get("discord_webhook_singles") or alerts.get("discord_webhook")
+    if not drops or not hook or DRY_RUN[0]:
+        print(f"   (price drops: {len(drops)} single(s) {float(s['min_pct']):g}%+ cheaper in the last {hours} hours"
+              + (", nothing to post)" if not drops else ", not posted)"))
+        if not DRY_RUN[0]:
+            status["drops_slot"] = slot
+        return drops
+    payload = {"username": alerts.get("bot_name") or "One Piece Restock",
+               "embeds": [drops_embed(drops, hours, store, s, now)], "allowed_mentions": {"parse": []}}
+    if discord_send(alerts, hook, payload):
+        status["drops_slot"] = slot
+        print(f"   (price drops: posted the best {len(drops)} of the last {hours} hours to Discord)")
+    else:
+        print("   ! price drops didn't reach Discord; trying again next check")
+    return drops
+
+
+def drops_report(drops, hours, min_pct=10):
+    """Console lines for --all."""
+    if not drops:
+        return f"PRICE DROPS (last {hours}h): none of {float(min_pct):g}%+ yet."
+    lines = [f"PRICE DROPS (last {hours}h)"]
+    for d in drops:
+        lines.append(f"  {d['name']}  {money(d['price'])} (was {money(d['was'])}, {d['pct']:.0f}% off)  @ {d['shop']}")
+        lines.append(f"    {d['url']}")
+    return "\n".join(lines)
 
 
 def _me():
@@ -2265,7 +2703,7 @@ def _discord_embeds(finds, cfg=None):
     hist = None
     for f in finds:
         kind = f["kind"]
-        fields = [{"name": "Price", "value": money(f["price"]) if f.get("price") else "not set yet", "inline": True},
+        fields = [{"name": "Price", "value": price_label(f) if f.get("price") else "not set yet", "inline": True},
                   {"name": "Shop", "value": f["shop"], "inline": True}]
         poke = f.get("game") == POKE and pokemon_watch
         if poke:
@@ -2374,7 +2812,7 @@ def report(finds, label):
         for f in singles:
             star = "*" if f.get("priority") else " "
             deck = f" [{f['deck']}]" if f.get("deck") else ""
-            lines.append(f" {star}{f['name']} x{f['qty']}{deck}  {money(f['price'])}  @ {f['shop']}")
+            lines.append(f" {star}{f['name']} x{f['qty']}{deck}  {price_label(f)}  @ {f['shop']}")
             lines.append(f"    {f['url']}")
             if f.get("cart"):
                 lines.append(f"    BUY: {f['cart']}")
@@ -2527,6 +2965,12 @@ def _short(name, n=60):
     return name if len(name) <= n else name[:n - 1] + "…"
 
 
+def link_text(name, n=60):
+    """A shop title for inside a Discord [link](...): square brackets (Elemental's '[Romance Dawn]') become
+    round ones, so a title cut short can't leave a stray '[' that breaks the link."""
+    return _short(str(name or "").replace("[", "(").replace("]", ")"), n)
+
+
 def run_recap(cfg, now=None, post=True, save=True):
     """One Discord post summing up the day: what's buyable within your limits, price moves and
     new listings since yesterday's recap, what's coming up, and shops that are down.
@@ -2559,7 +3003,7 @@ def run_recap(cfg, now=None, post=True, save=True):
     order = {"Booster box": 0, "Sealed": 1, "Single": 2}
     buy = sorted(box_finds + singles, key=lambda f: (order[f["kind"]], not f.get("priority"), f["price"]))
     icon = {"Booster box": "📦", "Sealed": "🎁", "Single": "🃏"}
-    lines = [f"{icon[f['kind']]} [{_short(f['name'])}]({f.get('cart') or f['url']}) **{money(f['price'])}** · {f['shop']}"
+    lines = [f"{icon[f['kind']]} [{_short(f['name'])}]({f.get('cart') or f['url']}) **{price_label(f)}** · {f['shop']}"
              for f in buy]
     for c in combined_carts(singles):
         lines.insert(0, f"🧺 [One cart at {c['shop']}: {c['n']} cards]({c['link']}) **{money(c['total'])}**")
@@ -2827,6 +3271,14 @@ def run_once(cfg, args, drop=None):
             post_status(cfg, msg, color)
     if CONFIG_WARNINGS:
         print("   ! config.json: " + "; ".join(CONFIG_WARNINGS))
+    if do_singles:
+        try:            # the 6-hourly price drops: never let them get in the way of restock alerts
+            drops = run_price_drops(cfg, status, show_all=args.all, role=role, pc_on=pc_on)
+            if args.all and drops is not None:
+                ds = drops_settings(cfg)
+                print("\n" + drops_report(drops, ds["every_hours"], ds["min_pct"]))
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! price drops skipped this check ({redact(e)})")
     poke_posted = pokemon_posts(cfg, status, intro, role, pc_poke) if not args.all else []
 
     deliver, from_held = [], False

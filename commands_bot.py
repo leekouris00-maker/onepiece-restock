@@ -11,6 +11,7 @@ Type these in your Discord server:
     /card <search>    look a card up at Elemental Arcade, Good Games and Mayhem
     /history <search> price history of a box or sealed product, and the lowest price seen
     /stats            restocks in the last 30 days: which shops, what hours, how long stock lasts
+    /pricedrops       singles that got the most cheaper in the last 6 hours (hours: to change)
     /drops            releases and drop windows coming up
     /recap            the daily recap, right now
     /status           is the bot healthy? last check, speed, shops not loading
@@ -194,7 +195,7 @@ def build_deals(cfg, data, kind, ts, note=""):
     icon = {"Booster box": "📦", "Sealed": "🎁"}
     want_lines = [f"🧺 [One cart at {c['shop']}: {c['n']} cards]({c['link']}) **{tb.money(c['total'])}**"
                   for c in tb.combined_carts(wants)]
-    want_lines += [f"{'⭐' if f.get('priority') else '🃏'} [{tb._short(f['name'])}]({link(f)}) **{tb.money(f['price'])}** · "
+    want_lines += [f"{'⭐' if f.get('priority') else '🃏'} [{tb._short(f['name'])}]({link(f)}) **{tb.price_label(f)}** · "
                    f"{f['shop']} · want x{f['qty']}" for f in sorted(wants, key=lambda f: (not f.get('priority'), f['price']))]
     fields = [
         lines_field(f"📦 Sealed within your limits ({len(sealed)})",
@@ -205,7 +206,7 @@ def build_deals(cfg, data, kind, ts, note=""):
     ]
     if picks or os.path.exists(tb.PICKS_PATH):          # (no network call: this path must stay instant)
         fields.append(lines_field(f"💎 Value picks buyable now ({len(picks)})",
-                                  [f"💎 [{tb._short(f['name'])}]({link(f)}) **{tb.money(f['price'])}** · {f['shop']}" for f in picks],
+                                  [f"💎 [{tb._short(f['name'])}]({link(f)}) **{tb.price_label(f)}** · {f['shop']}" for f in picks],
                                   "None of today's value picks are buyable at or under market right now."))
     total = len(sealed) + len(wants) + len(picks)
     return embed(f"🛒 Best buys right now ({total})", fields, TEAL if total else GREY, note or None, footer(kind, ts))
@@ -255,23 +256,51 @@ def build_card(cfg, query):
     for shop, base, products in per_shop:
         for p in products:
             price = float(p.get("price_min") or p.get("price") or 0)
-            if price <= 0:
+            if price <= 0 or not p.get("handle"):
                 continue
-            rows.append({"name": p.get("title", ""), "price": price, "available": bool(p.get("available")),
-                         "url": f"{base}/products/{p.get('handle')}", "shop": shop})
+            rows.append({"name": p.get("title", ""), "price": price, "available": bool(p.get("available")), "cond": "",
+                         "url": f"{base}/products/{p['handle']}", "shop": shop, "base": base, "handle": p["handle"]})
+    # Search results only give the cheapest condition's price, sold out or not, so read the in-stock
+    # ones' pages for the copy you can actually buy: near mint if it's in stock, else the cheapest left.
+    live = [r for r in rows if r["available"]]
+    for r, page in zip(live, tb.pmap(lambda r: tb.product_js(r["base"], r["handle"]), live)):
+        price, _, cond = tb.nm_copy((page or {}).get("variants"), cents=True)
+        if price is not None:
+            r["price"], r["cond"] = price, cond
+        elif page:
+            r["available"] = False           # the page says none are left after all
     rows.sort(key=lambda r: (not r["available"], r["price"]))
-    stock = [f"✅ [{tb._short(r['name'], 60)}]({r['url']}) **{tb.money(r['price'])}** · {r['shop']}" for r in rows if r["available"]]
-    gone = [f"▫️ [{tb._short(r['name'], 60)}]({r['url']}) {tb.money(r['price'])} · {r['shop']}" for r in rows if not r["available"]]
+    stock = [f"✅ [{tb.link_text(r['name'], 60)}]({r['url']}) **{tb.price_label(r)}** · {r['shop']}" for r in rows if r["available"]]
+    gone = [f"▫️ [{tb.link_text(r['name'], 60)}]({r['url']}) · {r['shop']}" for r in rows if not r["available"]]
     fields = [lines_field(f"In stock ({len(stock)})", stock, "None in stock.", 10)]
     if gone:
         fields.append(lines_field(f"Sold out ({len(gone)})", gone, "-", 6))
     e = embed(f"🔎 “{query}” at {', '.join(shops)}"[:256], fields, BLUE,
               "Search results can include other versions (alt art, SP, manga), so check the name. "
-              "Prices are near-mint where the shop shows one.")
+              "Prices are for near mint when it's in stock, otherwise the cheapest condition left (in brackets).")
     _card_cache[key] = (time.time(), e)
     if len(_card_cache) > 200:
         _card_cache.clear()
     return e
+
+
+def build_pricedrops(cfg, hours=0):
+    """The singles that got the most cheaper over the last few hours, from the restock bot's own record
+    of every single's price (singles_prices.json). Instant: nothing is fetched."""
+    s = tb.drops_settings(cfg)
+    hours = max(1, min(int(hours or s["every_hours"]), tb.DROPS_KEEP_HOURS))
+    store = tb.load_drops_store()
+    drops = tb.best_drops(store, time.time(), hours, float(s["min_pct"]), float(s["min_drop"]), 15, s["rank_by"])
+    e = tb.drops_embed(drops, hours, store, s)
+    if not store.get("items"):
+        e["description"] = ("No prices recorded yet: the restock bot reads the singles lists about once an hour, "
+                            "so give it an hour or two." if s["enabled"] and s["shops"]
+                            else "Price drops are switched off (\"price_drops\" in config.json).")
+    else:
+        reads = [max(sh.get("scans") or [0]) for sh in store.get("shops", {}).values()]
+        if reads and max(reads):
+            e["footer"]["text"] += f" · last read {ago(max(reads))}"
+    return discord.Embed.from_dict(e)
 
 
 def build_drops(cfg):
@@ -347,6 +376,15 @@ def build_status(cfg):
          (f"Next: {nxt[0]['name']}, {nxt[0]['start']:%a %d %b %I:%M %p}" if nxt else "No windows set")},
         {"name": "Pings", "value": f"🔕 muted until {datetime.fromtimestamp(mute):%a %I:%M %p}" if mute > time.time() else "🔔 on"},
     ]
+    ds = tb.drops_settings(cfg)
+    if ds["enabled"] and ds["shops"]:
+        store = tb.load_drops_store()
+        reads = [max(sh.get("scans") or [0]) for sh in store.get("shops", {}).values()]
+        fields.append({"name": "📉 Price drops", "value": f"tracking {len(store.get('items') or {}):,} singles at "
+                       f"{', '.join(x['name'] for x in ds['shops'])} · last read {ago(max(reads, default=0))} · "
+                       f"best drops posted every {ds['every_hours']} hours (`/pricedrops` any time)"})
+    else:
+        fields.append({"name": "📉 Price drops", "value": "off"})
     if pw:
         pc = pw.settings(cfg)
         secs = [s["name"] for s in pc["sections"] if s["enabled"] and s["queries"]]
@@ -421,6 +459,7 @@ HELP = (
     "`/card <search>` look up a card, e.g. `/card OP13-120` or `/card sabo`\n"
     "`/history <search>` price history and lowest price seen, e.g. `/history op-18`\n"
     "`/stats` restock patterns over the last 30 days\n"
+    "`/pricedrops` singles that got the most cheaper in the last 6 hours (`hours:` to change)\n"
     "`/drops` releases and drop windows coming up\n"
     "`/recap` the daily recap, right now\n"
     "`/status` last check, speed, shops not loading, drop mode\n\n"
@@ -580,6 +619,15 @@ async def history_cmd(inter: discord.Interaction, search: str):
 async def stats_cmd(inter: discord.Interaction):
     try:
         await inter.response.send_message(embed=build_stats(cfg_now()))
+    except Exception as e:  # noqa: BLE001
+        await fail(inter, e)
+
+
+@bot.tree.command(name="pricedrops", description="Singles that got the most cheaper in the last few hours")
+@app_commands.describe(hours="How far back to compare, 1 to 48 hours (default 6)")
+async def pricedrops_cmd(inter: discord.Interaction, hours: int = 0):
+    try:
+        await inter.response.send_message(embed=build_pricedrops(cfg_now(), hours))
     except Exception as e:  # noqa: BLE001
         await fail(inter, e)
 

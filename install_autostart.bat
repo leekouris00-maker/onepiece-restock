@@ -18,5 +18,5 @@ echo Autostart is on: the bot and its Discord commands will start by themselves 
 echo.
 call "%~dp0restart_bot.bat"
 echo.
-echo All done. Discord's #bot-status should show "Bot online (PC, v2.2.0)" within a minute or two.
+echo All done. Discord's #bot-status should show "Bot online (PC, v2.3.0)" within a minute or two.
 pause

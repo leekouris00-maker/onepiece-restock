@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.2.0)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.3.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
 
 If something looks wrong, open bot_output.log in this folder and send Claude the last few lines.
