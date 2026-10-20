@@ -1,10 +1,17 @@
 {
+ "drops_scan": {
+  "Elemental Arcade": 1792513721,
+  "Good Games": 1792513721
+ },
+ "drops_slot": "2026-10-21 00",
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
  "offline_streak": 0,
  "page_hints": {
-  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 2
+  "https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250": 14,
+  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 2,
+  "https://tcg.goodgames.com.au/collections/one-piece-card-game-singles-in-stock/products.json?limit=250": 6
  },
  "pages_seen": {},
  "pc_on": false,
@@ -3059,7 +3066,7 @@
   "tcg.goodgames.com.au": 0,
   "www.gameology.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 1,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
