@@ -19,7 +19,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python diag_gametraders.py > diag_output.txt 2>&1 || true
+      - run: |
+          python diag_gametraders.py > diag_output.txt 2>&1 || true
+          echo "=== full box check, every shop (dry run) ===" >> diag_output.txt
+          python tcg_bot.py --sealed --all --dry-run >> diag_output.txt 2>&1 || echo "EXIT $?" >> diag_output.txt
         env:
           TZ: Australia/Melbourne
       - run: |
