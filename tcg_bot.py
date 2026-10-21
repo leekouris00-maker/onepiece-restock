@@ -938,6 +938,32 @@ DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhoo
 CONFIG_WARNINGS = []
 
 
+def collection_extras_ok(shop, w):
+    """Optional settings on a "shopify_collections" entry, tidied in place:
+      "must_include": "one piece"  (or a list) - only titles with one of these count. For a collection
+                                     that mixes games; a broken value skips the shop rather than let its
+                                     Yu-Gi-Oh and Pokémon boxes alert as One Piece
+      "max_pages": 2               - read at most this many pages of 250 (1-8, default 4)
+      "gzip": true                 - ask for compressed pages (big collections)
+    False if the shop should be skipped (with a warning in w)."""
+    name = shop.get("name")
+    mi = shop.get("must_include")
+    if mi is not None:
+        mi = [mi] if isinstance(mi, str) else mi
+        if not isinstance(mi, list) or not mi or not all(isinstance(x, str) and x.strip() for x in mi):
+            w.append(f'sealed shop "{name}": "must_include" should be a word or a list of words; shop skipped')
+            return False
+        shop["must_include"] = [x.strip() for x in mi]
+    if "max_pages" in shop:
+        n = _num(shop.get("max_pages"))
+        if n is None or n < 1:
+            w.append(f'sealed shop "{name}": "max_pages" should be a number from 1 to 8; using {MAX_PAGES}')
+            shop.pop("max_pages")
+        else:
+            shop["max_pages"] = int(min(8, n))
+    return True
+
+
 def check_config(cfg):
     """Fix what can be fixed (numbers typed as text) and switch off what can't, with a warning each,
     so one bad value never stops the whole bot. Returns the warnings."""
@@ -961,7 +987,8 @@ def check_config(cfg):
         keep = []
         for shop in sealed.get(key) or []:
             if isinstance(shop, dict) and shop.get("name") and str(shop.get(need, "")).startswith("https://"):
-                keep.append(shop)
+                if key != "shopify_collections" or collection_extras_ok(shop, w):
+                    keep.append(shop)
             else:
                 w.append(f'sealed "{key}" entry {shop!r} needs a "name" and an https:// "{need}"; skipped')
         if key in sealed:
@@ -1227,16 +1254,21 @@ def shopify_collection(url, max_pages=MAX_PAGES):
     return products, pages
 
 
-def shopify_boxes(shop_name, url, max_price, watch=()):
+def shopify_boxes(shop_name, url, max_price, watch=(), must_include=None, max_pages=MAX_PAGES):
     """Returns (finds, listings). listings is None if the shop couldn't be read.
-    Covers booster boxes and the other sealed products in the watch list."""
-    products, pages = shopify_collection(url)
+    Covers booster boxes and the other sealed products in the watch list.
+    must_include: for a collection that mixes games (e.g. a shop's whole "trading-cards" section), only
+    titles with one of these words count, so its Yu-Gi-Oh and Pokémon boxes don't alert as One Piece."""
+    products, pages = shopify_collection(url, max_pages)
     if products is None:
         return [], None
     base = origin(url)
+    need = [str(m).lower() for m in must_include or []]
     finds, listings = [], []
     for p in products:
         title = p.get("title", "")
+        if need and not any(m in title.lower() for m in need):
+            continue
         w = None if is_box_title(title) else watch_item(title, watch)
         if not is_box_title(title) and not w:
             continue
@@ -1383,7 +1415,10 @@ def check_sealed(cfg):
     cols, prods, woo, search = sealed_shops(cfg)
     jobs = []
     for shop in cols:
-        jobs.append((shopify_boxes, shop["name"], shop["url"], mx, watch))
+        if shop.get("gzip"):
+            HTTP.gzip_urls.add(shop["url"].split("?", 1)[0])     # a big mixed section: ~10x less to download
+        jobs.append((shopify_boxes, shop["name"], shop["url"], mx, watch, shop.get("must_include"),
+                     shop.get("max_pages", MAX_PAGES)))
     for shop in prods:
         jobs.append((shopify_product_box, shop["name"], shop["url"], mx, watch))
     for shop in woo:
