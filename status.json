@@ -23,6 +23,7 @@
   "Good Games (sealed)": 99,
   "Grailborne": 99,
   "Gumnut": 99,
+  "JToys": 99,
   "Light of Cards": 99,
   "M-G": 99,
   "Pocket Games": 99,
@@ -4202,7 +4203,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 1,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -4212,5 +4213,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1792593447
+ "sweep_ts": 1792596264
 }
