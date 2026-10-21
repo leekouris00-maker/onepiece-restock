@@ -80,6 +80,14 @@
             {
                 "name": "Pocket Games",
                 "url": "https://pocketgames.com.au/collections/one-piece-tcg-cards/products.json?limit=250"
+            },
+            {
+                "name": "Gametraders Modbury Heights",
+                "url": "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250",
+                "must_include": "one piece",
+                "max_pages": 2,
+                "gzip": true,
+                "_note": "Added 21 Oct 2026 (missed EB-05 restock). No One Piece section, so it reads the mixed trading-cards list (newest first; 2 pages = the 500 newest) and keeps One Piece titles only. Website is gametradersinglefarm.com.au."
             }
         ],
         "shopify_products": [
