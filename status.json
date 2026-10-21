@@ -1,9 +1,9 @@
 {
  "drops_scan": {
-  "Elemental Arcade": 1792593447,
-  "Good Games": 1792593447
+  "Elemental Arcade": 1792610643,
+  "Good Games": 1792610643
  },
- "drops_slot": "2026-10-22 00",
+ "drops_slot": "2026-10-22 06",
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -291,7 +291,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511461.5963485
+   "t": 1792610599.3679895
   },
   "cardbot.com.au": {
    "rules": [
@@ -805,7 +805,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511461.6223707
+   "t": 1792610599.4053762
   },
   "elementalarcade.com.au": {
    "rules": [
@@ -1062,7 +1062,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511461.8807342
+   "t": 1792610601.9407015
   },
   "grailborne.com.au": {
    "rules": [
@@ -1319,7 +1319,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511461.6185622
+   "t": 1792610599.441229
   },
   "lightofcards.com.au": {
    "rules": [
@@ -1833,7 +1833,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511461.5930996
+   "t": 1792610599.351936
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -2090,7 +2090,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511461.6073606
+   "t": 1792610599.3433561
   },
   "tcg.goodgames.com.au": {
    "rules": [
@@ -2347,7 +2347,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511462.3223498
+   "t": 1792610605.0325897
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -2789,7 +2789,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511461.5920978
+   "t": 1792610599.341634
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -3464,15 +3464,277 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511461.591718
+   "t": 1792610600.2742162
   },
   "www.jtoys.com.au": {
-   "rules": [],
-   "t": 1792511461.6013477
+   "rules": [
+    [
+     0,
+     "/wp-admin/"
+    ],
+    [
+     1,
+     "/wp-admin/admin-ajax.php"
+    ]
+   ],
+   "t": 1792610599.3860893
   },
   "www.kollecter.com.au": {
-   "rules": [],
-   "t": 1792511470.4637241
+   "rules": [
+    [
+     1,
+     "/"
+    ],
+    [
+     1,
+     "/products/account"
+    ],
+    [
+     1,
+     "/products/orders"
+    ],
+    [
+     1,
+     "/products/checkout"
+    ],
+    [
+     1,
+     "/*/products/account"
+    ],
+    [
+     1,
+     "/*/products/orders"
+    ],
+    [
+     1,
+     "/*/products/checkout"
+    ],
+    [
+     1,
+     "/collections/account"
+    ],
+    [
+     1,
+     "/collections/orders"
+    ],
+    [
+     1,
+     "/collections/checkout"
+    ],
+    [
+     1,
+     "/*/collections/account"
+    ],
+    [
+     1,
+     "/*/collections/orders"
+    ],
+    [
+     1,
+     "/*/collections/checkout"
+    ],
+    [
+     1,
+     "/pages/checkout"
+    ],
+    [
+     1,
+     "/*/pages/checkout"
+    ],
+    [
+     1,
+     "/blogs/*account"
+    ],
+    [
+     1,
+     "/blogs/*orders"
+    ],
+    [
+     1,
+     "/blogs/*checkout"
+    ],
+    [
+     1,
+     "/*/blogs/*account"
+    ],
+    [
+     1,
+     "/*/blogs/*orders"
+    ],
+    [
+     1,
+     "/*/blogs/*checkout"
+    ],
+    [
+     0,
+     "/admin"
+    ],
+    [
+     0,
+     "/cart/"
+    ],
+    [
+     0,
+     "/*/cart/"
+    ],
+    [
+     0,
+     "/checkout"
+    ],
+    [
+     0,
+     "/*/checkout"
+    ],
+    [
+     0,
+     "/checkouts/"
+    ],
+    [
+     0,
+     "/*/checkouts/"
+    ],
+    [
+     0,
+     "/orders"
+    ],
+    [
+     0,
+     "/*/orders"
+    ],
+    [
+     1,
+     "/account/login"
+    ],
+    [
+     1,
+     "/*/account/login"
+    ],
+    [
+     0,
+     "/account"
+    ],
+    [
+     0,
+     "/*/account"
+    ],
+    [
+     0,
+     "/59635990685"
+    ],
+    [
+     0,
+     "/cdn/wpm/*.js"
+    ],
+    [
+     0,
+     "/services"
+    ],
+    [
+     0,
+     "/sf_*"
+    ],
+    [
+     0,
+     "/cart.js"
+    ],
+    [
+     0,
+     "/*/cart.js"
+    ],
+    [
+     0,
+     "/recommendations/products"
+    ],
+    [
+     0,
+     "/*/recommendations/products"
+    ],
+    [
+     0,
+     "/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/*/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/collections/*+*"
+    ],
+    [
+     0,
+     "/collections/*%2B*"
+    ],
+    [
+     0,
+     "/collections/*%2b*"
+    ],
+    [
+     0,
+     "/*/collections/*+*"
+    ],
+    [
+     0,
+     "/*/collections/*%2B*"
+    ],
+    [
+     0,
+     "/*/collections/*%2b*"
+    ],
+    [
+     0,
+     "/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/*/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/blogs/*+*"
+    ],
+    [
+     0,
+     "/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*/blogs/*+*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*?*ls=*&ls=*"
+    ],
+    [
+     0,
+     "/*?*ls%3*ls%3*"
+    ],
+    [
+     0,
+     "/*?*oseid=*"
+    ],
+    [
+     0,
+     "/*?*preview_theme_id=*"
+    ],
+    [
+     0,
+     "/*?*preview_script_id=*"
+    ]
+   ],
+   "t": 1792610635.099817
   },
   "www.m-g.com.au": {
    "rules": [
@@ -3505,7 +3767,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1792511461.6053388
+   "t": 1792610599.3890972
   },
   "www.mayhemcollectables.com.au": {
    "rules": [
@@ -3762,11 +4024,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511462.1565535
+   "t": 1792610602.5256777
   },
   "www.monstermart.com.au": {
    "rules": [],
-   "t": 1792511470.5498874
+   "t": 1792610635.4104083
   },
   "www.pokebox.com.au": {
    "rules": [
@@ -3927,7 +4189,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1792511461.5993493
+   "t": 1792610599.3830929
   },
   "www.tcgroupau.com.au": {
    "rules": [
@@ -4184,7 +4446,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792511461.5923388
+   "t": 1792610599.3419743
   }
  },
  "shop_down": [],
@@ -4213,5 +4475,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1792596264
+ "sweep_ts": 1792610642
 }
