@@ -1,0 +1,23 @@
+# One-off test, only on the test/gametraders branch: how the bot should read Gametraders Modbury Heights.
+# No secrets, so it can't post anywhere.
+name: Test Gametraders shop
+
+on:
+  push:
+    branches: [test/gametraders]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python diag_gametraders.py
+        env:
+          TZ: Australia/Melbourne
