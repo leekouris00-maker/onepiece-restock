@@ -61,6 +61,24 @@ class Classify(unittest.TestCase):
                   "Koala (P-069) Promo Set"):
             self.assertIsNone(self.group(t), t)
 
+    def test_merch_and_stray_singles_from_the_first_cloud_run_are_left_out(self):
+        for t in ("Grand Ship Collection Thousand Sunny", "One Piece Grand Ship Collection Baratie",
+                  "One Piece - Character Stamp Blind Box", "One Piece Paldolce Collection Vol.1(Ver.B)",
+                  "One Piece Battle Record Collection Trafalgar Law",
+                  "Mighty Jaxx: Freenys Hidden Dissectibles – One Piece (Wano Arc Edition) Display",
+                  "*Pre-order* One Piece - Luffy w/Momonosuke Pop! Premium (ETA October)",
+                  "2026 Guarded Cherry Pie One Piece 1-Card Box",
+                  "One Piece Card Game - Kaku 003 (Common Alternate Art) - Starter Deck 29: Egghead (ST-29)",
+                  "2025 One Piece Premium Card Collection -Best Selection Vol.4 - #070 Nami"):
+            self.assertIsNone(self.group(t), t)
+        for t in ("One Piece - Premium Card Collection - Uta  (Limit 1 Per Customer)",
+                  "One Piece Starter Deck ST-35 : Sabo (Limit 2 Per Customer)",
+                  "One Piece Card Game - Tin Pack Set Vol. 3 Display [TS-03] (Preorder)",
+                  "One Piece Card Game Double Pack – TBA DP-14",
+                  "One Piece Card Game - Gift Box 2023 (GB-01)",
+                  "One Piece Card Game Learn Together Deck Set LD-01"):
+            self.assertEqual(self.group(t), "new", t)
+
     def test_a_single_sold_by_condition_is_not_sealed(self):
         self.assertIsNone(self.group("Mr.3(Galdino) - Starter Deck EX: Gear 5",
                                      [{"title": "Near Mint"}, {"title": "Lightly Played"}]))

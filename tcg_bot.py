@@ -274,6 +274,12 @@ NOT_SEALED = ("sleeve", "playmat", "play mat", "deck box", "deck case", "card ca
               " pins ", "magnet", "art print", "tournament kit", "prize", "damaged box")
 PACK_WORDS = ("booster pack", "single pack")
 SINGLE_NUM_RE = re.compile(r"\b(?:OP|EB|ST|PRB)\d{2}-\d{3}\b|\bP-\d{3}\b", re.I)   # a card number = a single
+# Shops that sell One Piece merch too (Good Games: Grand Ship models, blind boxes, Pop!s) list it next to
+# the cards, so a new sealed listing must also say it's the card game (seen in the first v2.4 cloud run).
+TCG_RE = re.compile(r"card game|\btcg\b|card collection|\b(?:OP|EB|ST|DP|PRB|PEB|IB|TS|GC|GB|DF|LD|SD)-?\d{1,2}\b|"
+                    r"booster|starter deck|double pack|ultra deck|tin pack", re.I)
+SINGLE_HINT_RE = re.compile(r"alternate art|alt art|\((?:common|uncommon|rare|super rare|secret rare|leader|sec|sr)\b|"
+                            r"manga rare|#\d{3}\b|\bpsa\b|\bcgc\b|\bbgs\b|graded", re.I)
 SEALED_OPTS = {"new": True, "packs": False}      # set from config.json in begin_check()
 
 # ---- v2.4: release-code sweep
@@ -1247,8 +1253,8 @@ def is_sealed_listing(title, variants=None):
     t = norm(title)
     if is_excluded(title, WATCH_EXCLUDE) or any(w in t for w in NOT_SEALED):
         return False
-    if SINGLE_NUM_RE.search(title):
-        return False
+    if SINGLE_NUM_RE.search(title) or SINGLE_HINT_RE.search(title) or not TCG_RE.search(title):
+        return False                 # a single or graded card, or One Piece merch rather than the card game
     if any(condition(v.get("title")) for v in variants or [] if isinstance(v, dict)):
         return False                 # sold by condition (Near Mint, Lightly Played...): a single
     if not SEALED_OPTS.get("packs") and any(w in t for w in PACK_WORDS):
