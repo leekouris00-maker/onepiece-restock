@@ -9,6 +9,8 @@ Checks Australian shops for:
   3. Other English sealed products on a watch list (starter decks, double packs, illustration boxes,
      premium collections...) at or under their max price - see DEFAULT_SEALED_WATCH
   4. NEW listings: a box or watched product a shop has just added, even before it's buyable
+     (v2.4: any English One Piece sealed product - starter decks, tins, collections... - not just boxes
+     and the watch list; plus a "🔓 Now buyable" alert when a listed one's pre-order or stock opens)
   5. eBay: cards and collectibles in ebay_watch.json (e.g. the Nike x One Piece TNs and DON!! cards) listed
      at or under your max, delivered (needs a free eBay key, see the top of ebay_watch.py)
   6. Pokémon (pokemon_watch.py): the upcoming English releases, each in its own Discord channel - new
@@ -18,6 +20,13 @@ Checks Australian shops for:
      lists and remembers each card's near-mint price; every 6 hours (12am, 6am, 12pm, 6pm) it posts the
      10 singles in stock that got the most cheaper over those 6 hours (10%+ and $1+ off). Settings:
      "price_drops" in config.json; /pricedrops in Discord shows them any time.
+  8. Release-code sweep (v2.4): every 15 minutes (every 2 in a One Piece drop window) it also searches
+     each shop for the codes in the release calendar (OP-18, EB-05, ST-37...) and pre-order searches,
+     so pre-orders a shop keeps outside its One Piece section are seen too (Good Games' OP-18 box was
+     only findable that way on 22 Oct 2026). New shops in v2.4: Cherry Collectables, GD Games, Light of
+     Cards and Card Bot. Settings (all optional): "sweep": false, "sweep_every_minutes": 15,
+     "sweep_queries": ["PEB-01"], "new_sealed": false, "new_sealed_packs": true (single packs too).
+     The first v2.4 check only remembers what's listed already, so upgrading doesn't flood Discord.
 
 Singles prices are for near mint when it's in stock, otherwise the cheapest condition that is (the
 alert says which, e.g. "$2.00 (LP)"). Before v2.3 Elemental quoted its cheapest condition's price even
@@ -123,7 +132,7 @@ try:
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
 
-VERSION = "2.3.0"
+VERSION = "2.4.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -230,11 +239,18 @@ RECAP_MOVE_PCT = 5      # price changes smaller than this (%) are left out of th
 # Shops with a One Piece section are read like the others; the rest are read through their search.
 EXTRA_SHOPIFY_COLLECTIONS = [
     {"name": "Alpha Gaming", "url": "https://alphagaming.com.au/collections/one-piece-sealed-products/products.json?limit=250"},
+    # v2.4 (Oct 2026): specialists that Fellowship of the Ping / CardTracker get One Piece hits from.
+    # Both block their search page in robots.txt, so their One Piece section is read instead.
+    {"name": "Cherry Collectables", "url": "https://www.cherrycollectables.com.au/collections/one-piece/products.json?limit=250",
+     "max_pages": 4, "gzip": True},
+    {"name": "GD Games", "url": "https://www.gdgames.com.au/collections/one-piece-tcg/products.json?limit=250"},
 ]
 EXTRA_SHOPIFY_SEARCH = [
     {"name": "Grailborne", "base": "https://grailborne.com.au"},
     {"name": "Collectible Madness", "base": "https://collectiblemadness.com.au"},
     # Friendly Collectibles was removed in Oct 2026: its search refused the bot (HTTP 401) on every check.
+    {"name": "Light of Cards", "base": "https://lightofcards.com.au"},     # v2.4; mostly Japanese, English kept
+    {"name": "Card Bot", "base": "https://cardbot.com.au"},                # v2.4; mostly Japanese, English kept
 ]
 SEARCH_QUERIES = ["one piece booster box", "one piece booster display", "one piece card game"]
 
@@ -242,6 +258,43 @@ WATCH_EXCLUDE = ["japanese", "(jp)", " jp ", "chinese", "korean", "asia", "simpl
 
 MAX_PAGES = 4                   # Shopify collections: read up to 4 pages of 250 (1,000 products)
 PREORDER_RE = re.compile(r"\bpre[\s_-]?(?:orders?|sale)\b", re.I)
+
+# ---- v2.4: every new English sealed product, not just booster boxes and the sealed_watch list
+# Before v2.4 a new listing only alerted if its title said "booster box"/"booster display" or matched
+# sealed_watch, so new starter decks, tins and collections (e.g. ST-39 to ST-44, TS-03) never showed.
+# Now any English One Piece sealed product a shop lists alerts once as a new listing (no price limit:
+# it's information, not a buy alert), and again when it becomes buyable (pre-order or stock opens).
+# Off with "new_sealed": false. Single booster packs are left out unless "new_sealed_packs": true.
+SEALED_WORD_RE = re.compile(r"\b(?:booster|box(?:es)?|display|decks?|double pack|tins?|collections?|gift|sets?|"
+                            r"bundles?|premium|illustration|cases?|kit)\b", re.I)
+NOT_SEALED = ("sleeve", "playmat", "play mat", "deck box", "deck case", "card case", "storage box", "binder",
+              "portfolio", "toploader", "top loader", "figure", "plush", "keyring", "key chain", "keychain",
+              "t-shirt", " tee ", "poster", " dice", "counter", "card stand", "graded", " psa ", " cgc ", " bgs ",
+              "slab", "proxy", "empty box", "no contents", "fruit only", "display stand", "acrylic", " pin ",
+              " pins ", "magnet", "art print", "tournament kit", "prize", "damaged box")
+PACK_WORDS = ("booster pack", "single pack")
+SINGLE_NUM_RE = re.compile(r"\b(?:OP|EB|ST|PRB)\d{2}-\d{3}\b|\bP-\d{3}\b", re.I)   # a card number = a single
+SEALED_OPTS = {"new": True, "packs": False}      # set from config.json in begin_check()
+
+# ---- v2.4: release-code sweep
+# A shop's One Piece section doesn't always hold its pre-orders (Good Games' had no OP-18 or EB-05 at all
+# on 22 Oct 2026, while its search had the OP-18 box, ST-37/38 and DP-13 pre-orders). So every
+# "sweep_every_minutes" (default 15; every 2 in a One Piece drop window) the bot also searches each shop
+# for the codes in the release calendar (OP-18, EB-05, ST-37...) plus a few pre-order searches. Extra
+# searches: "sweep_queries": ["PEB-01", ...]. Off with "sweep": false. A shop whose robots.txt blocks its
+# search page (Pokebox, Cherry Collectables, GD Games) is skipped quietly.
+SWEEP_EVERY_DEFAULT = 15
+SWEEP_DROP_EVERY = 2
+SWEEP_PAGE = 99                 # listings found by the sweep: the first sweep of a shop only remembers them
+SWEEP_DAYS_BACK = 21            # release codes from 3 weeks ago...
+SWEEP_DAYS_AHEAD = 180          # ...to 6 months ahead
+SWEEP_MAX_QUERIES = 16
+SWEEP_GENERAL = ["one piece pre-order", "one piece preorder"]
+SWEEP_CODE_RE = re.compile(r"\b(OP|EB|PRB|PEB|ST|DP|IB|TS)-?(\d{1,2})\b", re.I)
+
+# ---- v2.4: "now buyable" - a listed product (not a booster box or watched item, which alert through
+# your max prices already) that was not buyable for at least this long and now is: pre-order or stock opened
+OPEN_MIN_GAP = 20 * 60
 
 
 # ================================================================ fast, polite HTTP (stdlib only)
@@ -816,6 +869,8 @@ def begin_check(cfg, status=None, drop=None, skip_down=True):
         _host_results.clear()
     _seen_errors.clear()
     HTTP.reset_metrics()
+    SEALED_OPTS.update(new=bool((cfg or {}).get("new_sealed", True)),
+                       packs=bool((cfg or {}).get("new_sealed_packs", False)))
     HTTP.user_agent = (cfg or {}).get("user_agent") or UA
     HTTP.classic = bool((cfg or {}).get("classic_requests", True))
     HTTP.ua_by_host = {**UA_BY_HOST, **{str(k).lower(): v for k, v in
@@ -933,7 +988,8 @@ def _num(x):
 KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
                   "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
-                  "classic_requests", "user_agent_by_shop", "pokemon", "price_drops"}
+                  "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
+                  "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -1028,6 +1084,13 @@ def check_config(cfg):
             else:
                 w.append(f"sealed_watch entry {x!r} needs \"match\" and a number for \"max\"; skipped")
         cfg["sealed_watch"] = good
+    sq = cfg.get("sweep_queries")
+    if sq is not None and not (isinstance(sq, list) and all(isinstance(x, str) for x in sq)):
+        w.append('"sweep_queries" should be a list of searches, e.g. ["PEB-01", "ST-39"]; ignored')
+        cfg["sweep_queries"] = []
+    if "sweep_every_minutes" in cfg and _num(cfg.get("sweep_every_minutes")) is None:
+        w.append(f'"sweep_every_minutes" should be a number; using {SWEEP_EVERY_DEFAULT}')
+        cfg.pop("sweep_every_minutes")
     alerts = cfg.get("alerts") or {}
     for k, v in alerts.items():
         if k.startswith("discord_webhook") and v and not DISCORD_HOOK_RE.match(str(v)):
@@ -1176,6 +1239,38 @@ def watch_item(title, watch):
     return None
 
 
+def is_sealed_listing(title, variants=None):
+    """v2.4: an English One Piece sealed product worth a new-listing alert: not a single (card number in
+    the title, or sold by condition), not an accessory, not a Japanese/Asian print, not a single pack."""
+    if not title or not SEALED_OPTS.get("new", True):
+        return False
+    t = norm(title)
+    if is_excluded(title, WATCH_EXCLUDE) or any(w in t for w in NOT_SEALED):
+        return False
+    if SINGLE_NUM_RE.search(title):
+        return False
+    if any(condition(v.get("title")) for v in variants or [] if isinstance(v, dict)):
+        return False                 # sold by condition (Near Mint, Lightly Played...): a single
+    if not SEALED_OPTS.get("packs") and any(w in t for w in PACK_WORDS):
+        return False
+    return bool(SEALED_WORD_RE.search(title))
+
+
+def classify(title, watch, max_price, variants=None):
+    """What the bot does with a product title -> (kind, id prefix, group, max price, sealed_watch entry),
+    or None if it isn't watched. Groups: "box" (booster boxes, alert at or under your max), "watch"
+    (sealed_watch items, alert at or under their max) and "new" (v2.4: any other English sealed product,
+    alerting only as a new listing and when it becomes buyable)."""
+    if is_box_title(title):
+        return "Booster box", "box", "box", max_price, None
+    w = watch_item(title, watch)
+    if w:
+        return "Sealed", "sealed", "watch", w["max"], w
+    if is_sealed_listing(title, variants):
+        return "New listing", "item", "new", 0.0, None
+    return None
+
+
 def card_num_variants(num):
     """OP13-120 -> ['op13-120', 'op13120'] (Elemental sometimes drops the dash in handles)."""
     n = num.lower()
@@ -1269,15 +1364,14 @@ def shopify_boxes(shop_name, url, max_price, watch=(), must_include=None, max_pa
         title = p.get("title", "")
         if need and not any(m in title.lower() for m in need):
             continue
-        w = None if is_box_title(title) else watch_item(title, watch)
-        if not is_box_title(title) and not w:
+        variants = p.get("variants", [])
+        c = classify(title, watch, max_price, variants)
+        if not c:
             continue
-        kind, prefix, group = ("Sealed", "sealed", "watch") if w else ("Booster box", "box", "box")
-        limit = w["max"] if w else max_price
+        kind, prefix, group, limit, w = c
         handle = p.get("handle")
         page = f"{base}/products/{handle}"
         is_pre = is_preorder(title, p.get("tags", ""))
-        variants = p.get("variants", [])
         price, vid = cheapest_available(variants, cents=False)
         all_prices = [float(v["price"]) for v in variants if v.get("price")]
         note = ", ".join(x for x in ((w["name"] if w else ""), ("pre-order" if is_pre else "")) if x)
@@ -1289,7 +1383,7 @@ def shopify_boxes(shop_name, url, max_price, watch=(), must_include=None, max_pa
             "cart": shopify_cart_link(base, vid) if vid else "",
             "note": note, "max": limit, "page": pages.get(handle, 1),
         })
-        if price is None or price > limit:
+        if group == "new" or price is None or price > limit:
             continue
         finds.append({
             "id": f"{prefix}|{shop_name}|{handle}", "kind": kind, "name": title, "shop": shop_name,
@@ -1303,11 +1397,12 @@ def _suggest_url(base, q):
             f"&resources[type]=product&resources[limit]=10")
 
 
-def shopify_search_boxes(shop_name, base, max_price, watch=()):
-    """For shops without a One Piece section: read their search results instead.
+def shopify_search_boxes(shop_name, base, max_price, watch=(), queries=None, page_no=1):
+    """For shops without a One Piece section: read their search results instead (v2.4: also the
+    release-code sweep, with its own queries and page_no=SWEEP_PAGE).
     Returns (finds, listings) like shopify_boxes; listings is None if every search failed."""
     base = base.rstrip("/")
-    results = pmap(lambda q: fetch_json(_suggest_url(base, q)), SEARCH_QUERIES)   # all three at once
+    results = pmap(lambda q: fetch_json(_suggest_url(base, q)), list(queries or SEARCH_QUERIES))   # all at once
     products, any_ok = {}, False
     for data in results:
         if data is None:
@@ -1320,21 +1415,19 @@ def shopify_search_boxes(shop_name, base, max_price, watch=()):
     rows = []
     for handle, p in products.items():
         title = p.get("title", "")
-        if "one piece" not in title.lower():
+        if not handle or "one piece" not in title.lower():
             continue
-        w = None if is_box_title(title) else watch_item(title, watch)
-        if not is_box_title(title) and not w:
+        c = classify(title, watch, max_price)
+        if not c:
             continue
-        limit = w["max"] if w else max_price
-        price = float(p.get("price") or p.get("price_min") or 0)
-        rows.append((handle, p, w, limit, price, bool(p.get("available"))))
+        price = float(_num(p.get("price") or p.get("price_min")) or 0)
+        rows.append((handle, p, c, price, bool(p.get("available"))))
     # only look up cart IDs for what's worth alerting, all at once
-    want = [r[0] for r in rows if r[5] and 0 < r[4] <= r[3]]
+    want = [r[0] for r in rows if r[4] and r[2][2] != "new" and 0 < r[3] <= r[2][3]]
     carts = dict(zip(want, pmap(lambda h: product_js(base, h) or {}, want)))
     finds, listings = [], []
-    for handle, p, w, limit, price, available in rows:
+    for handle, p, (kind, prefix, group, limit, w), price, available in rows:
         title = p.get("title", "")
-        kind, prefix, group = ("Sealed", "sealed", "watch") if w else ("Booster box", "box", "box")
         page = f"{base}/products/{handle}"
         note = ", ".join(x for x in ((w["name"] if w else ""), ("pre-order" if is_preorder(title, p.get("tags", "")) else "")) if x)
         cart = ""
@@ -1344,8 +1437,8 @@ def shopify_search_boxes(shop_name, base, max_price, watch=()):
         listings.append({"id": f"list|{shop_name}|{handle}", "box_id": f"{prefix}|{shop_name}|{handle}",
                          "group": group, "kind": "New listing", "name": title, "shop": shop_name,
                          "price": price, "available": available, "url": page, "cart": cart,
-                         "note": note, "max": limit, "page": 1})
-        if available and 0 < price <= limit:
+                         "note": note, "max": limit, "page": page_no})
+        if group != "new" and available and 0 < price <= limit:
             finds.append({"id": f"{prefix}|{shop_name}|{handle}", "kind": kind, "name": title,
                           "shop": shop_name, "price": price, "url": page, "cart": cart, "note": note})
     return finds, listings
@@ -1376,7 +1469,7 @@ def shopify_product_box(shop_name, url, max_price, watch=()):
              "cart": shopify_cart_link(url, vid), "note": ""}], []
 
 
-def woo_boxes(shop_name, url, max_price, watch=()):
+def woo_boxes(shop_name, url, max_price, watch=(), page_no=1):
     data = fetch_json(url)
     if not isinstance(data, list):
         return [], None
@@ -1385,31 +1478,104 @@ def woo_boxes(shop_name, url, max_price, watch=()):
         name = re.sub("<[^>]+>", "", p.get("name", ""))
         if "one piece" not in name.lower():
             continue
-        w = None if is_box_title(name) else watch_item(name, watch)
-        if not is_box_title(name) and not w:
+        c = classify(name, watch, max_price)
+        if not c:
             continue
-        kind, prefix, group = ("Sealed", "sealed", "watch") if w else ("Booster box", "box", "box")
-        limit = w["max"] if w else max_price
+        kind, prefix, group, limit, w = c
         prices = p.get("prices", {})
         minor = int(prices.get("currency_minor_unit", 2))
         price = int(prices.get("price", 0) or 0) / (10 ** minor)
         buyable = bool(p.get("is_in_stock") and p.get("is_purchasable", True))
         link = woo_cart_link(url, p.get("id")) if buyable else ""
-        note = w["name"] if w else ""
+        note = ", ".join(x for x in ((w["name"] if w else ""), ("pre-order" if is_preorder(name) else "")) if x)
         listings.append({
             "id": f"list|{shop_name}|{p.get('id')}", "box_id": f"{prefix}|{shop_name}|{p.get('id')}",
             "group": group, "kind": "New listing", "name": name, "shop": shop_name, "price": price,
-            "available": buyable, "url": p.get("permalink"), "cart": link, "note": note, "max": limit, "page": 1,
+            "available": buyable, "url": p.get("permalink"), "cart": link, "note": note, "max": limit, "page": page_no,
         })
-        if not buyable or price <= 0 or price > limit:
+        if group == "new" or not buyable or price <= 0 or price > limit:
             continue
         finds.append({"id": f"{prefix}|{shop_name}|{p.get('id')}", "kind": kind, "name": name,
                       "shop": shop_name, "price": price, "url": p.get("permalink"), "cart": link, "note": note})
     return finds, listings
 
 
-def check_sealed(cfg):
-    """Returns (finds, listings_by_shop). listings_by_shop[shop] is None when that shop failed."""
+def sweep_queries(cfg, now=None):
+    """The sweep's searches: your "sweep_queries", then the codes of releases from 3 weeks ago to 6 months
+    ahead in the release calendar ("ST-37 / ST-38 Starter Decks" -> ST-37, ST-38), then the pre-order searches."""
+    now = now or datetime.now()
+    codes = []
+    for r in cfg.get("releases", DEFAULT_RELEASES) or []:
+        if not isinstance(r, dict):
+            continue
+        try:
+            d = datetime.strptime(str(r.get("date")), "%Y-%m-%d")
+        except ValueError:
+            continue
+        if not -SWEEP_DAYS_BACK <= (d.date() - now.date()).days <= SWEEP_DAYS_AHEAD:
+            continue
+        for m in SWEEP_CODE_RE.finditer(str(r.get("name", ""))):
+            codes.append(f"{m.group(1).upper()}-{int(m.group(2)):02d}")
+    extra = [str(q).strip() for q in cfg.get("sweep_queries") or [] if str(q).strip()]
+    return list(dict.fromkeys(extra + codes + SWEEP_GENERAL))[:SWEEP_MAX_QUERIES]
+
+
+def sweep_shopify(shop_name, base, max_price, watch, queries):
+    """One shop's release-code sweep through its search. Never 'failed' (that would hide what its
+    regular check saw): a shop whose robots.txt blocks search, or whose search doesn't answer, gives []."""
+    try:
+        if HTTP.robots_on and not HTTP.allowed(_suggest_url(base, queries[0] if queries else "one piece")):
+            return [], []
+    except SkipHost:
+        return [], []
+    except Exception:  # noqa: BLE001
+        pass
+    finds, listings = shopify_search_boxes(shop_name, base, max_price, watch, queries, SWEEP_PAGE)
+    if listings is not None:
+        SWEPT.add(shop_name)
+    return finds, (listings or [])
+
+
+def sweep_woo(shop_name, url, max_price, watch, queries):
+    """The same sweep for a WooCommerce shop: its product search, once per query."""
+    u = urllib.parse.urlsplit(url)
+    q = dict(urllib.parse.parse_qsl(u.query))
+
+    def one(term):
+        term = term if "one piece" in term.lower() else f"one piece {term}"
+        return woo_boxes(shop_name, urllib.parse.urlunsplit(u._replace(query=urllib.parse.urlencode(
+            dict(q, search=term, per_page="20")))), max_price, watch, SWEEP_PAGE)
+    finds, listings = [], []
+    for f, ls in pmap(one, queries):
+        finds += f
+        if ls is not None:
+            SWEPT.add(shop_name)
+            listings += ls
+    return finds, listings
+
+
+def sweep_jobs(cfg, max_price, watch):
+    """Sweep jobs for every Shopify and WooCommerce sealed shop (one per website)."""
+    if not cfg.get("sweep", True):
+        return []
+    queries = sweep_queries(cfg)
+    if not queries:
+        return []
+    cols, _, woo, search = sealed_shops(cfg)
+    jobs, seen = [], set()
+    for shop in cols + search:
+        base = origin(shop.get("url") or shop.get("base"))
+        if (shop["name"], base) not in seen:
+            seen.add((shop["name"], base))
+            jobs.append((sweep_shopify, shop["name"], base, max_price, watch, queries))
+    for shop in woo:
+        jobs.append((sweep_woo, shop["name"], shop["url"], max_price, watch, queries))
+    return jobs
+
+
+def check_sealed(cfg, sweep=False):
+    """Returns (finds, listings_by_shop). listings_by_shop[shop] is None when that shop failed.
+    sweep: also run the release-code sweep (v2.4) this check."""
     mx = cfg["sealed"]["max_price"]
     watch = cfg.get("sealed_watch", DEFAULT_SEALED_WATCH) or []
     cols, prods, woo, search = sealed_shops(cfg)
@@ -1425,6 +1591,9 @@ def check_sealed(cfg):
         jobs.append((woo_boxes, shop["name"], shop["url"], mx, watch))
     for shop in search:
         jobs.append((shopify_search_boxes, shop["name"], shop["base"], mx, watch))
+    if sweep:
+        SWEPT.clear()
+        jobs += sweep_jobs(cfg, mx, watch)
     results = pmap(lambda j: (j, j[0](*j[1:])), jobs, leaf=False)
     finds, by_shop = [], {}
     for job, (f, listings) in results:
@@ -1454,10 +1623,30 @@ def save_known(known):
     atomic_write_json(KNOWN_PATH, known, indent=1, sort_keys=True)
 
 
-def new_listings(by_shop, known, box_finds, pages_seen=None):
+KNOWN_SUFFIX = {"box": "", "watch": " (other sealed)", "new": " (all sealed)"}
+
+
+def known_key(shop, group):
+    """known_products.json key for a shop's listings of one group: "Gumnut", "Gumnut (other sealed)",
+    "Gumnut (all sealed)" (v2.4: every other English sealed product)."""
+    return shop + KNOWN_SUFFIX.get(group, " (other sealed)")
+
+
+def _base_shop(key):
+    for suffix in (" (other sealed)", " (all sealed)"):
+        if key.endswith(suffix):
+            return key[:-len(suffix)]
+    return key
+
+
+SWEPT = set()          # shops whose release-code sweep got answers this check (filled by the sweep)
+
+
+def new_listings(by_shop, known, box_finds, pages_seen=None, swept=()):
     """Listings never seen before at that shop. The first good read of a shop only remembers
     what's there (no alerts), so a fresh install doesn't flood you. The same goes for products the
-    bot reads for the first time because it now reads past page 1 of a big shop."""
+    bot reads for the first time because it now reads past page 1 of a big shop, and for what the
+    first release-code sweep of a shop finds (swept: the shops swept this check)."""
     pages_seen = {} if pages_seen is None else pages_seen
     finds_ids = {f["id"] for f in box_finds}
     out = []
@@ -1466,19 +1655,20 @@ def new_listings(by_shop, known, box_finds, pages_seen=None):
         if listings is None:
             continue
         for l in listings:
-            key = shop if l.get("group", "box") == "box" else f"{shop} (other sealed)"
-            groups.setdefault(key, []).append(l)
+            groups.setdefault(known_key(shop, l.get("group", "box")), []).append(l)
         groups.setdefault(shop, [])              # a shop with no boxes still gets remembered
+        if SEALED_OPTS.get("new", True):
+            groups.setdefault(known_key(shop, "new"), [])   # ...and with no other sealed, so its first one alerts
     deepest = {}
     for shop, listings in groups.items():
-        base_shop = shop.replace(" (other sealed)", "")
+        base_shop = _base_shop(shop)
         for l in listings:
             deepest[base_shop] = max(deepest.get(base_shop, 1), int(l.get("page", 1)))
     for shop, listings in groups.items():
         ids = {l["id"] for l in listings}
-        base_shop = shop.replace(" (other sealed)", "")
+        base_shop = _base_shop(shop)
         if shop not in known:
-            what = "other sealed" if shop.endswith("(other sealed)") else "box"
+            what = shop[len(base_shop):].strip(" ()") or "box"
             print(f"   (remembering {len(ids)} existing {what} listing(s) at {base_shop}; new ones will alert)")
             known[shop] = sorted(ids)
             continue
@@ -1488,16 +1678,43 @@ def new_listings(by_shop, known, box_finds, pages_seen=None):
             if l["id"] in before or l["box_id"] in finds_ids:
                 continue            # already known, or already alerting as a buyable box
             if int(l.get("page", 1)) > read_to:
-                continue            # first time we've read this deep into the shop: just remember it
+                continue            # first time we've read this deep into the shop (or swept it): just remember it
             status = ("in stock" if l["available"] else "listed, not buyable yet")
-            if l["available"] and l["price"] > l["max"]:
+            if l["available"] and (l.get("max") or 0) > 0 and l["price"] > l["max"]:
                 status += f" (over your {money(l['max'])} max)"
+            if any(o["id"] == l["id"] for o in out):
+                continue            # found by both the shop's section and the sweep: one alert
             l = dict(l, note=(l["note"] + ", " if l["note"] else "") + status)
             out.append(l)
         known[shop] = sorted(before | ids)
+    for shop in swept:
+        if by_shop.get(shop) is not None:     # swept and remembered once: what it finds from now on alerts
+            deepest[shop] = max(deepest.get(shop, 1), SWEEP_PAGE)
     for shop, page in deepest.items():
         if page > int(pages_seen.get(shop, 1)):
             pages_seen[shop] = page
+    return out
+
+
+def opened_listings(by_shop, skip_ids=(), hist=None, now=None):
+    """v2.4: sealed products (the "new" group) that were listed but not buyable for at least OPEN_MIN_GAP
+    and are buyable now: a pre-order or a restock has opened. Booster boxes and watched items aren't
+    included: they alert through your max prices already. Uses price_history.json (so "history" must be on),
+    and must run before record_history() updates it."""
+    hist = read_json(HISTORY_PATH, {}) if hist is None else hist
+    now = now or time.time()
+    out, seen = [], set(skip_ids)
+    for listings in by_shop.values():
+        for l in listings or []:
+            if l.get("group") != "new" or not l.get("available") or l["box_id"] in seen:
+                continue
+            h = (hist or {}).get(l["box_id"])
+            if not h or h.get("avail") or now - float(h.get("since") or now) < OPEN_MIN_GAP:
+                continue            # new to us (that's a new-listing alert), already buyable, or just flickered
+            seen.add(l["box_id"])
+            what = "pre-order open" if is_preorder(l["name"], l.get("note", "")) else "now buyable"
+            out.append(dict(l, id=f"open|{l['box_id']}|{int(now) // 3600}", opened=True,
+                            note=(l["note"] + ", " if l.get("note") else "") + what))
     return out
 
 
@@ -2140,11 +2357,11 @@ def run_checks(cfg, sealed=True, singles=True):
     return s, g
 
 
-def run_checks_all(cfg, sealed=True, singles=True, pokemon=True, poke_only=None):
-    """Boxes, singles and Pokémon at the same time.
+def run_checks_all(cfg, sealed=True, singles=True, pokemon=True, poke_only=None, sweep=False):
+    """Boxes, singles and Pokémon at the same time (sweep: the release-code sweep along with the boxes).
     -> ((finds, by_shop) | None, singles | None, pokemon_watch.Result | None)"""
     ex = _pool("phases", 4)
-    fs = ex.submit(check_sealed, cfg) if sealed else None
+    fs = (ex.submit(check_sealed, cfg, True) if sweep else ex.submit(check_sealed, cfg)) if sealed else None
     fg = ex.submit(check_singles, cfg) if singles else None
     fp = ex.submit(pokemon_watch.check, cfg, _me(), poke_only) if (pokemon and pokemon_watch) else None
     return (fs.result() if fs else None), (fg.result() if fg else None), (fp.result() if fp else None)
@@ -2644,7 +2861,7 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
             poke_group.add(hook)
         elif f.get("ebay"):
             hook = ebay_hook                 # eBay watch (ebay_watch.json): Nike TNs, promos, graded cards
-        elif f["kind"] == "Sealed" or (f["kind"] == "New listing" and f.get("group") == "watch"):
+        elif f["kind"] == "Sealed" or (f["kind"] == "New listing" and f.get("group") in ("watch", "new")):
             hook = sealed_hook               # other sealed products: their own channel if set up
         elif f["kind"] in BOX_KINDS:
             hook = boxes_hook
@@ -2765,6 +2982,8 @@ def _discord_embeds(finds, cfg=None):
             icon, color = "📦 ", 0xF4A261
         elif kind == "Sealed":
             icon, color = "🎁 ", 0x2A9D8F
+        elif kind == "New listing" and f.get("opened"):
+            icon, color = "🔓 Now buyable: ", 0x2A9D8F
         elif kind == "New listing":
             icon, color = "🆕 ", 0x9B5DE5
         elif f.get("value_pick"):
@@ -3195,21 +3414,32 @@ def run_once(cfg, args, drop=None):
                 poke_only = set(drop["sections"])      # the releases out today every minute; the rest when due
         elif not due:
             poke_on = False
+    do_sweep = False
+    if do_sealed and cfg.get("sweep", True):
+        gap = _num(cfg.get("sweep_every_minutes"))
+        gap = SWEEP_DROP_EVERY if op_drop else (SWEEP_EVERY_DEFAULT if gap is None else gap)
+        do_sweep = args.all or time.time() - float(status.get("sweep_ts", 0) or 0) >= gap * 60 - 20
     if do_sealed:
-        print(" checking booster boxes...")
+        print(" checking booster boxes and sealed..." + (" (+ release-code sweep)" if do_sweep else ""))
     if do_singles:
         print(" checking singles...")
     if poke_on:
         print(" checking Pokémon..." + (f" ({', '.join(sorted(poke_only))})" if poke_only else ""))
-    sealed_res, singles, poke = run_checks_all(cfg, do_sealed, do_singles, poke_on, poke_only)
+    sealed_res, singles, poke = (run_checks_all(cfg, do_sealed, do_singles, poke_on, poke_only, sweep=True) if do_sweep
+                                 else run_checks_all(cfg, do_sealed, do_singles, poke_on, poke_only))
     finds, listed, known = [], [], None
     box_finds, by_shop = sealed_res if sealed_res else ([], {})
     finds += box_finds
     if do_sealed and loop:
         status["sealed_ts"] = round(time.time())
+    if do_sweep:
+        status["sweep_ts"] = round(time.time())
     if do_sealed and cfg.get("new_listings", True):
         known = load_known()
-        listed = new_listings(by_shop, known, box_finds, status.setdefault("pages_seen", {}))
+        listed = new_listings(by_shop, known, box_finds, status.setdefault("pages_seen", {}),
+                              swept=set(SWEPT) if do_sweep else ())
+        if cfg.get("history", True):     # v2.4: a listed sealed product's pre-order / stock just opened
+            listed += opened_listings(by_shop, {l["box_id"] for l in listed} | {f["id"] for f in box_finds})
     alerts = cfg.get("alerts") or {}
     poke_ok, poke_secs, poke_shops, intro = set(), set(), set(), []
     if poke is not None and not poke.problem:
@@ -3382,7 +3612,7 @@ def run_once(cfg, args, drop=None):
             for f in deliver:
                 if f["id"] in undelivered and f["kind"] == "New listing":
                     keys = ((pokemon_watch.known_key(f["shop"], f.get("section")),) if f.get("game") == POKE
-                            else (f["shop"], f"{f['shop']} (other sealed)"))
+                            else tuple(known_key(f["shop"], g) for g in KNOWN_SUFFIX))
                     for shop in keys:
                         if shop in known and f["id"] in known[shop]:
                             known[shop].remove(f["id"])

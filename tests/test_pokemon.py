@@ -458,7 +458,7 @@ class Pacing(unittest.TestCase):
         self._run, self._ebay = tb.run_checks_all, tb.ebay_watch
         self.calls = []
 
-        def fake(cfg, sealed=True, singles=True, pokemon=True, poke_only=None):
+        def fake(cfg, sealed=True, singles=True, pokemon=True, poke_only=None, sweep=False):
             self.calls.append((sealed, singles, pokemon, poke_only))
             return (([], {}) if sealed else None), ([] if singles else None), (pw.Result() if pokemon else None)
         tb.run_checks_all = fake
@@ -514,7 +514,7 @@ class FullRuns(Patched):
             setattr(tb, k, os.path.join(self.tmp, k.lower() + ".json"))
         self.saved = {n: getattr(tb, n) for n in ("check_sealed", "check_singles", "ebay_watch", "pc_last_seen",
                                                    "store_locked", "desktop_beep")}
-        tb.check_sealed = lambda cfg: ([], {})
+        tb.check_sealed = lambda cfg, sweep=False: ([], {})
         tb.check_singles = lambda cfg: []
         tb.ebay_watch = None
         tb.pc_last_seen = lambda cfg: None

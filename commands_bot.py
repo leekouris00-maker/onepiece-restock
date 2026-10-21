@@ -213,14 +213,19 @@ def build_deals(cfg, data, kind, ts, note=""):
 
 
 def build_listings(cfg, data, kind, ts, group, note=""):
-    """All in-stock listings of booster boxes (group 'box') or other sealed ('watch'), any price."""
+    """All in-stock listings of booster boxes (group 'box') or other sealed ('watch', plus v2.4's 'new':
+    every other English sealed product), any price."""
     max_box = cfg["sealed"]["max_price"]
-    items = [l for l in data.get("sealed", {}).get("listings", [])
-             if l.get("group", "box") == group and l["available"] and l["price"] > 0]
+    groups = ("box",) if group == "box" else ("watch", "new")
+    seen, items = set(), []
+    for l in data.get("sealed", {}).get("listings", []):
+        if l.get("group", "box") in groups and l["available"] and l["price"] > 0 and l["id"] not in seen:
+            seen.add(l["id"])            # a product found by both the shop's section and the sweep: once
+            items.append(l)
     items.sort(key=lambda l: l["price"])
     lines = []
     for l in items:
-        ok = l["price"] <= l["max"]
+        ok = (l.get("max") or 0) > 0 and l["price"] <= l["max"]
         extra = f" · {l['note']}" if l.get("note") else ""
         lines.append(f"{'✅' if ok else '▫️'} [{tb._short(l['name'], 55)}]({link(l) if ok else l['url']}) "
                      f"**{tb.money(l['price'])}** · {l['shop']}{extra if group == 'watch' else ''}")

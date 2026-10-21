@@ -524,7 +524,7 @@ class InTheCheck(Quiet):
             setattr(tb, k, os.path.join(self.tmp, k.lower() + ".json"))
         self.saved = {n: getattr(tb, n) for n in ("check_sealed", "check_singles", "ebay_watch", "pokemon_watch",
                                                    "run_price_drops", "store_locked", "desktop_beep")}
-        tb.check_sealed = lambda cfg: ([], {})
+        tb.check_sealed = lambda cfg, sweep=False: ([], {})
         tb.check_singles = lambda cfg: []
         tb.ebay_watch = tb.pokemon_watch = None
         tb.store_locked = lambda host: False
