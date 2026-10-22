@@ -1,4 +1,4 @@
-{"v":1,"shops":{"Elemental Arcade":{"base":"https://elementalarcade.com.au","n":3330,"scans":[1792513720,1792525203,1792535960,1792544092,1792549201,1792560344,1792578241,1792593447,1792610642,1792621810,1792630225,1792646950]},"Good Games":{"base":"https://tcg.goodgames.com.au","n":1261,"scans":[1792513720,1792525203,1792535960,1792544092,1792549201,1792560344,1792578241,1792593447,1792610642,1792621810,1792630225,1792646950]}},"items":{
+{"v":1,"shops":{"Elemental Arcade":{"base":"https://elementalarcade.com.au","n":3329,"scans":[1792513720,1792525203,1792535960,1792544092,1792549201,1792560344,1792578241,1792593447,1792610642,1792621810,1792630225,1792646950,1792664802]},"Good Games":{"base":"https://tcg.goodgames.com.au","n":1261,"scans":[1792513720,1792525203,1792535960,1792544092,1792549201,1792560344,1792578241,1792593447,1792610642,1792621810,1792630225,1792646950,1792664802]}},"items":{
 "Elemental Arcade|absalom-op06081-wings-of-the-captain":{"n":"Absalom - OP06-081 [Wings of the Captain]","v":54899468501283,"p":[[1792513720,1.0,1]]},
 "Elemental Arcade|absalom-op14100-the-azure-seas-seven":{"n":"Absalom - OP14-100 [The Azure Sea's Seven]","v":54899468665123,"p":[[1792513720,1.0,1]]},
 "Elemental Arcade|absalom-op15079-adventure-on-kamis-island":{"n":"Absalom - OP15-079 [Adventure on Kami's Island]","v":54899468828963,"p":[[1792513720,0.5,1]]},
@@ -1223,7 +1223,7 @@
 "Elemental Arcade|hull-dismantler-slash-op03073-pillars-of-strength":{"n":"Hull Dismantler Slash - OP03-073 [Pillars of Strength]","v":54899894518051,"p":[[1792513720,0.5,1]]},
 "Elemental Arcade|humandrill-op14032-the-azure-seas-seven":{"n":"Humandrill - OP14-032 [The Azure Sea's Seven]","v":54899894845731,"p":[[1792513720,0.7,1]]},
 "Elemental Arcade|humandrill-op14032-the-azure-seas-seven-release-event-cards":{"n":"Humandrill - OP14-032 [The Azure Sea's Seven Release Event Cards]","v":54899895009571,"p":[[1792513720,4.4,1]]},
-"Elemental Arcade|humandrill-st12004-starter-deck-12-zoro-and-sanji":{"n":"Humandrill - ST12-004 [Starter Deck 12: Zoro and Sanji]","v":54899895173411,"p":[[1792513720,0.5,1]]},
+"Elemental Arcade|humandrill-st12004-starter-deck-12-zoro-and-sanji":{"n":"Humandrill - ST12-004 [Starter Deck 12: Zoro and Sanji]","v":54899895173411,"p":[[1792513720,0.5,1],[1792664802,0.5,0]],"gone":1792664802},
 "Elemental Arcade|hurry-up-and-make-me-the-pirate-king-op14097-the-azure-seas-seven":{"n":"Hurry Up and Make Me the Pirate King! - OP14-097 [The Azure Sea's Seven]","v":54899895337251,"p":[[1792513720,0.7,1]]},
 "Elemental Arcade|hydra-op02090-paramount-war":{"n":"Hydra - OP02-090 [Paramount War]","v":54899895664931,"p":[[1792513720,0.7,1]]},
 "Elemental Arcade|hyogoro-op01020-romance-dawn":{"n":"Hyogoro - OP01-020 [Romance Dawn]","v":54899896025379,"p":[[1792513720,0.5,1]]},
