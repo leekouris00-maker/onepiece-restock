@@ -145,7 +145,7 @@ try:
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
 
-VERSION = "2.5.0"
+VERSION = "2.5.1"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
