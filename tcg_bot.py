@@ -141,11 +141,15 @@ try:
 except ImportError:
     link_watch = None
 try:
+    import fast_lane           # v2.6: drop-window fast lane, desk mode, quantity links; optional
+except ImportError:
+    fast_lane = None
+try:
     import pokemon_watch       # Pokémon releases; optional
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
 
-VERSION = "2.5.1"
+VERSION = "2.6.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -1084,7 +1088,8 @@ KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "relea
                   "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
-                  "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries"}
+                  "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
+                  "fast_lane"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -3185,6 +3190,9 @@ def _discord_embeds(finds, cfg=None):
         if f.get("cart"):
             qty = f" (x{f['qty']})" if kind == "Single" and f.get("qty", 1) > 1 else ""
             fields.append({"name": "⚡ Buy", "value": f"[Add to cart → checkout{qty}]({f['cart']})", "inline": False})
+        if f.get("cart_n"):
+            fields.append({"name": f"⚡ Buy {f['cart_qty']}", "value": f"[Add {f['cart_qty']} to cart → checkout]"
+                                                                        f"({f['cart_n']})", "inline": False})
         if f.get("note"):
             fields.append({"name": "Status" if kind == "New listing" else "Listing",
                            "value": str(f["note"])[:1000], "inline": False})
@@ -3261,6 +3269,8 @@ def report(finds, label):
             lines.append(f"    {f['url']}")
             if f.get("cart"):
                 lines.append(f"    BUY: {f['cart']}")
+            if f.get("cart_n"):
+                lines.append(f"    BUY {f['cart_qty']}: {f['cart_n']}")
     if sealed:
         lines.append("OTHER SEALED")
         for f in sorted(sealed, key=lambda f: f["price"]):
@@ -3268,6 +3278,8 @@ def report(finds, label):
             lines.append(f"    {f['url']}")
             if f.get("cart"):
                 lines.append(f"    BUY: {f['cart']}")
+            if f.get("cart_n"):
+                lines.append(f"    BUY {f['cart_qty']}: {f['cart_n']}")
     if listed:
         lines.append("NEW LISTINGS")
         for f in listed:
@@ -3644,6 +3656,8 @@ def run_once(cfg, args, drop=None):
     finds, listed, known = [], [], None
     box_finds, by_shop = sealed_res if sealed_res else ([], {})
     finds += box_finds
+    if fast_lane:      # v2.6: what the fast lane checks every 15 s until the next full check
+        fast_lane.update_targets(sys.modules[__name__], cfg, drop, by_shop if do_sealed else None)
     if do_sealed and loop:
         status["sealed_ts"] = round(time.time())
     if do_sweep:
@@ -3691,6 +3705,8 @@ def run_once(cfg, args, drop=None):
     state = load_state()
     show = finds if args.all else new_only(finds, state)
     show = show + listed
+    if fast_lane:
+        fast_lane.add_qty_links(cfg, show)
     if intro:
         new_sections = {slug for slug, _, _ in intro}
         show = [f for f in show if not (f.get("game") == POKE and f.get("section") in new_sections)]
@@ -3743,6 +3759,8 @@ def run_once(cfg, args, drop=None):
     if not IN_ACTIONS:         # the cloud copy commits status.json; keep it free of per-run noise
         status["last_check"] = f"{datetime.now():%Y-%m-%d %H:%M:%S}"
         status["last_found"] = len(finds)
+        if fast_lane:
+            status["fast_lane"] = dict(fast_lane.STATUS)
     posts = shop_health(cfg, status)
     for name, saved in RESTORED:
         posts.append((f"🩹 **{name} was damaged**, so the bot loaded its last good copy (saved {saved:%d %b %I:%M %p}) "
@@ -3815,6 +3833,8 @@ def run_once(cfg, args, drop=None):
     undelivered = set()
     if deliver and not args.all:
         desktop_beep()
+        if fast_lane:
+            fast_lane.desk_open(sys.modules[__name__], deliver)
         dtext = text if deliver == show else report(deliver, "New since the PC copy went quiet" if from_held
                                                     else "New since last check")
         append_text(LOG_PATH, f"\n--- {stamp} ---\n{dtext}\n")
@@ -4126,7 +4146,10 @@ def main():
         sys.stdout.flush()
         if wait > IDLE_MAX:
             HTTP.close_idle()        # shops drop idle connections anyway; don't hold sockets open for nothing
-        time.sleep(wait)
+        if fast_lane:
+            fast_lane.wait(sys.modules[__name__], cfg, wait)     # drop window: fast lane every 15 s meanwhile
+        else:
+            time.sleep(wait)
 
 
 if __name__ == "__main__":

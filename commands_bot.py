@@ -30,6 +30,8 @@ Type these in your Discord server:
     /watch list | remove             what's watched and what each page said last check
     /ebay list | check | max | add | remove   the eBay watch (ebay_watch.json) without editing files
     /bought <card> [qty]             log a pickup; the card stops alerting once you have them all
+  v2.6 (admins):
+    /desk on [hours] | off           the PC opens the checkout tab itself for target finds (fast_lane.py)
 
   Admin only (people with Manage Server, or listed in "admin_user_ids" under "alerts"):
     /want list | add | remove | enable   change the singles want list without editing config.json
@@ -401,6 +403,16 @@ def build_status(cfg):
          (f"Next: {nxt[0]['name']}, {nxt[0]['start']:%a %d %b %I:%M %p}" if nxt else "No windows set")},
         {"name": "Pings", "value": f"🔕 muted until {datetime.fromtimestamp(mute):%a %I:%M %p}" if mute > time.time() else "🔔 on"},
     ]
+    desk = float(tb.read_controls().get("desk_until", 0) or 0)
+    fl = st.get("fast_lane") or {}
+    lane = ("off" if cfg.get("fast_lane", True) is False else
+            (f"{fl.get('targets', 0)} target(s) for {fl.get('window')} · {fl.get('alerts', 0)} alert(s) so far"
+             + (f" · paused (429): {', '.join(fl['paused'])}" if fl.get("paused") else "")
+             + (f" · slow, top targets only: {', '.join(fl['slow'])}" if fl.get("slow") else "")
+             if win and fl.get("window") else "on, runs during drop windows"))
+    fields.append({"name": "⚡ Fast lane · 🖥️ Desk mode",
+                   "value": f"{lane}\nDesk mode: " + (f"on until {datetime.fromtimestamp(desk):%a %I:%M %p}"
+                                                     if desk > time.time() else "off (`/desk on`)")})
     ds = tb.drops_settings(cfg)
     if ds["enabled"] and ds["shops"]:
         store = tb.load_drops_store()
@@ -500,7 +512,9 @@ HELP = (
     "🔗 **Watch any link**: `/watch add link:<product page> max:<price>` alerts the moment it's buyable at or "
     "under your max · `/watch list` · `/watch remove`\n"
     "🛒 **eBay**: `/ebay list` · `/ebay check` (cheapest listed now) · `/ebay max` · `/ebay add` · `/ebay remove`\n"
-    "🎉 `/bought <card>` picked some up? logs it and stops the alerts once you've got them all\n\n"
+    "🎉 `/bought <card>` picked some up? logs it and stops the alerts once you've got them all\n"
+    "🖥️ `/desk on` the PC opens the checkout tab itself when a target comes in stock (`/desk off`)\n"
+    "⚡ In drop windows the bot also checks that release's listings and your /watch links every 15 seconds.\n\n"
     "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`, "
     "and the /watch, /ebay and /bought commands."
 )
@@ -1077,8 +1091,10 @@ if lw:
 
     @watch.command(name="add", description="Watch a product page; alerts when it's buyable at or under your max")
     @app_commands.describe(link="The product page (any shop)", max="Most you'd pay (AUD). Leave out = any price",
-                           name="A short name for it (otherwise the page's own title)")
-    async def watch_add(inter: discord.Interaction, link: str, max: Optional[float] = None, name: str = ""):
+                           name="A short name for it (otherwise the page's own title)",
+                           qty="Also give a one-click link to buy this many (e.g. the shop's limit)")
+    async def watch_add(inter: discord.Interaction, link: str, max: Optional[float] = None, name: str = "",
+                        qty: Optional[app_commands.Range[int, 1, 10]] = None):
         cfg = await admin_only(inter)
         if cfg is None:
             return
@@ -1087,7 +1103,7 @@ if lw:
             url = lw.clean_url(link.strip().strip("<>"))
             r = await asyncio.to_thread(lw.read, url, _fetch)
             title = name.strip() or (r.get("title") or "")[:120]
-            item, what = await asyncio.to_thread(lw.add, url, max, title, str(inter.user))
+            item, what = await asyncio.to_thread(lw.add, url, max, title, str(inter.user), None, qty)
             _audit(_who(inter), f"watch add {url} max={max} name={title!r}")
         except ValueError as e:
             await inter.followup.send(f"⚠️ {e}", ephemeral=True)
@@ -1097,6 +1113,8 @@ if lw:
             return
         label = item.get("name") or lw.shop_name(url)
         mx = f"max **{tb.money(max)}**" if max else "**any price**"
+        if (item.get("qty") or 1) > 1:
+            mx += f" · alerts include a buy-{item['qty']} link"
         if r.get("ok"):
             within = not max or (r["price"] is not None and r["price"] <= max + 0.001)
             now = f"Right now: **{r['status']}** at **{tb.money(r['price'])}**"
@@ -1363,6 +1381,35 @@ if ew:
         await inter.followup.send(embed=e, ephemeral=True)
 
     bot.tree.add_command(ebay)
+
+
+@bot.tree.command(name="desk", description="Desk mode: the PC opens the checkout tab itself when a target comes in stock")
+@app_commands.default_permissions(manage_guild=True)
+@app_commands.describe(mode="on or off", hours="How long to stay on (default 12, up to 72)")
+@app_commands.choices(mode=[app_commands.Choice(name="on", value="on"), app_commands.Choice(name="off", value="off")])
+async def desk_cmd(inter: discord.Interaction, mode: app_commands.Choice[str], hours: Optional[float] = 12.0):
+    cfg = await admin_only(inter)
+    if cfg is None:
+        return
+    controls = tb.read_controls()
+    if mode.value == "on":
+        h = max(0.25, min(72.0, float(hours or 12)))
+        until = time.time() + h * 3600
+        controls["desk_until"] = round(until)
+        msg = (f"🖥️ **Desk mode on** until {datetime.fromtimestamp(until):%a %I:%M %p}. When a booster box, watched "
+               "sealed product or /watch link comes in stock within your max, the PC opens its checkout tab in your "
+               "browser. At most 2 tabs a minute; never for new-listing alerts. Be signed in to the shops with your "
+               "card saved, so all that's left is paying.")
+    else:
+        controls.pop("desk_until", None)
+        msg = "🖥️ Desk mode off. Alerts still post as usual."
+    try:
+        tb.atomic_write_json(tb.CONTROLS_PATH, controls)
+        _audit(_who(inter), f"desk {mode.value} hours={hours}")
+    except Exception as e:  # noqa: BLE001
+        await fail(inter, e)
+        return
+    await inter.response.send_message(msg, ephemeral=True)
 
 
 @bot.tree.command(name="bought", description="Picked some up? Logs them so the bot stops alerting for that card")

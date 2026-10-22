@@ -51,6 +51,14 @@ EVERY_MINUTES = 15          # how often each copy of the bot asks eBay (the free
 MIN_EVERY = 5
 GST_RATE = 0.10             # eBay adds GST at checkout on items posted to Australia from overseas
 NET_FAILS_BEFORE_POST = 3   # eBay unreachable this many checks in a row -> one status post
+# v2.6: every listing, whatever it is, is skipped if its title has one of these, or its seller's
+# feedback is under these. Change them at the top of ebay_watch.json: "skip_all", "min_feedback_pct",
+# "min_feedback_count" (a seller eBay shows no feedback for is let through).
+SKIP_ALL = ["digital code", "code card", "online code", "code only", "empty box", "box only", "empty case",
+            "case only", "artwork only", "art print", "photo only", "picture only", "read description",
+            "not real", "proxy", "fan made", "fanmade", "custom", "replica", "reproduction"]
+MIN_FEEDBACK_PCT = 98.0
+MIN_FEEDBACK_COUNT = 20
 TIMEOUT = 20
 GREEN, AMBER = 0x2A9D8F, 0xF4A261
 
@@ -131,6 +139,11 @@ def load_watch(path=None):
     if not isinstance(data, dict):
         return [], EVERY_MINUTES
     every = max(MIN_EVERY, _num(data.get("every_minutes")) or EVERY_MINUTES)
+    skip_all = _strings(data["skip_all"]) if "skip_all" in data else list(SKIP_ALL)
+    min_pct = _num(data.get("min_feedback_pct"))
+    min_pct = MIN_FEEDBACK_PCT if min_pct is None else min_pct
+    min_n = _num(data.get("min_feedback_count"))
+    min_n = MIN_FEEDBACK_COUNT if min_n is None else min_n
     cards = []
     for c in data.get("cards") or []:
         if not isinstance(c, dict) or c.get("enabled", True) is False:
@@ -143,7 +156,8 @@ def load_watch(path=None):
             continue
         cards.append({"name": str(c.get("name") or search[0]), "max": mx, "search": search,
                       "must_have": _strings(c.get("must_have")), "exclude": _strings(c.get("exclude")),
-                      "note": str(c.get("note") or ""), "add_gst": c.get("add_gst", True) is not False})
+                      "note": str(c.get("note") or ""), "add_gst": c.get("add_gst", True) is not False,
+                      "skip_all": skip_all, "min_pct": min_pct, "min_n": min_n})
     return cards, every
 
 
@@ -188,6 +202,20 @@ def title_matches(title, card):
         if not any(_has(t, alt) for alt in str(need).split("|")):
             return False
     return not any(_has(t, x) for x in card.get("exclude", []))
+
+
+def seller_ok(item, card):
+    """The seller's feedback meets the minimum (no feedback shown = let through)."""
+    s = item.get("seller") or {}
+    pct, n = _num(s.get("feedbackPercentage")), _num(s.get("feedbackScore"))
+    if pct is not None and pct < (card.get("min_pct") or 0):
+        return False
+    return not (n is not None and n < (card.get("min_n") or 0))
+
+
+def junk(title, card):
+    t = _norm(title)
+    return any(_has(t, x) for x in card.get("skip_all", []))
 
 
 def _amount(a):
@@ -330,6 +358,8 @@ def _search_card(cid, secret, card, now, cap=None):
         for it in items:
             iid = it.get("itemId")
             if not iid or iid in seen or not title_matches(it.get("title"), card):
+                continue
+            if junk(it.get("title"), card) or not seller_ok(it, card):
                 continue
             seen.add(iid)
             c = cost(it, card["add_gst"])

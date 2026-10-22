@@ -85,9 +85,10 @@ def load(path=None):
         if not url.lower().startswith(("http://", "https://")):
             continue
         mx = _num(it.get("max"))
+        q = _num(it.get("qty"))
         out.append({"id": str(it.get("id") or link_id(url)), "url": url, "name": str(it.get("name") or ""),
                     "max": mx if mx and mx > 0 else None, "by": str(it.get("by") or ""),
-                    "added": it.get("added")})
+                    "added": it.get("added"), "qty": max(1, min(10, int(q))) if q else 1})
     return out
 
 
@@ -117,7 +118,7 @@ def link_id(url):
     return hashlib.sha1(clean_url(url).encode("utf-8")).hexdigest()[:8]
 
 
-def add(url, max_price=None, name="", by="", path=None):
+def add(url, max_price=None, name="", by="", path=None, qty=None):
     """Add a link (or update its max/name if it's already watched). Returns (item, "added"|"updated").
     Raises ValueError with a plain-English reason."""
     path = path or WATCH_PATH
@@ -140,12 +141,16 @@ def add(url, max_price=None, name="", by="", path=None):
                 it.update({"max": mx if mx else None, "enabled": True})
                 if name:
                     it["name"] = name
+                if qty:
+                    it["qty"] = max(1, min(10, int(qty)))
                 _write(data, path)
                 return dict(it), "updated"
         if sum(1 for it in items if it.get("enabled", True) is not False) >= MAX_WATCHES:
             raise ValueError(f"You're already watching {MAX_WATCHES} links. Remove one first (/watch remove).")
         it = {"id": wid, "url": url, "name": name, "max": mx if mx else None, "by": by,
               "added": time.strftime("%Y-%m-%d"), "enabled": True}
+        if qty and int(qty) > 1:
+            it["qty"] = max(1, min(10, int(qty)))
         items.append(it)
         _write(data, path)
         return dict(it), "added"
@@ -419,7 +424,7 @@ def make_find(item, r):
         note = r["title"][:200] + "\n" + note
     return {"id": f"watch|{item['id']}", "kind": "Sealed", "name": name[:200], "deck": "", "qty": 1,
             "shop": shop_name(item["url"]), "price": r["price"], "url": item["url"], "cart": r.get("cart", ""),
-            "note": note[:1000], "priority": True, "link_watch": True}
+            "note": note[:1000], "priority": True, "link_watch": True, "cart_qty": int(item.get("qty") or 1)}
 
 
 def check(cfg=None, fetch=None, path=None, items=None):
