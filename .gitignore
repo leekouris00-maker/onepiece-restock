@@ -3,3 +3,7 @@
 *.lock
 __pycache__/
 secrets.json
+# v2.4.1: last good copies of the memory files (PC only)
+*.bak
+*.damaged
+misses.json

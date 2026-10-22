@@ -37,6 +37,7 @@ jobs:
           DISCORD_WEBHOOK_DROPS: ${{ secrets.DISCORD_WEBHOOK_DROPS }}     # optional: the 6-hourly price drops get their own channel
           DISCORD_PING: ${{ secrets.DISCORD_PING }}
           HEARTBEAT_TOPIC: ${{ secrets.HEARTBEAT_TOPIC }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}                   # optional: phone pushes (and "Discord posts failing")
           EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}           # eBay watch (ebay_watch.json); off until set
           EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
           POKEMON_WEBHOOKS: ${{ secrets.POKEMON_WEBHOOKS }}       # Pokémon channels (one line of JSON); quiet until set
@@ -50,7 +51,7 @@ jobs:
         run: |
           git config user.name "restock-bot"
           git config user.email "restock-bot@users.noreply.github.com"
-          for f in seen.json known_products.json status.json price_history.json singles_prices.json; do [ -f "$f" ] && git add "$f"; done
+          for f in seen.json known_products.json status.json price_history.json singles_prices.json events.jsonl; do [ -f "$f" ] && git add "$f"; done
           if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
           git commit -m "Update bot memory"
           git pull --rebase

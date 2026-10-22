@@ -14,7 +14,9 @@ Type these in your Discord server:
     /pricedrops       singles that got the most cheaper in the last 6 hours (hours: to change)
     /drops            releases and drop windows coming up
     /recap            the daily recap, right now
-    /status           is the bot healthy? last check, speed, shops not loading
+    /status           is the bot healthy? last check, speed, shops not loading, Discord posts failing
+    /missed <link>    someone posted it before the bot? paste the link and see what happened (misses.py)
+    /misses           which kind of miss happens most, over the last 30 days
     /help             this list
 
   Pokémon (pokemon_watch.py):
@@ -63,6 +65,10 @@ except ImportError:
 
 import tcg_bot as tb
 
+try:
+    import misses as ms        # v2.4.1: /missed and /misses
+except ImportError:
+    ms = None
 try:
     import pokemon_watch as pw
 except ImportError:          # no pokemon_watch.py next to the bot: no /pokemon commands
@@ -397,6 +403,10 @@ def build_status(cfg):
         fields.append({"name": "Pokémon", "value": (f"{', '.join(secs)} · last check {ago((snap.get('pokemon') or {}).get('ts'))} · "
                                                      if pc["enabled"] and secs else "off · ")
                        + ("channels live ✅" if live else "quiet: no Pokémon channels yet (`/pokemon setup`)")})
+    bad = [(k, h) for k, h in (st.get("discord_health") or {}).items() if isinstance(h, dict) and h.get("fails")]
+    fields.append({"name": "Discord posts", "value": "\n".join(
+        f"⚠️ {tb.hook_label(k)}: failing for {h['fails']} check(s), first {ago(h.get('since'))} · {h.get('error', '')[:120]}"
+        for k, h in bad)[:1000] if bad else "All channels taking the bot's posts ✅"})
     if tb.CONFIG_WARNINGS:
         fields.append({"name": "⚠️ config.json", "value": "\n".join("• " + w for w in tb.CONFIG_WARNINGS)[:1000]})
     return embed(f"🩺 Bot status (PC, v{tb.VERSION})", fields, GREY)
@@ -467,7 +477,9 @@ HELP = (
     "`/pricedrops` singles that got the most cheaper in the last 6 hours (`hours:` to change)\n"
     "`/drops` releases and drop windows coming up\n"
     "`/recap` the daily recap, right now\n"
-    "`/status` last check, speed, shops not loading, drop mode\n\n"
+    "`/status` last check, speed, shops not loading, drop mode\n"
+    "`/missed <link>` someone posted it before the bot? paste the link: the bot says what happened\n"
+    "`/misses` what kind of misses happen most, over the last 30 days\n\n"
     "`/deals`, `/boxes` and `/sealed` answer instantly from the last check; add `fresh:True` to check the shops now.\n\n"
     "⚡ **Pokémon**: `/pokemon releases` · `/pokemon stock` · `/pokemon report` (spotted stock in a store? it pings "
     "everyone in #pokemon-in-store) · `/pokemon instore`\n\n"
@@ -522,6 +534,9 @@ class Bot(discord.Client):
         self.synced = False
 
     async def on_ready(self):
+        if not getattr(self, "watching", False):
+            self.watching = True
+            asyncio.create_task(watch_discord_health())
         if not self.synced:
             for g in self.guilds:                  # per-server commands appear instantly
                 self.tree.copy_global_to(guild=g)
@@ -532,6 +547,38 @@ class Bot(discord.Client):
 
 
 bot = Bot()
+_dm_sent = set()
+
+
+async def watch_discord_health():
+    """v2.4.1: the restock bot posts through webhooks; this bot logs in with its own token, so it can still
+    reach you when a webhook has been deleted. Every 2 minutes it reads status.json and DMs the server
+    owner (and "admin_user_ids") once about each channel whose posts keep failing."""
+    await bot.wait_until_ready()
+    while not bot.is_closed():
+        try:
+            health = tb.load_status().get("discord_health") or {}
+            for k, h in health.items():
+                if not isinstance(h, dict) or not h.get("warned") or (k, h["warned"]) in _dm_sent:
+                    continue
+                _dm_sent.add((k, h["warned"]))
+                text = (f"⚠️ The restock bot can't post in **{tb.hook_label(k)}** ({h.get('copy', 'PC copy')}): "
+                        f"`{str(h.get('error', ''))[:200]}`\n"
+                        + ("That channel's webhook seems to be deleted or reset: make a new one (channel settings > "
+                           "Integrations > Webhooks) and put it in the bot's settings. "
+                           if h.get("code") in tb.HOOK_GONE else "")
+                        + "Finds for that channel are being kept and will post once it works.")
+                ids = {str(x) for x in ((cfg_now().get("alerts") or {}).get("admin_user_ids") or [])}
+                ids |= {str(g.owner_id) for g in bot.guilds if g.owner_id}
+                for uid in ids:
+                    try:
+                        user = bot.get_user(int(uid)) or await bot.fetch_user(int(uid))
+                        await user.send(text)
+                    except Exception as e:  # noqa: BLE001
+                        print(f"   ! couldn't DM {uid} about Discord posts failing ({tb.redact(e)})", flush=True)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! Discord health check skipped ({tb.redact(e)})", flush=True)
+        await asyncio.sleep(120)
 
 
 async def fail(inter, e):
@@ -656,6 +703,39 @@ async def status_cmd(inter: discord.Interaction):
         await inter.response.send_message(embed=build_status(cfg_now()))
     except Exception as e:  # noqa: BLE001
         await fail(inter, e)
+
+
+def build_missed(cfg, link, minutes_ago, note, who):
+    reported = time.time() - max(0.0, float(minutes_ago or 0)) * 60
+    res = ms.explain(tb, cfg, link, reported=reported)
+    if res.get("kind") == "error":
+        return embed("🤔 Not a product link", [], GREY, description=res["headline"])
+    ms.record(tb, res, who, note)
+    lines = [res["headline"]] + res.get("lines", [])
+    if res.get("title"):
+        lines.append(f"Shop's title: *{res['title'][:200]}*")
+    color = {"first": TEAL, "late": ORANGE, "seen": BLUE, "not_found": PURPLE, "filtered": ORANGE,
+             "not_watched": GREY}.get(res["kind"], GREY)
+    return embed(f"{ms.ICON.get(res['kind'], '•')} {ms.NAME.get(res['kind'], 'Miss')}", [], color,
+                 description="\n\n".join(lines)[:4000] + f"\n\n{res['link']}",
+                 footer="Logged for /misses. Thanks: this is how the bot learns where it's weak.")
+
+
+def build_misses(cfg, days):
+    head, lines = ms.summary(tb, days)
+    return embed(f"🧭 {head}", [], BLUE, description="\n".join(lines)[:4000])
+
+
+if ms:
+    @bot.tree.command(name="missed", description="Someone posted it before the bot? Paste the link and see why")
+    @app_commands.describe(link="The product page link", minutes_ago="How many minutes ago you saw it elsewhere (0 = now)",
+                           note="Where you saw it, e.g. Fellowship")
+    async def missed_cmd(inter: discord.Interaction, link: str, minutes_ago: float = 0.0, note: str = ""):
+        await respond(inter, build_missed, link, minutes_ago, note, str(inter.user))
+
+    @bot.tree.command(name="misses", description="What kind of misses happen most (last 30 days)")
+    async def misses_cmd(inter: discord.Interaction, days: int = 30):
+        await respond(inter, build_misses, max(1, min(365, days)))
 
 
 @bot.tree.command(name="help", description="What the restock bot's commands do")

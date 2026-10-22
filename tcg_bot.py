@@ -28,6 +28,15 @@ Checks Australian shops for:
      "sweep_queries": ["PEB-01"], "new_sealed": false, "new_sealed_packs": true (single packs too).
      The first v2.4 check only remembers what's listed already, so upgrading doesn't flood Discord.
 
+What's new in v2.4.1 (nothing to change in config.json):
+  * The memory files (seen, known_products, status, price_history, singles_prices, recap) keep their last
+    good version as <name>.bak. A damaged one is swapped for it automatically (and a status post says so).
+  * If Discord stops taking the bot's posts in a channel (webhook deleted: straight away; other errors: 3
+    checks in a row), you get one phone push through ntfy ("ntfy_topic" in alerts / NTFY_TOPIC secret), a
+    line in /status and a DM from the commands bot, then another push when it works again.
+  * Every alert's time goes in events.jsonl, so /missed (commands bot, misses.py) can say whether the bot
+    was first, late, saw it without alerting, skipped it (and why), or doesn't read that shop.
+
 Singles prices are for near mint when it's in stock, otherwise the cheapest condition that is (the
 alert says which, e.g. "$2.00 (LP)"). Before v2.3 Elemental quoted its cheapest condition's price even
 when that copy was sold out.
@@ -132,7 +141,7 @@ try:
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
 
-VERSION = "2.4.0"
+VERSION = "2.4.1"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -301,6 +310,7 @@ SWEEP_CODE_RE = re.compile(r"\b(OP|EB|PRB|PEB|ST|DP|IB|TS)-?(\d{1,2})\b", re.I)
 # ---- v2.4: "now buyable" - a listed product (not a booster box or watched item, which alert through
 # your max prices already) that was not buyable for at least this long and now is: pre-order or stock opened
 OPEN_MIN_GAP = 20 * 60
+ALERT_LOG_SINCE = datetime(2026, 10, 23).timestamp()   # v2.4.1: alert times are logged in events.jsonl from here on
 
 
 # ================================================================ fast, polite HTTP (stdlib only)
@@ -873,6 +883,8 @@ def begin_check(cfg, status=None, drop=None, skip_down=True):
     """Reset the per-check counters and apply settings (user agent, robots, shops in their quiet period)."""
     with _host_lock:
         _host_results.clear()
+    with _hook_lock:
+        _hook_results.clear()
     _seen_errors.clear()
     HTTP.reset_metrics()
     SEALED_OPTS.update(new=bool((cfg or {}).get("new_sealed", True)),
@@ -910,15 +922,48 @@ def run_metrics():
 
 
 # ---------------------------------------------------------------- helpers
+# v2.4.1: the bot's memory files keep a copy of their last good version (<name>.bak). If one is ever
+# damaged (a crash mid-copy, a disk hiccup, a bad hand edit), the bot loads the .bak instead of starting
+# that file over - which for price_history.json would have lost every "lowest seen" price for good.
+# A file you delete on purpose (to reset it) is NOT brought back from its .bak.
+BACKUP_FILES = {"seen.json", "known_products.json", "status.json", "price_history.json", "singles_prices.json",
+                "recap.json", "misses.json"}
+RESTORED = []           # files restored from their .bak this run, for a status post: [(name, saved at)]
+
+
+def _parse_json_file(path):
+    with open(path, encoding="utf-8-sig") as f:
+        return json.load(f)
+
+
 def read_json(path, default=None):
-    """A JSON file, or `default` if it's missing or unreadable (a Notepad BOM is fine)."""
+    """A JSON file, or `default` if it's missing or unreadable (a Notepad BOM is fine). A damaged memory
+    file is swapped for its last good copy (.bak); the damaged one is kept as <name>.damaged."""
     try:
-        with open(path, encoding="utf-8-sig") as f:
-            return json.load(f)
+        return _parse_json_file(path)
     except FileNotFoundError:
         return default
     except (ValueError, OSError) as e:
-        print(f"   ! {os.path.basename(path)} couldn't be read ({e}); starting it fresh")
+        name = os.path.basename(path)
+        bak = path + ".bak"
+        if name in BACKUP_FILES and os.path.exists(bak):
+            try:
+                data = _parse_json_file(bak)
+                saved = datetime.fromtimestamp(os.path.getmtime(bak))
+                if not DRY_RUN[0]:
+                    try:
+                        os.replace(path, path + ".damaged")
+                        with open(bak, "rb") as src:
+                            atomic_write_bytes(path, src.read())
+                    except OSError:
+                        pass
+                print(f"   ! {name} was damaged ({e}); loaded its last good copy from {saved:%d %b %I:%M %p}")
+                if all(n != name for n, _ in RESTORED):
+                    RESTORED.append((name, saved))
+                return data
+            except (ValueError, OSError):
+                pass
+        print(f"   ! {name} couldn't be read ({e}); starting it fresh")
         return default
 
 
@@ -927,10 +972,49 @@ def atomic_write_json(path, obj, indent=1, sort_keys=False, ensure_ascii=True):
     atomic_write_text(path, json.dumps(obj, indent=indent, sort_keys=sort_keys, ensure_ascii=ensure_ascii))
 
 
+def _keep_backup(path):
+    """Before a memory file is replaced: copy the current version to <name>.bak, but only if it reads as
+    good JSON, so a damaged file never overwrites the last good copy."""
+    if os.path.basename(path) not in BACKUP_FILES:
+        return
+    try:
+        with open(path, "rb") as f:
+            raw = f.read()
+        json.loads(raw.decode("utf-8-sig"))
+    except (OSError, ValueError):
+        return
+    try:
+        atomic_write_bytes(path + ".bak", raw)
+    except OSError as e:
+        print(f"   ! couldn't keep a backup of {os.path.basename(path)} ({e})")
+
+
+def atomic_write_bytes(path, raw):
+    """Bytes to a file through a temp file and a rename (used for the .bak copies)."""
+    tmp = f"{path}.{os.getpid()}.{threading.get_ident()}.tmp"
+    with open(tmp, "wb") as f:
+        f.write(raw)
+    try:
+        for i in range(10):
+            try:
+                os.replace(tmp, path)
+                return
+            except PermissionError:      # Windows: another program has it open for a moment
+                time.sleep(0.05 * (i + 1))
+        with open(path, "wb") as f:
+            f.write(raw)
+    finally:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+
+
 def atomic_write_text(path, data):
     """atomic_write_json's file writing, for text that's already laid out."""
     if DRY_RUN[0]:
         return
+    _keep_backup(path)
     tmp = f"{path}.{os.getpid()}.{threading.get_ident()}.tmp"
     with open(tmp, "w", encoding="utf-8", newline="\n") as f:
         f.write(data)
@@ -2762,7 +2846,7 @@ def discord_send(alerts, hook, payload, tries=3):
     comps = bool(payload.get("components")) and _buttons_ok[0]
     if not comps:
         payload = {k: v for k, v in payload.items() if k != "components"}
-    last = None
+    last, code = None, None
     for attempt in range(tries):
         wait = _hook_pace.get(hook, 0) - time.time()
         if wait > 0:
@@ -2780,6 +2864,7 @@ def discord_send(alerts, hook, payload, tries=3):
             except ValueError:
                 pass
         if 200 <= status < 300:
+            _note_hook(hook, True)
             return True
         if status == 429:
             ra = _retry_after(h, body) or 1.0
@@ -2800,9 +2885,108 @@ def discord_send(alerts, hook, payload, tries=3):
         last = f"HTTP {status}: {body[:200].decode('utf-8', 'replace')}"
         if status == 404:
             last += " (this webhook was deleted - make a new one)"
+        code = status
         break
     print(f"   ! Discord post failed: {redact(last)}")
+    _note_hook(hook, False, redact(last), code)
     return False
+
+
+# ---------------------------------------------------------------- v2.4.1: is Discord taking our posts?
+# Every alert and status post goes through a Discord webhook, so if a webhook is deleted or Discord is
+# down, the bot's own "something's wrong" post can't get through either. So each check notes which
+# channels' posts went through. A channel whose posts fail for DISCORD_FAIL_CHECKS checks in a row (or
+# straight away when Discord says the webhook is gone: 401/404) gets one phone push through ntfy
+# ("ntfy_topic" in alerts / NTFY_TOPIC secret), a line in /status, and a DM from the commands bot
+# (PC). Another push says when it works again. Finds that didn't get through keep being retried as before.
+DISCORD_FAIL_CHECKS = 3
+HOOK_GONE = {401, 403, 404}
+_hook_results = {}          # webhook -> [ok, failed, last error, last HTTP status]
+_hook_lock = threading.Lock()
+HOOK_LABELS = {"discord_webhook_boxes": "#booster-boxes", "discord_webhook_singles": "#singles-alerts",
+               "discord_webhook_sealed": "#sealed-alerts", "discord_webhook_ebay": "#ebay-resale",
+               "discord_webhook_status": "#bot-status", "discord_webhook_drops": "price drops",
+               "discord_webhook_recap": "daily recap", "discord_webhook": "main channel"}
+
+
+def _note_hook(hook, ok, err="", code=None):
+    with _hook_lock:
+        r = _hook_results.setdefault(hook, [0, 0, "", None])
+        if ok:
+            r[0] += 1
+        else:
+            r[1] += 1
+            r[2], r[3] = err, code
+
+
+def hook_key(alerts, hook):
+    """Which setting a webhook came from ("discord_webhook_boxes", "pokemon:mega-evolution"...). Only these
+    names are saved (status.json is public in the cloud copy), never the webhook address itself."""
+    for k in HOOK_LABELS:
+        if (alerts or {}).get(k) == hook:
+            return k
+    for k, v in ((alerts or {}).get("pokemon_webhooks") or {}).items() if isinstance(
+            (alerts or {}).get("pokemon_webhooks"), dict) else []:
+        if v == hook:
+            return f"pokemon:{k}"
+    return "webhook"
+
+
+def hook_label(key):
+    if key.startswith("pokemon:"):
+        return f"Pokémon {key[8:]}"
+    return HOOK_LABELS.get(key, "a Discord channel")
+
+
+def discord_health(cfg, status, now=None):
+    """After a check's posts: update status["discord_health"] and send the phone push / recovery push.
+    Returns the channels that are failing now ([(key, entry)])."""
+    alerts = cfg.get("alerts") or {}
+    now = round(now or time.time())
+    health = status.setdefault("discord_health", {})
+    with _hook_lock:
+        results = dict(_hook_results)
+    per_key = {}
+    for hook, (ok, bad, err, code) in results.items():
+        k = hook_key(alerts, hook)
+        p = per_key.setdefault(k, [0, 0, "", None])
+        p[0] += ok
+        p[1] += bad
+        if bad:
+            p[2], p[3] = err, code
+    for k, (ok, bad, err, code) in per_key.items():
+        h = health.get(k) or {"fails": 0}
+        if ok:
+            if h.get("warned"):
+                down_for = max(1, (now - int(h.get("since") or now)) // 60)
+                text = (f"✅ Discord is taking the bot's posts in {hook_label(k)} again (it was failing for about "
+                        f"{down_for} min). Alerts that didn't get through have been posted now or will be next check.")
+                push_phone(cfg, "Restock bot: Discord working again", text)
+                post_status(cfg, text, GREEN)
+            health.pop(k, None)
+            continue
+        if not bad:
+            continue
+        h["fails"] = int(h.get("fails") or 0) + 1
+        h.setdefault("since", now)
+        h["error"] = str(err)[:200]
+        h["code"] = code
+        h["copy"] = copy_label(cfg)
+        if not h.get("warned") and (h["fails"] >= DISCORD_FAIL_CHECKS or code in HOOK_GONE):
+            gone = code in HOOK_GONE
+            text = (f"The restock bot can't post in {hook_label(k)}: "
+                    + ("Discord says that channel's webhook doesn't exist any more (deleted or reset). Make a new "
+                       "webhook for it and put it in the bot's settings." if gone else
+                       f"its posts have failed for {h['fails']} checks in a row ({h['error']}).")
+                    + " Finds for that channel are being kept and will post once it works.")
+            print(f"   !!! {text}")
+            if IN_ACTIONS:
+                print(f"::error::{text}")
+            if (alerts.get("ntfy_topic")):
+                push_phone(cfg, "Restock bot: Discord posts failing", text)
+            h["warned"] = now
+        health[k] = h
+    return [(k, h) for k, h in health.items() if h.get("warned")]
 
 
 EMBED_BUDGET = 5600       # Discord allows 6000 characters across a message's embeds; keep a margin
@@ -3157,7 +3341,7 @@ def record_history(by_shop, now=None):
             h = hist.get(key)
             if h is None:
                 h = hist[key] = {"name": l["name"], "shop": l["shop"], "url": l["url"], "points": [],
-                                 "avail": avail, "since": ts}
+                                 "avail": avail, "since": ts, "first": ts}     # v2.4.1: when first seen, for /missed
                 changed = True
             elif h.get("avail") != avail:
                 events.append({"t": ts, "event": "in_stock" if avail else "sold_out", "id": key, "name": l["name"],
@@ -3524,6 +3708,11 @@ def run_once(cfg, args, drop=None):
         status["last_check"] = f"{datetime.now():%Y-%m-%d %H:%M:%S}"
         status["last_found"] = len(finds)
     posts = shop_health(cfg, status)
+    for name, saved in RESTORED:
+        posts.append((f"🩹 **{name} was damaged**, so the bot loaded its last good copy (saved {saved:%d %b %I:%M %p}) "
+                      f"and carried on. The damaged file is kept as {name}.damaged in case you want to look at it.",
+                      AMBER))
+    RESTORED.clear()
     if ebay_watch:
         msg = ebay_watch.status_message(status, ebay)
         if msg:
@@ -3608,6 +3797,11 @@ def run_once(cfg, args, drop=None):
             for f in deliver:
                 if f["id"] not in undelivered:
                     status.get("held", {}).pop(f["id"], None)
+        # v2.4.1: when each alert went out, so /missed can say whether the bot was first or late
+        log_events([{"t": round(time.time()), "event": "alert", "id": f["id"], "kind": f.get("kind"),
+                     "name": f.get("name"), "shop": f.get("shop"), "url": f.get("url"), "price": f.get("price"),
+                     "copy": "cloud" if role == "listen" else "pc"}
+                    for f in deliver if f["id"] not in undelivered and f.get("url")])
     if role == "send":
         send_heartbeat(cfg, force=(bool(deliver) and not undelivered) or bool(poke_posted), status=status)
     if undelivered:
@@ -3626,6 +3820,7 @@ def run_once(cfg, args, drop=None):
 
     metrics = run_metrics()
     if not DRY_RUN[0]:
+        discord_health(cfg, status)
         save_state(kept)
         if known is not None:
             save_known(known)
