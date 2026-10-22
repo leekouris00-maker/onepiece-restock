@@ -165,9 +165,15 @@ def credentials(cfg=None):
 
 
 # ---------------------------------------------------------------- matching and prices
+# Half sizes ("10.5", "10,5", "10½", "10 1/2") become one word ("10h5") before punctuation is dropped,
+# so "US10.5" can't pass as "US10" (it used to: "us10.5" became "us10 5", and "us10" matched).
+_HALF = re.compile(r"(\d)(?:\s?[.,]5(?!\d)|\s?½|\s+1\s?/\s?2(?!\d))")
+
+
 def _norm(s):
     """Lower case, punctuation to spaces, padded: whole-word matching ("psa 10" isn't in "psa 100")."""
-    return " " + re.sub(r"[^a-z0-9]+", " ", str(s or "").lower()).strip() + " "
+    s = _HALF.sub(r"\1h5", str(s or "").lower())
+    return " " + re.sub(r"[^a-z0-9]+", " ", s).strip() + " "
 
 
 def _has(text_n, phrase):
@@ -241,6 +247,17 @@ def make_find(card, item, c):
     return {"id": f"ebay|{iid}", "kind": "Single", "name": card["name"], "deck": "eBay watch", "qty": 1,
             "shop": "eBay" + (f" (from {where})" if where else ""), "price": total, "url": url, "cart": "",
             "note": note[:1000], "priority": True, "ebay": True}
+
+
+def _multi(find, names):
+    """One find for a listing that matches several watched cards: named after all of them, flagged as a
+    set so it's read carefully (a 'set' can be missing one, e.g. 'NO LUFFY')."""
+    f = dict(find)
+    short = [re.sub(r"^Nike x One Piece\s+", "", n) for n in names]
+    f["name"] = " + ".join(short)[:200]
+    f["note"] = (f"⚠️ One listing, {len(names)} of your cards - check exactly what's included before buying.\n"
+                 + find["note"])[:1000]
+    return f
 
 
 # ---------------------------------------------------------------- talking to eBay
@@ -337,13 +354,19 @@ def check(cfg, status=None, force=False, now=None, watch_path=None):
         return Result(_cache["finds"], active=True, cards=cards, every=every)
     status["ebay_ts"] = round(now)
     try:
-        found = {}
+        found, covers = {}, {}
         for card in cards:
             for it, c in _search_card(cid, secret, card, now):
                 if c[3] <= card["max"] + 0.001:
                     f = make_find(card, it, c)
+                    covers.setdefault(f["id"], [])
+                    if card["name"] not in covers[f["id"]]:
+                        covers[f["id"]].append(card["name"])
                     if f["id"] not in found or f["price"] < found[f["id"]]["price"]:
                         found[f["id"]] = f
+        for fid, names in covers.items():       # one listing, several cards (e.g. a 3-card set): one alert
+            if len(names) > 1:
+                found[fid] = _multi(found[fid], names)
     except EbayError as e:
         print(f"   ! eBay watch: {e}")
         return Result(_cache["finds"], problem=str(e), kind=e.kind, active=True, cards=cards, every=every)

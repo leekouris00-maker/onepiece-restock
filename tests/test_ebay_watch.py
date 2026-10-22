@@ -315,6 +315,56 @@ class RealListTests(unittest.TestCase):
         self.assertFalse(ew.title_matches("Nike Air Max Plus One Piece Gomu Gomu Womens US 10", g))
         self.assertFalse(ew.title_matches("One Piece x Nike Air Max Plus Gomu Gomu DON!! Promo Card", g))
 
+    def test_half_sizes_never_pass_as_whole_sizes(self):
+        cards, _ = ew.load_watch(REAL_FILE)
+        g = next(c for c in cards if "Gomu Gomu - US 10" in c["name"])
+        # the real listing that slipped through on 22 Oct 2026
+        self.assertFalse(ew.title_matches(
+            'IR0968-500 One Piece × Nike Air Max Plus "Devil Fruits/Gomu Gomu" US10.5 ✅✅', g))
+        for size in ("US10.5", "US 10.5", "Size 10½", "US 10 1/2", "US M10.5", "sz 10,5", "10.5 US"):
+            self.assertFalse(ew.title_matches(f"Nike Air Max Plus One Piece Gomu Gomu {size}", g), size)
+        for size in ("US10", "US 10", "Size 10", "US M10", "Men's US 10", "10 US"):
+            self.assertTrue(ew.title_matches(f"Nike Air Max Plus One Piece Gomu Gomu {size}", g), size)
+        self.assertTrue(ew.title_matches(
+            'IR0968-500 One Piece × Nike Air Max Plus "Devil Fruits/Gomu Gomu" (Men\'s US 10)', g))
+
+    def test_half_size_rule_leaves_other_titles_alone(self):
+        self.assertEqual(ew._norm("Luffy PSA 10 ST10-006 $10.50"), " luffy psa 10 st10 006 10 50 ")
+        self.assertTrue(ew.title_matches("PSA 10 Luffy Promo ST10-006 ONE PIECE DAY 2024 Japanese", luffy()))
+
+
+class MultiCardTests(Base):
+    """A listing that matches several watched cards (a set) is one alert, named after all of them."""
+
+    def test_set_is_one_alert(self):
+        with open(REAL_FILE, encoding="utf-8") as f:
+            data = json.load(f)
+        data["cards"] = [c for c in data["cards"] if c["name"].endswith("DON!! card (Japanese)")]
+        path = os.path.join(tempfile.mkdtemp(), "ebay_watch.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+        fake = FakeEbay([
+            item(900, "NIKE x ONE PIECE 3 DON!! Cards Set Gomu Mera Ope Japanese Promo NO LUFFY", 85, post=5, country="JP"),
+            item(901, "PRESALE Nike x ONE PIECE TCG Mera Mera DON!! Air Max Plus Jump Promo Japanese", 110, post=10, country="JP"),
+        ])
+        ew._urlopen = fake
+        out, old = io.StringIO(), sys.stdout
+        sys.stdout = out
+        try:
+            res = ew.check(self.cfg, {}, watch_path=path, now=1_000_000)
+        finally:
+            sys.stdout = old
+        by_id = {f["id"]: f for f in res.finds}
+        self.assertEqual(len(res.finds), 2)
+        s = by_id["ebay|v1|900|0"]
+        self.assertEqual(s["name"], "Gomu Gomu DON!! card (Japanese) + Mera Mera DON!! card (Japanese) + "
+                                    "Ope Ope DON!! card (Japanese)")
+        self.assertIn("3 of your cards", s["note"])
+        self.assertEqual(s["price"], 99.0)
+        one = by_id["ebay|v1|901|0"]
+        self.assertEqual(one["name"], "Nike x One Piece Mera Mera DON!! card (Japanese)")
+        self.assertNotIn("of your cards", one["note"])
+
     def test_nike_don_cards(self):
         cards, _ = ew.load_watch(REAL_FILE)
         en = next(c for c in cards if c["name"] == "Nike x One Piece Gomu Gomu DON!! card (English)")
