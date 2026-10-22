@@ -1,10 +1,151 @@
 {
+ "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1792664803,
-  "Good Games": 1792664803
+  "Elemental Arcade": 1792672939,
+  "Good Games": 1792672939
  },
  "drops_slot": "2026-10-22 18",
- "held": {},
+ "ebay_fails": 0,
+ "ebay_state": "ok",
+ "ebay_ts": 1792672929,
+ "held": {
+  "ebay|v1|178490730493|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|178490730493|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Mera Mera DON!! card (English)",
+    "note": "[ONE PIECE TCG x Nike Mera Mera no Mi DON!! Promo Card English 2026](https://www.ebay.com.au/itm/178490730493)\nA$250.39 item + free postage + A$25.04 GST (est.) \u00b7 seller feedback 100.0% (47)\nCame with in-store pair purchases outside Japan. Not much sales data yet - ~A$250-300 guess based on the other two.",
+    "price": 275.43,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Korea)",
+    "url": "https://www.ebay.com.au/itm/178490730493"
+   },
+   "t": 1792672945
+  },
+  "ebay|v1|366683562606|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|366683562606|0",
+    "kind": "Single",
+    "name": "Gomu Gomu DON!! card (Japanese) + Mera Mera DON!! card (Japanese) + Ope Ope DON!! card (Japanese)",
+    "note": "\u26a0\ufe0f One listing, 3 of your cards - check exactly what's included before buying.\n[NIKE x ONE PIECE 3 DON!! Cards Set Gomu Mera Ope Japanese Promo NO LUFFY](https://www.ebay.com.au/itm/366683562606)\nA$46.93 item + A$46.93 postage + A$9.39 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 100.0% (47)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027, 10 of each DON per set) - expect prices to drop, lower this then.",
+    "price": 103.25,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Japan)",
+    "url": "https://www.ebay.com.au/itm/366683562606"
+   },
+   "t": 1792672945
+  },
+  "ebay|v1|366725971268|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|366725971268|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Mera Mera DON!! card (English)",
+    "note": "[ONE PIECE TCG x Nike Mera Mera no Mi DON!! Promo Card English 2026](https://www.ebay.com.au/itm/366725971268)\nA$269.17 item + free postage + A$26.92 GST (est.) \u00b7 seller feedback 100.0% (25)\nCame with in-store pair purchases outside Japan. Not much sales data yet - ~A$250-300 guess based on the other two.",
+    "price": 296.09,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Japan)",
+    "url": "https://www.ebay.com.au/itm/366725971268"
+   },
+   "t": 1792672945
+  },
+  "ebay|v1|820082175327|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|820082175327|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Gomu Gomu DON!! card (Japanese)",
+    "note": "[PRESALE Nike x ONE PIECE TCG Gomu Gomu DON!! Air Max Plus Jump Promo Japanese](https://www.ebay.com.au/itm/820082175327)\nA$123.62 item + free postage + A$12.36 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 99.8% (474)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027, 10 of each DON per set) - expect prices to drop, lower this then.",
+    "price": 135.98,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Japan)",
+    "url": "https://www.ebay.com.au/itm/820082175327"
+   },
+   "t": 1792672945
+  },
+  "ebay|v1|820082180571|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|820082180571|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Mera Mera DON!! card (Japanese)",
+    "note": "[PRESALE Nike x ONE PIECE TCG Mera Mera DON!! Air Max Plus Jump Promo Japanese](https://www.ebay.com.au/itm/820082180571)\nA$123.62 item + free postage + A$12.36 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 99.8% (474)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027) - expect prices to drop, lower this then.",
+    "price": 135.98,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Japan)",
+    "url": "https://www.ebay.com.au/itm/820082180571"
+   },
+   "t": 1792672945
+  },
+  "ebay|v1|820082186334|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|820082186334|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Ope Ope DON!! card (Japanese)",
+    "note": "[PRESALE Nike x ONE PIECE TCG Ope Ope DON!! Air Max Plus Jump Promo Japanese](https://www.ebay.com.au/itm/820082186334)\nA$123.62 item + free postage + A$12.36 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 99.8% (474)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027). StockX ask ~US$340 but best offer only ~US$66 - real market is much lower.",
+    "price": 135.98,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Japan)",
+    "url": "https://www.ebay.com.au/itm/820082186334"
+   },
+   "t": 1792672945
+  },
+  "ebay|v1|820247640057|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|820247640057|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Mera Mera DON!! card (English)",
+    "note": "[ONE PIECE TCG x Nike 2026 Mera Mera no Mi DON!! Promo Card 1P English NEW SEALED](https://www.ebay.com.au/itm/820247640057)\nA$300.00 item + free postage \u00b7 seller feedback 100.0% (11)\nCame with in-store pair purchases outside Japan. Not much sales data yet - ~A$250-300 guess based on the other two.",
+    "price": 300.0,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Australia)",
+    "url": "https://www.ebay.com.au/itm/820247640057"
+   },
+   "t": 1792672945
+  },
+  "ebay|v1|880035734451|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|880035734451|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Ope Ope DON!! card (English)",
+    "note": "[One Piece x Nike Air Max Plus Ope Ope Don Promo Card (English) Limited Edition](https://www.ebay.com.au/itm/880035734451)\nA$226.92 item + A$27.27 postage + A$25.42 GST (est.) \u00b7 seller feedback 100.0% (1,788)\nCame with in-store pair purchases outside Japan. Sold ~US$170+post (~A$255) Sep 2026.",
+    "price": 279.61,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from USA)",
+    "url": "https://www.ebay.com.au/itm/880035734451"
+   },
+   "t": 1792672945
+  }
+ },
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
  "offline_streak": 0,
@@ -29,7 +170,7 @@
   "Pocket Games": 99,
   "TCGroup": 99
  },
- "pc_on": false,
+ "pc_on": true,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -4475,5 +4616,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1792664802
+ "sweep_ts": 1792672929
 }
