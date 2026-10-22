@@ -329,3 +329,22 @@ class BotRuns(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BoxAndPackListings(unittest.TestCase):
+    """23 Oct 2026: Pocket Games' '... Booster Box & Pack [JP]' listings alerted as $9-$20 boxes."""
+
+    def test_jp_in_brackets_is_japanese(self):
+        for t in ("One Piece TCG (OP-13) – Carrying On His Will Booster Box & Pack [JP]",
+                  "OP-13 Booster Box [JPN]", "OP-13 Booster Box JPN"):
+            self.assertFalse(tb.is_box_title(t), t)
+        self.assertTrue(tb.is_box_title("One Piece OP-13 Carrying On His Will Booster Box"))
+
+    def test_box_and_pack_priced_by_the_box(self):
+        vs = [{"id": 1, "title": "Pack", "price": "9.00", "available": True},
+              {"id": 2, "title": "Booster Box", "price": "189.00", "available": True}]
+        self.assertEqual(tb.cheapest_available(vs, cents=False), (189.0, 2))
+        vs[1]["available"] = False
+        self.assertEqual(tb.cheapest_available(vs, cents=False), (None, None))   # only packs left: no box
+        plain = [{"id": 3, "title": "Default Title", "price": "199.00", "available": True}]
+        self.assertEqual(tb.cheapest_available(plain, cents=False), (199.0, 3))

@@ -216,7 +216,7 @@ DEFAULT_EXCLUDE = [
     "championship", "store treasure", "beginners deck", "anniversary", "sp gold", "sp silver",
     "playmat", "jumbo", "signed",
 ]
-BOX_EXCLUDE = ["japanese", "(jp)", " jp ", "asia", "asian", "chinese", "korean",
+BOX_EXCLUDE = ["japanese", "(jp)", " jp ", "[jp]", "jpn", "asia", "asian", "chinese", "korean",
                "case", "sleeved", "single pack", "booster pack", "display case"]
 
 BOX_KINDS = ("Booster box", "Sealed", "New listing")
@@ -268,7 +268,7 @@ EXTRA_SHOPIFY_SEARCH = [
 ]
 SEARCH_QUERIES = ["one piece booster box", "one piece booster display", "one piece card game"]
 
-WATCH_EXCLUDE = ["japanese", "(jp)", " jp ", "chinese", "korean", "asia", "simplified", "traditional"]
+WATCH_EXCLUDE = ["japanese", "(jp)", " jp ", "[jp]", "jpn", "chinese", "korean", "asia", "simplified", "traditional"]
 
 MAX_PAGES = 4                   # Shopify collections: read up to 4 pages of 250 (1,000 products)
 PREORDER_RE = re.compile(r"\bpre[\s_-]?(?:orders?|sale)\b", re.I)
@@ -1386,9 +1386,22 @@ def woo_cart_link(url, product_id, qty=1):
     return f"{origin(url)}/checkout/?add-to-cart={product_id}&quantity={max(1, int(qty))}"
 
 
+_BOXY = re.compile(r"\b(box|display)\b", re.I)
+_PACKY = re.compile(r"\b(pack|packs|single)\b", re.I)
+
+
+def unit_variants(variants):
+    """A "Booster Box & Pack" listing sells both: only the box variants count, so a $9 pack can't
+    pass as a $9 box (Pocket Games, 23 Oct 2026). Listings without such options are unchanged."""
+    vs = [v for v in variants or [] if isinstance(v, dict)]
+    boxy = [v for v in vs if _BOXY.search(str(v.get("title") or ""))]
+    packy = [v for v in vs if _PACKY.search(str(v.get("title") or "")) and v not in boxy]
+    return boxy if boxy and packy else vs
+
+
 def cheapest_available(variants, cents):
     """(price in dollars, variant id) of the cheapest in-stock variant, or (None, None)."""
-    avail = [v for v in variants or [] if v.get("available")]
+    avail = [v for v in unit_variants(variants) if v.get("available")]
     if not avail:
         return None, None
     v = min(avail, key=lambda v: float(v.get("price") or 0))
@@ -1468,7 +1481,7 @@ def shopify_boxes(shop_name, url, max_price, watch=(), must_include=None, max_pa
         page = f"{base}/products/{handle}"
         is_pre = is_preorder(title, p.get("tags", ""))
         price, vid = cheapest_available(variants, cents=False)
-        all_prices = [float(v["price"]) for v in variants if v.get("price")]
+        all_prices = [float(v["price"]) for v in unit_variants(variants) if v.get("price")]
         note = ", ".join(x for x in ((w["name"] if w else ""), ("pre-order" if is_pre else "")) if x)
         listings.append({
             "id": f"list|{shop_name}|{handle}", "box_id": f"{prefix}|{shop_name}|{handle}", "group": group,
