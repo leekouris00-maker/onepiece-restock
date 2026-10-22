@@ -1,4 +1,4 @@
-{"v":1,"shops":{"Elemental Arcade":{"base":"https://elementalarcade.com.au","n":3312,"scans":[1792513720,1792525203,1792535960,1792544092,1792549201,1792560344,1792578241,1792593447,1792610642,1792621810]},"Good Games":{"base":"https://tcg.goodgames.com.au","n":1261,"scans":[1792513720,1792525203,1792535960,1792544092,1792549201,1792560344,1792578241,1792593447,1792610642,1792621810]}},"items":{
+{"v":1,"shops":{"Elemental Arcade":{"base":"https://elementalarcade.com.au","n":3311,"scans":[1792513720,1792525203,1792535960,1792544092,1792549201,1792560344,1792578241,1792593447,1792610642,1792621810,1792630225]},"Good Games":{"base":"https://tcg.goodgames.com.au","n":1261,"scans":[1792513720,1792525203,1792535960,1792544092,1792549201,1792560344,1792578241,1792593447,1792610642,1792621810,1792630225]}},"items":{
 "Elemental Arcade|absalom-op06081-wings-of-the-captain":{"n":"Absalom - OP06-081 [Wings of the Captain]","v":54899468501283,"p":[[1792513720,1.0,1]]},
 "Elemental Arcade|absalom-op14100-the-azure-seas-seven":{"n":"Absalom - OP14-100 [The Azure Sea's Seven]","v":54899468665123,"p":[[1792513720,1.0,1]]},
 "Elemental Arcade|absalom-op15079-adventure-on-kamis-island":{"n":"Absalom - OP15-079 [Adventure on Kami's Island]","v":54899468828963,"p":[[1792513720,0.5,1]]},
@@ -352,7 +352,7 @@
 "Elemental Arcade|buggy-sp-op03008-wings-of-the-captain":{"n":"Buggy (SP) - OP03-008 [Wings of the Captain]","v":54899591348515,"p":[[1792513720,217.6,1],[1792593447,219.3,1]]},
 "Elemental Arcade|buggy-st03011-starter-deck-3-the-seven-warlords-of-the-sea":{"n":"Buggy - ST03-011 [Starter Deck 3: The Seven Warlords of The Sea]","v":54899591512355,"p":[[1792513720,0.5,1]]},
 "Elemental Arcade|buggy-st17003-reprint-premium-booster-the-best-vol-2":{"n":"Buggy - ST17-003 (Reprint) [Premium Booster -The Best- Vol. 2]","v":54899592298787,"p":[[1792513720,0.5,1]]},
-"Elemental Arcade|buggy-st25004-starter-deck-25-blue-buggy":{"n":"Buggy - ST25-004 [Starter Deck 25: BLUE Buggy]","v":54899592659235,"p":[[1792513720,2.0,1]]},
+"Elemental Arcade|buggy-st25004-starter-deck-25-blue-buggy":{"n":"Buggy - ST25-004 [Starter Deck 25: BLUE Buggy]","v":54899592659235,"p":[[1792513720,2.0,1],[1792630225,2.0,0]],"gone":1792630225},
 "Elemental Arcade|building-snake-op09008-emperors-in-the-new-world":{"n":"Building Snake - OP09-008 [Emperors in the New World]","v":54899592823075,"p":[[1792513720,0.7,1]]},
 "Elemental Arcade|building-snake-op17025-the-worlds-strongest-warriors":{"n":"Building Snake - OP17-025 [The World's Strongest Warriors]","v":55451295613219,"p":[[1792513720,0.7,1]]},
 "Elemental Arcade|building-snake-op17025-the-worlds-strongest-warriors-release-event-cards":{"n":"Building Snake - OP17-025 [The World's Strongest Warriors Release Event Cards]","v":55513269567779,"p":[[1792513720,3.7,1]]},

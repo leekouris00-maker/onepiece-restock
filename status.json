@@ -1,7 +1,7 @@
 {
  "drops_scan": {
-  "Elemental Arcade": 1792621810,
-  "Good Games": 1792621810
+  "Elemental Arcade": 1792630225,
+  "Good Games": 1792630225
  },
  "drops_slot": "2026-10-22 06",
  "held": {},
@@ -4475,5 +4475,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1792621810
+ "sweep_ts": 1792630225
 }
