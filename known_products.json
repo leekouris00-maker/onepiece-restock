@@ -570,7 +570,11 @@
   "list|JToys|88102"
  ],
  "JToys (all sealed)": [],
- "JToys (pokemon:30th-celebration)": [],
+ "JToys (pokemon:30th-celebration)": [
+  "plist|30th-celebration|JToys|88578",
+  "plist|30th-celebration|JToys|89316",
+  "plist|30th-celebration|JToys|89320"
+ ],
  "JToys (pokemon:delta-reign)": [
   "plist|delta-reign|JToys|88614"
  ],
@@ -734,7 +738,8 @@
   "list|TCGroup|one-piece-memorial-collection-extra-booster-eb-01-booster-box-english"
  ],
  "TCGroup (all sealed)": [
-  "list|TCGroup|one-piece-card-game-legacy-of-the-master-op-12-dp-08-double-pack"
+  "list|TCGroup|one-piece-card-game-legacy-of-the-master-op-12-dp-08-double-pack",
+  "list|TCGroup|one-piece-card-game-premium-card-collection-live-action-edition"
  ],
  "TCGroup (other sealed)": [
   "list|TCGroup|one-piece-card-game-heroines-gift-collection-display-gc-2026-english"
