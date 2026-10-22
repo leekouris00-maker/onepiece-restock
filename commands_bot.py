@@ -25,6 +25,12 @@ Type these in your Discord server:
     /pokemon report          spotted stock in a store? posts it in #pokemon-in-store and pings Pokémon Ping
     /pokemon instore         sightings from the last 24 hours
 
+  v2.5 (admins):
+    /watch add <link> [max] [name]   watch any product page; alerts when it's buyable at or under max (link_watch.py)
+    /watch list | remove             what's watched and what each page said last check
+    /ebay list | check | max | add | remove   the eBay watch (ebay_watch.json) without editing files
+    /bought <card> [qty]             log a pickup; the card stops alerting once you have them all
+
   Admin only (people with Manage Server, or listed in "admin_user_ids" under "alerts"):
     /want list | add | remove | enable   change the singles want list without editing config.json
     /boxmax <price>                      change the booster box max price
@@ -77,6 +83,14 @@ try:
     import add_pokemon_channels as apc
 except ImportError:
     apc = None
+try:
+    import link_watch as lw    # v2.5: /watch
+except ImportError:
+    lw = None
+try:
+    import ebay_watch as ew    # v2.5: /ebay
+except ImportError:
+    ew = None
 
 if not hasattr(tb, "VERSION"):
     sys.exit("This commands_bot.py needs the v2 tcg_bot.py next to it - copy both files.")
@@ -483,7 +497,12 @@ HELP = (
     "`/deals`, `/boxes` and `/sealed` answer instantly from the last check; add `fresh:True` to check the shops now.\n\n"
     "⚡ **Pokémon**: `/pokemon releases` · `/pokemon stock` · `/pokemon report` (spotted stock in a store? it pings "
     "everyone in #pokemon-in-store) · `/pokemon instore`\n\n"
-    "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`."
+    "🔗 **Watch any link**: `/watch add link:<product page> max:<price>` alerts the moment it's buyable at or "
+    "under your max · `/watch list` · `/watch remove`\n"
+    "🛒 **eBay**: `/ebay list` · `/ebay check` (cheapest listed now) · `/ebay max` · `/ebay add` · `/ebay remove`\n"
+    "🎉 `/bought <card>` picked some up? logs it and stops the alerts once you've got them all\n\n"
+    "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`, "
+    "and the /watch, /ebay and /bought commands."
 )
 
 
@@ -1026,6 +1045,376 @@ async def post_report(cfg, hook, user, store, what, price, photo):
         await wh.send(content=role or None, embed=e, username=pw.bot_name(alerts), wait=True,
                       allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=bool(role)), **kwargs)
     return bool(role)
+
+
+# ---------------------------------------------------------------- v2.5: /watch, /ebay, /bought
+WATCH_GREEN, WATCH_RED = 0x2A9D8F, 0xE63946
+
+
+def _who(inter):
+    return f"{inter.user} ({inter.user.id})"
+
+
+def _audit(who, what):
+    tb.append_text(AUDIT_PATH, f"{datetime.now():%Y-%m-%d %H:%M:%S}  {who}  {what}\n", 500_000)
+
+
+if lw:
+    watch = app_commands.Group(name="watch", description="Watch any product link until it's buyable under your max (admins)",
+                               default_permissions=discord.Permissions(manage_guild=True))
+
+    def _fetch(url):
+        return tb.HTTP.fetch(url, tries=2)
+
+    async def watch_autocomplete(inter: discord.Interaction, current: str):
+        cur = current.lower()
+        out = []
+        for it in lw.load():
+            label = it["name"] or lw.shop_name(it["url"])
+            if cur in label.lower() or cur in it["url"].lower():
+                out.append(app_commands.Choice(name=label[:100], value=it["id"]))
+        return out[:25]
+
+    @watch.command(name="add", description="Watch a product page; alerts when it's buyable at or under your max")
+    @app_commands.describe(link="The product page (any shop)", max="Most you'd pay (AUD). Leave out = any price",
+                           name="A short name for it (otherwise the page's own title)")
+    async def watch_add(inter: discord.Interaction, link: str, max: Optional[float] = None, name: str = ""):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        await inter.response.defer(ephemeral=True, thinking=True)
+        try:
+            url = lw.clean_url(link.strip().strip("<>"))
+            r = await asyncio.to_thread(lw.read, url, _fetch)
+            title = name.strip() or (r.get("title") or "")[:120]
+            item, what = await asyncio.to_thread(lw.add, url, max, title, str(inter.user))
+            _audit(_who(inter), f"watch add {url} max={max} name={title!r}")
+        except ValueError as e:
+            await inter.followup.send(f"⚠️ {e}", ephemeral=True)
+            return
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        label = item.get("name") or lw.shop_name(url)
+        mx = f"max **{tb.money(max)}**" if max else "**any price**"
+        if r.get("ok"):
+            within = not max or (r["price"] is not None and r["price"] <= max + 0.001)
+            now = f"Right now: **{r['status']}** at **{tb.money(r['price'])}**"
+            if r.get("buyable") and within:
+                now += " ✅ already within your max, so the alert comes on the bot's next check (within 5 min)."
+            elif r.get("buyable"):
+                now += " 💸 over your max. You'll hear when the price comes down."
+            else:
+                now += ". You'll get an alert the moment it's buyable" + (" at or under your max." if max else ".")
+            color = WATCH_GREEN
+        else:
+            now = (f"⚠️ The bot couldn't read a price and stock from that page ({r.get('problem')}). It's on the list "
+                   "and will keep trying, but if `/watch list` keeps showing this, that shop can't be watched this way.")
+            color = ORANGE
+        e = discord.Embed(title=f"🔗 {'Watching' if what == 'added' else 'Updated'}: {label}"[:256], url=url,
+                          color=color, description=f"{mx} · checked every 5 minutes by the PC bot\n\n{now}")
+        e.set_footer(text="/watch list to see everything watched · /watch remove to stop")
+        await inter.followup.send(embed=e, ephemeral=True)
+
+    @watch.command(name="list", description="Everything you're watching, and what each page said last check")
+    async def watch_list(inter: discord.Interaction):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        items = lw.load()
+        if not items:
+            await inter.response.send_message("Nothing watched yet. `/watch add link:<product page> max:<price>`",
+                                              ephemeral=True)
+            return
+        last = (tb.load_status().get("watch_last") or {})
+        lines = []
+        for it in items:
+            r = last.get(it["id"])
+            line = lw.describe(it, r)
+            if r and r.get("ts"):
+                line += f" · {datetime.fromtimestamp(r['ts']):%I:%M %p}".replace(" 0", " ")
+            lines.append(f"{line}\n<{it['url']}>")
+        e = embed(f"🔗 Watched links ({len(items)}/{lw.MAX_WATCHES})", [], BLUE, description="\n".join(lines)[:4000],
+                  footer="✅ buyable within your max · 💸 buyable but over · ⏳ not buyable yet · ⚠️ page not readable")
+        await inter.response.send_message(embed=e, ephemeral=True)
+
+    @watch.command(name="remove", description="Stop watching a link")
+    @app_commands.describe(item="Which one (start typing its name)")
+    @app_commands.autocomplete(item=watch_autocomplete)
+    async def watch_remove(inter: discord.Interaction, item: str):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        try:
+            hit = await asyncio.to_thread(lw.remove, item)
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        if hit is None:
+            await inter.response.send_message("Couldn't find that one. Pick it from the list as you type, or "
+                                              "paste its link.", ephemeral=True)
+            return
+        _audit(_who(inter), f"watch remove {hit.get('url')}")
+        await inter.response.send_message(f"🗑️ Stopped watching **{hit.get('name') or lw.shop_name(hit['url'])}**.",
+                                          ephemeral=True)
+
+    bot.tree.add_command(watch)
+
+
+if ew:
+    ebay = app_commands.Group(name="ebay", description="The eBay watch list (admins)",
+                              default_permissions=discord.Permissions(manage_guild=True))
+    _ebay_lock = threading.Lock()
+    _ebay_last_check = [0.0]
+    EBAY_EXCLUDE = ["proxy", "custom", "replica", "fake", "orica", "reprint", "fan art", "digital", "lot", "bundle"]
+    _STOP = {"the", "and", "for", "with", "card", "cards", "new", "x"}
+
+    def edit_ebay(change, who, what):
+        """Change ebay_watch.json safely (backup, atomic write, audit.log). The bot reads it every check."""
+        with _ebay_lock:
+            with open(ew.WATCH_PATH, encoding="utf-8-sig") as f:
+                old = f.read()
+            raw = json.loads(old)
+            result = change(raw)
+            with open(ew.WATCH_PATH + ".bak", "w", encoding="utf-8") as f:
+                f.write(old)
+            tb.atomic_write_json(ew.WATCH_PATH, raw, indent=2, ensure_ascii=False)
+            _audit(who, what)
+            return result
+
+    def _ebay_cards_raw():
+        try:
+            with open(ew.WATCH_PATH, encoding="utf-8-sig") as f:
+                return json.load(f).get("cards") or []
+        except Exception:  # noqa: BLE001
+            return []
+
+    async def ebay_autocomplete(inter: discord.Interaction, current: str):
+        cur = current.lower()
+        out = []
+        for c in _ebay_cards_raw():
+            n = str(c.get("name") or "")
+            label = n + ("" if c.get("enabled", True) else " (off)")
+            if cur in label.lower():
+                out.append(app_commands.Choice(name=label[:100], value=n[:100]))
+        return out[:25]
+
+    def _find_card(raw, name):
+        cards = raw.get("cards") or []
+        exact = [c for c in cards if str(c.get("name", "")).lower() == name.lower()]
+        if exact:
+            return exact[0]
+        part = [c for c in cards if name.lower() in str(c.get("name", "")).lower()]
+        return part[0] if len(part) == 1 else None
+
+    @ebay.command(name="list", description="What the bot watches on eBay, and the max for each")
+    async def ebay_list(inter: discord.Interaction):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        cards = _ebay_cards_raw()
+        on = [c for c in cards if c.get("enabled", True)]
+        off = [c for c in cards if not c.get("enabled", True)]
+        lines = [f"🔎 **{c.get('name')}** · max {tb.money(float(c.get('max') or 0))} delivered" for c in on]
+        lines += [f"⏸️ ~~{c.get('name')}~~ (off)" for c in off]
+        key = "✅ eBay key works" if (tb.load_status().get("ebay_state") == "ok") else "⚠️ eBay key not working yet"
+        e = embed(f"🛒 eBay watch ({len(on)} on)", [], BLUE, description="\n".join(lines)[:4000] or "Nothing yet.",
+                  footer=f"{key} · /ebay check for what's listed now · /ebay max to change a price")
+        await inter.response.send_message(embed=e, ephemeral=True)
+
+    @ebay.command(name="max", description="Change the most you'd pay (delivered) for something on the eBay watch")
+    @app_commands.describe(item="Which one (start typing)", price="Most you'd pay in AUD, delivered")
+    @app_commands.autocomplete(item=ebay_autocomplete)
+    async def ebay_max(inter: discord.Interaction, item: str, price: float):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        if price <= 0:
+            await inter.response.send_message("Use a price above $0 (or `/ebay remove` to stop watching).",
+                                              ephemeral=True)
+            return
+
+        def change(raw):
+            c = _find_card(raw, item)
+            if c is None:
+                return None
+            old = c.get("max")
+            c["max"], c["enabled"] = round(price, 2), True
+            return c.get("name"), old
+        try:
+            res = await asyncio.to_thread(edit_ebay, change, _who(inter), f"ebay max {item!r} {price}")
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        if res is None:
+            await inter.response.send_message("That isn't on the eBay watch. Pick it from the list as you type.",
+                                              ephemeral=True)
+            return
+        n, old = res
+        await inter.response.send_message(f"✅ **{n}**: max {tb.money(float(old or 0))} → **{tb.money(price)}** "
+                                          "delivered. Used from the bot's next eBay check.", ephemeral=True)
+
+    @ebay.command(name="add", description="Watch something new on eBay")
+    @app_commands.describe(name="What to call it, e.g. Zoro OP01-025 PSA 10",
+                           max="Most you'd pay in AUD, delivered (item + postage + GST)",
+                           search="What to type into eBay, e.g. zoro op01-025 psa 10",
+                           exclude="Words that mean it's the wrong listing, comma separated, e.g. japanese, psa 9")
+    async def ebay_add(inter: discord.Interaction, name: str, max: float, search: str, exclude: str = ""):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        words = [w for w in re.findall(r"[a-z0-9][a-z0-9-]*", search.lower()) if len(w) >= 2 and w not in _STOP]
+        if max <= 0 or not words:
+            await inter.response.send_message("Give it a max above $0 and some search words.", ephemeral=True)
+            return
+        extra = [w.strip().lower() for w in exclude.split(",") if w.strip()]
+        card = {"name": name.strip()[:100], "max": round(max, 2), "search": [search.strip()[:100]],
+                "must_have": words[:8], "exclude": list(dict.fromkeys(EBAY_EXCLUDE + extra)),
+                "note": f"Added with /ebay add by {inter.user} on {datetime.now():%d %b %Y}.", "enabled": True}
+
+        def change(raw):
+            cards = raw.setdefault("cards", [])
+            for c in cards:
+                if str(c.get("name", "")).lower() == card["name"].lower():
+                    c.update({k: card[k] for k in ("max", "search", "must_have", "enabled")})
+                    if extra:
+                        c["exclude"] = list(dict.fromkeys((c.get("exclude") or []) + extra))
+                    return "updated"
+            cards.append(card)
+            return "added"
+        try:
+            what = await asyncio.to_thread(edit_ebay, change, _who(inter), f"ebay add {name!r} max={max} q={search!r}")
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        await inter.response.send_message(
+            f"✅ {what.capitalize()} **{card['name']}** on the eBay watch: max {tb.money(max)} delivered.\n"
+            f"A listing's title must contain all of: `{'`, `'.join(card['must_have'])}`, and none of the skip words. "
+            "Run `/ebay check` to see what that catches right now.", ephemeral=True)
+
+    @ebay.command(name="remove", description="Stop watching something on eBay (kept on the list, switched off)")
+    @app_commands.autocomplete(item=ebay_autocomplete)
+    async def ebay_remove(inter: discord.Interaction, item: str):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+
+        def change(raw):
+            c = _find_card(raw, item)
+            if c is not None:
+                c["enabled"] = False
+                return c.get("name")
+            return None
+        try:
+            n = await asyncio.to_thread(edit_ebay, change, _who(inter), f"ebay remove {item!r}")
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        await inter.response.send_message(f"⏸️ Stopped watching **{n}** on eBay (`/ebay max` switches it back on)."
+                                          if n else "That isn't on the eBay watch.", ephemeral=True)
+
+    def _ebay_live(cfg):
+        cards, _ = ew.load_watch()
+        cid, secret = ew.credentials(cfg)
+        if not cid:
+            return None, "No eBay key yet (see the top of ebay_watch.py)."
+        out, now = [], time.time()
+        for c in cards:
+            try:
+                hits = ew._search_card(cid, secret, c, now, cap=c["max"] * 1.5)
+            except ew.EbayError as e:
+                return None, str(e)
+            hits.sort(key=lambda h: h[1][3])
+            out.append((c, hits))
+        return out, None
+
+    @ebay.command(name="check", description="Search eBay right now: the cheapest listing for each watched item")
+    async def ebay_check(inter: discord.Interaction):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        if time.time() - _ebay_last_check[0] < 60:
+            await inter.response.send_message("eBay was checked under a minute ago. Try again shortly.",
+                                              ephemeral=True)
+            return
+        _ebay_last_check[0] = time.time()
+        await inter.response.defer(ephemeral=True, thinking=True)
+        try:
+            res, problem = await asyncio.to_thread(_ebay_live, cfg)
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        if problem:
+            await inter.followup.send(f"⚠️ {problem}", ephemeral=True)
+            return
+        lines = []
+        for c, hits in res:
+            if not hits:
+                lines.append(f"⏳ **{c['name']}** (max {tb.money(c['max'])}): nothing close listed")
+                continue
+            it, cost = hits[0]
+            url = str(it.get("itemWebUrl") or "").split("?")[0]
+            mark = "✅" if cost[3] <= c["max"] + 0.001 else "💸"
+            under = sum(1 for _, k in hits if k[3] <= c["max"] + 0.001)
+            lines.append(f"{mark} **{c['name']}** (max {tb.money(c['max'])}): cheapest [{tb.money(cost[3])} delivered]"
+                         f"({url})" + (f" · {under} within your max" if under else ""))
+        e = embed("🛒 eBay right now", [], BLUE, description="\n".join(lines)[:4000],
+                  footer="✅ within your max · 💸 over your max (shown up to 1.5× it) · prices include postage and GST")
+        await inter.followup.send(embed=e, ephemeral=True)
+
+    bot.tree.add_command(ebay)
+
+
+@bot.tree.command(name="bought", description="Picked some up? Logs them so the bot stops alerting for that card")
+@app_commands.default_permissions(manage_guild=True)
+@app_commands.describe(card="Card number (start typing)", qty="How many you got (leave out = all you still needed)")
+@app_commands.autocomplete(card=want_autocomplete)
+async def bought_cmd(inter: discord.Interaction, card: str, qty: Optional[int] = None):
+    cfg = await admin_only(inter)
+    if cfg is None:
+        return
+    n = norm_num(card) or card.strip().upper()
+    if qty is not None and not 1 <= qty <= 50:
+        await inter.response.send_message("qty has to be from 1 to 50.", ephemeral=True)
+        return
+
+    def change(raw):
+        for c in raw.get("singles", {}).get("cards", []):
+            if str(c.get("num", "")).upper() == n:
+                want_n = int(tb._num(c.get("qty", 1)) or 1)
+                have = int(tb._num(c.get("owned")) or 0)
+                if qty is None and have >= want_n:
+                    return c, 0, have, want_n            # already logged as owned: nothing to add
+                got = qty if qty is not None else max(1, want_n - have)
+                have += got
+                c["owned"] = have
+                if have >= want_n:
+                    c["enabled"] = False
+                stamp = f"Bought x{got} ({datetime.now():%d %b %Y})."
+                c["note"] = (str(c.get("note") or "") + "  " + stamp).strip()[-400:]
+                return c, got, have, want_n
+        return None
+    try:
+        res, _ = await asyncio.to_thread(edit_config, change, _who(inter), f"bought {n} qty={qty}")
+    except Exception as e:  # noqa: BLE001
+        await fail(inter, e)
+        return
+    if res is None:
+        await inter.response.send_message(f"{n} isn't on the want list, so there's nothing to stop. "
+                                          "(`/want add` puts a card on it.)", ephemeral=True)
+        return
+    c, got, have, want_n = res
+    label = f"{c.get('name', '')} {n}".strip()
+    if got == 0:
+        msg = (f"You've already logged **{have}/{want_n}** of **{label}**, so it isn't being watched. "
+               "Add `qty:` if you picked up extra copies.")
+    elif have >= want_n:
+        msg = (f"🎉 Logged **{got}× {label}**. You've got **{have}/{want_n}**, so the bot has stopped alerting for it. "
+               "Collector versions (Manga, Wanted, Treasure...) still show up as value picks.")
+    else:
+        msg = (f"✅ Logged **{got}× {label}**: **{have}/{want_n}**. Still watching for the other "
+               f"{want_n - have}.")
+    await inter.response.send_message(msg, ephemeral=True)
 
 
 if pw:

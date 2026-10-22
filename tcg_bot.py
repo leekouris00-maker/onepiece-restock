@@ -137,11 +137,15 @@ try:
 except ImportError:            # ebay_watch.py not next to the bot: eBay is skipped, everything else as normal
     ebay_watch = None
 try:
+    import link_watch          # any product link you /watch (watches.json); optional
+except ImportError:
+    link_watch = None
+try:
     import pokemon_watch       # Pokémon releases; optional
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
 
-VERSION = "2.4.1"
+VERSION = "2.5.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -184,6 +188,7 @@ ENV_ALERTS = {
     "DISCORD_WEBHOOK_BOXES": "discord_webhook_boxes",
     "DISCORD_WEBHOOK_SINGLES": "discord_webhook_singles",
     "DISCORD_WEBHOOK_SEALED": "discord_webhook_sealed",
+    "DISCORD_WEBHOOK_WATCH": "discord_webhook_watch",
     "DISCORD_PING": "discord_ping",
     "NTFY_TOPIC": "ntfy_topic",
     "BOT_NAME": "bot_name",
@@ -2905,6 +2910,7 @@ _hook_results = {}          # webhook -> [ok, failed, last error, last HTTP stat
 _hook_lock = threading.Lock()
 HOOK_LABELS = {"discord_webhook_boxes": "#booster-boxes", "discord_webhook_singles": "#singles-alerts",
                "discord_webhook_sealed": "#sealed-alerts", "discord_webhook_ebay": "#ebay-resale",
+               "discord_webhook_watch": "#watched-links",
                "discord_webhook_status": "#bot-status", "discord_webhook_drops": "price drops",
                "discord_webhook_recap": "daily recap", "discord_webhook": "main channel"}
 
@@ -3028,6 +3034,7 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
     singles_hook = alerts.get("discord_webhook_singles") or default
     sealed_hook = alerts.get("discord_webhook_sealed") or boxes_hook
     ebay_hook = alerts.get("discord_webhook_ebay") or singles_hook   # eBay resale finds: their own channel if set up
+    watch_hook = alerts.get("discord_webhook_watch") or sealed_hook  # /watch links: own channel if set up
     poke_hooks = pokemon_watch.hooks(alerts) if pokemon_watch else {}
     if not (default or boxes_hook or singles_hook or poke_hooks):
         return False, set()
@@ -3051,6 +3058,8 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
             poke_group.add(hook)
         elif f.get("ebay"):
             hook = ebay_hook                 # eBay watch (ebay_watch.json): Nike TNs, promos, graded cards
+        elif f.get("link_watch"):
+            hook = watch_hook                # a link you asked to /watch
         elif f["kind"] == "Sealed" or (f["kind"] == "New listing" and f.get("group") in ("watch", "new")):
             hook = sealed_hook               # other sealed products: their own channel if set up
         elif f["kind"] in BOX_KINDS:
@@ -3168,6 +3177,8 @@ def _discord_embeds(finds, cfg=None):
                            "value": str(f["note"])[:1000], "inline": False})
         if poke:
             icon, color = (("🆕 " if kind == "New listing" else "") + p_icon + " "), p_color
+        elif f.get("link_watch"):
+            icon, color = "🔗 Watched: ", 0xE63946
         elif kind == "Booster box":
             icon, color = "📦 ", 0xF4A261
         elif kind == "Sealed":
@@ -3658,6 +3669,11 @@ def run_once(cfg, args, drop=None):
         if ebay_watch:
             ebay = ebay_watch.check(cfg, status, force=args.all)
             finds += ebay.finds
+    links = None
+    if link_watch and not only_poke:                 # /watch links: every check, they're few and cheap
+        links = link_watch.check(cfg, fetch=lambda u: HTTP.fetch(u, tries=2))
+        finds += links.finds
+        link_watch.remember(status, links)
 
     state = load_state()
     show = finds if args.all else new_only(finds, state)
@@ -3681,6 +3697,13 @@ def run_once(cfg, args, drop=None):
             return "Single" in checked
         if k.startswith("ebay|"):
             return ebay is not None and ebay.ran
+        if k.startswith("watch|"):
+            # read fine just now (so a sold-out link alerts again when it's back), or no longer watched;
+            # a page that failed to load keeps its place, so a hiccup doesn't cause a repeat alert
+            if links is None:
+                return False
+            r = links.readings.get(k.split("|", 1)[1])
+            return r is None or bool(r.get("ok"))
         if k.startswith("poke|"):
             parts = k.split("|", 3)
             if len(parts) != 4:
