@@ -1,9 +1,9 @@
 {
  "drops_scan": {
-  "Elemental Arcade": 1792630225,
-  "Good Games": 1792630225
+  "Elemental Arcade": 1792646951,
+  "Good Games": 1792646951
  },
- "drops_slot": "2026-10-22 06",
+ "drops_slot": "2026-10-22 12",
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -3046,7 +3046,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792549173.4498067
+   "t": 1792646910.7609117
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -4465,7 +4465,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 1,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -4475,5 +4475,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1792630225
+ "sweep_ts": 1792646951
 }
