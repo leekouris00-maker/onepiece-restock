@@ -1,13 +1,13 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1792768388,
-  "Good Games": 1792768388
+  "Elemental Arcade": 1792782753,
+  "Good Games": 1792782753
  },
- "drops_slot": "2026-10-24 00",
+ "drops_slot": "2026-10-24 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1792768376,
+ "ebay_ts": 1792782743,
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -552,7 +552,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792682765.3659906
+   "t": 1792782703.4158344
   },
   "collectiblemadness.com.au": {
    "rules": [
@@ -1580,7 +1580,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792682765.1809082
+   "t": 1792782703.1794455
   },
   "pocketgames.com.au": {
    "rules": [
@@ -2536,7 +2536,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1792682765.129872
+   "t": 1792782703.1185064
   },
   "www.gameology.com.au": {
    "rules": [
@@ -3211,7 +3211,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1792682765.132877
+   "t": 1792782703.1216042
   },
   "www.gumnut.com.au": {
    "rules": [
@@ -4460,7 +4460,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 1,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -4470,5 +4470,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1792768376
+ "sweep_ts": 1792782743
 }
