@@ -1,13 +1,13 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1792782753,
-  "Good Games": 1792782753
+  "Elemental Arcade": 1792793316,
+  "Good Games": 1792793316
  },
  "drops_slot": "2026-10-24 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1792782743,
+ "ebay_ts": 1792793306,
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -37,6 +37,9 @@
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
+ },
+ "pokemon_reminders": {
+  "2026-10-24|day": 1792793323
  },
  "pokemon_state": "live",
  "robots": {
@@ -4470,5 +4473,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1792782743
+ "sweep_ts": 1792793306
 }
