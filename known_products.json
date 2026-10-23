@@ -103,13 +103,16 @@
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-battle-deck-umbreon-ex",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-binder-collection",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-booster-bundle",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-ditto-premium-collection",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-elite-trainer-box",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-figure-collection-mew",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-greninja-ex-box",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-knock-out-collection",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-poster-collection",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-sylveon-ex-box",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-tech-sticker-collection",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-tin",
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-ultra-premium-collection-day",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-ultra-premium-collection-night"
  ],
  "Collectible Madness (pokemon:delta-reign)": [
@@ -448,6 +451,8 @@
  ],
  "Good Games (sealed) (other sealed)": [
   "list|Good Games (sealed)|one-piece-card-game-double-pack-tba-dp-13",
+  "list|Good Games (sealed)|one-piece-card-game-gift-collection-display-heroines-gc-2026",
+  "list|Good Games (sealed)|one-piece-card-game-gift-collection-heroines-gc-2026",
   "list|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-37",
   "list|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-38"
  ],
