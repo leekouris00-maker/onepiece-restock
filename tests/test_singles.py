@@ -322,13 +322,15 @@ class Drops(unittest.TestCase):
         self.scan(s, self.T, {"a": 5, "b": 9})
         self.scan(s, self.T + h, {"a": 6})                     # b leaves the list
         self.scan(s, self.T + 2 * h, {"a": 7})
-        self.scan(s, self.T + 60 * h, {"a": 8})
+        self.scan(s, self.T + (tb.DROPS_KEEP_HOURS + 12) * h, {"a": 8})
         pts = s["items"]["Elemental Arcade|a"]["p"]
-        self.assertEqual([p[1] for p in pts], [7, 8])           # the last price before 48h ago stays
+        self.assertEqual([p[1] for p in pts], [7, 8])           # the last price before the cut-off stays
         self.assertIn("Elemental Arcade|b", s["items"])
         self.scan(s, self.T + 15 * 24 * h, {"a": 8})
         self.assertNotIn("Elemental Arcade|b", s["items"])      # gone 15 days: forgotten
-        self.assertEqual(len(s["shops"]["Elemental Arcade"]["scans"]), 1)
+        self.assertTrue(all(self.T + 15 * 24 * h - t < tb.DROPS_KEEP_HOURS * h
+                            for t in s["shops"]["Elemental Arcade"]["scans"]))   # older reads let go too
+        self.assertEqual(len(s["shops"]["Elemental Arcade"]["scans"]), 2)
 
     def test_saved_and_read_back(self):
         tmp = tempfile.mkdtemp()

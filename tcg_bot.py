@@ -149,7 +149,7 @@ try:
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
 
-VERSION = "2.6.0"
+VERSION = "2.7.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -2088,7 +2088,8 @@ DROPS_DEFAULTS = {"enabled": True, "every_hours": 6, "top": 10, "min_pct": 10.0,
                   "rank_by": "percent", "scan_every_minutes": 60, "shops": None}
 DROPS_HOURS = (1, 2, 3, 4, 6, 8, 12, 24)    # posts start on the hour from midnight, so it has to divide 24
 CATALOG_MAX_PAGES = 30          # 250 a page, so up to 7,500 singles per shop
-DROPS_KEEP_HOURS = 48           # price changes older than this are let go (the last one before stays as "before")
+DROPS_KEEP_HOURS = 8 * 24       # price changes older than this are let go (the last one before stays as "before");
+                                # 8 days so /value always has a full week (v2.7, was 48 hours)
 DROPS_FORGET_DAYS = 14          # a single that's been off its shop's list this long is forgotten
 DROPS_FRESH = 15 * 60           # just before a post, a shop list read longer ago than this is read again
 CARD_NUM_RE = re.compile(r"\b(?:(?:OP|EB|ST|PRB)\d{2}|P)-\d{3}\b", re.I)

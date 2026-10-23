@@ -10,6 +10,7 @@ Type these in your Discord server:
     /sealed           other sealed products in stock (starter decks, collections...)
     /card <search>    look a card up at Elemental Arcade, Good Games and Mayhem
     /history <search> price history of a box or sealed product, and the lowest price seen
+    /value <card>     what a single's worth at the shops now, with a price chart for the last week (value.py)
     /stats            restocks in the last 30 days: which shops, what hours, how long stock lasts
     /pricedrops       singles that got the most cheaper in the last 6 hours (hours: to change)
     /drops            releases and drop windows coming up
@@ -93,6 +94,10 @@ try:
     import ebay_watch as ew    # v2.5: /ebay
 except ImportError:
     ew = None
+try:
+    import value as cv         # v2.7: /value
+except ImportError:
+    cv = None
 
 if not hasattr(tb, "VERSION"):
     sys.exit("This commands_bot.py needs the v2 tcg_bot.py next to it - copy both files.")
@@ -499,6 +504,7 @@ HELP = (
     "`/sealed` other sealed products in stock\n"
     "`/card <search>` look up a card, e.g. `/card OP13-120` or `/card sabo`\n"
     "`/history <search>` price history and lowest price seen, e.g. `/history op-18`\n"
+    "`/value <card>` a single's value at the shops now + its price chart for the last week, e.g. `/value OP13-120`\n"
     "`/stats` restock patterns over the last 30 days\n"
     "`/pricedrops` singles that got the most cheaper in the last 6 hours (`hours:` to change)\n"
     "`/drops` releases and drop windows coming up\n"
@@ -700,6 +706,31 @@ async def history_cmd(inter: discord.Interaction, search: str):
         await fail(inter, e)
 
 
+if cv:
+    async def value_autocomplete(inter: discord.Interaction, current: str):
+        try:
+            store = await asyncio.to_thread(cv.load_store)
+            return [app_commands.Choice(name=label, value=key) for label, key in cv.suggestions(store, current)]
+        except Exception:  # noqa: BLE001
+            return []
+
+    @bot.tree.command(name="value", description="What a single's worth at the shops now, with its price chart for the last week")
+    @app_commands.describe(card="Card number or name, e.g. OP13-120 or sabo wanted (pick a version from the list)",
+                           days="How many days to chart, 1 to 7 (default 7)")
+    @app_commands.autocomplete(card=value_autocomplete)
+    async def value_cmd(inter: discord.Interaction, card: str, days: app_commands.Range[int, 1, 7] = 7):
+        await inter.response.defer(thinking=True)
+        try:
+            e, png = await asyncio.to_thread(cv.build, cfg_now(), card.strip()[:100], days)
+            d = discord.Embed.from_dict(e)
+            if png:
+                await inter.followup.send(embed=d, file=discord.File(io.BytesIO(png), filename="value.png"))
+            else:
+                await inter.followup.send(embed=d)
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+
 @bot.tree.command(name="stats", description="Restocks over the last 30 days: shops, hours, how long stock lasted")
 async def stats_cmd(inter: discord.Interaction):
     try:
@@ -709,7 +740,7 @@ async def stats_cmd(inter: discord.Interaction):
 
 
 @bot.tree.command(name="pricedrops", description="Singles that got the most cheaper in the last few hours")
-@app_commands.describe(hours="How far back to compare, 1 to 48 hours (default 6)")
+@app_commands.describe(hours="How far back to compare, 1 to 168 hours (default 6)")
 async def pricedrops_cmd(inter: discord.Interaction, hours: int = 0):
     try:
         await inter.response.send_message(embed=build_pricedrops(cfg_now(), hours))
