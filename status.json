@@ -1,28 +1,14 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1792843525,
+  "Elemental Arcade": 1792848233,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-24 18",
+ "drops_slot": "2026-10-25 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1792843516,
- "held": {
-  "box|Rogue Online|pre-order-gundam-card-game-gd06-booster-box": {
-   "f": {
-    "cart": "https://rogueonline.com.au/cart/67856883417369:1",
-    "id": "box|Rogue Online|pre-order-gundam-card-game-gd06-booster-box",
-    "kind": "Booster box",
-    "name": "PRE-ORDER - GUNDAM CARD GAME - [GD06] BOOSTER BOX",
-    "note": "pre-order",
-    "price": 194.99,
-    "shop": "Rogue Online",
-    "url": "https://rogueonline.com.au/products/pre-order-gundam-card-game-gd06-booster-box"
-   },
-   "t": 1792843531
-  }
- },
+ "ebay_ts": 1792848221,
+ "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
  "offline_streak": 0,
@@ -47,12 +33,13 @@
   "Light of Cards": 99,
   "M-G": 99,
   "Overhauled Games": 99,
+  "Overhauled Games TCG": 99,
   "Pocket Games": 99,
   "Rogue Online": 99,
   "TCGroup": 99,
   "The Wandering Collector": 99
  },
- "pc_on": true,
+ "pc_on": false,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -5297,7 +5284,7 @@
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
   "shop.goodgames.com.au": 0,
-  "tcg.goodgames.com.au": 0,
+  "tcg.goodgames.com.au": 1,
   "thewanderingcollector.com.au": 0,
   "www.cherrycollectables.com.au": 0,
   "www.gameology.com.au": 0,
@@ -5314,5 +5301,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1792843516
+ "sweep_ts": 1792848221
 }
