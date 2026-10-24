@@ -1,13 +1,13 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1792877558,
+  "Elemental Arcade": 1792884741,
   "Good Games": 1792843525
  },
  "drops_slot": "2026-10-25 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1792877548,
+ "ebay_ts": 1792884730,
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -5276,7 +5276,7 @@
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
-  "cardplustcg.com.au": 1,
+  "cardplustcg.com.au": 0,
   "collectiblemadness.com.au": 0,
   "elementalarcade.com.au": 0,
   "goldfieldsgames.com.au": 0,
@@ -5305,7 +5305,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1792878458
+  "tcg.goodgames.com.au": 1792885641
  },
- "sweep_ts": 1792877548
+ "sweep_ts": 1792884730
 }
