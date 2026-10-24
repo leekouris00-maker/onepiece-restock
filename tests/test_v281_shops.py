@@ -24,7 +24,7 @@ class NewShops(unittest.TestCase):
     def test_new_shops_are_checked(self):
         cols, prods, woos, _ = tb.sealed_shops(CFG)
         names = {s["name"] for s in cols + prods + woos}
-        for n in ("Goldfields Games", "Rogue Online", "The Wandering Collector", "Overhauled Games", "CardPlus TCG"):
+        for n in ("Goldfields Games", "Rogue Online", "The Wandering Collector", "Overhauled Games TCG", "CardPlus TCG"):
             self.assertIn(n, names)
         self.assertTrue(any("op-18" in p["url"] for p in prods))
 
@@ -38,7 +38,7 @@ class NewShops(unittest.TestCase):
     def test_shop_names_know_the_new_hosts(self):
         names = tb.shop_names(dict(CFG, singles={"shops": {}}))
         self.assertEqual(names.get("goldfieldsgames.com.au"), "Goldfields Games")
-        self.assertEqual(names.get("overhauledgames.com.au"), "Overhauled Games")
+        self.assertEqual(names.get("overhauledgames.com.au"), "Overhauled Games TCG")
 
 
 class Deposits(unittest.TestCase):

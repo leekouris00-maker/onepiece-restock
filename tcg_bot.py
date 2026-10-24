@@ -277,7 +277,7 @@ EXTRA_SHOPIFY_PRODUCTS = [
 ]
 # WooCommerce shops (their public Store API, the same one their own shop pages use).
 EXTRA_WOOCOMMERCE = [
-    {"name": "Overhauled Games",
+    {"name": "Overhauled Games TCG",
      "url": "https://overhauledgames.com.au/wp-json/wc/store/v1/products?search=one%20piece%20tcg&per_page=100"},
     {"name": "CardPlus TCG", "url": "https://cardplustcg.com.au/wp-json/wc/store/v1/products?search=one%20piece&per_page=100"},
 ]
