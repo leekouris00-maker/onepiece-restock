@@ -1,14 +1,33 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1792802165,
-  "Good Games": 1792802165
+  "Elemental Arcade": 1792817936,
+  "Good Games": 1792817936
  },
- "drops_slot": "2026-10-24 06",
+ "drops_slot": "2026-10-24 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1792802155,
- "held": {},
+ "ebay_ts": 1792817925,
+ "held": {
+  "card|pick|https://tcg.goodgames.com.au/products/benn-beckman-alternate-art-the-worlds-strongest-warriors": {
+   "f": {
+    "cart": "https://tcg.goodgames.com.au/cart/46168833392819:1",
+    "cond": "NM",
+    "deck": "value pick",
+    "id": "card|pick|https://tcg.goodgames.com.au/products/benn-beckman-alternate-art-the-worlds-strongest-warriors",
+    "kind": "Single",
+    "name": "Benn.Beckman OP17-027 Alternate Art",
+    "note": "Benn.Beckman (Alternate Art) [The World's Strongest Warriors] \u00b7 US market \u2248 $18.27 \u00b7 in stock, listed 5% under market",
+    "price": 14.3,
+    "priority": false,
+    "qty": 1,
+    "shop": "Good Games",
+    "url": "https://tcg.goodgames.com.au/products/benn-beckman-alternate-art-the-worlds-strongest-warriors",
+    "value_pick": true
+   },
+   "t": 1792817943
+  }
+ },
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
  "offline_streak": 0,
@@ -33,7 +52,7 @@
   "Pocket Games": 99,
   "TCGroup": 99
  },
- "pc_on": false,
+ "pc_on": true,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -4482,5 +4501,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1792802155
+ "sweep_ts": 1792817925
 }
