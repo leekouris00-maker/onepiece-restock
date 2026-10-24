@@ -149,7 +149,7 @@ try:
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
 
-VERSION = "2.8.0"
+VERSION = "2.8.1"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -263,7 +263,26 @@ EXTRA_SHOPIFY_COLLECTIONS = [
     {"name": "Cherry Collectables", "url": "https://www.cherrycollectables.com.au/collections/one-piece/products.json?limit=250",
      "max_pages": 4, "gzip": True},
     {"name": "GD Games", "url": "https://www.gdgames.com.au/collections/one-piece-tcg/products.json?limit=250"},
+    # v2.8.1 (24 Oct 2026): more shops Fellowship of the Ping / CardTracker post from.
+    {"name": "Goldfields Games", "url": "https://goldfieldsgames.com.au/collections/one-piece-card-game/products.json?limit=250"},
+    {"name": "Rogue Online", "url": "https://rogueonline.com.au/collections/one-piece-tcg/products.json?limit=250"},
+    {"name": "The Wandering Collector",
+     "url": "https://thewanderingcollector.com.au/collections/one-piece-tcg-english-sealed-products/products.json?limit=250"},
 ]
+# Single products to check directly (Shopify .js), for ones a shop hasn't put in its One Piece section yet.
+EXTRA_SHOPIFY_PRODUCTS = [
+    # Goldfields lists OP-18 at A$180 but outside its One Piece section, and its search doesn't find it.
+    {"name": "Goldfields Games",
+     "url": "https://goldfieldsgames.com.au/products/one-piece-card-game-the-dominance-of-god-op-18-booster-box.js"},
+]
+# WooCommerce shops (their public Store API, the same one their own shop pages use).
+EXTRA_WOOCOMMERCE = [
+    {"name": "Overhauled Games",
+     "url": "https://overhauledgames.com.au/wp-json/wc/store/v1/products?search=one%20piece%20booster%20box&per_page=100"},
+    {"name": "CardPlus TCG", "url": "https://cardplustcg.com.au/wp-json/wc/store/v1/products?search=one%20piece&per_page=100"},
+]
+BOX_MIN_PRICE = 80      # a "booster box" listed under this is a pre-order deposit (CardPlus: $35), not the box's price
+DEPOSIT_RE = re.compile(r"\bdeposit\b", re.I)
 EXTRA_SHOPIFY_SEARCH = [
     {"name": "Grailborne", "base": "https://grailborne.com.au"},
     {"name": "Collectible Madness", "base": "https://collectiblemadness.com.au"},
@@ -1603,11 +1622,16 @@ def sealed_shops(cfg):
     s = cfg["sealed"]
     cols = list(s.get("shopify_collections", []))
     search = list(s.get("shopify_search", []))
+    prods = list(s.get("shopify_products", []))
+    woo = list(s.get("woocommerce", []))
     if cfg.get("extra_shops", True):
-        have = {x["name"] for x in cols + search}
+        have = {x["name"] for x in cols + search + woo}
         cols += [x for x in EXTRA_SHOPIFY_COLLECTIONS if x["name"] not in have]
         search += [x for x in EXTRA_SHOPIFY_SEARCH if x["name"] not in have]
-    return cols, s.get("shopify_products", []), s.get("woocommerce", []), search
+        woo += [x for x in EXTRA_WOOCOMMERCE if x["name"] not in have]
+        have_urls = {x["url"] for x in prods}
+        prods += [x for x in EXTRA_SHOPIFY_PRODUCTS if x["url"] not in have_urls]
+    return cols, prods, woo, search
 
 
 def shopify_product_box(shop_name, url, max_price, watch=()):
@@ -1759,9 +1783,11 @@ def check_sealed(cfg, sweep=False):
             by_shop[name] = None            # failed: don't touch what we know about this shop
         elif by_shop.get(name, []) is not None:
             by_shop.setdefault(name, []).extend(listings)
-    # de-dupe (same product listed twice)
+    # de-dupe (same product listed twice); a booster box at a deposit price isn't a real price (v2.8.1)
     seen, out = set(), []
     for f in finds:
+        if f["kind"] == "Booster box" and (f["price"] < BOX_MIN_PRICE or DEPOSIT_RE.search(f["name"] or "")):
+            continue
         if f["id"] not in seen:
             seen.add(f["id"])
             out.append(f)
