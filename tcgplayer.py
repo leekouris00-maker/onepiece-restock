@@ -340,6 +340,8 @@ def sync(store, cfg=None, force=False, log=print, sleep=time.sleep):
     ok = len(failed) <= MAX_FAILED_SHARE * len(groups)
     if ok:
         store["updated"] = stamp
+    if failed:
+        log(f"   ! TCGplayer: {len(failed)} set(s) didn't load: kept their prices from last time")
     log(f"   (TCGplayer: {len(seen):,} prices from {len(groups) - len(failed)}/{len(groups)} sets in "
         f"{time.time() - t0:.0f}s; US$1 = A${store['fx']['rate']:g} ({store['fx']['src']}))")
     return "done" if ok else "partial"
@@ -772,10 +774,12 @@ def main():
     embeds = report(store, cfg, drops=tb.load_drops_store())
     if a.dry_run:
         for e in embeds:
-            print(f"\n== {e['title']} ==\n{e.get('description', '')}")
-            for f in e.get("fields") or []:
-                print(f"-- {f['name']}\n{f['value']}")
-            print(f"[{e.get('footer', {}).get('text', '')}]")
+            text = e.get("description", "") + "".join(f"\n-- {f['name']}\n{f['value']}" for f in e.get("fields") or [])
+            text += f"\n[{e.get('footer', {}).get('text', '')}]"
+            print(f"\n== {e['title']} ==\n{text}")
+            if os.environ.get("GITHUB_ACTIONS"):   # also as a note on the run's page (GitHub keeps 10 per step)
+                esc = text.replace("%", "%25").replace("\r", "").replace("\n", "%0A")
+                print(f"::notice title={e['title']}::{esc}")
         return 0
     if post(store, cfg, embeds):
         store["posted"] = store.get("updated")
