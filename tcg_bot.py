@@ -149,7 +149,7 @@ try:
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
 
-VERSION = "2.7.0"
+VERSION = "2.7.1"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -1377,6 +1377,46 @@ def card_num_variants(num):
     return [n, n.replace("-", "")]
 
 
+# v2.7.1: DON!! cards have no card number. On the want list they get a made-up key instead, e.g.
+# "num": "DON-GOMU-GOMU", plus "match": ["gomu", "gomu"]: a shop listing is that card when its title
+# says DON and has every match word (a word can be "gomu|gum" for either spelling).
+DON_SKIP = {"don", "card", "cards", "the", "a", "of", "x"}
+DON_EXCLUDE = ["playmat", "sleeve", "deck box", "binder", "jumbo"]
+
+
+def is_don(text):
+    """'DON!!' or 'Don card', not Don Quixote Doflamingo."""
+    return bool(re.search(r"\bdon(?:\s*!!|[\s-]+cards?\b)", str(text or ""), re.I))
+
+
+def don_words(text):
+    """'GOMU GOMU (RUBBER-RUBBER) DON!! CARD' -> ['gomu', 'gomu']: words in brackets are left out (they're
+    usually a translation the shop won't use), unless that's all there is."""
+    t = str(text or "").lower()
+    words = [w for w in re.findall(r"[a-z0-9]+", re.sub(r"\([^)]*\)", " ", t)) if w not in DON_SKIP]
+    return words or [w for w in re.findall(r"[a-z0-9]+", t) if w not in DON_SKIP]
+
+
+def don_key(words):
+    return "DON-" + "-".join(w.upper() for w in words)[:60] if words else ""
+
+
+def card_label(card):
+    """How a want-list card is named in posts: 'Sabo OP13-120', or just 'Gomu Gomu DON!!' for a DON!! card."""
+    if card.get("match"):
+        return str(card.get("name") or card.get("num") or "")
+    return f"{card.get('name', '')} {card.get('num', '')}".strip()
+
+
+def card_matches(card, text):
+    """Is this listing (title, handle, or a product page as text) the want-list card?"""
+    t = str(text or "").lower()
+    words = card.get("match")
+    if words:
+        return is_don(t) and all(any(alt in t for alt in str(w).lower().split("|")) for w in words)
+    return any(n in t for n in card_num_variants(card["num"]))
+
+
 def shopify_cart_link(base, variant_id, qty=1):
     """Shopify cart permalink: opens checkout with this item already in the cart."""
     if not variant_id:
@@ -1848,11 +1888,13 @@ def elemental_card(card, base):
     Its search results only give the cheapest condition's price, sold out or not (a Damaged copy at $1
     when the only copy left is Near Mint at $2), so the price comes from the product page, by the same
     rule as the other shops: near mint if it's in stock, otherwise the cheapest condition that is."""
-    excl = card.get("exclude", DEFAULT_EXCLUDE)
+    excl = card.get("exclude", DON_EXCLUDE if card.get("match") else DEFAULT_EXCLUDE)
     hits = []
-    for p in suggest(base, card["num"]):
+    query = card.get("search") or ("don " + " ".join(dict.fromkeys(str(w).split("|")[0] for w in card["match"]))
+                                   if card.get("match") else card["num"])
+    for p in suggest(base, query):
         title = p.get("title", "")
-        if not any(n in title.lower() or n in p.get("handle", "") for n in card_num_variants(card["num"])):
+        if not card_matches(card, title + " " + p.get("handle", "")):
             continue
         if is_excluded(title, excl) or not p.get("available"):
             continue
@@ -1905,7 +1947,7 @@ def nm_price(p):
 
 
 def handle_shop_card(card, shop_name, base):
-    excl = card.get("exclude", DEFAULT_EXCLUDE)
+    excl = card.get("exclude", DON_EXCLUDE if card.get("match") else DEFAULT_EXCLUDE)
     handles = list(card.get("handles", {}).get(shop_name, []))
     if not handles:  # search by name and confirm number below
         for p in suggest(base, card.get("search", card["name"])):
@@ -1915,7 +1957,10 @@ def handle_shop_card(card, shop_name, base):
     pages = pmap(lambda h: product_js(base, h), handles)      # all product pages at once (v1: one by one)
     out = []
     for h, p in zip(handles, pages):
-        if not p or not js_matches_number(p, card["num"]):
+        if not p:
+            continue
+        # a DON!! card is matched on its title: every One Piece card's text mentions DON!!
+        if not (card_matches(card, f"{p.get('title', '')} {h}") if card.get("match") else js_matches_number(p, card["num"])):
             continue
         if is_excluded(p.get("title", ""), excl):
             continue
@@ -1930,7 +1975,7 @@ def handle_shop_card(card, shop_name, base):
 def single_find(card, shop, price, url, title, cart="", cond=""):
     """cond: the condition of the copy the price and Buy link are for ('NM', 'LP'...), if the shop says."""
     return {"id": f"card|{shop}|{card['num']}|{url.rsplit('/', 1)[-1]}", "kind": "Single",
-            "name": f"{card['name']} {card['num']}".strip(), "deck": card.get("deck", ""), "qty": card.get("qty", 1),
+            "name": card_label(card), "deck": card.get("deck", ""), "qty": card.get("qty", 1),
             "shop": shop, "price": price, "url": url, "cart": cart, "note": title,
             "priority": card.get("priority", False), "cond": cond}
 

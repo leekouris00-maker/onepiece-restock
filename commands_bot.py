@@ -518,7 +518,9 @@ HELP = (
     "🔗 **Watch any link**: `/watch add link:<product page> max:<price>` alerts the moment it's buyable at or "
     "under your max · `/watch list` · `/watch remove`\n"
     "🛒 **eBay**: `/ebay list` · `/ebay check` (cheapest listed now) · `/ebay max` · `/ebay add` · `/ebay remove`\n"
-    "🎉 `/bought <card>` picked some up? logs it and stops the alerts once you've got them all\n"
+    "🎉 `/bought <card>` picked some up? logs it and stops the alerts once you've got them all (works for "
+    "eBay watch items too)\n"
+    "🃏 DON!! cards have no number: `/want add num:Gomu Gomu DON max:<price>`\n"
     "🖥️ `/desk on` the PC opens the checkout tab itself when a target comes in stock (`/desk off`)\n"
     "⚡ In drop windows the bot also checks that release's listings and your /watch links every 15 seconds.\n\n"
     "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`, "
@@ -563,6 +565,51 @@ def norm_num(num):
     if m:
         return f"P-{m.group(1)}"
     return None
+
+
+def don_entry(num, name=""):
+    """v2.7.1: a DON!! card has no number, so /want add takes its name instead ('Gomu Gomu DON').
+    -> (key, match words) e.g. ('DON-GOMU-GOMU', ['gomu']), or (None, None) if this isn't a DON!! card."""
+    text = f"{num} {name}"
+    if not re.search(r"\bdon\b", text, re.I):
+        return None, None
+    words = tb.don_words(num) or tb.don_words(name)
+    if not words:
+        return None, None
+    return tb.don_key(words), list(dict.fromkeys(words))
+
+
+def find_want(cards, text):
+    """The want-list card someone means: its number or DON!! key (what autocomplete sends), a typed
+    DON!! name like 'gomu gomu don', or its name."""
+    t = str(text or "").strip()
+    keys = {norm_num(t) or t.upper()}
+    key, _ = don_entry(t)
+    if key:
+        keys.add(key)
+    for c in cards:
+        if str(c.get("num", "")).upper() in keys:
+            return c
+    for c in cards:
+        if t and str(c.get("name", "")).strip().lower() == t.lower():
+            return c
+    return None
+
+
+def ebay_matches(raw, text):
+    """eBay watch entries someone means by name: an exact name, or every word they typed (words in
+    brackets left out) in the entry's name. Returns a list: two means 'which one?'."""
+    cards = [c for c in (raw.get("cards") or []) if isinstance(c, dict)]
+    t = str(text or "").strip().lower()
+    if t.startswith("ebay:"):
+        t = t[5:].strip()
+    exact = [c for c in cards if str(c.get("name", "")).lower() == t]
+    if exact:
+        return exact[:1]
+    words = [w for w in tb.don_words(t) if len(w) > 1]
+    if not words:
+        return []
+    return [c for c in cards if all(w in re.sub(r"[^a-z0-9]+", " ", str(c.get("name", "")).lower()).split() for w in words)]
 
 
 # ---------------------------------------------------------------- Discord wiring
@@ -684,7 +731,7 @@ async def want_autocomplete(inter: discord.Interaction, current: str):
     cur = current.lower()
     out = []
     for c in cards:
-        label = f"{c.get('name', '')} {c.get('num', '')}" + ("" if c.get("enabled", True) else " (off)")
+        label = tb.card_label(c) + ("" if c.get("enabled", True) else " (off)")
         if cur in label.lower():
             out.append(app_commands.Choice(name=label[:100], value=str(c.get("num", ""))[:100]))
     return out[:25]
@@ -828,7 +875,7 @@ async def want_list(inter: discord.Interaction):
         return
     cards = cfg["singles"]["cards"]
     on = [c for c in cards if c.get("enabled", True)]
-    lines = [f"{'⭐' if c.get('priority') else '🃏'} **{c.get('name', '')} {c['num']}** x{c['qty']} · max "
+    lines = [f"{'⭐' if c.get('priority') else '🃏'} **{tb.card_label(c)}** x{c['qty']} · max "
              f"{tb.money(c['max'])}" + (f" · {c['deck']}" if c.get("deck") else "") for c in on]
     await inter.response.send_message(embed=embed(f"📝 Want list ({len(on)} on, {len(cards) - len(on)} off)",
                                                   [lines_field("Watching", lines, "Nothing switched on.", 20)], BLUE),
@@ -836,7 +883,8 @@ async def want_list(inter: discord.Interaction):
 
 
 @want.command(name="add", description="Add a card, or change one already on the list")
-@app_commands.describe(num="Card number, e.g. OP13-120", max="Most you'd pay each (AUD)", qty="How many you want",
+@app_commands.describe(num="Card number, e.g. OP13-120. DON!! cards have none: type its name, e.g. Gomu Gomu DON",
+                       max="Most you'd pay each (AUD)", qty="How many you want",
                        name="Card name (used to search Good Games and Mayhem)", deck="Which deck it's for",
                        priority="Show it first and highlight it")
 async def want_add(inter: discord.Interaction, num: str, max: float, qty: int = 1, name: str = "", deck: str = "",
@@ -844,10 +892,15 @@ async def want_add(inter: discord.Interaction, num: str, max: float, qty: int = 
     cfg = await admin_only(inter)
     if cfg is None:
         return
-    n = norm_num(num)
+    n, match = norm_num(num), None
+    if not n:
+        n, match = don_entry(num, name)
+        if n and not name:
+            name = " ".join(w.capitalize() for w in tb.don_words(num)) + " DON!!"
     if not n or max <= 0 or not 1 <= qty <= 50:
-        await inter.response.send_message("Use a card number like OP13-120 (or P-105), a max above $0 and a qty "
-                                          "from 1 to 50.", ephemeral=True)
+        await inter.response.send_message("Use a card number like OP13-120 (or P-105), or for a DON!! card its name "
+                                          "with DON in it (e.g. `Gomu Gomu DON`), a max above $0 and a qty from 1 to "
+                                          "50.", ephemeral=True)
         return
 
     def change(raw):
@@ -855,6 +908,8 @@ async def want_add(inter: discord.Interaction, num: str, max: float, qty: int = 
         for c in cards:
             if str(c.get("num", "")).upper() == n:
                 c.update({"max": max, "qty": qty, "enabled": True})
+                if match:
+                    c["match"] = match
                 if name:
                     c["name"] = name
                 if deck:
@@ -863,6 +918,8 @@ async def want_add(inter: discord.Interaction, num: str, max: float, qty: int = 
                     c["priority"] = True
                 return "updated", c
         c = {"name": name or n, "num": n, "qty": qty, "max": max, "deck": deck, "priority": priority, "enabled": True}
+        if match:
+            c["match"] = match
         cards.append(c)
         return "added", c
     try:
@@ -871,8 +928,12 @@ async def want_add(inter: discord.Interaction, num: str, max: float, qty: int = 
     except Exception as e:  # noqa: BLE001
         await fail(inter, e)
         return
-    tip = "" if name or c.get("name") != n else " Tip: add name:... so Good Games and Mayhem can be searched too."
-    await inter.response.send_message(f"✅ {what.capitalize()} **{c['name']} {n}**: x{qty}, max {tb.money(max)}. "
+    if match:
+        tip = (f" It's a DON!! card, so a listing counts when its title says DON!! and has: "
+               f"`{'`, `'.join(match)}`.")
+    else:
+        tip = "" if name or c.get("name") != n else " Tip: add name:... so Good Games and Mayhem can be searched too."
+    await inter.response.send_message(f"✅ {what.capitalize()} **{tb.card_label(c)}**: x{qty}, max {tb.money(max)}. "
                                       f"The restock bot picks it up on its next check.{tip}", ephemeral=True)
 
 
@@ -883,11 +944,10 @@ async def _set_enabled(inter, num, on):
     n = norm_num(num) or num.upper()
 
     def change(raw):
-        for c in raw.get("singles", {}).get("cards", []):
-            if str(c.get("num", "")).upper() == n:
-                c["enabled"] = on
-                return c
-        return None
+        c = find_want(raw.get("singles", {}).get("cards", []), num)
+        if c is not None:
+            c["enabled"] = on
+        return c
     try:
         c, _ = await asyncio.to_thread(edit_config, change, f"{inter.user} ({inter.user.id})",
                                        f"want {'enable' if on else 'remove'} {n}")
@@ -897,7 +957,7 @@ async def _set_enabled(inter, num, on):
     if c is None:
         await inter.response.send_message(f"{n} isn't on the want list.", ephemeral=True)
     else:
-        await inter.response.send_message(f"{'✅ Watching' if on else '⏸️ Stopped watching'} **{c.get('name', '')} {n}**"
+        await inter.response.send_message(f"{'✅ Watching' if on else '⏸️ Stopped watching'} **{tb.card_label(c)}**"
                                           + ("" if on else " (kept on the list switched off; /want enable to bring it back)."),
                                           ephemeral=True)
 
@@ -1443,10 +1503,29 @@ async def desk_cmd(inter: discord.Interaction, mode: app_commands.Choice[str], h
     await inter.response.send_message(msg, ephemeral=True)
 
 
+async def bought_autocomplete(inter: discord.Interaction, current: str):
+    """The want list first, then the eBay watch (sent as 'ebay:<name>')."""
+    out = await want_autocomplete(inter, current)
+    if ew:
+        cur = current.lower()
+        try:
+            with open(ew.WATCH_PATH, encoding="utf-8-sig") as f:
+                items = json.load(f).get("cards") or []
+        except Exception:  # noqa: BLE001
+            items = []
+        for c in items:
+            n = str(c.get("name") or "")
+            if n and cur in n.lower():
+                label = f"🛒 eBay: {n}" + ("" if c.get("enabled", True) else " (off)")
+                out.append(app_commands.Choice(name=label[:100], value=f"ebay:{n}"[:100]))
+    return out[:25]
+
+
 @bot.tree.command(name="bought", description="Picked some up? Logs them so the bot stops alerting for that card")
 @app_commands.default_permissions(manage_guild=True)
-@app_commands.describe(card="Card number (start typing)", qty="How many you got (leave out = all you still needed)")
-@app_commands.autocomplete(card=want_autocomplete)
+@app_commands.describe(card="Card number, DON!! card or eBay watch item (start typing)",
+                       qty="How many you got (leave out = all you still needed)")
+@app_commands.autocomplete(card=bought_autocomplete)
 async def bought_cmd(inter: discord.Interaction, card: str, qty: Optional[int] = None):
     cfg = await admin_only(inter)
     if cfg is None:
@@ -1457,32 +1536,32 @@ async def bought_cmd(inter: discord.Interaction, card: str, qty: Optional[int] =
         return
 
     def change(raw):
-        for c in raw.get("singles", {}).get("cards", []):
-            if str(c.get("num", "")).upper() == n:
-                want_n = int(tb._num(c.get("qty", 1)) or 1)
-                have = int(tb._num(c.get("owned")) or 0)
-                if qty is None and have >= want_n:
-                    return c, 0, have, want_n            # already logged as owned: nothing to add
-                got = qty if qty is not None else max(1, want_n - have)
-                have += got
-                c["owned"] = have
-                if have >= want_n:
-                    c["enabled"] = False
-                stamp = f"Bought x{got} ({datetime.now():%d %b %Y})."
-                c["note"] = (str(c.get("note") or "") + "  " + stamp).strip()[-400:]
-                return c, got, have, want_n
-        return None
+        c = None if card.strip().lower().startswith("ebay:") else find_want(raw.get("singles", {}).get("cards", []), card)
+        if c is None:
+            return None
+        want_n = int(tb._num(c.get("qty", 1)) or 1)
+        have = int(tb._num(c.get("owned")) or 0)
+        if qty is None and have >= want_n:
+            return c, 0, have, want_n            # already logged as owned: nothing to add
+        got = qty if qty is not None else max(1, want_n - have)
+        have += got
+        c["owned"] = have
+        if have >= want_n:
+            c["enabled"] = False
+        stamp = f"Bought x{got} ({datetime.now():%d %b %Y})."
+        c["note"] = (str(c.get("note") or "") + "  " + stamp).strip()[-400:]
+        return c, got, have, want_n
     try:
         res, _ = await asyncio.to_thread(edit_config, change, _who(inter), f"bought {n} qty={qty}")
     except Exception as e:  # noqa: BLE001
         await fail(inter, e)
         return
     if res is None:
-        await inter.response.send_message(f"{n} isn't on the want list, so there's nothing to stop. "
-                                          "(`/want add` puts a card on it.)", ephemeral=True)
+        # v2.7.1: not on the want list. Maybe it's on the eBay watch (the Nike DON!! cards, the shoes...).
+        await bought_ebay(inter, card, qty)
         return
     c, got, have, want_n = res
-    label = f"{c.get('name', '')} {n}".strip()
+    label = tb.card_label(c)
     if got == 0:
         msg = (f"You've already logged **{have}/{want_n}** of **{label}**, so it isn't being watched. "
                "Add `qty:` if you picked up extra copies.")
@@ -1493,6 +1572,45 @@ async def bought_cmd(inter: discord.Interaction, card: str, qty: Optional[int] =
         msg = (f"✅ Logged **{got}× {label}**: **{have}/{want_n}**. Still watching for the other "
                f"{want_n - have}.")
     await inter.response.send_message(msg, ephemeral=True)
+
+
+async def bought_ebay(inter, card, qty):
+    """/bought for something on the eBay watch: switch it off and note the date."""
+    nothing = (f"**{card.strip()[:80]}** isn't on the want list or the eBay watch, so there's nothing to stop. "
+               "(`/want add` puts a card on the want list; DON!! cards go in by name, e.g. `Gomu Gomu DON`.)")
+    if not ew:
+        await inter.response.send_message(nothing, ephemeral=True)
+        return
+
+    def change(raw):
+        hits = ebay_matches(raw, card)
+        if len(hits) != 1:
+            return [c.get("name") for c in hits]
+        c = hits[0]
+        was_on = c.get("enabled", True)
+        c["enabled"] = False
+        stamp = f"Bought{f' x{qty}' if qty else ''} ({datetime.now():%d %b %Y}); switched off with /bought."
+        c["note"] = (str(c.get("note") or "") + "  " + stamp).strip()[-400:]
+        return c.get("name"), was_on
+    try:
+        res = await asyncio.to_thread(edit_ebay, change, _who(inter), f"bought ebay {card!r} qty={qty}")
+    except Exception as e:  # noqa: BLE001
+        await fail(inter, e)
+        return
+    if isinstance(res, list):
+        if not res:
+            await inter.response.send_message(nothing, ephemeral=True)
+        else:
+            await inter.response.send_message("That matches more than one thing on the eBay watch: "
+                                              + ", ".join(f"**{x}**" for x in res[:6])
+                                              + ". Run `/bought` again and pick the one you got from the list as you type.",
+                                              ephemeral=True)
+        return
+    name, was_on = res
+    await inter.response.send_message((f"🎉 Logged **{name}** as bought. The eBay watch has stopped looking for it "
+                                       "(`/ebay max` switches it back on)." if was_on else
+                                       f"Noted **{name}** as bought. It was already switched off on the eBay watch."),
+                                      ephemeral=True)
 
 
 if pw:
