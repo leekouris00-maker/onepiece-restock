@@ -11,7 +11,7 @@ on:
   workflow_dispatch:          # "Run workflow" button for testing
     inputs:
       mode:
-        description: "normal, dry-run (print only), force (sync again) or repost"
+        description: "normal, dry-run (print only), sync-only (no post), force (sync again) or repost"
         default: normal
 
 permissions:
@@ -44,6 +44,7 @@ jobs:
         run: |
           case "$MODE" in
             dry-run) python tcgplayer.py --dry-run ;;
+            sync-only) python tcgplayer.py --no-post ;;
             force)   python tcgplayer.py --force ;;
             repost)  python tcgplayer.py --repost ;;
             *)       python tcgplayer.py ;;
