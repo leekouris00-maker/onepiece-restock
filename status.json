@@ -1,132 +1,26 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1792833514,
-  "Good Games": 1792833514
+  "Elemental Arcade": 1792843525,
+  "Good Games": 1792843525
  },
  "drops_slot": "2026-10-24 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1792833504,
+ "ebay_ts": 1792843516,
  "held": {
-  "ebay|v1|178490730493|0": {
+  "box|Rogue Online|pre-order-gundam-card-game-gd06-booster-box": {
    "f": {
-    "cart": "",
-    "deck": "eBay watch",
-    "ebay": true,
-    "id": "ebay|v1|178490730493|0",
-    "kind": "Single",
-    "name": "Nike x One Piece Mera Mera DON!! card (English)",
-    "note": "[ONE PIECE TCG x Nike Mera Mera no Mi DON!! Promo Card English 2026](https://www.ebay.com.au/itm/178490730493)\nA$250.14 item + free postage + A$25.01 GST (est.) \u00b7 seller feedback 100.0% (50)\nCame with in-store pair purchases outside Japan. Not much sales data yet - ~A$250-300 guess based on the other two.",
-    "price": 275.15,
-    "priority": true,
-    "qty": 1,
-    "shop": "eBay (from Korea)",
-    "url": "https://www.ebay.com.au/itm/178490730493"
+    "cart": "https://rogueonline.com.au/cart/67856883417369:1",
+    "id": "box|Rogue Online|pre-order-gundam-card-game-gd06-booster-box",
+    "kind": "Booster box",
+    "name": "PRE-ORDER - GUNDAM CARD GAME - [GD06] BOOSTER BOX",
+    "note": "pre-order",
+    "price": 194.99,
+    "shop": "Rogue Online",
+    "url": "https://rogueonline.com.au/products/pre-order-gundam-card-game-gd06-booster-box"
    },
-   "t": 1792833521
-  },
-  "ebay|v1|366683562606|0": {
-   "f": {
-    "cart": "",
-    "deck": "eBay watch",
-    "ebay": true,
-    "id": "ebay|v1|366683562606|0",
-    "kind": "Single",
-    "name": "Gomu Gomu DON!! card (Japanese) + Mera Mera DON!! card (Japanese) + Ope Ope DON!! card (Japanese)",
-    "note": "\u26a0\ufe0f One listing, 3 of your cards - check exactly what's included before buying.\n[NIKE x ONE PIECE 3 DON!! Cards Set Gomu Mera Ope Japanese Promo NO LUFFY](https://www.ebay.com.au/itm/366683562606)\nA$46.89 item + A$46.89 postage + A$9.38 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 100.0% (47)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027, 10 of each DON per set) - expect prices to drop, lower this then.",
-    "price": 103.16,
-    "priority": true,
-    "qty": 1,
-    "shop": "eBay (from Japan)",
-    "url": "https://www.ebay.com.au/itm/366683562606"
-   },
-   "t": 1792833521
-  },
-  "ebay|v1|366725971268|0": {
-   "f": {
-    "cart": "",
-    "deck": "eBay watch",
-    "ebay": true,
-    "id": "ebay|v1|366725971268|0",
-    "kind": "Single",
-    "name": "Nike x One Piece Mera Mera DON!! card (English)",
-    "note": "[ONE PIECE TCG x Nike Mera Mera no Mi DON!! Promo Card English 2026](https://www.ebay.com.au/itm/366725971268)\nA$268.90 item + free postage + A$26.89 GST (est.) \u00b7 seller feedback 100.0% (25)\nCame with in-store pair purchases outside Japan. Not much sales data yet - ~A$250-300 guess based on the other two.",
-    "price": 295.79,
-    "priority": true,
-    "qty": 1,
-    "shop": "eBay (from Japan)",
-    "url": "https://www.ebay.com.au/itm/366725971268"
-   },
-   "t": 1792833521
-  },
-  "ebay|v1|820082175327|0": {
-   "f": {
-    "cart": "",
-    "deck": "eBay watch",
-    "ebay": true,
-    "id": "ebay|v1|820082175327|0",
-    "kind": "Single",
-    "name": "Nike x One Piece Gomu Gomu DON!! card (Japanese)",
-    "note": "[PRESALE Nike x ONE PIECE TCG Gomu Gomu DON!! Air Max Plus Jump Promo Japanese](https://www.ebay.com.au/itm/820082175327)\nA$123.49 item + free postage + A$12.35 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 99.8% (475)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027, 10 of each DON per set) - expect prices to drop, lower this then.",
-    "price": 135.84,
-    "priority": true,
-    "qty": 1,
-    "shop": "eBay (from Japan)",
-    "url": "https://www.ebay.com.au/itm/820082175327"
-   },
-   "t": 1792833521
-  },
-  "ebay|v1|820082180571|0": {
-   "f": {
-    "cart": "",
-    "deck": "eBay watch",
-    "ebay": true,
-    "id": "ebay|v1|820082180571|0",
-    "kind": "Single",
-    "name": "Nike x One Piece Mera Mera DON!! card (Japanese)",
-    "note": "[PRESALE Nike x ONE PIECE TCG Mera Mera DON!! Air Max Plus Jump Promo Japanese](https://www.ebay.com.au/itm/820082180571)\nA$123.49 item + free postage + A$12.35 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 99.8% (475)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027) - expect prices to drop, lower this then.",
-    "price": 135.84,
-    "priority": true,
-    "qty": 1,
-    "shop": "eBay (from Japan)",
-    "url": "https://www.ebay.com.au/itm/820082180571"
-   },
-   "t": 1792833521
-  },
-  "ebay|v1|820082186334|0": {
-   "f": {
-    "cart": "",
-    "deck": "eBay watch",
-    "ebay": true,
-    "id": "ebay|v1|820082186334|0",
-    "kind": "Single",
-    "name": "Nike x One Piece Ope Ope DON!! card (Japanese)",
-    "note": "[PRESALE Nike x ONE PIECE TCG Ope Ope DON!! Air Max Plus Jump Promo Japanese](https://www.ebay.com.au/itm/820082186334)\nA$123.49 item + free postage + A$12.35 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 99.8% (475)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027). StockX ask ~US$340 but best offer only ~US$66 - real market is much lower.",
-    "price": 135.84,
-    "priority": true,
-    "qty": 1,
-    "shop": "eBay (from Japan)",
-    "url": "https://www.ebay.com.au/itm/820082186334"
-   },
-   "t": 1792833521
-  },
-  "ebay|v1|880035734451|0": {
-   "f": {
-    "cart": "",
-    "deck": "eBay watch",
-    "ebay": true,
-    "id": "ebay|v1|880035734451|0",
-    "kind": "Single",
-    "name": "Nike x One Piece Ope Ope DON!! card (English)",
-    "note": "[One Piece x Nike Air Max Plus Ope Ope Don Promo Card (English) Limited Edition](https://www.ebay.com.au/itm/880035734451)\nA$218.87 item + A$27.00 postage + A$24.59 GST (est.) \u00b7 seller feedback 100.0% (1,793)\nCame with in-store pair purchases outside Japan. Sold ~US$170+post (~A$255) Sep 2026.",
-    "price": 270.46,
-    "priority": true,
-    "qty": 1,
-    "shop": "eBay (from USA)",
-    "url": "https://www.ebay.com.au/itm/880035734451"
-   },
-   "t": 1792833521
+   "t": 1792843531
   }
  },
  "last_check": "2026-10-18 20:31:51",
@@ -141,17 +35,22 @@
  "pages_seen": {
   "Alpha Gaming": 99,
   "Card Bot": 99,
+  "CardPlus TCG": 99,
   "Collectible Madness": 99,
   "Gameology": 99,
   "Gametraders Modbury Heights": 99,
+  "Goldfields Games": 99,
   "Good Games (sealed)": 99,
   "Grailborne": 99,
   "Gumnut": 99,
   "JToys": 99,
   "Light of Cards": 99,
   "M-G": 99,
+  "Overhauled Games": 99,
   "Pocket Games": 99,
-  "TCGroup": 99
+  "Rogue Online": 99,
+  "TCGroup": 99,
+  "The Wandering Collector": 99
  },
  "pc_on": true,
  "pokemon_intro": {
@@ -677,6 +576,39 @@
    ],
    "t": 1792782703.4158344
   },
+  "cardplustcg.com.au": {
+   "rules": [
+    [
+     0,
+     "/wp-content/uploads/wc-logs/"
+    ],
+    [
+     0,
+     "/wp-content/uploads/woocommerce_transient_files/"
+    ],
+    [
+     0,
+     "/wp-content/uploads/woocommerce_uploads/"
+    ],
+    [
+     0,
+     "/*?add-to-cart="
+    ],
+    [
+     0,
+     "/*?*add-to-cart="
+    ],
+    [
+     0,
+     "/wp-admin/"
+    ],
+    [
+     1,
+     "/wp-admin/admin-ajax.php"
+    ]
+   ],
+   "t": 1792843466.7750387
+  },
   "collectiblemadness.com.au": {
    "rules": [
     [
@@ -1190,6 +1122,263 @@
     ]
    ],
    "t": 1792802116.8738813
+  },
+  "goldfieldsgames.com.au": {
+   "rules": [
+    [
+     1,
+     "/"
+    ],
+    [
+     1,
+     "/products/account"
+    ],
+    [
+     1,
+     "/products/orders"
+    ],
+    [
+     1,
+     "/products/checkout"
+    ],
+    [
+     1,
+     "/*/products/account"
+    ],
+    [
+     1,
+     "/*/products/orders"
+    ],
+    [
+     1,
+     "/*/products/checkout"
+    ],
+    [
+     1,
+     "/collections/account"
+    ],
+    [
+     1,
+     "/collections/orders"
+    ],
+    [
+     1,
+     "/collections/checkout"
+    ],
+    [
+     1,
+     "/*/collections/account"
+    ],
+    [
+     1,
+     "/*/collections/orders"
+    ],
+    [
+     1,
+     "/*/collections/checkout"
+    ],
+    [
+     1,
+     "/pages/checkout"
+    ],
+    [
+     1,
+     "/*/pages/checkout"
+    ],
+    [
+     1,
+     "/blogs/*account"
+    ],
+    [
+     1,
+     "/blogs/*orders"
+    ],
+    [
+     1,
+     "/blogs/*checkout"
+    ],
+    [
+     1,
+     "/*/blogs/*account"
+    ],
+    [
+     1,
+     "/*/blogs/*orders"
+    ],
+    [
+     1,
+     "/*/blogs/*checkout"
+    ],
+    [
+     0,
+     "/admin"
+    ],
+    [
+     0,
+     "/cart/"
+    ],
+    [
+     0,
+     "/*/cart/"
+    ],
+    [
+     0,
+     "/checkout"
+    ],
+    [
+     0,
+     "/*/checkout"
+    ],
+    [
+     0,
+     "/checkouts/"
+    ],
+    [
+     0,
+     "/*/checkouts/"
+    ],
+    [
+     0,
+     "/orders"
+    ],
+    [
+     0,
+     "/*/orders"
+    ],
+    [
+     1,
+     "/account/login"
+    ],
+    [
+     1,
+     "/*/account/login"
+    ],
+    [
+     0,
+     "/account"
+    ],
+    [
+     0,
+     "/*/account"
+    ],
+    [
+     0,
+     "/54935060739"
+    ],
+    [
+     0,
+     "/cdn/wpm/*.js"
+    ],
+    [
+     0,
+     "/services"
+    ],
+    [
+     0,
+     "/sf_*"
+    ],
+    [
+     0,
+     "/cart.js"
+    ],
+    [
+     0,
+     "/*/cart.js"
+    ],
+    [
+     0,
+     "/recommendations/products"
+    ],
+    [
+     0,
+     "/*/recommendations/products"
+    ],
+    [
+     0,
+     "/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/*/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/collections/*+*"
+    ],
+    [
+     0,
+     "/collections/*%2B*"
+    ],
+    [
+     0,
+     "/collections/*%2b*"
+    ],
+    [
+     0,
+     "/*/collections/*+*"
+    ],
+    [
+     0,
+     "/*/collections/*%2B*"
+    ],
+    [
+     0,
+     "/*/collections/*%2b*"
+    ],
+    [
+     0,
+     "/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/*/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/blogs/*+*"
+    ],
+    [
+     0,
+     "/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*/blogs/*+*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*?*ls=*&ls=*"
+    ],
+    [
+     0,
+     "/*?*ls%3*ls%3*"
+    ],
+    [
+     0,
+     "/*?*oseid=*"
+    ],
+    [
+     0,
+     "/*?*preview_theme_id=*"
+    ],
+    [
+     0,
+     "/*?*preview_script_id=*"
+    ]
+   ],
+   "t": 1792843466.37878
   },
   "grailborne.com.au": {
    "rules": [
@@ -1705,6 +1894,10 @@
    ],
    "t": 1792782703.1794455
   },
+  "overhauledgames.com.au": {
+   "rules": [],
+   "t": 1792843466.751498
+  },
   "pocketgames.com.au": {
    "rules": [
     [
@@ -1961,6 +2154,263 @@
     ]
    ],
    "t": 1792802114.806267
+  },
+  "rogueonline.com.au": {
+   "rules": [
+    [
+     1,
+     "/"
+    ],
+    [
+     1,
+     "/products/account"
+    ],
+    [
+     1,
+     "/products/orders"
+    ],
+    [
+     1,
+     "/products/checkout"
+    ],
+    [
+     1,
+     "/*/products/account"
+    ],
+    [
+     1,
+     "/*/products/orders"
+    ],
+    [
+     1,
+     "/*/products/checkout"
+    ],
+    [
+     1,
+     "/collections/account"
+    ],
+    [
+     1,
+     "/collections/orders"
+    ],
+    [
+     1,
+     "/collections/checkout"
+    ],
+    [
+     1,
+     "/*/collections/account"
+    ],
+    [
+     1,
+     "/*/collections/orders"
+    ],
+    [
+     1,
+     "/*/collections/checkout"
+    ],
+    [
+     1,
+     "/pages/checkout"
+    ],
+    [
+     1,
+     "/*/pages/checkout"
+    ],
+    [
+     1,
+     "/blogs/*account"
+    ],
+    [
+     1,
+     "/blogs/*orders"
+    ],
+    [
+     1,
+     "/blogs/*checkout"
+    ],
+    [
+     1,
+     "/*/blogs/*account"
+    ],
+    [
+     1,
+     "/*/blogs/*orders"
+    ],
+    [
+     1,
+     "/*/blogs/*checkout"
+    ],
+    [
+     0,
+     "/admin"
+    ],
+    [
+     0,
+     "/cart/"
+    ],
+    [
+     0,
+     "/*/cart/"
+    ],
+    [
+     0,
+     "/checkout"
+    ],
+    [
+     0,
+     "/*/checkout"
+    ],
+    [
+     0,
+     "/checkouts/"
+    ],
+    [
+     0,
+     "/*/checkouts/"
+    ],
+    [
+     0,
+     "/orders"
+    ],
+    [
+     0,
+     "/*/orders"
+    ],
+    [
+     1,
+     "/account/login"
+    ],
+    [
+     1,
+     "/*/account/login"
+    ],
+    [
+     0,
+     "/account"
+    ],
+    [
+     0,
+     "/*/account"
+    ],
+    [
+     0,
+     "/14750928"
+    ],
+    [
+     0,
+     "/cdn/wpm/*.js"
+    ],
+    [
+     0,
+     "/services"
+    ],
+    [
+     0,
+     "/sf_*"
+    ],
+    [
+     0,
+     "/cart.js"
+    ],
+    [
+     0,
+     "/*/cart.js"
+    ],
+    [
+     0,
+     "/recommendations/products"
+    ],
+    [
+     0,
+     "/*/recommendations/products"
+    ],
+    [
+     0,
+     "/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/*/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/collections/*+*"
+    ],
+    [
+     0,
+     "/collections/*%2B*"
+    ],
+    [
+     0,
+     "/collections/*%2b*"
+    ],
+    [
+     0,
+     "/*/collections/*+*"
+    ],
+    [
+     0,
+     "/*/collections/*%2B*"
+    ],
+    [
+     0,
+     "/*/collections/*%2b*"
+    ],
+    [
+     0,
+     "/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/*/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/blogs/*+*"
+    ],
+    [
+     0,
+     "/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*/blogs/*+*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*?*ls=*&ls=*"
+    ],
+    [
+     0,
+     "/*?*ls%3*ls%3*"
+    ],
+    [
+     0,
+     "/*?*oseid=*"
+    ],
+    [
+     0,
+     "/*?*preview_theme_id=*"
+    ],
+    [
+     0,
+     "/*?*preview_script_id=*"
+    ]
+   ],
+   "t": 1792843466.3658113
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -2475,6 +2925,263 @@
     ]
    ],
    "t": 1792802121.6509635
+  },
+  "thewanderingcollector.com.au": {
+   "rules": [
+    [
+     1,
+     "/"
+    ],
+    [
+     1,
+     "/products/account"
+    ],
+    [
+     1,
+     "/products/orders"
+    ],
+    [
+     1,
+     "/products/checkout"
+    ],
+    [
+     1,
+     "/*/products/account"
+    ],
+    [
+     1,
+     "/*/products/orders"
+    ],
+    [
+     1,
+     "/*/products/checkout"
+    ],
+    [
+     1,
+     "/collections/account"
+    ],
+    [
+     1,
+     "/collections/orders"
+    ],
+    [
+     1,
+     "/collections/checkout"
+    ],
+    [
+     1,
+     "/*/collections/account"
+    ],
+    [
+     1,
+     "/*/collections/orders"
+    ],
+    [
+     1,
+     "/*/collections/checkout"
+    ],
+    [
+     1,
+     "/pages/checkout"
+    ],
+    [
+     1,
+     "/*/pages/checkout"
+    ],
+    [
+     1,
+     "/blogs/*account"
+    ],
+    [
+     1,
+     "/blogs/*orders"
+    ],
+    [
+     1,
+     "/blogs/*checkout"
+    ],
+    [
+     1,
+     "/*/blogs/*account"
+    ],
+    [
+     1,
+     "/*/blogs/*orders"
+    ],
+    [
+     1,
+     "/*/blogs/*checkout"
+    ],
+    [
+     0,
+     "/admin"
+    ],
+    [
+     0,
+     "/cart/"
+    ],
+    [
+     0,
+     "/*/cart/"
+    ],
+    [
+     0,
+     "/checkout"
+    ],
+    [
+     0,
+     "/*/checkout"
+    ],
+    [
+     0,
+     "/checkouts/"
+    ],
+    [
+     0,
+     "/*/checkouts/"
+    ],
+    [
+     0,
+     "/orders"
+    ],
+    [
+     0,
+     "/*/orders"
+    ],
+    [
+     1,
+     "/account/login"
+    ],
+    [
+     1,
+     "/*/account/login"
+    ],
+    [
+     0,
+     "/account"
+    ],
+    [
+     0,
+     "/*/account"
+    ],
+    [
+     0,
+     "/66762571961"
+    ],
+    [
+     0,
+     "/cdn/wpm/*.js"
+    ],
+    [
+     0,
+     "/services"
+    ],
+    [
+     0,
+     "/sf_*"
+    ],
+    [
+     0,
+     "/cart.js"
+    ],
+    [
+     0,
+     "/*/cart.js"
+    ],
+    [
+     0,
+     "/recommendations/products"
+    ],
+    [
+     0,
+     "/*/recommendations/products"
+    ],
+    [
+     0,
+     "/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/*/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/collections/*+*"
+    ],
+    [
+     0,
+     "/collections/*%2B*"
+    ],
+    [
+     0,
+     "/collections/*%2b*"
+    ],
+    [
+     0,
+     "/*/collections/*+*"
+    ],
+    [
+     0,
+     "/*/collections/*%2B*"
+    ],
+    [
+     0,
+     "/*/collections/*%2b*"
+    ],
+    [
+     0,
+     "/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/*/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/blogs/*+*"
+    ],
+    [
+     0,
+     "/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*/blogs/*+*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*?*ls=*&ls=*"
+    ],
+    [
+     0,
+     "/*?*ls%3*ls%3*"
+    ],
+    [
+     0,
+     "/*?*oseid=*"
+    ],
+    [
+     0,
+     "/*?*preview_theme_id=*"
+    ],
+    [
+     0,
+     "/*?*preview_script_id=*"
+    ]
+   ],
+   "t": 1792843466.3697863
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -3173,7 +3880,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792750863.8357108
+   "t": 1792843466.3858993
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -4580,13 +5287,18 @@
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
+  "cardplustcg.com.au": 0,
   "collectiblemadness.com.au": 0,
   "elementalarcade.com.au": 0,
+  "goldfieldsgames.com.au": 0,
   "grailborne.com.au": 0,
   "lightofcards.com.au": 0,
+  "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
+  "rogueonline.com.au": 0,
   "shop.goodgames.com.au": 0,
   "tcg.goodgames.com.au": 0,
+  "thewanderingcollector.com.au": 0,
   "www.cherrycollectables.com.au": 0,
   "www.gameology.com.au": 0,
   "www.gametradersinglefarm.com.au": 0,
@@ -4602,5 +5314,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1792833504
+ "sweep_ts": 1792843516
 }

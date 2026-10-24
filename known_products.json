@@ -59,6 +59,46 @@
  ],
  "Card Bot (pokemon:30th-celebration)": [],
  "Card Bot (pokemon:delta-reign)": [],
+ "CardPlus TCG": [
+  "list|CardPlus TCG|13708",
+  "list|CardPlus TCG|13721",
+  "list|CardPlus TCG|13868",
+  "list|CardPlus TCG|14404",
+  "list|CardPlus TCG|15624",
+  "list|CardPlus TCG|15709",
+  "list|CardPlus TCG|17604",
+  "list|CardPlus TCG|18384"
+ ],
+ "CardPlus TCG (all sealed)": [
+  "list|CardPlus TCG|13723"
+ ],
+ "CardPlus TCG (other sealed)": [
+  "list|CardPlus TCG|13728",
+  "list|CardPlus TCG|13734",
+  "list|CardPlus TCG|15631",
+  "list|CardPlus TCG|15703",
+  "list|CardPlus TCG|15706"
+ ],
+ "CardPlus TCG (pokemon:30th-celebration)": [
+  "plist|30th-celebration|CardPlus TCG|15977",
+  "plist|30th-celebration|CardPlus TCG|16011",
+  "plist|30th-celebration|CardPlus TCG|16034",
+  "plist|30th-celebration|CardPlus TCG|16137",
+  "plist|30th-celebration|CardPlus TCG|16138",
+  "plist|30th-celebration|CardPlus TCG|16139",
+  "plist|30th-celebration|CardPlus TCG|16140",
+  "plist|30th-celebration|CardPlus TCG|16141",
+  "plist|30th-celebration|CardPlus TCG|16142",
+  "plist|30th-celebration|CardPlus TCG|16143",
+  "plist|30th-celebration|CardPlus TCG|16144",
+  "plist|30th-celebration|CardPlus TCG|17927"
+ ],
+ "CardPlus TCG (pokemon:delta-reign)": [
+  "plist|delta-reign|CardPlus TCG|17378",
+  "plist|delta-reign|CardPlus TCG|17483",
+  "plist|delta-reign|CardPlus TCG|17548",
+  "plist|delta-reign|CardPlus TCG|17605"
+ ],
  "Cherry Collectables": [
   "list|Cherry Collectables|one-piece-card-game-eb-01-memorial-collection-extra-booster-booster-box",
   "list|Cherry Collectables|one-piece-card-game-eb-02-extra-booster-booster-box",
@@ -342,6 +382,39 @@
   "plist|delta-reign|Gametraders Modbury Heights|pre-order-pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box-6th-november",
   "plist|delta-reign|Gametraders Modbury Heights|pre-order-pokemon-tcg-mega-evolution-delta-reign-three-booster-blister-6th-november"
  ],
+ "Goldfields Games": [
+  "list|Goldfields Games|one-piece-card-game-a-fist-of-divine-speed-op-11-booster-box",
+  "list|Goldfields Games|one-piece-card-game-extra-booster-box-eb-02",
+  "list|Goldfields Games|one-piece-card-game-premium-booster-box-prb-02",
+  "list|Goldfields Games|one-piece-card-game-tba-op-12-booster-box",
+  "list|Goldfields Games|one-piece-card-game-tba-op-13-booster-box",
+  "list|Goldfields Games|one-piece-card-game-tba-op-14-booster-box",
+  "list|Goldfields Games|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box"
+ ],
+ "Goldfields Games (all sealed)": [
+  "list|Goldfields Games|one-piece-card-game-dp-09-emperors-in-the-new-world-double-pack",
+  "list|Goldfields Games|one-piece-card-game-english-2nd-anniversary-set",
+  "list|Goldfields Games|one-piece-card-game-premium-card-collection-best-selection-vol-2",
+  "list|Goldfields Games|one-piece-card-game-premium-card-collection-best-selection-vol-3",
+  "list|Goldfields Games|one-piece-card-game-premium-card-collection-best-selection-vol-4",
+  "list|Goldfields Games|one-piece-card-game-set-sail-sd-01-deck-set",
+  "list|Goldfields Games|one-piece-card-game-starter-deck-ace-newgate-st-22",
+  "list|Goldfields Games|one-piece-card-game-starter-deck-ex-gear-5-st-21",
+  "list|Goldfields Games|one-piece-card-game-starter-deck-tba-st-23",
+  "list|Goldfields Games|one-piece-card-game-starter-deck-tba-st-24",
+  "list|Goldfields Games|one-piece-card-game-starter-deck-tba-st-25",
+  "list|Goldfields Games|one-piece-card-game-starter-deck-tba-st-26",
+  "list|Goldfields Games|one-piece-card-game-starter-deck-tba-st-27",
+  "list|Goldfields Games|one-piece-card-game-starter-deck-tba-st-28",
+  "list|Goldfields Games|one-piece-card-game-tba-dp-07-double-pack",
+  "list|Goldfields Games|one-piece-card-game-tba-dp-08-double-pack",
+  "list|Goldfields Games|one-piece-card-game-tba-dp-09-double-pack",
+  "list|Goldfields Games|one-piece-card-game-tba-dp-09-double-pack-display",
+  "list|Goldfields Games|one-piece-card-game-tin-pack-set-display-vol-1-ts-01",
+  "list|Goldfields Games|one-piece-card-game-tin-pack-set-display-vol-2-ts-02"
+ ],
+ "Goldfields Games (pokemon:30th-celebration)": [],
+ "Goldfields Games (pokemon:delta-reign)": [],
  "Good Games (pokemon:30th-celebration)": [],
  "Good Games (pokemon:delta-reign)": [
   "plist|delta-reign|Good Games|pokemon-tcg-delta-reign-booster-box",
@@ -640,6 +713,18 @@
  "Mayhem (pokemon:delta-reign)": [],
  "Monster Mart (pokemon:30th-celebration)": [],
  "Monster Mart (pokemon:delta-reign)": [],
+ "Overhauled Games": [],
+ "Overhauled Games (all sealed)": [],
+ "Overhauled Games (pokemon:30th-celebration)": [
+  "plist|30th-celebration|Overhauled Games|20704",
+  "plist|30th-celebration|Overhauled Games|20706"
+ ],
+ "Overhauled Games (pokemon:delta-reign)": [
+  "plist|delta-reign|Overhauled Games|21230",
+  "plist|delta-reign|Overhauled Games|21238",
+  "plist|delta-reign|Overhauled Games|21240",
+  "plist|delta-reign|Overhauled Games|21242"
+ ],
  "Pocket Games": [
   "list|Pocket Games|one-piece-op15-sky-island-booster-box",
   "list|Pocket Games|one-piece-tcg-eb-03-heroines-edition-booster-box-japanese",
@@ -721,6 +806,20 @@
   "plist|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-booster-box",
   "plist|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-elite-trainer-box-etb"
  ],
+ "Rogue Online": [
+  "list|Rogue Online|one-piece-card-game-op-18-the-dominance-of-god-booster-box",
+  "list|Rogue Online|pre-order-gundam-card-game-gd06-booster-box",
+  "list|Rogue Online|pre-order-one-piece-card-game-eb-05-heroines-vol-2-booster-box-1",
+  "list|Rogue Online|pre-order-one-piece-card-game-op-17-the-worlds-strongest-warriors-booster-box"
+ ],
+ "Rogue Online (all sealed)": [],
+ "Rogue Online (pokemon:30th-celebration)": [
+  "plist|30th-celebration|Rogue Online|pre-order-pokemon-tcg-30th-celebration-elite-trainer-box-1"
+ ],
+ "Rogue Online (pokemon:delta-reign)": [
+  "plist|delta-reign|Rogue Online|pre-order-pokemon-tcg-mega-evolution-delta-reign-3-pack-blister",
+  "plist|delta-reign|Rogue Online|pre-order-pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box"
+ ],
  "TCGroup": [
   "list|TCGroup|one-piece-awakening-of-the-new-era-op-05-booster-box-english",
   "list|TCGroup|one-piece-card-game-500-years-in-the-future-op-07-booster-box-english",
@@ -770,5 +869,58 @@
   "plist|delta-reign|TCGroup|pokemon-trading-card-game-mega-evolution-me06-delta-reign-booster-box-english",
   "plist|delta-reign|TCGroup|pokemon-trading-card-game-mega-evolution-me06-delta-reign-elite-trainer-box-etb-english",
   "plist|delta-reign|TCGroup|pokemon-trading-card-game-mega-evolution-me06-delta-reign-three-booster-blister-english"
- ]
+ ],
+ "The Wandering Collector": [
+  "list|The Wandering Collector|one-piece-card-game-booster-display-a-fist-of-divine-speed-op-11-pre-order",
+  "list|The Wandering Collector|one-piece-card-game-booster-display-romance-dawn-op-01-blue-bottom-first-print",
+  "list|The Wandering Collector|one-piece-card-game-booster-display-romance-dawn-op-01-white-bottom",
+  "list|The Wandering Collector|one-piece-tcg-500-years-in-the-future-booster-box-op-07",
+  "list|The Wandering Collector|one-piece-tcg-awakening-of-the-new-era-booster-box-op-05",
+  "list|The Wandering Collector|one-piece-tcg-carrying-on-his-will-extra-booster-box-op-13",
+  "list|The Wandering Collector|one-piece-tcg-emperors-in-the-new-world-booster-box-op-09",
+  "list|The Wandering Collector|one-piece-tcg-heroines-extra-booster-box-eb-03",
+  "list|The Wandering Collector|one-piece-tcg-kingdoms-of-intrigue-booster-box-op-04",
+  "list|The Wandering Collector|one-piece-tcg-legacy-of-the-master-booster-box-op-12",
+  "list|The Wandering Collector|one-piece-tcg-memorial-collection-extra-booster-box-eb-01",
+  "list|The Wandering Collector|one-piece-tcg-paramount-war-booster-box-op-02-red-bottom",
+  "list|The Wandering Collector|one-piece-tcg-pillars-of-strength-booster-box-op-03",
+  "list|The Wandering Collector|one-piece-tcg-royal-blood-booster-box-op-10",
+  "list|The Wandering Collector|one-piece-tcg-the-best-premium-booster-box-prb-02",
+  "list|The Wandering Collector|one-piece-tcg-the-one-premium-booster-box-prb-01",
+  "list|The Wandering Collector|one-piece-tcg-the-time-of-battle-booster-box-op-16",
+  "list|The Wandering Collector|one-piece-tcg-the-worlds-strongest-warriors-booster-box-op-17",
+  "list|The Wandering Collector|one-piece-tcg-two-legends-booster-box-op-08",
+  "list|The Wandering Collector|one-piece-tcg-wings-of-the-captain-booster-box-op-06",
+  "list|The Wandering Collector|pre-order-one-piece-tcg-anime-25th-collection-extra-booster-box-eb-02",
+  "list|The Wandering Collector|pre-order-one-piece-tcg-tba-booster-box-op-15",
+  "list|The Wandering Collector|pre-order-one-piece-tcg-the-azure-seas-seven-booster-box-op-14"
+ ],
+ "The Wandering Collector (all sealed)": [
+  "list|The Wandering Collector|one-piece-tcg-awakening-of-the-new-era-booster-box-case-op-05",
+  "list|The Wandering Collector|one-piece-tcg-carrying-on-his-will-extra-booster-box-case-op-13",
+  "list|The Wandering Collector|one-piece-tcg-english-2nd-anniversary-set-sealed",
+  "list|The Wandering Collector|one-piece-tcg-oripa-vol-5-mystery-box-sp-manga-gold-dons-events-only",
+  "list|The Wandering Collector|one-piece-tcg-the-best-premium-booster-box-case-prb-02",
+  "list|The Wandering Collector|one-piece-tcg-ts-02-tin-pack-set-vol-2-master-case-48-tins",
+  "list|The Wandering Collector|pre-order-one-piece-tcg-anime-25th-collection-extra-booster-box-case-eb-02",
+  "list|The Wandering Collector|pre-order-one-piece-tcg-heroines-extra-booster-box-case-eb-03",
+  "list|The Wandering Collector|pre-order-one-piece-tcg-tba-booster-box-case-op-15",
+  "list|The Wandering Collector|pre-order-one-piece-tcg-the-azure-seas-seven-booster-box-case-op-14"
+ ],
+ "The Wandering Collector (other sealed)": [
+  "list|The Wandering Collector|one-piece-tcg-ib-05-illustration-box-vol-5-master-case-24-boxes",
+  "list|The Wandering Collector|one-piece-tcg-ib-06-illustration-box-vol-6-master-case-24-boxes-copy"
+ ],
+ "The Wandering Collector (pokemon:30th-celebration)": [
+  "plist|30th-celebration|The Wandering Collector|pokemon-tcg-30th-celebration-knock-out-collection",
+  "plist|30th-celebration|The Wandering Collector|pokemon-tcg-30th-celebration-mini-tin",
+  "plist|30th-celebration|The Wandering Collector|pokemon-tcg-30th-celebration-mini-tin-sealed-display",
+  "plist|30th-celebration|The Wandering Collector|pokemon-tcg-30th-celebration-poster-collection",
+  "plist|30th-celebration|The Wandering Collector|pokemon-tcg-30th-celebration-sylveon-ex-box-greninja-ex-box-assorted",
+  "plist|30th-celebration|The Wandering Collector|pokemon-tcg-30th-celebration-tech-sticker-collection",
+  "plist|30th-celebration|The Wandering Collector|pokemon-tcg-30th-celebration-ultra-premium-collection-day-night",
+  "plist|30th-celebration|The Wandering Collector|pokemon-tcg-mega-evolution-30th-celebration-booster-bundle",
+  "plist|30th-celebration|The Wandering Collector|pre-order-pokemon-tcg-30th-celebration-elite-trainer-box"
+ ],
+ "The Wandering Collector (pokemon:delta-reign)": []
 }
