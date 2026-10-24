@@ -278,7 +278,7 @@ EXTRA_SHOPIFY_PRODUCTS = [
 # WooCommerce shops (their public Store API, the same one their own shop pages use).
 EXTRA_WOOCOMMERCE = [
     {"name": "Overhauled Games",
-     "url": "https://overhauledgames.com.au/wp-json/wc/store/v1/products?search=one%20piece%20booster%20box&per_page=100"},
+     "url": "https://overhauledgames.com.au/wp-json/wc/store/v1/products?search=one%20piece%20tcg&per_page=100"},
     {"name": "CardPlus TCG", "url": "https://cardplustcg.com.au/wp-json/wc/store/v1/products?search=one%20piece&per_page=100"},
 ]
 BOX_MIN_PRICE = 80      # a "booster box" listed under this is a pre-order deposit (CardPlus: $35), not the box's price
