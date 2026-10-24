@@ -149,7 +149,7 @@ try:
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
 
-VERSION = "2.7.1"
+VERSION = "2.8.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -200,6 +200,7 @@ ENV_ALERTS = {
     "DISCORD_WEBHOOK_STATUS": "discord_webhook_status",
     "DISCORD_WEBHOOK_EBAY": "discord_webhook_ebay",
     "DISCORD_WEBHOOK_DROPS": "discord_webhook_drops",      # optional: the 6-hourly price drops get their own channel
+    "DISCORD_WEBHOOK_PRICES": "discord_webhook_prices",    # optional: v2.8 daily TCGplayer report (tcgplayer.py)
     "LEDGER_URL": "ledger_url",
     "HEARTBEAT_TOPIC": "heartbeat_topic",
     "HEARTBEAT_ROLE": "heartbeat_role",
@@ -1089,7 +1090,7 @@ KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "relea
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
                   "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
-                  "fast_lane"}
+                  "fast_lane", "tcgplayer"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -2976,6 +2977,7 @@ HOOK_LABELS = {"discord_webhook_boxes": "#booster-boxes", "discord_webhook_singl
                "discord_webhook_sealed": "#sealed-alerts", "discord_webhook_ebay": "#ebay-resale",
                "discord_webhook_watch": "#watched-links",
                "discord_webhook_status": "#bot-status", "discord_webhook_drops": "price drops",
+               "discord_webhook_prices": "#tcgplayer-prices",
                "discord_webhook_recap": "daily recap", "discord_webhook": "main channel"}
 
 

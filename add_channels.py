@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-Add two channels to the One Piece TCG Discord server (run once)
-================================================================
+Add the bot's extra channels to the One Piece TCG Discord server (run once)
+===========================================================================
 
 Creates, under 🚨 RESTOCK ALERTS:
   🛒・ebay-resale   eBay finds from ebay_watch.json (Nike TNs, Nike DON!! cards, graded promos)
   🤖・bot-status    the bot's own notices: shop not loading / back, drop mode on/off, PC went quiet
+  📈・tcgplayer-prices  the daily TCGplayer price report (v2.8, tcgplayer.py)
 
-Both are read-only for members (the bot and its webhooks can still post). It makes a webhook for
+All are read-only for members (the bot and its webhooks can still post). It makes a webhook for
 each, saves them where your other webhooks are (config.json or secrets.json), and posts a hello in
-each channel so you can see it worked. Then it prints the two values to add to GitHub, so the cloud
+each channel so you can see it worked. Then it prints the values to add to GitHub, so the cloud
 copy uses the same channels.
 
 Double-click add_channels.bat, or:  py -3 add_channels.py
@@ -47,6 +48,11 @@ CHANNELS = [
      "discord_webhook_status", "DISCORD_WEBHOOK_STATUS",
      "🤖 **Bot status will post here** from now on (shops down or back, drop mode, the PC going quiet), "
      "so the alert channels only have finds in them."),
+    ("📈・tcgplayer-prices", "Bot: daily TCGplayer (US) market prices in A$ - movers, AU shop deals, boxes. No pings.",
+     "discord_webhook_prices", "DISCORD_WEBHOOK_PRICES",
+     "📈 **The daily TCGplayer price report will post here** (about 7:45am): biggest movers, singles cheaper "
+     "at the AU shops than TCGplayer's market, booster box prices and your want list. Look anything up with "
+     "`/tcgp`, e.g. `/tcgp OP13-120`."),
 ]
 
 TOKEN = None
@@ -177,7 +183,7 @@ def main():
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=1, ensure_ascii=False)
     os.replace(tmp, path)
-    print(f"\n  Saved both webhooks in {os.path.basename(path)} "
+    print(f"\n  Saved the webhooks in {os.path.basename(path)} "
           f"(a backup is in {os.path.basename(path)}.before-channels.bak).")
 
     print("\nDone. Two more steps:\n")

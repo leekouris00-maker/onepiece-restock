@@ -1,5 +1,5 @@
 """
-/value: what a single is worth at the shops right now, and its price over the last week (v2.7)
+/value: what a single is worth at the shops right now, and its price over the last week (v2.7; TCGplayer line v2.8)
 =============================================================================================
 
     /value card:OP13-120          every version of that card number
@@ -344,8 +344,20 @@ def _ago(s):
     return f"{s // 60} min ago" if s < 5400 else f"{s / 3600:.1f} h ago"
 
 
-def build(cfg, query, days=MAX_DAYS, now=None, store=None):
-    """-> (embed dict, PNG bytes or None)."""
+def _tcg_line(tcg, name):
+    """v2.8: TCGplayer's US market for the same card and version (tcgplayer.py), or ''."""
+    if not tcg or not name:
+        return ""
+    try:
+        import tcgplayer as tp
+        return tp.value_line(tcg, name)
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def build(cfg, query, days=MAX_DAYS, now=None, store=None, tcg=None):
+    """-> (embed dict, PNG bytes or None). tcg: the TCGplayer price store (tcgplayer.load_for), if any,
+    for a "TCGplayer (US) market" line on each version."""
     now = float(now or time.time())
     days = max(1, min(MAX_DAYS, int(days or MAX_DAYS)))
     t0 = now - days * 86400
@@ -403,6 +415,9 @@ def build(cfg, query, days=MAX_DAYS, now=None, store=None):
         stock = "in stock" if st["in_stock"] else "sold out"
         line = (f"{mark} {head}{extra}\n   now **{tb.money(st['now'])}** {stock} · {days}d low {tb.money(st['low'])}"
                 f" · high {tb.money(st['high'])} · {trend(st)}")
+        tl = _tcg_line(tcg, ln.get("name"))
+        if tl:
+            line += f"\n   {tl}"
         if i >= MAX_LINES:
             line += " · *(not on the chart)*"
         rows.append(line)

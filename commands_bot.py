@@ -11,6 +11,7 @@ Type these in your Discord server:
     /card <search>    look a card up at Elemental Arcade, Good Games and Mayhem
     /history <search> price history of a box or sealed product, and the lowest price seen
     /value <card>     what a single's worth at the shops now, with a price chart for the last week (value.py)
+    /tcgp <search>    TCGplayer's US market price for a card or sealed product, in US$ and A$ (tcgplayer.py)
     /stats            restocks in the last 30 days: which shops, what hours, how long stock lasts
     /pricedrops       singles that got the most cheaper in the last 6 hours (hours: to change)
     /drops            releases and drop windows coming up
@@ -98,6 +99,10 @@ try:
     import value as cv         # v2.7: /value
 except ImportError:
     cv = None
+try:
+    import tcgplayer as tp     # v2.8: /tcgp, and the TCGplayer line in /value
+except ImportError:
+    tp = None
 
 if not hasattr(tb, "VERSION"):
     sys.exit("This commands_bot.py needs the v2 tcg_bot.py next to it - copy both files.")
@@ -505,6 +510,7 @@ HELP = (
     "`/card <search>` look up a card, e.g. `/card OP13-120` or `/card sabo`\n"
     "`/history <search>` price history and lowest price seen, e.g. `/history op-18`\n"
     "`/value <card>` a single's value at the shops now + its price chart for the last week, e.g. `/value OP13-120`\n"
+    "`/tcgp <search>` TCGplayer's US market price in US$ and A$, e.g. `/tcgp OP13-120` or `/tcgp op13 booster box`\n"
     "`/stats` restock patterns over the last 30 days\n"
     "`/pricedrops` singles that got the most cheaper in the last 6 hours (`hours:` to change)\n"
     "`/drops` releases and drop windows coming up\n"
@@ -768,12 +774,31 @@ if cv:
     async def value_cmd(inter: discord.Interaction, card: str, days: app_commands.Range[int, 1, 7] = 7):
         await inter.response.defer(thinking=True)
         try:
-            e, png = await asyncio.to_thread(cv.build, cfg_now(), card.strip()[:100], days)
+            cfg = cfg_now()
+            tcg = None
+            if tp:
+                try:
+                    tcg = await asyncio.to_thread(tp.load_for, cfg)
+                except Exception:  # noqa: BLE001
+                    tcg = None
+            e, png = await asyncio.to_thread(cv.build, cfg, card.strip()[:100], days, None, None, tcg)
             d = discord.Embed.from_dict(e)
             if png:
                 await inter.followup.send(embed=d, file=discord.File(io.BytesIO(png), filename="value.png"))
             else:
                 await inter.followup.send(embed=d)
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+
+if tp:
+    @bot.tree.command(name="tcgp", description="TCGplayer (US) market price for a card or sealed product, in US$ and A$")
+    @app_commands.describe(search="Card number, name or product, e.g. OP13-120, sabo wanted, op13 booster box")
+    async def tcgp_cmd(inter: discord.Interaction, search: str):
+        await inter.response.defer(thinking=True)
+        try:
+            store = await asyncio.to_thread(tp.load_for, cfg_now())
+            await inter.followup.send(embed=discord.Embed.from_dict(tp.lookup_embed(store, search.strip()[:100])))
         except Exception as e:  # noqa: BLE001
             await fail(inter, e)
 

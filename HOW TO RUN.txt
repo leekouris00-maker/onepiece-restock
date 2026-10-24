@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.7.0)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.8.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
 
 If something looks wrong, open bot_output.log in this folder and send Claude the last few lines.
@@ -13,3 +13,11 @@ New in v2.5: /watch add <link> <max> watches any product page; /ebay list|check|
 New in v2.7: /value <card> shows what a single's worth at the shops now, with a price chart for the last week.
   For the chart picture, once:  py -3 -m pip install matplotlib   (without it /value shows a text sparkline).
   The week fills out over the first 7 days after updating (the bot used to keep only 2 days of single prices).
+
+New in v2.8: TCGplayer prices (tcgplayer.py, via TCGCSV - TCGplayer's own data, refreshed daily, no key needed).
+  The cloud copy downloads them every morning (~7:45am) and posts a daily report: biggest movers, singles
+  cheaper at Elemental Arcade / Good Games than TCGplayer's market, booster box prices, and your want list.
+  /tcgp <search> looks up any card or sealed product, e.g. /tcgp OP13-120 or /tcgp op13 booster box.
+  /value now shows TCGplayer's market (in A$) under each version too.
+  Its own channel (optional): double-click add_channels.bat, then add DISCORD_WEBHOOK_PRICES to GitHub
+  as it says. Until then the report posts in the price-drops channel.

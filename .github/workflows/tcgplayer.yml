@@ -1,0 +1,64 @@
+# Downloads TCGplayer's One Piece prices from TCGCSV once a day and posts the daily price report to Discord:
+# movers, singles cheaper at the AU shops than TCGplayer, booster box prices and your want list.
+# TCGCSV refreshes around 20:00 UTC; the second run is a retry for days it's late (it does nothing if
+# today's report is already out).
+name: TCGplayer prices
+
+on:
+  schedule:
+    - cron: "41 20 * * *"     # 7:41am Melbourne in summer (6:41am in winter)
+    - cron: "53 22 * * *"     # retry: 9:53am Melbourne in summer
+  workflow_dispatch:          # "Run workflow" button for testing
+    inputs:
+      mode:
+        description: "normal, dry-run (print only), force (sync again) or repost"
+        default: normal
+
+permissions:
+  contents: write             # saves tcgplayer_prices.json back to the repo
+
+concurrency:
+  group: tcgplayer
+  cancel-in-progress: false
+
+jobs:
+  prices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sync TCGplayer prices and post the report
+        env:
+          DISCORD_WEBHOOK_PRICES: ${{ secrets.DISCORD_WEBHOOK_PRICES }}   # optional: #tcgplayer-prices (add_channels.py)
+          DISCORD_WEBHOOK_DROPS: ${{ secrets.DISCORD_WEBHOOK_DROPS }}     # used until the above is set
+          DISCORD_WEBHOOK_SINGLES: ${{ secrets.DISCORD_WEBHOOK_SINGLES }}
+          DISCORD_WEBHOOK_STATUS: ${{ secrets.DISCORD_WEBHOOK_STATUS }}
+          BOT_NAME: "One Piece Restock (cloud)"
+          TZ: Australia/Melbourne
+          MODE: ${{ github.event.inputs.mode || 'normal' }}
+        run: |
+          case "$MODE" in
+            dry-run) python tcgplayer.py --dry-run ;;
+            force)   python tcgplayer.py --force ;;
+            repost)  python tcgplayer.py --repost ;;
+            *)       python tcgplayer.py ;;
+          esac
+
+      - name: Remember today's prices
+        if: ${{ github.event.inputs.mode != 'dry-run' }}
+        run: |
+          git config user.name "restock-bot"
+          git config user.email "restock-bot@users.noreply.github.com"
+          [ -f tcgplayer_prices.json ] && git add tcgplayer_prices.json
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -m "Update TCGplayer prices"
+          for i in 1 2 3 4 5; do
+            git pull --rebase && git push && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
