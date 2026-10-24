@@ -1,13 +1,13 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1792860258,
+  "Elemental Arcade": 1792868535,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-25 00",
+ "drops_slot": "2026-10-25 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1792860249,
+ "ebay_ts": 1792868523,
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -5270,7 +5270,9 @@
    "t": 1792802114.801845
   }
  },
- "shop_down": [],
+ "shop_down": [
+  "tcg.goodgames.com.au"
+ ],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -5284,14 +5286,14 @@
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
   "shop.goodgames.com.au": 0,
-  "tcg.goodgames.com.au": 2,
+  "tcg.goodgames.com.au": 3,
   "thewanderingcollector.com.au": 0,
   "www.cherrycollectables.com.au": 0,
   "www.gameology.com.au": 0,
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 1,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -5299,7 +5301,11 @@
   "www.pokebox.com.au": 0,
   "www.tcgroupau.com.au": 0
  },
- "shop_locked": [],
- "shop_retry": {},
- "sweep_ts": 1792860249
+ "shop_locked": [
+  "tcg.goodgames.com.au"
+ ],
+ "shop_retry": {
+  "tcg.goodgames.com.au": 1792869435
+ },
+ "sweep_ts": 1792868523
 }
