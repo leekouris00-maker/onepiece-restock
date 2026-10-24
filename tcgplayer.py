@@ -531,6 +531,29 @@ def shop_deals(store, drops, s):
     return out
 
 
+def match_report(store, drops, top=12):
+    """For --dry-run: how many shop singles matched a TCGplayer product, and the cheapest compared with it."""
+    n = hit = 0
+    rows = []
+    for key, it in (drops.get("items") or {}).items():
+        pts = it.get("p") or []
+        if not pts or not CARD_NUM_RE.search(str(it.get("n") or "")):
+            continue
+        n += 1
+        tk = match(store, it.get("n"))
+        if not tk:
+            continue
+        hit += 1
+        mk = aud(store, store["items"][tk].get("m"))
+        if pts[-1][2] and mk and mk >= 10:
+            rows.append((pts[-1][1] / mk, it.get("n"), pts[-1][1], mk, store["items"][tk]["n"]))
+    rows.sort()
+    out = [f"{hit:,} of {n:,} shop singles matched a TCGplayer product ({hit / max(n, 1):.0%}); "
+           f"{len(rows):,} in stock and worth A$10+ on TCGplayer. Cheapest compared with TCGplayer:"]
+    out += [f"{r * 100:.0f}% · A${p:,.2f} vs A${m:,.2f} · {name[:60]} = {tn[:50]}" for r, name, p, m, tn in rows[:top]]
+    return "\n".join(out)
+
+
 def is_box(it):
     n = it.get("n", "").lower()
     return it.get("t") == "sealed" and "booster box" in n and "case" not in n and "sleeved" not in n
@@ -556,6 +579,8 @@ def want_lines(store, cfg):
         opts = [(k, store["items"][k]) for k in idx.get(str(c["num"]).upper(), [])]
         opts = [(k, it) for k, it in opts if it.get("m") is not None
                 and not any(w.strip() and w in it["n"].lower() for w in excl)]
+        plain = [(k, it) for k, it in opts if not tcg_version(it["n"])]
+        opts = plain or opts                     # the main print when there is one, not a cheap promo
         if not opts:
             continue
         key, best = min(opts, key=lambda kv: kv[1]["m"])
@@ -780,6 +805,10 @@ def main():
             if os.environ.get("GITHUB_ACTIONS"):   # also as a note on the run's page (GitHub keeps 10 per step)
                 esc = text.replace("%", "%25").replace("\r", "").replace("\n", "%0A")
                 print(f"::notice title={e['title']}::{esc}")
+        diag = match_report(store, tb.load_drops_store())
+        print("\n" + diag)
+        if os.environ.get("GITHUB_ACTIONS"):
+            print("::notice title=Shop matching::" + diag.replace("%", "%25").replace("\n", "%0A"))
         return 0
     if post(store, cfg, embeds):
         store["posted"] = store.get("updated")
