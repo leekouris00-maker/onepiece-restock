@@ -1,13 +1,13 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1792910281,
+  "Elemental Arcade": 1792929510,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-25 12",
+ "drops_slot": "2026-10-25 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1792910273,
+ "ebay_ts": 1792929500,
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -5293,7 +5293,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 1,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -5305,7 +5305,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1792911181
+  "tcg.goodgames.com.au": 1792930410
  },
- "sweep_ts": 1792910273
+ "sweep_ts": 1792929500
 }
