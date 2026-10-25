@@ -1,13 +1,13 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1792962632,
+  "Elemental Arcade": 1792970006,
   "Good Games": 1792843525
  },
  "drops_slot": "2026-10-26 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1792962622,
+ "ebay_ts": 1792969997,
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -561,7 +561,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792877306.959357
+   "t": 1792969955.0678718
   },
   "cardplustcg.com.au": {
    "rules": [
@@ -1879,7 +1879,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792877306.9030447
+   "t": 1792969955.0483072
   },
   "overhauledgames.com.au": {
    "rules": [],
@@ -3353,7 +3353,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1792877306.2378294
+   "t": 1792969954.403597
   },
   "www.gameology.com.au": {
    "rules": [
@@ -4028,7 +4028,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1792877306.242704
+   "t": 1792969954.4133694
   },
   "www.gumnut.com.au": {
    "rules": [
@@ -5305,7 +5305,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1792963532
+  "tcg.goodgames.com.au": 1792970906
  },
- "sweep_ts": 1792962622
+ "sweep_ts": 1792969997
 }
