@@ -1,13 +1,13 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1793019006,
+  "Elemental Arcade": 1793040850,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-26 18",
+ "drops_slot": "2026-10-27 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793018997,
+ "ebay_ts": 1793040838,
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -594,7 +594,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1792942240.3085835
+   "t": 1793040792.8252876
   },
   "collectiblemadness.com.au": {
    "rules": [
@@ -1266,6 +1266,10 @@
     ],
     [
      0,
+     "/.well-known/shopify/monorail"
+    ],
+    [
+     0,
      "/cart.js"
     ],
     [
@@ -1365,7 +1369,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792942239.8028703
+   "t": 1793040792.4572248
   },
   "grailborne.com.au": {
    "rules": [
@@ -1883,7 +1887,7 @@
   },
   "overhauledgames.com.au": {
    "rules": [],
-   "t": 1792942240.2567046
+   "t": 1793040792.8080504
   },
   "pocketgames.com.au": {
    "rules": [
@@ -2298,6 +2302,10 @@
     ],
     [
      0,
+     "/.well-known/shopify/monorail"
+    ],
+    [
+     0,
      "/cart.js"
     ],
     [
@@ -2397,7 +2405,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792942241.778735
+   "t": 1793040792.4413004
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -3069,6 +3077,10 @@
     ],
     [
      0,
+     "/.well-known/shopify/monorail"
+    ],
+    [
+     0,
      "/cart.js"
     ],
     [
@@ -3168,7 +3180,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792942239.7959342
+   "t": 1793040792.453314
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -3768,6 +3780,10 @@
     ],
     [
      0,
+     "/.well-known/shopify/monorail"
+    ],
+    [
+     0,
      "/cart.js"
     ],
     [
@@ -3867,7 +3883,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792942239.8117774
+   "t": 1793040792.4752915
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -5293,7 +5309,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 1,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -5305,7 +5321,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1793019906
+  "tcg.goodgames.com.au": 1793041750
  },
- "sweep_ts": 1793018997
+ "sweep_ts": 1793040838
 }
