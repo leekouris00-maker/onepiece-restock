@@ -105,10 +105,34 @@ try:
     import tcgplayer as tp     # v2.8: /tcgp, and the TCGplayer line in /value
 except ImportError:
     tp = None
+
+
+def _fetch_missing(module):
+    """v2.9: an update_bot.bat from before v2.9 doesn't know about new files, so it updates this file but not
+    the module next to it. Get that one file from the bot's own GitHub repo (the same place update_bot.bat
+    downloads from), once; if that doesn't work the command is just left out."""
+    path = os.path.join(tb.HERE, module + ".py")
+    if os.path.exists(path):
+        return
+    try:
+        body = tb.HTTP.fetch(f"{tb.REPO_RAW_URL}/{module}.py", tries=2, robots=False, memo=False)
+        text = body.decode("utf-8")
+        compile(text, path, "exec")                       # only keep it if it's real Python
+        tb.atomic_write_text(path, text)
+        print(f"   fetched {module}.py from GitHub (your update_bot.bat is older than it)", flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"   ! {module}.py is missing and couldn't be downloaded ({tb.redact(e)}): "
+              "run update_bot.bat again", flush=True)
+
+
 try:
     import deck_price as dk    # v2.9: /pricecheck
 except ImportError:
-    dk = None
+    _fetch_missing("deck_price")
+    try:
+        import deck_price as dk
+    except ImportError:
+        dk = None
 
 if not hasattr(tb, "VERSION"):
     sys.exit("This commands_bot.py needs the v2 tcg_bot.py next to it - copy both files.")
