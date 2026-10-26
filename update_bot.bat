@@ -12,7 +12,7 @@ echo Downloading the newest bot files from GitHub...
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference='Stop';" ^
   "$base='https://raw.githubusercontent.com/leekouris00-maker/onepiece-restock/master/';" ^
-  "$files='tcg_bot.py','commands_bot.py','value.py','tcgplayer.py','link_watch.py','ebay_watch.py','pokemon_watch.py','fast_lane.py','misses.py','add_channels.py','add_channels.bat','add_pokemon_channels.py','HOW TO RUN.txt';" ^
+  "$files='tcg_bot.py','commands_bot.py','value.py','tcgplayer.py','deck_price.py','link_watch.py','ebay_watch.py','pokemon_watch.py','fast_lane.py','misses.py','add_channels.py','add_channels.bat','add_pokemon_channels.py','HOW TO RUN.txt';" ^
   "New-Item -ItemType Directory -Force -Path 'backup-before-update' | Out-Null;" ^
   "foreach($f in $files){" ^
   "  $tmp=$f+'.download';" ^

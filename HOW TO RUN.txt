@@ -19,5 +19,12 @@ New in v2.8: TCGplayer prices (tcgplayer.py, via TCGCSV - TCGplayer's own data, 
   cheaper at Elemental Arcade / Good Games than TCGplayer's market, booster box prices, and your want list.
   /tcgp <search> looks up any card or sealed product, e.g. /tcgp OP13-120 or /tcgp op13 booster box.
   /value now shows TCGplayer's market (in A$) under each version too.
+New in v2.9: /pricecheck deck <deck> says what a whole deck costs to buy right now.
+  Pick a saved deck or a want-list deck (your "deck" tags) from the list, or paste a decklist
+  (1xOP12-001 4xOP12-016 ...). It shows the cheapest play copy in stock at Elemental Arcade / Good Games,
+  what's not in stock, and the TCGplayer total. Collector versions (Wanted Poster, alt art...) don't count.
+  /pricecheck save name:<name> list:<decklist> keeps a deck (or attach the .txt export) · /pricecheck list
+  Saved decks live in decks.json; the updater never touches it.
+
   Its own channel (optional): double-click add_channels.bat, then add DISCORD_WEBHOOK_PRICES to GitHub
   as it says. Until then the report posts in the price-drops channel.

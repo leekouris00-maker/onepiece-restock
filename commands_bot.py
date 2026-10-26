@@ -12,6 +12,8 @@ Type these in your Discord server:
     /history <search> price history of a box or sealed product, and the lowest price seen
     /value <card>     what a single's worth at the shops now, with a price chart for the last week (value.py)
     /tcgp <search>    TCGplayer's US market price for a card or sealed product, in US$ and A$ (tcgplayer.py)
+    /pricecheck deck <deck>   what a whole deck costs at the shops now, and at TCGplayer (deck_price.py)
+    /pricecheck save | list | remove   keep decklists to price later (decks.json)
     /stats            restocks in the last 30 days: which shops, what hours, how long stock lasts
     /pricedrops       singles that got the most cheaper in the last 6 hours (hours: to change)
     /drops            releases and drop windows coming up
@@ -103,6 +105,10 @@ try:
     import tcgplayer as tp     # v2.8: /tcgp, and the TCGplayer line in /value
 except ImportError:
     tp = None
+try:
+    import deck_price as dk    # v2.9: /pricecheck
+except ImportError:
+    dk = None
 
 if not hasattr(tb, "VERSION"):
     sys.exit("This commands_bot.py needs the v2 tcg_bot.py next to it - copy both files.")
@@ -511,6 +517,8 @@ HELP = (
     "`/history <search>` price history and lowest price seen, e.g. `/history op-18`\n"
     "`/value <card>` a single's value at the shops now + its price chart for the last week, e.g. `/value OP13-120`\n"
     "`/tcgp <search>` TCGplayer's US market price in US$ and A$, e.g. `/tcgp OP13-120` or `/tcgp op13 booster box`\n"
+    "`/pricecheck deck <deck>` what a whole deck costs at the shops now and at TCGplayer: a saved deck, a want-list "
+    "deck, or paste a list (`1xOP12-001 4xOP12-016 ...`). `/pricecheck save` keeps one · `/pricecheck list`\n"
     "`/stats` restock patterns over the last 30 days\n"
     "`/pricedrops` singles that got the most cheaper in the last 6 hours (`hours:` to change)\n"
     "`/drops` releases and drop windows coming up\n"
@@ -801,6 +809,98 @@ if tp:
             await inter.followup.send(embed=discord.Embed.from_dict(tp.lookup_embed(store, search.strip()[:100])))
         except Exception as e:  # noqa: BLE001
             await fail(inter, e)
+
+
+if dk:
+    pricecheck = app_commands.Group(name="pricecheck", description="What a whole deck costs to buy right now")
+
+    async def deck_autocomplete(inter: discord.Interaction, current: str):
+        try:
+            return [app_commands.Choice(name=a, value=b) for a, b in dk.suggestions(cfg_now(), current)]
+        except Exception:  # noqa: BLE001
+            return []
+
+    @pricecheck.command(name="deck", description="What a deck costs at the shops now, and at TCGplayer")
+    @app_commands.describe(deck="A saved deck or want-list deck (pick from the list), or paste a decklist")
+    @app_commands.autocomplete(deck=deck_autocomplete)
+    async def pricecheck_deck(inter: discord.Interaction, deck: str):
+        await inter.response.defer(thinking=True)
+        try:
+            cfg = cfg_now()
+            tcg = None
+            if tp:
+                try:
+                    tcg = await asyncio.to_thread(tp.load_for, cfg)
+                except Exception:  # noqa: BLE001
+                    tcg = None
+            e = await asyncio.to_thread(dk.build, cfg, deck.strip()[:4000], None, tcg)
+            await inter.followup.send(embed=discord.Embed.from_dict(e))
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+    @pricecheck.command(name="save", description="Keep a decklist so you can price it any time")
+    @app_commands.describe(name="What to call it, e.g. Red/Black Sabo",
+                           list="The decklist, e.g. 1xOP12-001 4xOP12-016 4xOP05-015 ...",
+                           file="Or attach a .txt decklist export instead")
+    async def pricecheck_save(inter: discord.Interaction, name: str, list: str = "",
+                              file: Optional[discord.Attachment] = None):
+        try:
+            text = list
+            if file is not None:
+                if file.size > 50_000:
+                    await inter.response.send_message("That file's too big for a decklist.", ephemeral=True)
+                    return
+                text += "\n" + (await file.read()).decode("utf-8", "replace")
+            cards, warn = dk.parse(text)
+            if not cards:
+                await inter.response.send_message("No card numbers in that. Paste it like `1xOP12-001 4xOP12-016 ...` "
+                                                  "or attach the deck builder's .txt export.", ephemeral=True)
+                return
+            old = dk.load_decks()["decks"].get(dk._key(name))
+            if old and str(old.get("by")) != str(inter.user) and not is_admin(inter, cfg_now()):
+                await inter.response.send_message(f"**{old.get('name')}** was saved by {old.get('by')}: pick another "
+                                                  "name (or ask an admin).", ephemeral=True)
+                return
+            what = await asyncio.to_thread(dk.save_deck, name, cards, str(inter.user))
+            _audit(_who(inter), f"pricecheck save {name!r} ({sum(q for _, q in cards)} cards)")
+        except ValueError as e:
+            await inter.response.send_message(f"⚠️ {e}", ephemeral=True)
+            return
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        n = sum(q for _, q in cards)
+        await inter.response.send_message(
+            f"✅ {what.capitalize()} **{name.strip()[:60]}**: {n} cards, {len(cards)} different."
+            + "".join(f"\n⚠️ {w}" for w in warn) + f"\n`/pricecheck deck deck:{name.strip()[:60]}` to price it.")
+
+    @pricecheck.command(name="list", description="The saved decks, and the decks on your want list")
+    async def pricecheck_list(inter: discord.Interaction):
+        try:
+            await inter.response.send_message(embed=discord.Embed.from_dict(dk.list_embed(cfg_now())))
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+    @pricecheck.command(name="remove", description="Forget a saved deck (admins, or whoever saved it)")
+    @app_commands.autocomplete(deck=deck_autocomplete)
+    async def pricecheck_remove(inter: discord.Interaction, deck: str):
+        try:
+            old = dk.load_decks()["decks"].get(dk._key(deck))
+            if old is None:
+                await inter.response.send_message("That isn't a saved deck (want-list decks change with `/want`).",
+                                                  ephemeral=True)
+                return
+            if str(old.get("by")) != str(inter.user) and not is_admin(inter, cfg_now()):
+                await inter.response.send_message(f"Only {old.get('by')} or an admin can remove that one.",
+                                                  ephemeral=True)
+                return
+            await asyncio.to_thread(dk.remove_deck, deck)
+            _audit(_who(inter), f"pricecheck remove {deck!r}")
+            await inter.response.send_message(f"🗑️ Removed **{old.get('name')}**.", ephemeral=True)
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+    bot.tree.add_command(pricecheck)
 
 
 @bot.tree.command(name="stats", description="Restocks over the last 30 days: shops, hours, how long stock lasted")
