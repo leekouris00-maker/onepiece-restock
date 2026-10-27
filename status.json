@@ -1,13 +1,13 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1793055345,
+  "Elemental Arcade": 1793065347,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-27 06",
+ "drops_slot": "2026-10-27 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793055334,
+ "ebay_ts": 1793065337,
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -462,6 +462,10 @@
     ],
     [
      0,
+     "/.well-known/shopify/monorail"
+    ],
+    [
+     0,
      "/cart.js"
     ],
     [
@@ -561,7 +565,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792969955.0678718
+   "t": 1793065294.158381
   },
   "cardplustcg.com.au": {
    "rules": [
@@ -1784,6 +1788,10 @@
     ],
     [
      0,
+     "/.well-known/shopify/monorail"
+    ],
+    [
+     0,
      "/cart.js"
     ],
     [
@@ -1883,7 +1891,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1792969955.0483072
+   "t": 1793065293.9870055
   },
   "overhauledgames.com.au": {
    "rules": [],
@@ -3365,7 +3373,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1792969954.403597
+   "t": 1793065293.4935677
   },
   "www.gameology.com.au": {
    "rules": [
@@ -4044,7 +4052,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1792969954.4133694
+   "t": 1793065293.49538
   },
   "www.gumnut.com.au": {
    "rules": [
@@ -5309,7 +5317,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 1,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -5321,7 +5329,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1793056245
+  "tcg.goodgames.com.au": 1793066247
  },
- "sweep_ts": 1793055334
+ "sweep_ts": 1793065337
 }
