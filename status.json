@@ -1,33 +1,14 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1793195995,
+  "Elemental Arcade": 1793215331,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-29 00",
+ "drops_slot": "2026-10-29 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793195982,
- "held": {
-  "list|Grailborne|one-piece-card-game-eb-06-extra-booster-box-releases-29-jan-2027": {
-   "f": {
-    "available": true,
-    "box_id": "box|Grailborne|one-piece-card-game-eb-06-extra-booster-box-releases-29-jan-2027",
-    "cart": "",
-    "group": "box",
-    "id": "list|Grailborne|one-piece-card-game-eb-06-extra-booster-box-releases-29-jan-2027",
-    "kind": "New listing",
-    "max": 260.0,
-    "name": "One Piece Card Game: EB-06 Extra Booster Box (Releases 29 Jan 2027)",
-    "note": "pre-order, in stock (over your $260.00 max)",
-    "page": 99,
-    "price": 499.0,
-    "shop": "Grailborne",
-    "url": "https://grailborne.com.au/products/one-piece-card-game-eb-06-extra-booster-box-releases-29-jan-2027"
-   },
-   "t": 1793196004
-  }
- },
+ "ebay_ts": 1793215319,
+ "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
  "offline_streak": 0,
@@ -59,7 +40,7 @@
   "TCGroup": 99,
   "The Wandering Collector": 99
  },
- "pc_on": true,
+ "pc_on": false,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -5464,7 +5445,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1793196895
+  "tcg.goodgames.com.au": 1793216230
  },
- "sweep_ts": 1793195982
+ "sweep_ts": 1793215319
 }
