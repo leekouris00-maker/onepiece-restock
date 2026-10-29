@@ -1,13 +1,13 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1793241100,
+  "Elemental Arcade": 1793263778,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-29 12",
+ "drops_slot": "2026-10-29 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793241089,
+ "ebay_ts": 1793263768,
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -309,7 +309,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171422.310767
+   "t": 1793263720.7505703
   },
   "cardbot.com.au": {
    "rules": [
@@ -570,7 +570,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171423.2948573
+   "t": 1793263721.6168983
   },
   "cardplustcg.com.au": {
    "rules": [
@@ -864,7 +864,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171423.1119463
+   "t": 1793263721.5349464
   },
   "elementalarcade.com.au": {
    "rules": [
@@ -1125,7 +1125,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171432.112059
+   "t": 1793263730.4566207
   },
   "goldfieldsgames.com.au": {
    "rules": [
@@ -1647,7 +1647,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171423.0918937
+   "t": 1793263721.5265675
   },
   "lightofcards.com.au": {
    "rules": [
@@ -1908,7 +1908,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171423.1419332
+   "t": 1793263721.559618
   },
   "overhauledgames.com.au": {
    "rules": [],
@@ -2173,7 +2173,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171422.3094606
+   "t": 1793263720.7444098
   },
   "rogueonline.com.au": {
    "rules": [
@@ -2695,7 +2695,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171422.3212473
+   "t": 1793263720.7915812
   },
   "tcg.goodgames.com.au": {
    "rules": [
@@ -2956,7 +2956,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171434.8477147
+   "t": 1793263733.2992692
   },
   "thewanderingcollector.com.au": {
    "rules": [
@@ -3482,7 +3482,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1793171422.323259
+   "t": 1793263720.7527122
   },
   "www.gameology.com.au": {
    "rules": [
@@ -3739,7 +3739,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171422.3085477
+   "t": 1793263720.7427604
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -4161,7 +4161,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1793171422.3324857
+   "t": 1793263720.7545712
   },
   "www.gumnut.com.au": {
    "rules": [
@@ -4422,11 +4422,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171422.30786
+   "t": 1793263720.7422314
   },
   "www.jtoys.com.au": {
    "rules": [],
-   "t": 1793171422.3542345
+   "t": 1793263720.7823744
   },
   "www.kollecter.com.au": {
    "rules": [
@@ -4687,7 +4687,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171463.74069
+   "t": 1793263759.848829
   },
   "www.m-g.com.au": {
    "rules": [
@@ -4720,7 +4720,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793171422.9298177
+   "t": 1793263721.3945422
   },
   "www.mayhemcollectables.com.au": {
    "rules": [
@@ -4981,11 +4981,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171433.7896097
+   "t": 1793263731.9017434
   },
   "www.monstermart.com.au": {
    "rules": [],
-   "t": 1793171464.5745938
+   "t": 1793263760.637131
   },
   "www.pokebox.com.au": {
    "rules": [
@@ -5146,7 +5146,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1793171422.3492393
+   "t": 1793263720.7787206
   },
   "www.tcgroupau.com.au": {
    "rules": [
@@ -5407,7 +5407,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793171422.3088148
+   "t": 1793263720.743059
   }
  },
  "shop_down": [
@@ -5433,7 +5433,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 1,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -5445,7 +5445,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1793242000
+  "tcg.goodgames.com.au": 1793264678
  },
- "sweep_ts": 1793241089
+ "sweep_ts": 1793263768
 }
