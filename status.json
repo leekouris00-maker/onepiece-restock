@@ -1,13 +1,13 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1793288293,
+  "Elemental Arcade": 1793306031,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-30 00",
+ "drops_slot": "2026-10-30 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793288284,
+ "ebay_ts": 1793306021,
  "held": {},
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -46,7 +46,8 @@
   "delta-reign": 1792481167
  },
  "pokemon_reminders": {
-  "2026-10-24|day": 1792793323
+  "2026-10-24|day": 1792793323,
+  "2026-10-30|day": 1793306039
  },
  "pokemon_state": "live",
  "robots": {
@@ -5445,7 +5446,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1793289193
+  "tcg.goodgames.com.au": 1793306931
  },
- "sweep_ts": 1793288284
+ "sweep_ts": 1793306021
 }
