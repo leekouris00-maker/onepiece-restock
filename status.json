@@ -1,31 +1,55 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1793339125,
+  "Elemental Arcade": 1793360477,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-30 12",
+ "drops_slot": "2026-10-30 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793339114,
+ "ebay_ts": 1793360465,
  "held": {
-  "list|Good Games (sealed)|ace-sabo-luffy-op13-007-carrying-on-his-will-foil": {
+  "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-tech-sticker-collection-random-select": {
    "f": {
-    "available": false,
-    "box_id": "sealed|Good Games (sealed)|ace-sabo-luffy-op13-007-carrying-on-his-will-foil",
+    "available": true,
+    "box_id": "poke|30th-celebration|Gameology|pokemon-tcg-30th-celebration-tech-sticker-collection-random-select",
     "cart": "",
-    "group": "watch",
-    "id": "list|Good Games (sealed)|ace-sabo-luffy-op13-007-carrying-on-his-will-foil",
+    "game": "pokemon",
+    "group": "pokemon",
+    "id": "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-tech-sticker-collection-random-select",
     "kind": "New listing",
-    "max": 150,
-    "name": "Ace & Sabo & Luffy OP13-007 (Carrying On His Will)  - Foil",
-    "note": "Ace, Sabo & Luffy Premium Card Collection, listed, not buyable yet",
+    "max": 50.0,
+    "name": "Pokemon TCG 30th Celebration Tech Sticker Collection (Random Select)",
+    "note": "Small collection \u00b7 in stock (over your $50 max)",
     "page": 1,
-    "price": 1.25,
-    "shop": "Good Games (sealed)",
-    "url": "https://shop.goodgames.com.au/products/ace-sabo-luffy-op13-007-carrying-on-his-will-foil"
+    "poke_id": "poke|30th-celebration|Gameology|pokemon-tcg-30th-celebration-tech-sticker-collection-random-select",
+    "preorder": false,
+    "price": 89.95,
+    "ptype": "Small collection",
+    "section": "30th-celebration",
+    "section_name": "30th Celebration",
+    "shop": "Gameology",
+    "url": "https://www.gameology.com.au/products/pokemon-tcg-30th-celebration-tech-sticker-collection-random-select"
    },
-   "t": 1793339132
+   "t": 1793360483
+  },
+  "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-three-booster-blister": {
+   "f": {
+    "cart": "https://collectiblemadness.com.au/cart/67923034210577:1",
+    "game": "pokemon",
+    "id": "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-three-booster-blister",
+    "kind": "Sealed",
+    "name": "Pokemon - TCG - Delta Reign Three Booster Blister",
+    "note": "Blister, pre-order, out Fri 6 Nov",
+    "preorder": true,
+    "price": 34.0,
+    "ptype": "Blister",
+    "section": "delta-reign",
+    "section_name": "Delta Reign",
+    "shop": "Collectible Madness",
+    "url": "https://collectiblemadness.com.au/products/pokemon-tcg-delta-reign-three-booster-blister"
+   },
+   "t": 1793360483
   }
  },
  "instore_state": "live",
@@ -330,7 +354,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263720.7505703
+   "t": 1793360420.5886397
   },
   "cardbot.com.au": {
    "rules": [
@@ -591,7 +615,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263721.6168983
+   "t": 1793360421.3614264
   },
   "cardplustcg.com.au": {
    "rules": [
@@ -885,7 +909,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263721.5349464
+   "t": 1793360421.3184044
   },
   "elementalarcade.com.au": {
    "rules": [
@@ -1146,7 +1170,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263730.4566207
+   "t": 1793360428.7877307
   },
   "goldfieldsgames.com.au": {
    "rules": [
@@ -1668,7 +1692,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263721.5265675
+   "t": 1793360421.308282
   },
   "lightofcards.com.au": {
    "rules": [
@@ -2194,7 +2218,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263720.7444098
+   "t": 1793360420.5826135
   },
   "rogueonline.com.au": {
    "rules": [
@@ -2716,7 +2740,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263720.7915812
+   "t": 1793360420.6226509
   },
   "tcg.goodgames.com.au": {
    "rules": [
@@ -2977,7 +3001,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263733.2992692
+   "t": 1793360431.9300845
   },
   "thewanderingcollector.com.au": {
    "rules": [
@@ -3503,7 +3527,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1793263720.7527122
+   "t": 1793360420.5919416
   },
   "www.gameology.com.au": {
    "rules": [
@@ -3760,7 +3784,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263720.7427604
+   "t": 1793360420.5782804
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -4182,7 +4206,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1793263720.7545712
+   "t": 1793360420.594662
   },
   "www.gumnut.com.au": {
    "rules": [
@@ -4443,11 +4467,20 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263720.7422314
+   "t": 1793360420.5777102
   },
   "www.jtoys.com.au": {
-   "rules": [],
-   "t": 1793263720.7823744
+   "rules": [
+    [
+     0,
+     "/wp-admin/"
+    ],
+    [
+     1,
+     "/wp-admin/admin-ajax.php"
+    ]
+   ],
+   "t": 1793360420.6156254
   },
   "www.kollecter.com.au": {
    "rules": [
@@ -4708,7 +4741,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263759.848829
+   "t": 1793360457.8614643
   },
   "www.m-g.com.au": {
    "rules": [
@@ -4741,7 +4774,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793263721.3945422
+   "t": 1793360421.085363
   },
   "www.mayhemcollectables.com.au": {
    "rules": [
@@ -5002,11 +5035,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263731.9017434
+   "t": 1793360430.3963048
   },
   "www.monstermart.com.au": {
    "rules": [],
-   "t": 1793263760.637131
+   "t": 1793360458.3943546
   },
   "www.pokebox.com.au": {
    "rules": [
@@ -5167,7 +5200,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1793263720.7787206
+   "t": 1793360420.6131911
   },
   "www.tcgroupau.com.au": {
    "rules": [
@@ -5428,7 +5461,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263720.743059
+   "t": 1793360420.5787706
   }
  },
  "shop_down": [
@@ -5465,7 +5498,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1793340025
+  "tcg.goodgames.com.au": 1793361377
  },
- "sweep_ts": 1793339114
+ "sweep_ts": 1793360465
 }
