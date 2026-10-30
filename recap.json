@@ -1,5 +1,5 @@
 {
- "date": "2026-10-29",
+ "date": "2026-10-30",
  "snapshot": {
   "list|Gumnut|one-piece-card-game-ultra-deck-the-three-captains-st-10-one-per-customer": {
    "name": "One Piece Card Game Ultra Deck The Three Captains (ST-10) - One Per Customer",
@@ -386,6 +386,13 @@
    "available": false,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-starter-deck"
   },
+  "list|Good Games (sealed)|one-piece-card-game-booster-box-tba-op-17": {
+   "name": "One Piece Card Game - The World's Strongest Warriors Booster Box [OP-17]",
+   "shop": "Good Games (sealed)",
+   "price": 529.0,
+   "available": false,
+   "url": "https://shop.goodgames.com.au/products/one-piece-card-game-booster-box-tba-op-17"
+  },
   "list|Good Games (sealed)|one-piece-card-game-op-16-booster-box": {
    "name": "One Piece Card Game - The Time of Battle OP-16 Booster Box",
    "shop": "Good Games (sealed)",
@@ -428,19 +435,19 @@
    "available": false,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-kingdom-of-intrigue-op-04-booster-box"
   },
+  "list|Good Games (sealed)|one-piece-card-game-tin-pack-set-vol-3-ts-03": {
+   "name": "One Piece Card Game - Tin Pack Set Vol. 3 [TS-03]",
+   "shop": "Good Games (sealed)",
+   "price": 46.0,
+   "available": false,
+   "url": "https://shop.goodgames.com.au/products/one-piece-card-game-tin-pack-set-vol-3-ts-03"
+  },
   "list|Good Games (sealed)|one-piece-card-game-double-pack-tba-dp-12": {
    "name": "One Piece Card Game - Double Pack TBA [DP-12]",
    "shop": "Good Games (sealed)",
    "price": 46.0,
    "available": false,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-double-pack-tba-dp-12"
-  },
-  "list|Good Games (sealed)|one-piece-card-game-tin-pack-set-vol-3-ts-03": {
-   "name": "One Piece Card Game - Tin Pack Set Vol. 3 [TS-03] (Preorder)",
-   "shop": "Good Games (sealed)",
-   "price": 46.0,
-   "available": false,
-   "url": "https://shop.goodgames.com.au/products/one-piece-card-game-tin-pack-set-vol-3-ts-03"
   },
   "list|Good Games (sealed)|one-piece-card-game-the-three-brothers-ultra-deck": {
    "name": "One Piece Card Game - The Three Brothers Ultra Deck (ST-13)",
@@ -561,19 +568,19 @@
    "available": false,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-starter-deck-tba-st-36"
   },
-  "list|Good Games (sealed)|one-piece-card-game-premium-card-collection-one-piece-film-red-edition-preorder": {
-   "name": "One Piece Card Game - Premium Card Collection One Piece Film Red Edition",
-   "shop": "Good Games (sealed)",
-   "price": 70.0,
-   "available": false,
-   "url": "https://shop.goodgames.com.au/products/one-piece-card-game-premium-card-collection-one-piece-film-red-edition-preorder"
-  },
   "list|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-35": {
    "name": "One Piece Card Game Starter Deck \u2013 Sabo (Red/Black) - ST-35",
    "shop": "Good Games (sealed)",
    "price": 40.0,
    "available": false,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-starter-deck-tba-st-35"
+  },
+  "list|Good Games (sealed)|one-piece-card-game-premium-card-collection-one-piece-film-red-edition-preorder": {
+   "name": "One Piece Card Game - Premium Card Collection One Piece Film Red Edition",
+   "shop": "Good Games (sealed)",
+   "price": 70.0,
+   "available": false,
+   "url": "https://shop.goodgames.com.au/products/one-piece-card-game-premium-card-collection-one-piece-film-red-edition-preorder"
   },
   "list|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-34": {
    "name": "One Piece Card Game Starter Deck \u2013 Charlotte Katakuri (Purple) - ST-34",
@@ -603,19 +610,19 @@
    "available": false,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-starter-deck-tba-st-31"
   },
-  "list|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-33": {
-   "name": "One Piece Card Game Starter Deck \u2013 Kuzan (Blue) - ST-33",
-   "shop": "Good Games (sealed)",
-   "price": 40.0,
-   "available": false,
-   "url": "https://shop.goodgames.com.au/products/one-piece-card-game-starter-deck-tba-st-33"
-  },
   "list|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-32": {
    "name": "One Piece Card Game Starter Deck \u2013 Roronoa Zoro (Green) - ST-32",
    "shop": "Good Games (sealed)",
    "price": 40.0,
    "available": false,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-starter-deck-tba-st-32"
+  },
+  "list|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-33": {
+   "name": "One Piece Card Game Starter Deck \u2013 Kuzan (Blue) - ST-33",
+   "shop": "Good Games (sealed)",
+   "price": 40.0,
+   "available": false,
+   "url": "https://shop.goodgames.com.au/products/one-piece-card-game-starter-deck-tba-st-33"
   },
   "list|Good Games (sealed)|one-piece-card-game-uta-st-11-starter-deck-preorder": {
    "name": "One Piece Card Game - Uta Starter Deck (ST-11)",
@@ -707,6 +714,13 @@
    "price": 90.0,
    "available": false,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-double-pack-set-vol-1-dp-01-starter-deck-preorder"
+  },
+  "list|Good Games (sealed)|ace-sabo-luffy-op13-007-carrying-on-his-will-foil": {
+   "name": "Ace & Sabo & Luffy OP13-007 (Carrying On His Will)  - Foil",
+   "shop": "Good Games (sealed)",
+   "price": 1.25,
+   "available": false,
+   "url": "https://shop.goodgames.com.au/products/ace-sabo-luffy-op13-007-carrying-on-his-will-foil"
   },
   "list|Good Games (sealed)|one-piece-card-game-booster-box-tba-op-19": {
    "name": "One Piece Card Game Booster Box \u2013 TBA OP-19",
@@ -977,7 +991,7 @@
   "list|Gameology|one-piece-card-game-devil-fruits-collection-vol-3-df-03": {
    "name": "One Piece Card Game Devil Fruits Collection Vol 3 DF-03",
    "shop": "Gameology",
-   "price": 84.95,
+   "price": 89.95,
    "available": true,
    "url": "https://www.gameology.com.au/products/one-piece-card-game-devil-fruits-collection-vol-3-df-03"
   },
@@ -991,7 +1005,7 @@
   "list|Gameology|one-piece-card-game-dp-10-double-pack": {
    "name": "One Piece Card Game DP-10 Double Pack",
    "shop": "Gameology",
-   "price": 69.95,
+   "price": 74.95,
    "available": true,
    "url": "https://www.gameology.com.au/products/one-piece-card-game-dp-10-double-pack"
   },
@@ -1467,7 +1481,7 @@
   "list|Gameology|one-piece-card-game-special-goods-set-former-four-emperors": {
    "name": "One Piece Card Game Special Goods Set - Former Four Emperors",
    "shop": "Gameology",
-   "price": 74.95,
+   "price": 72.95,
    "available": true,
    "url": "https://www.gameology.com.au/products/one-piece-card-game-special-goods-set-former-four-emperors"
   },
@@ -2682,12 +2696,12 @@
    "available": true,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-01-romance-dawn-booster-blue-bottom-release-print-12-box-case"
   },
-  "list|Cherry Collectables|one-piece-card-game-op-15-booster-box": {
-   "name": "One Piece Card Game [OP15-EB04] Adventures of Kami's Island Booster Box",
+  "list|Cherry Collectables|one-piece-card-game-starter-deck-st-31-red-monkey-d-luffy": {
+   "name": "One Piece Card Game: Starter Deck [ST-31] RED Monkey.D.Luffy",
    "shop": "Cherry Collectables",
-   "price": 419.99,
+   "price": 59.99,
    "available": false,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-15-booster-box"
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-starter-deck-st-31-red-monkey-d-luffy"
   },
   "list|Cherry Collectables|one-piece-card-game-op-14-booster-box": {
    "name": "One Piece Card Game [OP14-EB04] The Azure Sea's Seven - Booster Box",
@@ -2695,13 +2709,6 @@
    "price": 439.99,
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-14-booster-box"
-  },
-  "list|Cherry Collectables|super-prerelease-one-piece-card-game-st-02-worst-generation-starter-deck": {
-   "name": "[SUPER PRERELEASE] One Piece Card Game St-02 Worst Generation Starter Deck",
-   "shop": "Cherry Collectables",
-   "price": 599.99,
-   "available": false,
-   "url": "https://www.cherrycollectables.com.au/products/super-prerelease-one-piece-card-game-st-02-worst-generation-starter-deck"
   },
   "list|Cherry Collectables|one-piece-card-game-eb-02-extra-booster-booster-box": {
    "name": "One Piece Card Game [EB-02] Anime 25th Collection Extra Booster Box",
@@ -2717,19 +2724,19 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-eb-01-memorial-collection-extra-booster-booster-box"
   },
-  "list|Cherry Collectables|one-piece-card-game-starter-deck-st-31-red-monkey-d-luffy": {
-   "name": "One Piece Card Game: Starter Deck [ST-31] RED Monkey.D.Luffy",
-   "shop": "Cherry Collectables",
-   "price": 59.99,
-   "available": false,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-starter-deck-st-31-red-monkey-d-luffy"
-  },
   "list|Cherry Collectables|one-piece-card-game-starter-deck-st-35-red-black-sabo": {
    "name": "One Piece Card Game: Starter Deck [ST-35] RED/BLACK Sabo",
    "shop": "Cherry Collectables",
    "price": 49.99,
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-starter-deck-st-35-red-black-sabo"
+  },
+  "list|Cherry Collectables|super-prerelease-one-piece-card-game-st-02-worst-generation-starter-deck": {
+   "name": "[SUPER PRERELEASE] One Piece Card Game St-02 Worst Generation Starter Deck",
+   "shop": "Cherry Collectables",
+   "price": 599.99,
+   "available": false,
+   "url": "https://www.cherrycollectables.com.au/products/super-prerelease-one-piece-card-game-st-02-worst-generation-starter-deck"
   },
   "list|Cherry Collectables|one-piece-card-game-op-03-pillars-of-strength-booster-box": {
    "name": "One Piece Card Game [OP-03] Pillars Of Strength Booster Box",
@@ -2738,19 +2745,19 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-03-pillars-of-strength-booster-box"
   },
-  "list|Cherry Collectables|one-piece-card-game-prb-01-premium-booster-box": {
-   "name": "One Piece Card Game [PRB-01] Premium Collection Booster THE BEST - Booster Box",
-   "shop": "Cherry Collectables",
-   "price": 1600.0,
-   "available": true,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-prb-01-premium-booster-box"
-  },
   "list|Cherry Collectables|one-piece-card-game-op-16-booster-box": {
    "name": "One Piece Card Game [OP-16] The Time Of Battle - Booster Box",
    "shop": "Cherry Collectables",
    "price": 399.99,
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-16-booster-box"
+  },
+  "list|Cherry Collectables|one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck": {
+   "name": "One Piece Card Game [ST-18] (Purple) Monkey D. Luffy Starter Deck",
+   "shop": "Cherry Collectables",
+   "price": 149.99,
+   "available": false,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck"
   },
   "list|Cherry Collectables|super-prerelease-one-piece-card-game-st-04-animal-kingdom-pirates-starter-deck": {
    "name": "[SUPER PRERELEASE] One Piece Card Game St-04 Animal Kingdom Pirates Starter Deck",
@@ -2766,12 +2773,12 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-dp-11-double-pack-random"
   },
-  "list|Cherry Collectables|one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck": {
-   "name": "One Piece Card Game [ST-18] (Purple) Monkey D. Luffy Starter Deck",
+  "list|Cherry Collectables|one-piece-card-game-prb-01-premium-booster-box": {
+   "name": "One Piece Card Game [PRB-01] Premium Collection Booster THE BEST - Booster Box",
    "shop": "Cherry Collectables",
-   "price": 149.99,
-   "available": false,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck"
+   "price": 1600.0,
+   "available": true,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-prb-01-premium-booster-box"
   },
   "list|Cherry Collectables|one-piece-card-game-op-09-tba-booster-box": {
    "name": "One Piece Card Game [OP-09] Emperors in the New World Booster Box",
@@ -2786,6 +2793,13 @@
    "price": 2799.99,
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-english-2nd-anniversary-set"
+  },
+  "list|Cherry Collectables|one-piece-card-game-op-15-booster-box": {
+   "name": "One Piece Card Game [OP15-EB04] Adventures of Kami's Island Booster Box",
+   "shop": "Cherry Collectables",
+   "price": 419.99,
+   "available": false,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-15-booster-box"
   },
   "list|Cherry Collectables|one-piece-card-game-dp-12-double-pack-random": {
    "name": "One Piece Card Game [DP-12] Double Pack (Random)",
@@ -3599,12 +3613,12 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-gift-collection-heroines-gc-2026-display-6-sets"
   },
-  "list|Grailborne|one-piece-card-game-dp-12-the-world-s-strongest-warriors-double-pack-display-8-packs": {
-   "name": "One Piece Card Game: DP-12 The World's Strongest Warriors Double Pack Display (8 Packs)",
+  "list|Grailborne|one-piece-card-game-starter-deck-red-monkey-d-luffy-st-31-sealed-display-6-decks": {
+   "name": "One Piece Card Game: STARTER DECK -RED Monkey.D.Luffy- [ST-31] - Sealed Display (6 Decks)",
    "shop": "Grailborne",
-   "price": 599.0,
+   "price": 399.0,
    "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-dp-12-the-world-s-strongest-warriors-double-pack-display-8-packs"
+   "url": "https://grailborne.com.au/products/one-piece-card-game-starter-deck-red-monkey-d-luffy-st-31-sealed-display-6-decks"
   },
   "list|Grailborne|one-piece-card-game-dp-12-the-world-s-strongest-warriors-double-pack-set": {
    "name": "One Piece Card Game: DP-12 The World\u2019s Strongest Warriors Double Pack Set",
@@ -3626,6 +3640,13 @@
    "price": 589.99,
    "available": true,
    "url": "https://lightofcards.com.au/products/one-piece-op-17-the-worlds-strongest-warriors-booster-box"
+  },
+  "list|Light of Cards|one-piece-eb-05-heroines-edition-vol-2-booster-box": {
+   "name": "One Piece\uff5cEB-05 - Heroines Edition Vol. 2 - Booster Box",
+   "shop": "Light of Cards",
+   "price": 239.99,
+   "available": true,
+   "url": "https://lightofcards.com.au/products/one-piece-eb-05-heroines-edition-vol-2-booster-box"
   },
   "card|Elemental Arcade|OP05-015|belo-betty-op05015-awakening-of-the-new-era": {
    "name": "Belo Betty OP05-015",
@@ -3707,14 +3728,14 @@
   "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island": {
    "name": "Brook OP15-022 Alternate Art",
    "shop": "Elemental Arcade",
-   "price": 80.7,
+   "price": 80.8,
    "available": true,
    "url": "https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island"
   },
   "card|pick|https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle": {
    "name": "Tashigi OP14-029 SP",
    "shop": "Elemental Arcade",
-   "price": 83.2,
+   "price": 82.6,
    "available": true,
    "url": "https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle"
   },
@@ -3728,49 +3749,42 @@
   "ebay|v1|366683562606|0": {
    "name": "Gomu Gomu DON!! card (Japanese) + Mera Mera DON!! card (Japanese) + Ope Ope DON!! card (Japanese)",
    "shop": "eBay (from Japan)",
-   "price": 103.31,
+   "price": 102.89,
    "available": true,
    "url": "https://www.ebay.com.au/itm/366683562606"
   },
   "ebay|v1|820082175327|0": {
    "name": "Nike x One Piece Gomu Gomu DON!! card (Japanese)",
    "shop": "eBay (from Japan)",
-   "price": 136.06,
+   "price": 135.5,
    "available": true,
    "url": "https://www.ebay.com.au/itm/820082175327"
   },
   "ebay|v1|820082180571|0": {
    "name": "Nike x One Piece Mera Mera DON!! card (Japanese)",
    "shop": "eBay (from Japan)",
-   "price": 136.06,
+   "price": 135.5,
    "available": true,
    "url": "https://www.ebay.com.au/itm/820082180571"
   },
   "ebay|v1|820082186334|0": {
    "name": "Nike x One Piece Ope Ope DON!! card (Japanese)",
    "shop": "eBay (from Japan)",
-   "price": 136.06,
+   "price": 135.5,
    "available": true,
    "url": "https://www.ebay.com.au/itm/820082186334"
   },
   "ebay|v1|178490730493|0": {
    "name": "Nike x One Piece Mera Mera DON!! card (English)",
    "shop": "eBay (from Korea)",
-   "price": 266.97,
+   "price": 265.88,
    "available": true,
    "url": "https://www.ebay.com.au/itm/178490730493"
-  },
-  "ebay|v1|880035734451|0": {
-   "name": "Nike x One Piece Ope Ope DON!! card (English)",
-   "shop": "eBay (from USA)",
-   "price": 270.9,
-   "available": true,
-   "url": "https://www.ebay.com.au/itm/880035734451"
   },
   "ebay|v1|366725971268|0": {
    "name": "Nike x One Piece Mera Mera DON!! card (English)",
    "shop": "eBay (from Japan)",
-   "price": 296.25,
+   "price": 295.04,
    "available": true,
    "url": "https://www.ebay.com.au/itm/366725971268"
   }
