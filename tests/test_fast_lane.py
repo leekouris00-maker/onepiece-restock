@@ -91,14 +91,14 @@ class Base(unittest.TestCase):
         self.paths = {k: getattr(tb, k) for k in names}
         for k in names:
             setattr(tb, k, os.path.join(self.tmp, k.lower() + ".json"))
-        self.saved = {n: getattr(tb, n) for n in ("check_sealed", "check_singles", "ebay_watch", "pokemon_watch",
+        self.saved = {n: getattr(tb, n) for n in ("check_sealed", "check_singles", "ebay_watch", "onepiece_instore", "pokemon_watch",
                                                    "run_price_drops", "store_locked", "desktop_beep", "discord_send",
                                                    "pc_last_seen", "push_phone")}
         self.fetch, self.cool = tb.HTTP.fetch, dict(tb.HTTP.cool)
         self.watch_path = lw.WATCH_PATH
         lw.WATCH_PATH = os.path.join(self.tmp, "watches.json")
         tb.check_singles = lambda cfg: []
-        tb.ebay_watch = tb.pokemon_watch = None
+        tb.ebay_watch = tb.pokemon_watch = tb.onepiece_instore = None
         tb.run_price_drops = lambda cfg, status, **kw: []
         tb.store_locked = lambda host: False
         tb.desktop_beep = lambda: None
@@ -235,13 +235,14 @@ class Loop(Base):
 
     def test_no_window_just_sleeps(self):
         slept = []
-        old = fl.time
+        old, old_aw = fl.time, tb.active_window
         fl.time = SimpleNamespace(time=time.time, sleep=slept.append, perf_counter=time.perf_counter)
+        tb.active_window = lambda cfg, now=None: None      # pinned: on a real release day a window IS on
         try:
             fl.TARGETS[:] = [{"id": "x", "js": "https://a.test/products/x.js"}]
             fl.wait(tb, self.cfg, 300)
         finally:
-            fl.time = old
+            fl.time, tb.active_window = old, old_aw
         self.assertEqual(slept, [300])
         self.assertEqual(self.asked, [])
 

@@ -455,19 +455,19 @@ class Pacing(unittest.TestCase):
                                                   "HISTORY_PATH", "EVENTS_PATH", "LOG_PATH", "CONTROLS_PATH")}
         for k in self.paths:
             setattr(tb, k, os.path.join(self.tmp, k.lower() + ".json"))
-        self._run, self._ebay = tb.run_checks_all, tb.ebay_watch
+        self._run, self._ebay, self._oi = tb.run_checks_all, tb.ebay_watch, tb.onepiece_instore
         self.calls = []
 
         def fake(cfg, sealed=True, singles=True, pokemon=True, poke_only=None, sweep=False):
             self.calls.append((sealed, singles, pokemon, poke_only))
             return (([], {}) if sealed else None), ([] if singles else None), (pw.Result() if pokemon else None)
         tb.run_checks_all = fake
-        tb.ebay_watch = None
+        tb.ebay_watch = tb.onepiece_instore = None
 
     def tearDown(self):
         for k, v in self.paths.items():
             setattr(tb, k, v)
-        tb.run_checks_all, tb.ebay_watch = self._run, self._ebay
+        tb.run_checks_all, tb.ebay_watch, tb.onepiece_instore = self._run, self._ebay, self._oi
         shutil.rmtree(self.tmp, ignore_errors=True)
 
     def run_with(self, status, drop):
@@ -512,11 +512,11 @@ class FullRuns(Patched):
                                                   "RECAP_PATH", "PICKS_PATH")}
         for k in self.paths:
             setattr(tb, k, os.path.join(self.tmp, k.lower() + ".json"))
-        self.saved = {n: getattr(tb, n) for n in ("check_sealed", "check_singles", "ebay_watch", "pc_last_seen",
+        self.saved = {n: getattr(tb, n) for n in ("check_sealed", "check_singles", "ebay_watch", "onepiece_instore", "pc_last_seen",
                                                    "store_locked", "desktop_beep")}
         tb.check_sealed = lambda cfg, sweep=False: ([], {})
         tb.check_singles = lambda cfg: []
-        tb.ebay_watch = None
+        tb.ebay_watch = tb.onepiece_instore = None
         tb.pc_last_seen = lambda cfg: None
         tb.store_locked = lambda host: False
         tb.desktop_beep = lambda: None

@@ -4,8 +4,9 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.8.1)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.10.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
+One Piece in-store channel: type /onepiece setup in Discord (once).
 
 If something looks wrong, open bot_output.log in this folder and send Claude the last few lines.
 
@@ -28,3 +29,12 @@ New in v2.9: /pricecheck deck <deck> says what a whole deck costs to buy right n
 
   Its own channel (optional): double-click add_channels.bat, then add DISCORD_WEBHOOK_PRICES to GitHub
   as it says. Until then the report posts in the price-drops channel.
+New in v2.10: One Piece in-store section (#onepiece-in-store), the One Piece twin of #pokemon-in-store.
+  The evening before a release (6pm) it posts "tomorrow in stores"; at 7am on the day "out today" (pings the
+  One Piece ping role), with what's out, which online shops have it right now and where to look on a shelf.
+  /onepiece report  - spotted stock in a store? posts it there for everyone (store, what, price, photo).
+  /onepiece instore - sightings from the last 24 hours.   /onepiece releases - the calendar + drop windows.
+  Set it up once: /onepiece setup in Discord (admins), then add the DISCORD_WEBHOOK_INSTORE secret it shows
+  to GitHub so the cloud copy can post when the PC is off. Until then the section is quiet (nothing else changes).
+  Options in config.json, all optional:  "instore": {"evening": "18:00", "morning": "07:00", "ping": true,
+  "online": true, "stores": ["EB Games / Zing", "Big W", "Kmart", "Target", "JB Hi-Fi", "your local game store"]}

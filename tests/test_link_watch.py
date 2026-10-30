@@ -253,7 +253,7 @@ class BotRuns(unittest.TestCase):
         self.paths = {k: getattr(tb, k) for k in names}
         for k in names:
             setattr(tb, k, os.path.join(self.tmp, k.lower() + ".json"))
-        self.saved = {n: getattr(tb, n) for n in ("check_sealed", "check_singles", "ebay_watch", "pokemon_watch",
+        self.saved = {n: getattr(tb, n) for n in ("check_sealed", "check_singles", "ebay_watch", "onepiece_instore", "pokemon_watch",
                                                    "run_price_drops", "store_locked", "desktop_beep", "discord_send",
                                                    "pc_last_seen")}
         self.saved_http = tb.HTTP.fetch
@@ -261,7 +261,7 @@ class BotRuns(unittest.TestCase):
         lw.WATCH_PATH = os.path.join(self.tmp, "watches.json")
         tb.check_sealed = lambda cfg, sweep=False: ([], {})
         tb.check_singles = lambda cfg: []
-        tb.ebay_watch = tb.pokemon_watch = None
+        tb.ebay_watch = tb.pokemon_watch = tb.onepiece_instore = None
         tb.run_price_drops = lambda cfg, status, **kw: []
         tb.store_locked = lambda host: False
         tb.desktop_beep = lambda: None

@@ -27,6 +27,13 @@ Checks Australian shops for:
      Cards and Card Bot. Settings (all optional): "sweep": false, "sweep_every_minutes": 15,
      "sweep_queries": ["PEB-01"], "new_sealed": false, "new_sealed_packs": true (single packs too).
      The first v2.4 check only remembers what's listed already, so upgrading doesn't flood Discord.
+  9. One Piece in-store (v2.10, onepiece_instore.py): #onepiece-in-store gets "Tomorrow in stores" at 6pm
+     the evening before a release and "Out today" at 7am (pinging the One Piece ping role), listing what
+     comes out, which shops have it online right now and where to look on a shelf. `/onepiece report` in
+     Discord posts a shelf sighting for everyone; `/onepiece instore` lists the last 24 hours; `/onepiece
+     releases` the calendar. Channel: add_channels.bat or `/onepiece setup` ("discord_webhook_instore" /
+     DISCORD_WEBHOOK_INSTORE); until it exists the posts go to the sealed channel. Settings: "instore" in
+     config.json (see the top of onepiece_instore.py).
 
 What's new in v2.4.1 (nothing to change in config.json):
   * The memory files (seen, known_products, status, price_history, singles_prices, recap) keep their last
@@ -108,7 +115,7 @@ copy also posts anything it saw after the PC's last "I'm on", so nothing falls i
 Alert settings can also come from environment variables, which win over config.json.
 The cloud copy (GitHub Actions) uses these so the webhooks stay secret:
     DISCORD_WEBHOOK, DISCORD_WEBHOOK_BOXES, DISCORD_WEBHOOK_SINGLES, DISCORD_WEBHOOK_SEALED, DISCORD_PING,
-    DISCORD_WEBHOOK_EBAY, DISCORD_WEBHOOK_STATUS, DISCORD_WEBHOOK_RECAP,
+    DISCORD_WEBHOOK_EBAY, DISCORD_WEBHOOK_STATUS, DISCORD_WEBHOOK_RECAP, DISCORD_WEBHOOK_INSTORE,
     NTFY_TOPIC, BOT_NAME (the name the Discord posts show, e.g. "One Piece Restock (cloud)"),
     HEARTBEAT_TOPIC, HEARTBEAT_ROLE, POKEMON_WEBHOOKS (one line of JSON), POKEMON_PING
 """
@@ -148,8 +155,12 @@ try:
     import pokemon_watch       # Pokémon releases; optional
 except ImportError:            # pokemon_watch.py not next to the bot: Pokémon is skipped
     pokemon_watch = None
+try:
+    import onepiece_instore    # v2.10: One Piece in-store section (#onepiece-in-store); optional
+except ImportError:
+    onepiece_instore = None
 
-VERSION = "2.9.0"
+VERSION = "2.10.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -201,6 +212,7 @@ ENV_ALERTS = {
     "DISCORD_WEBHOOK_EBAY": "discord_webhook_ebay",
     "DISCORD_WEBHOOK_DROPS": "discord_webhook_drops",      # optional: the 6-hourly price drops get their own channel
     "DISCORD_WEBHOOK_PRICES": "discord_webhook_prices",    # optional: v2.8 daily TCGplayer report (tcgplayer.py)
+    "DISCORD_WEBHOOK_INSTORE": "discord_webhook_instore",  # optional: v2.10 One Piece in-store posts (onepiece_instore.py)
     "LEDGER_URL": "ledger_url",
     "HEARTBEAT_TOPIC": "heartbeat_topic",
     "HEARTBEAT_ROLE": "heartbeat_role",
@@ -244,6 +256,7 @@ DEFAULT_RELEASES = [
     {"date": "2026-11-20", "name": "OP-18 The Dominance of God"},
     {"date": "2026-11-20", "name": "Heroines Gift Collection"},
     {"date": "2026-11-20", "name": "DP-13 Double Pack Set Vol. 13"},
+    {"date": "2026-11-27", "name": "Premium Card Collection Live Action Edition Vol. 2 (November, approx.)"},
     {"date": "2026-12-04", "name": "IB-09 / IB-10 Illustration Boxes"},
     {"date": "2026-12-18", "name": "ST-37 / ST-38 Starter Decks"},
     {"date": "2027-01-29", "name": "EB-06 Extra Booster"},
@@ -1109,7 +1122,7 @@ KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "relea
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
                   "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
-                  "fast_lane", "tcgplayer"}
+                  "fast_lane", "tcgplayer", "instore"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -1240,6 +1253,8 @@ def check_config(cfg):
     w += check_drops_config(cfg)
     if pokemon_watch:
         w += pokemon_watch.warnings(cfg)
+    if onepiece_instore:
+        w += onepiece_instore.warnings(cfg)
     return w
 
 
@@ -2671,11 +2686,14 @@ def heartbeat_body(cfg, status=None):
     plus "r=<key>,..." for the release-day posts it made in the last half hour."""
     body = "pc-on"
     alerts = cfg.get("alerts") or {}
+    recent = []
     if pokemon_watch and pokemon_watch.enabled(cfg) and pokemon_watch.hooks(alerts):
         body += " pokemon"
-        recent = pokemon_watch.recently_sent(status or {})
-        if recent:
-            body += " r=" + ",".join(recent)
+        recent += pokemon_watch.recently_sent(status or {})
+    if onepiece_instore:
+        recent += onepiece_instore.recently_sent(status or {})     # v2.10: One Piece release-day posts too
+    if recent:
+        body += " r=" + ",".join(recent)
     return body
 
 
@@ -3003,7 +3021,7 @@ HOOK_LABELS = {"discord_webhook_boxes": "#booster-boxes", "discord_webhook_singl
                "discord_webhook_sealed": "#sealed-alerts", "discord_webhook_ebay": "#ebay-resale",
                "discord_webhook_watch": "#watched-links",
                "discord_webhook_status": "#bot-status", "discord_webhook_drops": "price drops",
-               "discord_webhook_prices": "#tcgplayer-prices",
+               "discord_webhook_prices": "#tcgplayer-prices", "discord_webhook_instore": "#onepiece-in-store",
                "discord_webhook_recap": "daily recap", "discord_webhook": "main channel"}
 
 
@@ -3847,6 +3865,8 @@ def run_once(cfg, args, drop=None):
             posts.append(msg)
     if poke is not None:
         posts += pokemon_status_posts(cfg, status, poke)
+    if onepiece_instore and not args.all:
+        posts += onepiece_status_posts(cfg, status)
     if role == "listen":
         before = status.get("pc_on")
         if before is True and not pc_on:
@@ -3868,6 +3888,7 @@ def run_once(cfg, args, drop=None):
         except Exception as e:  # noqa: BLE001
             print(f"   ! price drops skipped this check ({redact(e)})")
     poke_posted = pokemon_posts(cfg, status, intro, role, pc_poke) if not args.all else []
+    op_posted = onepiece_posts(cfg, status, role, pc_on) if not args.all else []
 
     deliver, from_held = [], False
     if show and not args.all:
@@ -3933,7 +3954,8 @@ def run_once(cfg, args, drop=None):
                      "copy": "cloud" if role == "listen" else "pc"}
                     for f in deliver if f["id"] not in undelivered and f.get("url")])
     if role == "send":
-        send_heartbeat(cfg, force=(bool(deliver) and not undelivered) or bool(poke_posted), status=status)
+        send_heartbeat(cfg, force=(bool(deliver) and not undelivered) or bool(poke_posted) or bool(op_posted),
+                       status=status)
     if undelivered:
         # not marked as seen, so the next check tries again (a doubled alert beats a missed one)
         for k in undelivered:
@@ -4075,6 +4097,83 @@ def pokemon_posts(cfg, status, intro, role=None, pc_posts_pokemon=False):
     return posted
 
 
+def onepiece_status_posts(cfg, status, now=None):
+    """v2.10: one (text, colour) status post when the in-store section changes state: on quietly (no channel
+    yet), live (channel set up) or off. Nothing while the state is unchanged."""
+    if not onepiece_instore:
+        return []
+    alerts = cfg.get("alerts") or {}
+    st = onepiece_instore.settings(cfg)
+    state = "off" if not st["enabled"] else ("live" if onepiece_instore.has_channel(alerts) else "quiet")
+    before = status.get("instore_state")
+    if before == state:
+        return []
+    status["instore_state"] = state
+    if state == "off":
+        return [("📍 The One Piece in-store section is off (\"instore\": false in config.json).", GREY)] if before else []
+    nxt = onepiece_instore.release_days(cfg, DEFAULT_RELEASES, now, days=60)
+    soon = (f" Next release day: **{onepiece_instore.day_text(nxt[0][0])}** ({', '.join(r['name'] for r in nxt[0][1])})."
+            if nxt else "")
+    if state == "live":
+        return [(f"📍 **One Piece in-store posts are live** in #onepiece-in-store: \"tomorrow in stores\" at "
+                 f"{st['evening']} the evening before each release and \"out today\" at {st['morning']} on the day "
+                 f"(with a ping), plus `/onepiece report` sightings.{soon}", GREEN)]
+    return [(f"📍 **One Piece in-store section is on, quietly.** Release-day posts and `/onepiece report` go to "
+             f"#onepiece-in-store, which doesn't exist yet: type `/onepiece setup` in Discord (or run "
+             f"add_channels.bat on the PC) and add the DISCORD_WEBHOOK_INSTORE secret it shows to GitHub.{soon}", BLUE)]
+
+
+def onepiece_posts(cfg, status, role=None, pc_on=False, now=None):
+    """v2.10: release-day posts in #onepiece-in-store ("tomorrow in stores" the evening before, "out today" at
+    7am). Same hand-off as the Pokémon ones: the PC copy posts them while it's on and says so in its "I'm on"
+    message (r=op:...); the cloud copy posts them only when the PC is off, and the PC copy skips any the cloud
+    copy already posted (status.json in the repo). Returns the keys of the posts made."""
+    if not onepiece_instore:
+        return []
+    alerts = cfg.get("alerts") or {}
+    try:
+        snap = read_json(SNAPSHOT_PATH, {}) or {}
+        due = onepiece_instore.reminders_due(cfg, status, DEFAULT_RELEASES, now, snap, money, _short,
+                                             windows=parse_windows(cfg))
+    except Exception as e:  # noqa: BLE001
+        print(f"   ! One Piece release-day posts skipped ({redact(e)})")
+        return []
+    if not due:
+        return []
+    hook = onepiece_instore.instore_hook(alerts)
+    if not hook:
+        return []            # no #onepiece-in-store yet: quiet (it posts once the channel exists, if it's still that day)
+    where = "#onepiece-in-store"
+    if role == "listen":
+        done = set(PC_INFO["posted"])
+        if pc_on:
+            done |= {r["key"] for r in due}       # the PC copy is on and posts them itself
+    elif role == "send":
+        remote = repo_json(cfg, "status.json", max_age=300)
+        done = remote.get(onepiece_instore.STATUS_KEY) if isinstance(remote, dict) else None
+        done = set(done) if isinstance(done, dict) else set()
+    else:
+        done = set()
+    posted = []
+    for r in due:
+        if r["key"] in done:
+            if role != "listen" or r["key"] in PC_INFO["posted"]:
+                onepiece_instore.mark_sent(status, r["key"], now)   # the other copy posted it
+            continue
+        ping = alerts.get("discord_ping", "") if (r["ping"] and ping_allowed(cfg, [], now)) else ""
+        if DRY_RUN[0]:
+            print(f"   [dry run] would post in {where}: {r['embed']['title']}" + (" (with ping)" if ping else ""))
+            continue
+        payload = {"username": alerts.get("bot_name") or "One Piece Restock", "content": ping.strip(),
+                   "embeds": [r["embed"]],
+                   "allowed_mentions": {"parse": ["roles", "users", "everyone"]} if ping else {"parse": []}}
+        if discord_send(alerts, hook, payload):
+            onepiece_instore.mark_sent(status, r["key"], now)
+            posted.append(r["key"])
+            print(f"   (posted in {where}: {r['embed']['title']})")
+    return posted
+
+
 def self_test(cfg):
     """Quick health check before going live: config, file access, one shop, alert settings."""
     ok = True
@@ -4112,6 +4211,13 @@ def self_test(cfg):
               + (f"channels: {', '.join(ph)}" if ph else "no Pokémon channels yet (quiet: run add_pokemon_channels.bat)"))
     else:
         print("pokemon: off (pokemon_watch.py isn't next to the bot)")
+    if onepiece_instore:
+        st = onepiece_instore.settings(cfg)
+        nxt = onepiece_instore.release_days(cfg, DEFAULT_RELEASES, days=60)
+        print(f"in-store: {'on' if st['enabled'] else 'off'} · "
+              + ("channel: #onepiece-in-store" if onepiece_instore.has_channel(alerts)
+                 else "no #onepiece-in-store yet (quiet: /onepiece setup in Discord, or add_channels.bat)")
+              + (f" · next: {onepiece_instore.day_text(nxt[0][0])} {nxt[0][1][0]['name']}" if nxt else ""))
     print("\nPASS" if ok else "\nFAIL")
     return ok
 

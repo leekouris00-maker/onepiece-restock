@@ -23,6 +23,12 @@ Type these in your Discord server:
     /misses           which kind of miss happens most, over the last 30 days
     /help             this list
 
+  One Piece in-store (v2.10, onepiece_instore.py):
+    /onepiece releases       the English release calendar and drop windows
+    /onepiece report         spotted stock in a store? posts it in #onepiece-in-store and pings
+    /onepiece instore        One Piece sightings from the last 24 hours
+    /onepiece setup          (admins) make #onepiece-in-store; the section is quiet until it exists
+
   Pokémon (pokemon_watch.py):
     /pokemon releases        upcoming releases and in-store days
     /pokemon stock           what the shops have for the watched releases (✅ within your max)
@@ -90,6 +96,17 @@ try:
 except ImportError:
     apc = None
 try:
+    import onepiece_instore as oi   # v2.10: /onepiece
+except ImportError:
+    _fetch_missing_later = ["onepiece_instore"]
+    oi = None
+else:
+    _fetch_missing_later = []
+try:
+    import add_channels as ac       # v2.10: /onepiece setup makes #onepiece-in-store
+except ImportError:
+    ac = None
+try:
     import link_watch as lw    # v2.5: /watch
 except ImportError:
     lw = None
@@ -133,6 +150,12 @@ except ImportError:
         import deck_price as dk
     except ImportError:
         dk = None
+if oi is None and "onepiece_instore" in _fetch_missing_later:
+    _fetch_missing("onepiece_instore")
+    try:
+        import onepiece_instore as oi
+    except ImportError:
+        oi = None
 
 if not hasattr(tb, "VERSION"):
     sys.exit("This commands_bot.py needs the v2 tcg_bot.py next to it - copy both files.")
@@ -551,6 +574,9 @@ HELP = (
     "`/missed <link>` someone posted it before the bot? paste the link: the bot says what happened\n"
     "`/misses` what kind of misses happen most, over the last 30 days\n\n"
     "`/deals`, `/boxes` and `/sealed` answer instantly from the last check; add `fresh:True` to check the shops now.\n\n"
+    "📍 **In store**: `/onepiece releases` · `/onepiece report` (spotted One Piece stock on a shelf? it pings "
+    "everyone in #onepiece-in-store) · `/onepiece instore` (last 24 hours). Release days get a post the night "
+    "before and at 7am.\n"
     "⚡ **Pokémon**: `/pokemon releases` · `/pokemon stock` · `/pokemon report` (spotted stock in a store? it pings "
     "everyone in #pokemon-in-store) · `/pokemon instore`\n\n"
     "🔗 **Watch any link**: `/watch add link:<product page> max:<price>` alerts the moment it's buyable at or "
@@ -562,6 +588,7 @@ HELP = (
     "🖥️ `/desk on` the PC opens the checkout tab itself when a target comes in stock (`/desk off`)\n"
     "⚡ In drop windows the bot also checks that release's listings and your /watch links every 15 seconds.\n\n"
     "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`, "
+    "`/onepiece setup`, "
     "and the /watch, /ebay and /bought commands."
 )
 
@@ -1250,7 +1277,8 @@ def build_poke_releases(cfg):
     ], POKE_YELLOW, "Dates can change. #pokemon-in-store gets a post the night before and at 7am on the day.")
 
 
-def read_reports(hours=24):
+def read_reports(hours=24, game="pokemon"):
+    """Sightings from instore_reports.jsonl for one game (rows from before v2.10 have no game: Pokémon)."""
     cutoff = time.time() - hours * 3600
     out = []
     try:
@@ -1260,11 +1288,17 @@ def read_reports(hours=24):
                     r = json.loads(line)
                 except ValueError:
                     continue
-                if r.get("t", 0) >= cutoff:
+                if r.get("t", 0) >= cutoff and (r.get("game") or "pokemon") == game:
                     out.append(r)
     except OSError:
         pass
     return out
+
+
+def save_report(user, store, what, price, game="pokemon"):
+    tb.append_text(REPORTS_PATH, json.dumps({"t": int(time.time()), "user": str(user), "user_id": user.id,
+                                             "store": store, "what": what, "price": price, "game": game},
+                                            ensure_ascii=False) + "\n", 1_000_000)
 
 
 def clean(text, n):
@@ -1276,27 +1310,33 @@ def clean(text, n):
     return t[:n]
 
 
-async def post_report(cfg, hook, user, store, what, price, photo):
-    """The sighting, as a Pokémon Restock post in #pokemon-in-store (with the photo, if one came with it)."""
+async def post_report(cfg, hook, user, store, what, price, photo, game="pokemon"):
+    """The sighting, as a post in #pokemon-in-store / #onepiece-in-store (with the photo, if one came with it).
+    Returns the ping used ("" if none)."""
     import aiohttp       # comes with discord.py
     alerts = cfg.get("alerts") or {}
-    role = pw.ping(alerts) if tb.ping_allowed(cfg, []) else ""
-    e = discord.Embed(title=f"📍 In store now: {what}"[:256], color=POKE_YELLOW,
+    if game == "pokemon":
+        role = pw.ping(alerts) if tb.ping_allowed(cfg, []) else ""
+        color, cmd, name = POKE_YELLOW, "/pokemon report", pw.bot_name(alerts)
+    else:
+        role = alerts.get("discord_ping", "") if tb.ping_allowed(cfg, []) else ""
+        color, cmd, name = (oi.RED if oi else 0xD62828), "/onepiece report", alerts.get("bot_name") or "One Piece Restock"
+    e = discord.Embed(title=f"📍 In store now: {what}"[:256], color=color,
                       description=f"Reported <t:{int(time.time())}:R>. Stock goes fast, so it may be gone by the time "
                                   f"you get there.")
     e.add_field(name="Store", value=store or "-", inline=True)
     if price:
         e.add_field(name="Price", value=tb.money(price), inline=True)
     e.add_field(name="Seen by", value=user.mention, inline=True)
-    e.set_footer(text="Spotted some? /pokemon report")
+    e.set_footer(text=f"Spotted some? {cmd}")
     kwargs = {}
     if photo is not None and (photo.content_type or "").startswith("image/") and photo.size <= 8 * 1024 * 1024:
-        name = re.sub(r"[^\w.-]", "_", photo.filename or "photo.jpg")[:60]
-        kwargs["file"] = discord.File(io.BytesIO(await photo.read()), filename=name)
-        e.set_image(url=f"attachment://{name}")
+        fname = re.sub(r"[^\w.-]", "_", photo.filename or "photo.jpg")[:60]
+        kwargs["file"] = discord.File(io.BytesIO(await photo.read()), filename=fname)
+        e.set_image(url=f"attachment://{fname}")
     async with aiohttp.ClientSession() as session:
         wh = discord.Webhook.from_url(hook, session=session)
-        await wh.send(content=role or None, embed=e, username=pw.bot_name(alerts), wait=True,
+        await wh.send(content=role or None, embed=e, username=name, wait=True,
                       allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=bool(role)), **kwargs)
     return bool(role)
 
@@ -1813,9 +1853,7 @@ if pw:
             _report_cd[inter.user.id] = time.time() + REPORT_COOLDOWN
             await inter.response.defer(ephemeral=True, thinking=True)
             pinged = await post_report(cfg, hook, inter.user, store, what, price, photo)
-            tb.append_text(REPORTS_PATH, json.dumps({"t": int(time.time()), "user": str(inter.user), "user_id": inter.user.id,
-                                                     "store": store, "what": what, "price": price},
-                                                    ensure_ascii=False) + "\n", 1_000_000)
+            save_report(inter.user, store, what, price)
             await inter.followup.send("✅ Posted in #pokemon-in-store" + (" and pinged Pokémon Ping." if pinged else ".")
                                       + " Thanks!", ephemeral=True)
         except Exception as e:  # noqa: BLE001
@@ -1902,6 +1940,113 @@ if pw:
         await inter.followup.send("```" + vals["POKEMON_WEBHOOKS"][:1990] + "```", ephemeral=True)
 
     bot.tree.add_command(pokemon)
+
+
+# ---------------------------------------------------------------- v2.10: /onepiece (in-store section)
+def build_op_releases(cfg):
+    now = datetime.now()
+    lines = [x[1] for x in oi.calendar_lines(cfg, tb.DEFAULT_RELEASES, now, 180)]
+    wins = [w for w in tb.parse_windows(cfg) if tb.ONE_PIECE in (w.get("games") or [tb.ONE_PIECE]) and w["end"] > now]
+    wl = [f"🚨 {w['name']}: {w['start']:%a %d %b %I:%M %p} to {w['end']:%I:%M %p}, every {w['every']}s"
+          + (" **(ON NOW)**" if w["start"] <= now else "") for w in wins]
+    alerts = cfg.get("alerts") or {}
+    where = "#onepiece-in-store" if oi.has_channel(alerts) else "#onepiece-in-store (not made yet: `/onepiece setup`)"
+    s = oi.settings(cfg)
+    return embed("🏴‍☠️ One Piece releases", [
+        lines_field("Release days (next 6 months)", lines, "Nothing in the next 6 months.", 12),
+        lines_field("Drop mode (the PC copy checks every minute)", wl, "None.", 6),
+    ], oi.RED, f"Dates can change. {where} gets a post the night before ({s['evening']}) and at {s['morning']} on the "
+               f"day, with what's online right now and where to look: {', '.join(s['stores'])}.")
+
+
+if oi:
+    onepiece = app_commands.Group(name="onepiece", description="One Piece releases and in-store drops")
+
+    @onepiece.command(name="releases", description="The English One Piece release calendar and drop windows")
+    async def op_releases_cmd(inter: discord.Interaction):
+        try:
+            await inter.response.send_message(embed=build_op_releases(cfg_now()))
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+    @onepiece.command(name="report", description="Spotted One Piece stock in a store? Posts it in #onepiece-in-store and pings")
+    @app_commands.describe(store="Which store, e.g. EB Games Doncaster", what="What's there, e.g. OP-18 booster boxes",
+                           price="Price each in AUD (optional)", photo="A photo of the shelf (optional)")
+    async def op_report_cmd(inter: discord.Interaction, store: str, what: str, price: Optional[float] = None,
+                            photo: Optional[discord.Attachment] = None):
+        try:
+            cfg = cfg_now()
+            alerts = cfg.get("alerts") or {}
+            hook = oi.instore_hook(alerts)
+            if not hook:
+                await inter.response.send_message("There's no #onepiece-in-store channel yet. An admin can make it "
+                                                  "with `/onepiece setup`.", ephemeral=True)
+                return
+            left = _report_cd.get(("op", inter.user.id), 0) - time.time()
+            if left > 0:
+                await inter.response.send_message(f"Hang on {int(left) + 1}s before your next report.", ephemeral=True)
+                return
+            store, what = clean(store, 80), clean(what, 120)
+            if not store or not what:
+                await inter.response.send_message("Say which store and what's there.", ephemeral=True)
+                return
+            price = price if price and 0 < price < 10000 else None
+            _report_cd[("op", inter.user.id)] = time.time() + REPORT_COOLDOWN
+            await inter.response.defer(ephemeral=True, thinking=True)
+            pinged = await post_report(cfg, hook, inter.user, store, what, price, photo, game="onepiece")
+            save_report(inter.user, store, what, price, game="onepiece")
+            await inter.followup.send("✅ Posted in #onepiece-in-store" + (" and pinged." if pinged else ".") + " Thanks!",
+                                      ephemeral=True)
+        except Exception as e:  # noqa: BLE001
+            _report_cd.pop(("op", inter.user.id), None)
+            await fail(inter, e)
+
+    @onepiece.command(name="instore", description="One Piece in-store sightings from the last 24 hours")
+    async def op_instore_cmd(inter: discord.Interaction):
+        try:
+            rows = sorted(read_reports(24, game="onepiece"), key=lambda r: -r.get("t", 0))
+            lines = [f"📍 **{r.get('what', '')}** at {r.get('store', '')}" + (f" · {tb.money(r['price'])}" if r.get("price") else "")
+                     + f" · {ago(r.get('t'))} · {r.get('user', '')}" for r in rows]
+            await inter.response.send_message(embed=embed("📍 One Piece in-store sightings, last 24 hours",
+                                                          [lines_field(f"Reports ({len(rows)})", lines,
+                                                                       "None yet. Spotted some? `/onepiece report`", 15)],
+                                                          oi.RED))
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+    @onepiece.command(name="setup", description="Make the #onepiece-in-store channel (admins; safe to run again)")
+    async def op_setup_cmd(inter: discord.Interaction):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        if ac is None or not hasattr(ac, "setup"):
+            await inter.response.send_message("add_channels.py isn't next to the bot (or is an old version): run "
+                                              "update_bot.bat, then add_channels.bat.", ephemeral=True)
+            return
+        token = os.environ.get("DISCORD_BOT_TOKEN") or (cfg.get("alerts") or {}).get("discord_bot_token")
+        await inter.response.defer(ephemeral=True, thinking=True)
+        try:
+            res = await asyncio.to_thread(ac.setup, token, inter.guild_id, set(ac.ONEPIECE_KEYS), lambda *a: None, False)
+            where = await asyncio.to_thread(ac.save, res["hooks"])
+        except ac.SetupError as e:
+            await inter.followup.send(f"⚠️ {e}", ephemeral=True)
+            return
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        tb.append_text(AUDIT_PATH, f"{datetime.now():%Y-%m-%d %H:%M:%S}  {inter.user} ({inter.user.id})  onepiece setup\n",
+                       500_000)
+        made = ", ".join(res["created"]) if res["created"] else "nothing new (it was there already)"
+        vals = ac.github_values(res["hooks"])
+        await inter.followup.send(f"✅ **One Piece in-store section ready.** Made: {made}. Saved in {where}; the restock "
+                                  f"bot posts there from its next check (release eves at 6pm, release days at 7am, and "
+                                  f"`/onepiece report` sightings).", ephemeral=True)
+        for name, val in vals.items():
+            await inter.followup.send(f"For the **cloud copy**, add this GitHub secret (repo Settings > Secrets and "
+                                      f"variables > Actions > New repository secret). Keep it private.\n**{name}**\n```"
+                                      + val + "```", ephemeral=True)
+
+    bot.tree.add_command(onepiece)
 
 
 def main():

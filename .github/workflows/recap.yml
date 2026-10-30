@@ -30,6 +30,7 @@ jobs:
           DISCORD_WEBHOOK_BOXES: ${{ secrets.DISCORD_WEBHOOK_BOXES }}
           DISCORD_WEBHOOK_SINGLES: ${{ secrets.DISCORD_WEBHOOK_SINGLES }}
           DISCORD_WEBHOOK_SEALED: ${{ secrets.DISCORD_WEBHOOK_SEALED }}
+          DISCORD_WEBHOOK_INSTORE: ${{ secrets.DISCORD_WEBHOOK_INSTORE }}   # optional: #onepiece-in-store (v2.10, /onepiece setup)
           DISCORD_WEBHOOK_EBAY: ${{ secrets.DISCORD_WEBHOOK_EBAY }}       # optional: eBay finds get their own channel
           DISCORD_WEBHOOK_STATUS: ${{ secrets.DISCORD_WEBHOOK_STATUS }}   # optional: bot status posts get their own channel
           DISCORD_WEBHOOK_RECAP: ${{ secrets.DISCORD_WEBHOOK_RECAP }}   # optional: its own channel
