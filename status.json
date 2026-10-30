@@ -1,85 +1,26 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1793380295,
+  "Elemental Arcade": 1793395933,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-31 00",
+ "drops_slot": "2026-10-31 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793380286,
+ "ebay_ts": 1793395922,
  "held": {
-  "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island": {
+  "sealed|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed": {
    "f": {
-    "cart": "https://elementalarcade.com.au/cart/54899576242467:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island",
-    "kind": "Single",
-    "name": "Brook OP15-022 Alternate Art",
-    "note": "Brook (OP15-022) (Alternate Art) [Adventure on Kami's Island] \u00b7 US market \u2248 $86.06 \u00b7 in stock, listed 4% under market",
-    "price": 79.3,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island",
-    "value_pick": true
+    "cart": "https://grailborne.com.au/cart/46897160388781:1",
+    "id": "sealed|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed",
+    "kind": "Sealed",
+    "name": "One Piece Card Game: Illustration Box Vol.7 (IB-07) - English Sealed",
+    "note": "Illustration Box IB-09 / IB-10",
+    "price": 69.0,
+    "shop": "Grailborne",
+    "url": "https://grailborne.com.au/products/one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed"
    },
-   "t": 1793380302
-  },
-  "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55204140941603:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
-    "kind": "Single",
-    "name": "Moby Dick OP16-021 Alternate Art",
-    "note": "Moby Dick (Alternate Art) - OP16-021 [The Time of Battle] \u00b7 US market \u2248 $22.93 \u00b7 in stock, listed 11% over market",
-    "price": 21.8,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
-    "value_pick": true
-   },
-   "t": 1793380302
-  },
-  "card|pick|https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55204142121251:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle",
-    "kind": "Single",
-    "name": "Tashigi OP14-029 SP",
-    "note": "Tashigi (SP) - OP14-029 [The Time of Battle] \u00b7 US market \u2248 $93.23 \u00b7 in stock, listed 8% over market",
-    "price": 80.5,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle",
-    "value_pick": true
-   },
-   "t": 1793380302
-  },
-  "list|TCGroup|one-piece-card-game-special-goods-set-former-four-emperors": {
-   "f": {
-    "available": false,
-    "box_id": "item|TCGroup|one-piece-card-game-special-goods-set-former-four-emperors",
-    "cart": "",
-    "group": "new",
-    "id": "list|TCGroup|one-piece-card-game-special-goods-set-former-four-emperors",
-    "kind": "New listing",
-    "max": 0.0,
-    "name": "One Piece Card Game - Special Goods Set Former Four Emperors",
-    "note": "listed, not buyable yet",
-    "page": 99,
-    "price": 79.99,
-    "shop": "TCGroup",
-    "url": "https://www.tcgroupau.com.au/products/one-piece-card-game-special-goods-set-former-four-emperors"
-   },
-   "t": 1793380302
+   "t": 1793395940
   }
  },
  "instore_state": "live",
@@ -5500,7 +5441,7 @@
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
-  "cardplustcg.com.au": 0,
+  "cardplustcg.com.au": 1,
   "collectiblemadness.com.au": 0,
   "elementalarcade.com.au": 0,
   "goldfieldsgames.com.au": 0,
@@ -5528,7 +5469,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1793381195
+  "tcg.goodgames.com.au": 1793396833
  },
- "sweep_ts": 1793380286
+ "sweep_ts": 1793395922
 }
