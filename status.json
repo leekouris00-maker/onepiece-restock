@@ -1,14 +1,34 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1793319193,
+  "Elemental Arcade": 1793339125,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-30 06",
+ "drops_slot": "2026-10-30 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793319181,
- "held": {},
+ "ebay_ts": 1793339114,
+ "held": {
+  "list|Good Games (sealed)|ace-sabo-luffy-op13-007-carrying-on-his-will-foil": {
+   "f": {
+    "available": false,
+    "box_id": "sealed|Good Games (sealed)|ace-sabo-luffy-op13-007-carrying-on-his-will-foil",
+    "cart": "",
+    "group": "watch",
+    "id": "list|Good Games (sealed)|ace-sabo-luffy-op13-007-carrying-on-his-will-foil",
+    "kind": "New listing",
+    "max": 150,
+    "name": "Ace & Sabo & Luffy OP13-007 (Carrying On His Will)  - Foil",
+    "note": "Ace, Sabo & Luffy Premium Card Collection, listed, not buyable yet",
+    "page": 1,
+    "price": 1.25,
+    "shop": "Good Games (sealed)",
+    "url": "https://shop.goodgames.com.au/products/ace-sabo-luffy-op13-007-carrying-on-his-will-foil"
+   },
+   "t": 1793339132
+  }
+ },
+ "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
  "offline_streak": 0,
@@ -40,7 +60,7 @@
   "TCGroup": 99,
   "The Wandering Collector": 99
  },
- "pc_on": false,
+ "pc_on": true,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -5422,7 +5442,6 @@
   "elementalarcade.com.au": 0,
   "goldfieldsgames.com.au": 0,
   "grailborne.com.au": 0,
-  "lightofcards.com.au": 0,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
@@ -5446,7 +5465,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1793320093
+  "tcg.goodgames.com.au": 1793340025
  },
- "sweep_ts": 1793319181
+ "sweep_ts": 1793339114
 }
