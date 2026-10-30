@@ -1,55 +1,85 @@
 {
  "discord_health": {},
  "drops_scan": {
-  "Elemental Arcade": 1793360477,
+  "Elemental Arcade": 1793380295,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-30 18",
+ "drops_slot": "2026-10-31 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793360465,
+ "ebay_ts": 1793380286,
  "held": {
-  "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-tech-sticker-collection-random-select": {
+  "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island": {
    "f": {
-    "available": true,
-    "box_id": "poke|30th-celebration|Gameology|pokemon-tcg-30th-celebration-tech-sticker-collection-random-select",
-    "cart": "",
-    "game": "pokemon",
-    "group": "pokemon",
-    "id": "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-tech-sticker-collection-random-select",
-    "kind": "New listing",
-    "max": 50.0,
-    "name": "Pokemon TCG 30th Celebration Tech Sticker Collection (Random Select)",
-    "note": "Small collection \u00b7 in stock (over your $50 max)",
-    "page": 1,
-    "poke_id": "poke|30th-celebration|Gameology|pokemon-tcg-30th-celebration-tech-sticker-collection-random-select",
-    "preorder": false,
-    "price": 89.95,
-    "ptype": "Small collection",
-    "section": "30th-celebration",
-    "section_name": "30th Celebration",
-    "shop": "Gameology",
-    "url": "https://www.gameology.com.au/products/pokemon-tcg-30th-celebration-tech-sticker-collection-random-select"
+    "cart": "https://elementalarcade.com.au/cart/54899576242467:1",
+    "cond": "NM",
+    "deck": "value pick",
+    "id": "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island",
+    "kind": "Single",
+    "name": "Brook OP15-022 Alternate Art",
+    "note": "Brook (OP15-022) (Alternate Art) [Adventure on Kami's Island] \u00b7 US market \u2248 $86.06 \u00b7 in stock, listed 4% under market",
+    "price": 79.3,
+    "priority": false,
+    "qty": 1,
+    "shop": "Elemental Arcade",
+    "url": "https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island",
+    "value_pick": true
    },
-   "t": 1793360483
+   "t": 1793380302
   },
-  "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-three-booster-blister": {
+  "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle": {
    "f": {
-    "cart": "https://collectiblemadness.com.au/cart/67923034210577:1",
-    "game": "pokemon",
-    "id": "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-three-booster-blister",
-    "kind": "Sealed",
-    "name": "Pokemon - TCG - Delta Reign Three Booster Blister",
-    "note": "Blister, pre-order, out Fri 6 Nov",
-    "preorder": true,
-    "price": 34.0,
-    "ptype": "Blister",
-    "section": "delta-reign",
-    "section_name": "Delta Reign",
-    "shop": "Collectible Madness",
-    "url": "https://collectiblemadness.com.au/products/pokemon-tcg-delta-reign-three-booster-blister"
+    "cart": "https://elementalarcade.com.au/cart/55204140941603:1",
+    "cond": "NM",
+    "deck": "value pick",
+    "id": "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
+    "kind": "Single",
+    "name": "Moby Dick OP16-021 Alternate Art",
+    "note": "Moby Dick (Alternate Art) - OP16-021 [The Time of Battle] \u00b7 US market \u2248 $22.93 \u00b7 in stock, listed 11% over market",
+    "price": 21.8,
+    "priority": false,
+    "qty": 1,
+    "shop": "Elemental Arcade",
+    "url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
+    "value_pick": true
    },
-   "t": 1793360483
+   "t": 1793380302
+  },
+  "card|pick|https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle": {
+   "f": {
+    "cart": "https://elementalarcade.com.au/cart/55204142121251:1",
+    "cond": "NM",
+    "deck": "value pick",
+    "id": "card|pick|https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle",
+    "kind": "Single",
+    "name": "Tashigi OP14-029 SP",
+    "note": "Tashigi (SP) - OP14-029 [The Time of Battle] \u00b7 US market \u2248 $93.23 \u00b7 in stock, listed 8% over market",
+    "price": 80.5,
+    "priority": false,
+    "qty": 1,
+    "shop": "Elemental Arcade",
+    "url": "https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle",
+    "value_pick": true
+   },
+   "t": 1793380302
+  },
+  "list|TCGroup|one-piece-card-game-special-goods-set-former-four-emperors": {
+   "f": {
+    "available": false,
+    "box_id": "item|TCGroup|one-piece-card-game-special-goods-set-former-four-emperors",
+    "cart": "",
+    "group": "new",
+    "id": "list|TCGroup|one-piece-card-game-special-goods-set-former-four-emperors",
+    "kind": "New listing",
+    "max": 0.0,
+    "name": "One Piece Card Game - Special Goods Set Former Four Emperors",
+    "note": "listed, not buyable yet",
+    "page": 99,
+    "price": 79.99,
+    "shop": "TCGroup",
+    "url": "https://www.tcgroupau.com.au/products/one-piece-card-game-special-goods-set-former-four-emperors"
+   },
+   "t": 1793380302
   }
  },
  "instore_state": "live",
@@ -5498,7 +5528,7 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {
-  "tcg.goodgames.com.au": 1793361377
+  "tcg.goodgames.com.au": 1793381195
  },
- "sweep_ts": 1793360465
+ "sweep_ts": 1793380286
 }
