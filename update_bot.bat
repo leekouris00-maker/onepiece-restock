@@ -31,7 +31,7 @@ echo Restarting the bot...
 if exist restart_bot.bat call restart_bot.bat
 echo.
 echo Done. Your old files are in the backup-before-update folder.
-echo Within a minute or two Discord's #bot-status should say "Bot online (PC, v2.10.0)".
+echo Within a minute or two Discord's #bot-status should say "Bot online (PC, v2.10.1)".
 echo.
 choice /m "Add the #onepiece-in-store (and #tcgplayer-prices) channels to Discord now"
 if errorlevel 2 goto end

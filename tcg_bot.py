@@ -160,7 +160,7 @@ try:
 except ImportError:
     onepiece_instore = None
 
-VERSION = "2.10.0"
+VERSION = "2.10.1"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -300,10 +300,14 @@ EXTRA_SHOPIFY_SEARCH = [
     {"name": "Grailborne", "base": "https://grailborne.com.au"},
     {"name": "Collectible Madness", "base": "https://collectiblemadness.com.au"},
     # Friendly Collectibles was removed in Oct 2026: its search refused the bot (HTTP 401) on every check.
-    {"name": "Light of Cards", "base": "https://lightofcards.com.au"},     # v2.4; mostly Japanese, English kept
+    {"name": "Light of Cards", "base": "https://lightofcards.com.au"},     # v2.4; mostly Japanese, English kept (paused: see SHOP_PAUSES)
     {"name": "Card Bot", "base": "https://cardbot.com.au"},                # v2.4; mostly Japanese, English kept
 ]
 SEARCH_QUERIES = ["one piece booster box", "one piece booster display", "one piece card game"]
+# v2.10.1: shops left alone until a date (YYYY-MM-DD; the shop is back on watch from that day). Lee paused Light of
+# Cards on 30 Oct 2026 (the shop asks for no bots around the EB-05 release). Your own in config.json win:
+#     "pause_shops": {"Light of Cards": "2026-11-01", "Gumnut": "2026-12-25"}   ("pause_shops": false = none)
+SHOP_PAUSES = {"Light of Cards": "2026-11-01"}
 
 WATCH_EXCLUDE = ["japanese", "(jp)", " jp ", "[jp]", "jpn", "chinese", "korean", "asia", "simplified", "traditional"]
 
@@ -1122,7 +1126,7 @@ KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "relea
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
                   "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
-                  "fast_lane", "tcgplayer", "instore"}
+                  "fast_lane", "tcgplayer", "instore", "pause_shops"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -1250,6 +1254,18 @@ def check_config(cfg):
     for d in cfg.get("drop_windows") or []:
         if isinstance(d, dict) and str(d.get("game", ONE_PIECE)).lower() not in (ONE_PIECE, POKE, "one piece", "pokémon"):
             w.append(f'drop window "{d.get("name", "?")}": "game" should be "onepiece" or "pokemon"')
+    ps = cfg.get("pause_shops")
+    if ps is not None and ps is not False:
+        if not isinstance(ps, dict):
+            w.append('"pause_shops" should be {"<shop name>": "YYYY-MM-DD", ...} or false; ignored')
+            cfg["pause_shops"] = {}
+        else:
+            for name, until in list(ps.items()):
+                try:
+                    datetime.strptime(str(until), "%Y-%m-%d")
+                except ValueError:
+                    w.append(f'pause_shops "{name}" should be a date like "2026-11-01" (it\'s {until!r}); not paused')
+                    ps.pop(name)
     w += check_drops_config(cfg)
     if pokemon_watch:
         w += pokemon_watch.warnings(cfg)
@@ -1646,7 +1662,28 @@ def sealed_shops(cfg):
         woo += [x for x in EXTRA_WOOCOMMERCE if x["name"] not in have]
         have_urls = {x["url"] for x in prods}
         prods += [x for x in EXTRA_SHOPIFY_PRODUCTS if x["url"] not in have_urls]
+    paused = paused_shops(cfg)
+    if paused:
+        cols, prods, woo, search = ([x for x in group if x.get("name") not in paused] for group in (cols, prods, woo, search))
     return cols, prods, woo, search
+
+
+def paused_shops(cfg, today=None):
+    """Shop names left alone today: SHOP_PAUSES with config.json "pause_shops" on top (a shop whose date has
+    passed is back on watch; "pause_shops": false pauses nothing)."""
+    user = (cfg or {}).get("pause_shops")
+    if user is False:
+        return set()
+    pauses = dict(SHOP_PAUSES, **(user if isinstance(user, dict) else {}))
+    today = today or datetime.now().date()
+    out = set()
+    for name, until in pauses.items():
+        try:
+            if datetime.strptime(str(until), "%Y-%m-%d").date() > today:
+                out.add(name)
+        except ValueError:
+            continue
+    return out
 
 
 def shopify_product_box(shop_name, url, max_price, watch=()):
