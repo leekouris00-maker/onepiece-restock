@@ -94,3 +94,4 @@
 {"t": 1793360484, "event": "in_stock", "id": "box|Rogue Online|pre-order-one-piece-card-game-eb-05-heroines-vol-2-booster-box-1", "name": "ONE PIECE CARD GAME - [EB-05] HEROINES VOL.2 BOOSTER BOX", "shop": "Rogue Online", "price": 579.99, "was": 418182}
 {"t": 1793360484, "event": "in_stock", "id": "poke|delta-reign|Gameology|pokemon-tcg-mega-evolution-delta-reign-booster-box", "name": "Pokemon TCG Mega Evolution Delta Reign Booster Box", "shop": "Gameology", "price": 379.95, "was": 922721}
 {"t": 1793360484, "event": "in_stock", "id": "poke|30th-celebration|Gameology|pokemon-tcg-30th-celebration-elite-trainer-box", "name": "Pokemon TCG 30th Celebration Elite Trainer Box", "shop": "Gameology", "price": 279.95, "was": 922721}
+{"t": 1793428402, "event": "sold_out", "id": "poke|30th-celebration|Pokebox|pokemon-tcg-30th-celebration-booster-bundle", "name": "Pokémon TCG: 30th Celebration Booster Bundle", "shop": "Pokebox", "price": 139.99, "was": 1009115}

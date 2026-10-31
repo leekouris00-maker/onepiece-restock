@@ -4,11 +4,114 @@
   "Elemental Arcade": 1793395933,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-31 06",
+ "drops_slot": "2026-10-31 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793408218,
- "held": {},
+ "ebay_ts": 1793428393,
+ "held": {
+  "ebay|v1|178490730493|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|178490730493|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Mera Mera DON!! card (English)",
+    "note": "[ONE PIECE TCG x Nike Mera Mera no Mi DON!! Promo Card English 2026](https://www.ebay.com.au/itm/178490730493)\nA$242.46 item + free postage + A$24.25 GST (est.) \u00b7 seller feedback 100.0% (56)\nCame with in-store pair purchases outside Japan. Not much sales data yet - ~A$250-300 guess based on the other two.",
+    "price": 266.71,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Korea)",
+    "url": "https://www.ebay.com.au/itm/178490730493"
+   },
+   "t": 1793428401
+  },
+  "ebay|v1|366683562606|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|366683562606|0",
+    "kind": "Single",
+    "name": "Gomu Gomu DON!! card (Japanese) + Mera Mera DON!! card (Japanese) + Ope Ope DON!! card (Japanese)",
+    "note": "\u26a0\ufe0f One listing, 3 of your cards - check exactly what's included before buying.\n[NIKE x ONE PIECE 3 DON!! Cards Set Gomu Mera Ope Japanese Promo NO LUFFY](https://www.ebay.com.au/itm/366683562606)\nA$46.91 item + A$46.91 postage + A$9.38 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 100.0% (48)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027, 10 of each DON per set) - expect prices to drop, lower this then.",
+    "price": 103.2,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Japan)",
+    "url": "https://www.ebay.com.au/itm/366683562606"
+   },
+   "t": 1793428401
+  },
+  "ebay|v1|366725971268|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|366725971268|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Mera Mera DON!! card (English)",
+    "note": "[ONE PIECE TCG x Nike Mera Mera no Mi DON!! Promo Card English 2026](https://www.ebay.com.au/itm/366725971268)\nA$269.06 item + free postage + A$26.91 GST (est.) \u00b7 seller feedback 100.0% (28)\nCame with in-store pair purchases outside Japan. Not much sales data yet - ~A$250-300 guess based on the other two.",
+    "price": 295.97,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Japan)",
+    "url": "https://www.ebay.com.au/itm/366725971268"
+   },
+   "t": 1793428401
+  },
+  "ebay|v1|820082175327|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|820082175327|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Gomu Gomu DON!! card (Japanese)",
+    "note": "[PRESALE Nike x ONE PIECE TCG Gomu Gomu DON!! Air Max Plus Jump Promo Japanese](https://www.ebay.com.au/itm/820082175327)\nA$123.56 item + free postage + A$12.36 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 99.8% (475)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027, 10 of each DON per set) - expect prices to drop, lower this then.",
+    "price": 135.92,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Japan)",
+    "url": "https://www.ebay.com.au/itm/820082175327"
+   },
+   "t": 1793428401
+  },
+  "ebay|v1|820082180571|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|820082180571|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Mera Mera DON!! card (Japanese)",
+    "note": "[PRESALE Nike x ONE PIECE TCG Mera Mera DON!! Air Max Plus Jump Promo Japanese](https://www.ebay.com.au/itm/820082180571)\nA$123.56 item + free postage + A$12.36 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 99.8% (475)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027) - expect prices to drop, lower this then.",
+    "price": 135.92,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Japan)",
+    "url": "https://www.ebay.com.au/itm/820082180571"
+   },
+   "t": 1793428401
+  },
+  "ebay|v1|820082186334|0": {
+   "f": {
+    "cart": "",
+    "deck": "eBay watch",
+    "ebay": true,
+    "id": "ebay|v1|820082186334|0",
+    "kind": "Single",
+    "name": "Nike x One Piece Ope Ope DON!! card (Japanese)",
+    "note": "[PRESALE Nike x ONE PIECE TCG Ope Ope DON!! Air Max Plus Jump Promo Japanese](https://www.ebay.com.au/itm/820082186334)\nA$123.56 item + free postage + A$12.36 GST (est.) \u00b7 accepts offers \u00b7 seller feedback 99.8% (475)\nJapanese copies flood in once the Jump 34-card sets ship (~Jan 2027). StockX ask ~US$340 but best offer only ~US$66 - real market is much lower.",
+    "price": 135.92,
+    "priority": true,
+    "qty": 1,
+    "shop": "eBay (from Japan)",
+    "url": "https://www.ebay.com.au/itm/820082186334"
+   },
+   "t": 1793428401
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -5443,7 +5546,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 1,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -5457,5 +5560,5 @@
  "shop_retry": {
   "tcg.goodgames.com.au": 1793396833
  },
- "sweep_ts": 1793408218
+ "sweep_ts": 1793428393
 }
