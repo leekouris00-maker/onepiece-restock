@@ -7,22 +7,8 @@
  "drops_slot": "2026-10-31 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793395922,
- "held": {
-  "sealed|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed": {
-   "f": {
-    "cart": "https://grailborne.com.au/cart/46897160388781:1",
-    "id": "sealed|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed",
-    "kind": "Sealed",
-    "name": "One Piece Card Game: Illustration Box Vol.7 (IB-07) - English Sealed",
-    "note": "Illustration Box IB-09 / IB-10",
-    "price": 69.0,
-    "shop": "Grailborne",
-    "url": "https://grailborne.com.au/products/one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed"
-   },
-   "t": 1793395940
-  }
- },
+ "ebay_ts": 1793408218,
+ "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -619,7 +605,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793319135.1498294
+   "t": 1793408194.7345057
   },
   "collectiblemadness.com.au": {
    "rules": [
@@ -1402,7 +1388,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793319134.5620737
+   "t": 1793408194.057698
   },
   "grailborne.com.au": {
    "rules": [
@@ -1928,7 +1914,7 @@
   },
   "overhauledgames.com.au": {
    "rules": [],
-   "t": 1793319135.144245
+   "t": 1793408194.722507
   },
   "pocketgames.com.au": {
    "rules": [
@@ -2450,7 +2436,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793319136.890447
+   "t": 1793408194.0468118
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -3233,7 +3219,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793319134.558127
+   "t": 1793408194.0482607
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -4016,7 +4002,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793319134.581068
+   "t": 1793408194.0727162
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -5441,7 +5427,7 @@
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
-  "cardplustcg.com.au": 1,
+  "cardplustcg.com.au": 0,
   "collectiblemadness.com.au": 0,
   "elementalarcade.com.au": 0,
   "goldfieldsgames.com.au": 0,
@@ -5457,7 +5443,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 1,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -5471,5 +5457,5 @@
  "shop_retry": {
   "tcg.goodgames.com.au": 1793396833
  },
- "sweep_ts": 1793395922
+ "sweep_ts": 1793408218
 }
