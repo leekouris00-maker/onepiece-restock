@@ -4,286 +4,11 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-10-31 18",
+ "drops_slot": "2026-11-01 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793451580,
- "held": {
-  "card|Elemental Arcade|OP05-015|belo-betty-jolly-roger-foil-op05015-premium-booster-the-best": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54899524010275:4",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP05-015|belo-betty-jolly-roger-foil-op05015-premium-booster-the-best",
-    "kind": "Single",
-    "name": "Belo Betty OP05-015",
-    "note": "Belo Betty (Jolly Roger Foil) - OP05-015 [Premium Booster -The Best-]",
-    "price": 1.2,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/belo-betty-jolly-roger-foil-op05015-premium-booster-the-best"
-   },
-   "t": 1793451598
-  },
-  "card|Elemental Arcade|OP05-015|belo-betty-op05015-awakening-of-the-new-era": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54899525714211:4",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP05-015|belo-betty-op05015-awakening-of-the-new-era",
-    "kind": "Single",
-    "name": "Belo Betty OP05-015",
-    "note": "Belo Betty - OP05-015 [Awakening of the New Era]",
-    "price": 1.0,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/belo-betty-op05015-awakening-of-the-new-era"
-   },
-   "t": 1793451598
-  },
-  "card|Elemental Arcade|OP05-015|belo-betty-op05015-reprint-premium-booster-the-best": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54899525910819:4",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP05-015|belo-betty-op05015-reprint-premium-booster-the-best",
-    "kind": "Single",
-    "name": "Belo Betty OP05-015",
-    "note": "Belo Betty (OP05-015) (Reprint) [Premium Booster -The Best-]",
-    "price": 1.0,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/belo-betty-op05015-reprint-premium-booster-the-best"
-   },
-   "t": 1793451598
-  },
-  "card|Elemental Arcade|OP05-021|revolutionary-army-hq-op05021-awakening-of-the-new-era": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54900291961123:3",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP05-021|revolutionary-army-hq-op05021-awakening-of-the-new-era",
-    "kind": "Single",
-    "name": "Revolutionary Army HQ OP05-021",
-    "note": "Revolutionary Army HQ - OP05-021 [Awakening of the New Era]",
-    "price": 0.7,
-    "priority": false,
-    "qty": 3,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/revolutionary-army-hq-op05021-awakening-of-the-new-era"
-   },
-   "t": 1793451598
-  },
-  "card|Elemental Arcade|OP05-021|revolutionary-army-hq-pirate-foil-op05021-premium-booster-the-best-vol-2": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54900292354339:3",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP05-021|revolutionary-army-hq-pirate-foil-op05021-premium-booster-the-best-vol-2",
-    "kind": "Single",
-    "name": "Revolutionary Army HQ OP05-021",
-    "note": "Revolutionary Army HQ (Pirate Foil) - OP05-021 [Premium Booster -The Best- Vol. 2]",
-    "price": 0.7,
-    "priority": false,
-    "qty": 3,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/revolutionary-army-hq-pirate-foil-op05021-premium-booster-the-best-vol-2"
-   },
-   "t": 1793451598
-  },
-  "card|Elemental Arcade|OP05-021|revolutionary-army-hq-reprint-op05021-premium-booster-the-best-vol-2": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54900292518179:3",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP05-021|revolutionary-army-hq-reprint-op05021-premium-booster-the-best-vol-2",
-    "kind": "Single",
-    "name": "Revolutionary Army HQ OP05-021",
-    "note": "Revolutionary Army HQ (Reprint) - OP05-021 [Premium Booster -The Best- Vol. 2]",
-    "price": 0.7,
-    "priority": false,
-    "qty": 3,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/revolutionary-army-hq-reprint-op05021-premium-booster-the-best-vol-2"
-   },
-   "t": 1793451598
-  },
-  "card|Elemental Arcade|OP13-017|monkeyddragon-op13017-carrying-on-his-will": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54900096696611:1",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP13-017|monkeyddragon-op13017-carrying-on-his-will",
-    "kind": "Single",
-    "name": "Monkey.D.Dragon OP13-017",
-    "note": "Monkey.D.Dragon - OP13-017 [Carrying On His Will]",
-    "price": 1.0,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/monkeyddragon-op13017-carrying-on-his-will"
-   },
-   "t": 1793451598
-  },
-  "card|Elemental Arcade|OP13-017|monkeyddragon-op13017-starter-deck-35-redblack-sabo": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55409371382051:1",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP13-017|monkeyddragon-op13017-starter-deck-35-redblack-sabo",
-    "kind": "Single",
-    "name": "Monkey.D.Dragon OP13-017",
-    "note": "Monkey.D.Dragon - OP13-017 [Starter Deck 35: RED/BLACK Sabo]",
-    "price": 1.0,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/monkeyddragon-op13017-starter-deck-35-redblack-sabo"
-   },
-   "t": 1793451598
-  },
-  "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": {
-   "f": {
-    "cart": "https://www.mayhemcollectables.com.au/cart/67693146931514:3",
-    "cond": "",
-    "deck": "Sabo",
-    "id": "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2",
-    "kind": "Single",
-    "name": "Revolutionary Army HQ OP05-021",
-    "note": "Revolutionary Army HQ (Reprint) OP05-021 (Premium Booster -The Best- Vol. 2)",
-    "price": 0.3,
-    "priority": false,
-    "qty": 3,
-    "shop": "Mayhem",
-    "url": "https://www.mayhemcollectables.com.au/products/revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2"
-   },
-   "t": 1793451598
-  },
-  "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54899576242467:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island",
-    "kind": "Single",
-    "name": "Brook OP15-022 Alternate Art",
-    "note": "Brook (OP15-022) (Alternate Art) [Adventure on Kami's Island] \u00b7 US market \u2248 $86.06 \u00b7 in stock, listed 4% under market",
-    "price": 79.3,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island",
-    "value_pick": true
-   },
-   "t": 1793451598
-  },
-  "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55204140941603:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
-    "kind": "Single",
-    "name": "Moby Dick OP16-021 Alternate Art",
-    "note": "Moby Dick (Alternate Art) - OP16-021 [The Time of Battle] \u00b7 US market \u2248 $22.93 \u00b7 in stock, listed 11% over market",
-    "price": 21.8,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
-    "value_pick": true
-   },
-   "t": 1793451598
-  },
-  "card|pick|https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54900095942947:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future",
-    "kind": "Single",
-    "name": "Monkey.D.Dragon OP07-015 Regular",
-    "note": "Monkey.D.Dragon - OP07-015 [500 Years in the Future] \u00b7 US market \u2248 $2.85 \u00b7 in stock, listed 30% under market",
-    "price": 2.0,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future",
-    "value_pick": true
-   },
-   "t": 1793451598
-  },
-  "card|pick|https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54900326170915:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will",
-    "kind": "Single",
-    "name": "Sabo OP13-004 Regular",
-    "note": "Sabo - OP13-004 [Carrying On His Will] \u00b7 US market \u2248 $4.02 \u00b7 in stock, listed 75% under market",
-    "price": 1.0,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will",
-    "value_pick": true
-   },
-   "t": 1793451598
-  },
-  "card|pick|https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55204142121251:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle",
-    "kind": "Single",
-    "name": "Tashigi OP14-029 SP",
-    "note": "Tashigi (SP) - OP14-029 [The Time of Battle] \u00b7 US market \u2248 $93.23 \u00b7 in stock, listed 8% over market",
-    "price": 80.5,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle",
-    "value_pick": true
-   },
-   "t": 1793451598
-  },
-  "list|Grailborne|one-piece-card-game-peb-01-premium-extra-booster-box-releases-mar-2027": {
-   "f": {
-    "available": true,
-    "box_id": "box|Grailborne|one-piece-card-game-peb-01-premium-extra-booster-box-releases-mar-2027",
-    "cart": "",
-    "group": "box",
-    "id": "list|Grailborne|one-piece-card-game-peb-01-premium-extra-booster-box-releases-mar-2027",
-    "kind": "New listing",
-    "max": 260.0,
-    "name": "One Piece Card Game: PEB-01 Premium Extra Booster Box (Expected Mar 2027)",
-    "note": "pre-order, in stock (over your $260.00 max)",
-    "page": 1,
-    "price": 599.0,
-    "shop": "Grailborne",
-    "url": "https://grailborne.com.au/products/one-piece-card-game-peb-01-premium-extra-booster-box-releases-mar-2027"
-   },
-   "t": 1793451598
-  },
-  "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": {
-   "f": {
-    "cart": "https://grailborne.com.au/cart/46863319072941:1",
-    "id": "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition",
-    "kind": "Sealed",
-    "name": "One Piece Card Game: Premium Card Collection - 29th Anniversary Edition (P-159 Monkey D. Luffy, 8 Cards) (Ships March 2027)",
-    "note": "29th Anniversary Premium Card Collection, pre-order",
-    "price": 99.0,
-    "shop": "Grailborne",
-    "url": "https://grailborne.com.au/products/one-piece-card-game-premium-card-collection-29th-anniversary-edition"
-   },
-   "t": 1793451598
-  }
- },
+ "ebay_ts": 1793467899,
+ "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -2185,7 +1910,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793263721.559618
+   "t": 1793467879.353011
   },
   "overhauledgames.com.au": {
    "rules": [],
@@ -5698,6 +5423,7 @@
   "elementalarcade.com.au": 0,
   "goldfieldsgames.com.au": 0,
   "grailborne.com.au": 0,
+  "lightofcards.com.au": 0,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
@@ -5709,7 +5435,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 1,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -5723,5 +5449,5 @@
  "shop_retry": {
   "tcg.goodgames.com.au": 1793452491
  },
- "sweep_ts": 1793451580
+ "sweep_ts": 1793467899
 }
