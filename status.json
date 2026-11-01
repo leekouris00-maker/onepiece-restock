@@ -4,11 +4,25 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-01 12",
+ "drops_slot": "2026-11-01 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793500490,
- "held": {},
+ "ebay_ts": 1793525943,
+ "held": {
+  "sealed|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed": {
+   "f": {
+    "cart": "https://grailborne.com.au/cart/46897160388781:1",
+    "id": "sealed|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed",
+    "kind": "Sealed",
+    "name": "One Piece Card Game: Illustration Box Vol.7 (IB-07) - English Sealed",
+    "note": "Illustration Box IB-09 / IB-10",
+    "price": 69.0,
+    "shop": "Grailborne",
+    "url": "https://grailborne.com.au/products/one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed"
+   },
+   "t": 1793525955
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -5435,7 +5449,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 1,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -5449,5 +5463,5 @@
  "shop_retry": {
   "tcg.goodgames.com.au": 1793452491
  },
- "sweep_ts": 1793500490
+ "sweep_ts": 1793525943
 }
