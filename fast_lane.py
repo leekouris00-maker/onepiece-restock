@@ -236,8 +236,12 @@ def tick(tb, cfg, drop=None, now=None):
     if show:
         delivered = deliver(tb, cfg, show, drop)
         undelivered = {f["id"] for f in show} - delivered
+    shown = {f["id"] for f in show}
     for f in finds:
-        if f["id"] not in undelivered and state.get(f["id"]) != f["price"]:
+        # v2.10.2: keep the alerted price while it stays in stock, so cents-a-day drift doesn't re-alert
+        if f["id"] in undelivered or (f["id"] in state and f["id"] not in shown):
+            continue
+        if state.get(f["id"]) != f["price"]:
             state[f["id"]] = f["price"]
             changed = True
     if changed and not tb.DRY_RUN[0]:

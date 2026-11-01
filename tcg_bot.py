@@ -160,7 +160,7 @@ try:
 except ImportError:
     onepiece_instore = None
 
-VERSION = "2.10.1"
+VERSION = "2.10.2"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -244,7 +244,9 @@ BOX_KINDS = ("Booster box", "Sealed", "New listing")
 DEFAULT_SEALED_WATCH = [
     {"name": "Starter decks ST-37 / ST-38", "match": ["ST-37", "ST-38"], "max": 45},
     {"name": "Double Pack Set DP-13", "match": ["DP-13"], "max": 35},
-    {"name": "Illustration Box IB-09 / IB-10", "match": ["IB-09", "IB-10", "Illustration Box"], "max": 130},
+    # v2.10.2: not plain "Illustration Box" - that matched the older IB-07 too
+    {"name": "Illustration Box IB-09 / IB-10", "match": ["IB-09", "IB-10", "Illustration Box Vol.9", "Illustration Box Vol 9",
+                                                         "Illustration Box Vol.10", "Illustration Box Vol 10"], "max": 130},
     {"name": "Heroines Gift Collection", "match": ["Gift Collection"], "max": 120},
     {"name": "Ace, Sabo & Luffy Premium Card Collection", "match": ["Ace, Sabo", "Sabo & Luffy", "Sabo and Luffy"], "max": 150},
     {"name": "29th Anniversary Premium Card Collection", "match": ["29th Anniversary"], "max": 150},
@@ -308,6 +310,13 @@ SEARCH_QUERIES = ["one piece booster box", "one piece booster display", "one pie
 # Cards on 30 Oct 2026 (the shop asks for no bots around the EB-05 release). Your own in config.json win:
 #     "pause_shops": {"Light of Cards": "2026-11-01", "Gumnut": "2026-12-25"}   ("pause_shops": false = none)
 SHOP_PAUSES = {"Light of Cards": "2026-11-01"}
+
+# v2.10.2: other card games that shops file inside their One Piece section (Rogue Online lists the Gundam
+# Card Game there), so their booster boxes don't alert as One Piece ones.
+OTHER_GAMES = ("gundam", "pokemon", "pokémon", "yu-gi-oh", "yugioh", "dragon ball", "digimon", "lorcana",
+               "magic: the gathering", " mtg ", "union arena", "weiss schwarz", "flesh and blood", "riftbound",
+               "star wars unlimited", "naruto", "battle spirits", "duel masters", "vanguard", "hololive",
+               "godzilla", "disney", "sorcery", "grand archive", "altered", "final fantasy")
 
 WATCH_EXCLUDE = ["japanese", "(jp)", " jp ", "[jp]", "jpn", "chinese", "korean", "asia", "simplified", "traditional"]
 
@@ -1365,9 +1374,16 @@ def is_excluded(title, words):
     return any(w.lower() in t for w in words)
 
 
+def is_other_game(title):
+    """v2.10.2: a product from another card game (Gundam, Yu-Gi-Oh...), even if a shop files it under One Piece."""
+    t = norm(title)
+    return "one piece" not in t and any(g in t for g in OTHER_GAMES)
+
+
 def is_box_title(title):
     t = (title or "").lower()
-    return ("booster box" in t or "booster display" in t) and not is_excluded(title, BOX_EXCLUDE)
+    return (("booster box" in t or "booster display" in t) and not is_excluded(title, BOX_EXCLUDE)
+            and not is_other_game(title))
 
 
 def is_preorder(title, tags=""):
@@ -1378,7 +1394,7 @@ def is_preorder(title, tags=""):
 
 def watch_item(title, watch):
     """The sealed_watch entry this product title matches, or None (box titles are left to the box check)."""
-    if not title or is_box_title(title) or is_excluded(title, WATCH_EXCLUDE):
+    if not title or is_box_title(title) or is_excluded(title, WATCH_EXCLUDE) or is_other_game(title):
         return None
     t = title.lower()
     squashed = re.sub(r"[\s\-]", "", t)
@@ -1396,7 +1412,7 @@ def is_sealed_listing(title, variants=None):
     if not title or not SEALED_OPTS.get("new", True):
         return False
     t = norm(title)
-    if is_excluded(title, WATCH_EXCLUDE) or any(w in t for w in NOT_SEALED):
+    if is_excluded(title, WATCH_EXCLUDE) or any(w in t for w in NOT_SEALED) or is_other_game(title):
         return False
     if SINGLE_NUM_RE.search(title) or SINGLE_HINT_RE.search(title) or not TCG_RE.search(title):
         return False                 # a single or graded card, or One Piece merch rather than the card game
@@ -2933,14 +2949,65 @@ def save_state(state):
     atomic_write_json(STATE_PATH, state, indent=1, sort_keys=True)
 
 
-def new_only(finds, state):
-    """New = not seen in stock last time, or cheaper than last time."""
+# v2.10.2: what counts as "cheaper" for a repeat alert. eBay prices are converted from USD/JPY/KRW and some
+# shops nudge prices by cents every day, so a few cents' wobble used to re-post the same listing daily.
+# Override in config.json: "alerts": {"repeat_drop_pct": 5, "repeat_drop_min": 2, "repeat_cooldown_hours": 24}
+REPEAT = {"pct": 5.0, "min": 2.0, "hours": 24.0, "box_hours": 2.0}
+
+
+def repeat_settings(cfg):
+    a = (cfg or {}).get("alerts") or {}
+    out = dict(REPEAT)
+    for k, key in (("pct", "repeat_drop_pct"), ("min", "repeat_drop_min"), ("hours", "repeat_cooldown_hours"),
+                   ("box_hours", "repeat_cooldown_hours_boxes")):
+        v = _num(a.get(key))
+        if v is not None and v >= 0:
+            out[k] = float(v)
+    return out
+
+
+def real_drop(price, prev, rs=None):
+    """Cheaper by enough to be worth a second alert (not just exchange-rate or cents wobble)."""
+    rs = rs or REPEAT
+    return price < prev - max(rs["min"], prev * rs["pct"] / 100.0) + 0.001
+
+
+def new_only(finds, state, recent=None, now=None, rs=None):
+    """New = not in stock last time, or meaningfully cheaper than when it was last alerted.
+    recent (v2.10.2): {id: [price, time]} of recent alerts, so a listing that drops out for a check (a page
+    that didn't load, a value pick not checked this turn) doesn't alert again when it's back at the same price.
+    Booster boxes and sealed get a short cool-down only, so a real sell-out and restock still alerts."""
+    rs = rs or REPEAT
+    now = now or time.time()
     out = []
     for f in finds:
         prev = state.get(f["id"])
-        if prev is None or f["price"] < prev - 0.001:
+        if prev is not None and not isinstance(prev, (int, float)):
+            prev = None
+        if prev is None and recent and f["id"] in recent:
+            try:
+                rp, rt = float(recent[f["id"]][0]), float(recent[f["id"]][1])
+            except (TypeError, ValueError, IndexError):
+                rp = rt = None
+            # singles and eBay: a day; boxes and sealed: a short blip only; /watch links and Pokémon
+            # already keep their place when a page fails, so they need none
+            hours = (rs["hours"] if f["id"].startswith(("card|", "ebay|")) else
+                     rs["box_hours"] if f["id"].startswith(("box|", "sealed|")) else 0)
+            if rt is not None and now - rt < hours * 3600:
+                prev = rp
+        if prev is None or real_drop(f["price"], prev, rs):
             out.append(f)
     return out
+
+
+def remember_alerts(recent, alerted, now=None, keep_hours=72):
+    """Note what was just alerted (and drop old notes)."""
+    now = now or time.time()
+    for f in alerted:
+        recent[f["id"]] = [f["price"], round(now)]
+    for k in [k for k, v in recent.items() if not isinstance(v, list) or len(v) < 2 or now - v[1] > keep_hours * 3600]:
+        recent.pop(k)
+    return recent
 
 
 def read_controls():
@@ -3832,7 +3899,9 @@ def run_once(cfg, args, drop=None):
         link_watch.remember(status, links)
 
     state = load_state()
-    show = finds if args.all else new_only(finds, state)
+    rs = repeat_settings(cfg)
+    recent = status.setdefault("recent_alerts", {})
+    show = finds if args.all else new_only(finds, state, recent, rs=rs)
     show = show + listed
     if fast_lane:
         fast_lane.add_qty_links(cfg, show)
@@ -3872,7 +3941,13 @@ def run_once(cfg, args, drop=None):
         return False
 
     kept = {k: v for k, v in state.items() if not forget(k)}
-    kept.update({f["id"]: f["price"] for f in finds})
+    # v2.10.2: keep the price it was last alerted at (unless it went up), so slow cents-a-day drift
+    # doesn't re-alert; only a real drop from the alerted price does
+    shown_ids = {f["id"] for f in show}
+    for f in finds:
+        prev = state.get(f["id"])
+        keep_prev = f["id"] not in shown_ids and isinstance(prev, (int, float))
+        kept[f["id"]] = prev if keep_prev else f["price"]
 
     role = heartbeat_role(cfg)
     pc_seen = pc_last_seen(cfg) if role == "listen" else None
@@ -3990,6 +4065,7 @@ def run_once(cfg, args, drop=None):
                      "name": f.get("name"), "shop": f.get("shop"), "url": f.get("url"), "price": f.get("price"),
                      "copy": "cloud" if role == "listen" else "pc"}
                     for f in deliver if f["id"] not in undelivered and f.get("url")])
+        remember_alerts(recent, [f for f in deliver if f["id"] not in undelivered])
     if role == "send":
         send_heartbeat(cfg, force=(bool(deliver) and not undelivered) or bool(poke_posted) or bool(op_posted),
                        status=status)

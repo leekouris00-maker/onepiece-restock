@@ -51,9 +51,10 @@ class MixedCollection(unittest.TestCase):
         self.assertEqual(sorted(l["box_id"].split("|")[-1] for l in listings), ["eb05", "gift", "op18"])
         self.assertTrue(all("one piece" in l["name"].lower() for l in listings))
 
-    def test_without_it_other_games_would_alert(self):
+    def test_without_it_other_games_still_dont_alert(self):
+        # v2.10.2: other games' boxes are skipped even without must_include (Rogue Online's Gundam box)
         finds, _ = tb.shopify_boxes("Gametraders Modbury Heights", URL, 260, tb.DEFAULT_SEALED_WATCH)
-        self.assertIn("Yugioh - Phantom Revenge Booster Box", [f["name"] for f in finds])
+        self.assertNotIn("Yugioh - Phantom Revenge Booster Box", [f["name"] for f in finds])
 
     def test_check_sealed_passes_the_settings_on(self):
         cfg = {"sealed": {"max_price": 260, "shopify_collections": [
