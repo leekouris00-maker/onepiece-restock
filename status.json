@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-02 00",
+ "drops_slot": "2026-11-02 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793550059,
+ "ebay_ts": 1793565402,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -15,7 +15,7 @@
  "offline_streak": 0,
  "page_hints": {
   "https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250": 14,
-  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 2,
+  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 4,
   "https://tcg.goodgames.com.au/collections/one-piece-card-game-singles-in-stock/products.json?limit=250": 6,
   "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250": 2
  },
@@ -52,13 +52,41 @@
  },
  "pokemon_state": "live",
  "recent_alerts": {
+  "list|Good Games (sealed)|don-bonney-premium-booster-the-best-vol-2-foil": [
+   1.85,
+   1793565415
+  ],
   "list|Good Games (sealed)|don-buggy-premium-booster-the-best-vol-2": [
    0.66,
    1793550070
   ],
+  "list|Good Games (sealed)|don-card-yamato-premium-booster-the-best": [
+   1.18,
+   1793565415
+  ],
+  "list|Good Games (sealed)|don-enel-premium-booster-the-best": [
+   0.85,
+   1793565415
+  ],
+  "list|Good Games (sealed)|don-enel-premium-booster-the-best-foil": [
+   2.63,
+   1793565415
+  ],
+  "list|Good Games (sealed)|don-jinbe-premium-booster-the-best-vol-2-foil": [
+   1.6,
+   1793565415
+  ],
+  "list|Good Games (sealed)|don-magellan-premium-booster-the-best-foil": [
+   1.13,
+   1793565415
+  ],
   "list|Good Games (sealed)|don-nami-gold-premium-booster-the-best-vol-2-foil": [
    73.32,
    1793550070
+  ],
+  "list|Good Games (sealed)|don-teach-gold-premium-booster-the-best-vol-2-foil": [
+   46.51,
+   1793565415
   ],
   "list|Good Games (sealed)|don-trafalgar-law-gold-premium-booster-the-best-foil": [
    102.95,
@@ -1671,7 +1699,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793467879.353011
+   "t": 1793565384.4238195
   },
   "overhauledgames.com.au": {
    "rules": [],
@@ -4448,5 +4476,5 @@
  "shop_retry": {
   "tcg.goodgames.com.au": 1793533019
  },
- "sweep_ts": 1793550059
+ "sweep_ts": 1793565402
 }
