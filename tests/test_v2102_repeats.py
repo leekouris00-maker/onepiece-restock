@@ -67,5 +67,17 @@ class Repeats(unittest.TestCase):
         self.assertEqual(len(tb.new_only([f("card|x", 82.0)], {"card|x": 83.1}, rs=rs)), 1)
 
 
+class GroupMove(unittest.TestCase):
+    def test_product_moving_group_isnt_new(self):
+        l = {"id": "list|Grailborne|ib-07", "box_id": "sealed|Grailborne|ib-07", "group": "new", "kind": "New listing",
+             "name": "Illustration Box Vol.7 (IB-07)", "shop": "Grailborne", "price": 69.0, "available": True,
+             "url": "u", "cart": "", "note": "", "max": 0, "page": 1}
+        known = {"Grailborne": [], "Grailborne (other sealed)": ["list|Grailborne|ib-07"],
+                 "Grailborne (all sealed)": []}
+        self.assertEqual(tb.new_listings({"Grailborne": [l]}, known, []), [])
+        known = {"Grailborne": [], "Grailborne (other sealed)": [], "Grailborne (all sealed)": []}
+        self.assertEqual(len(tb.new_listings({"Grailborne": [l]}, known, [])), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

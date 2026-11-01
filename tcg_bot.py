@@ -160,7 +160,7 @@ try:
 except ImportError:
     onepiece_instore = None
 
-VERSION = "2.10.2"
+VERSION = "2.10.3"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -1921,9 +1921,12 @@ def new_listings(by_shop, known, box_finds, pages_seen=None, swept=()):
             known[shop] = sorted(ids)
             continue
         before = set(known[shop])
+        # v2.10.2: known under any of the shop's groups counts (a product that moves group, e.g. an older
+        # Illustration Box that's no longer on the watch list, isn't a new listing)
+        anywhere = before.union(*(known[k] for k in known if k != shop and _base_shop(k) == base_shop))
         read_to = int(pages_seen.get(base_shop, 1))
         for l in listings:
-            if l["id"] in before or l["box_id"] in finds_ids:
+            if l["id"] in anywhere or l["box_id"] in finds_ids:
                 continue            # already known, or already alerting as a buyable box
             if int(l.get("page", 1)) > read_to:
                 continue            # first time we've read this deep into the shop (or swept it): just remember it
@@ -2993,7 +2996,7 @@ def new_only(finds, state, recent=None, now=None, rs=None):
             # already keep their place when a page fails, so they need none
             hours = (rs["hours"] if f["id"].startswith(("card|", "ebay|")) else
                      rs["box_hours"] if f["id"].startswith(("box|", "sealed|")) else 0)
-            if rt is not None and now - rt < hours * 3600:
+            if hours > 0 and rt is not None and now - rt < hours * 3600:
                 prev = rp
         if prev is None or real_drop(f["price"], prev, rs):
             out.append(f)
