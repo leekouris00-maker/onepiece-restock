@@ -4,187 +4,11 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-01 18",
+ "drops_slot": "2026-11-02 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793531941,
- "held": {
-  "card|Elemental Arcade|OP05-015|belo-betty-jolly-roger-foil-op05015-premium-booster-the-best": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54899524010275:4",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP05-015|belo-betty-jolly-roger-foil-op05015-premium-booster-the-best",
-    "kind": "Single",
-    "name": "Belo Betty OP05-015",
-    "note": "Belo Betty (Jolly Roger Foil) - OP05-015 [Premium Booster -The Best-]",
-    "price": 1.2,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/belo-betty-jolly-roger-foil-op05015-premium-booster-the-best"
-   },
-   "t": 1793532121
-  },
-  "card|Elemental Arcade|OP05-015|belo-betty-op05015-awakening-of-the-new-era": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54899525714211:4",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP05-015|belo-betty-op05015-awakening-of-the-new-era",
-    "kind": "Single",
-    "name": "Belo Betty OP05-015",
-    "note": "Belo Betty - OP05-015 [Awakening of the New Era]",
-    "price": 1.0,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/belo-betty-op05015-awakening-of-the-new-era"
-   },
-   "t": 1793532121
-  },
-  "card|Elemental Arcade|OP05-015|belo-betty-op05015-reprint-premium-booster-the-best": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54899525910819:4",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP05-015|belo-betty-op05015-reprint-premium-booster-the-best",
-    "kind": "Single",
-    "name": "Belo Betty OP05-015",
-    "note": "Belo Betty (OP05-015) (Reprint) [Premium Booster -The Best-]",
-    "price": 1.0,
-    "priority": false,
-    "qty": 4,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/belo-betty-op05015-reprint-premium-booster-the-best"
-   },
-   "t": 1793532121
-  },
-  "card|Elemental Arcade|OP05-021|revolutionary-army-hq-op05021-awakening-of-the-new-era": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54900291961123:3",
-    "cond": "NM",
-    "deck": "Sabo",
-    "id": "card|Elemental Arcade|OP05-021|revolutionary-army-hq-op05021-awakening-of-the-new-era",
-    "kind": "Single",
-    "name": "Revolutionary Army HQ OP05-021",
-    "note": "Revolutionary Army HQ - OP05-021 [Awakening of the New Era]",
-    "price": 0.7,
-    "priority": false,
-    "qty": 3,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/revolutionary-army-hq-op05021-awakening-of-the-new-era"
-   },
-   "t": 1793532121
-  },
-  "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": {
-   "f": {
-    "cart": "https://www.mayhemcollectables.com.au/cart/67693146931514:3",
-    "cond": "",
-    "deck": "Sabo",
-    "id": "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2",
-    "kind": "Single",
-    "name": "Revolutionary Army HQ OP05-021",
-    "note": "Revolutionary Army HQ (Reprint) OP05-021 (Premium Booster -The Best- Vol. 2)",
-    "price": 0.3,
-    "priority": false,
-    "qty": 3,
-    "shop": "Mayhem",
-    "url": "https://www.mayhemcollectables.com.au/products/revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2"
-   },
-   "t": 1793532121
-  },
-  "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54899576242467:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island",
-    "kind": "Single",
-    "name": "Brook OP15-022 Alternate Art",
-    "note": "Brook (OP15-022) (Alternate Art) [Adventure on Kami's Island] \u00b7 US market \u2248 $86.06 \u00b7 in stock, listed 4% under market",
-    "price": 78.5,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island",
-    "value_pick": true
-   },
-   "t": 1793532121
-  },
-  "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/55204140941603:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
-    "kind": "Single",
-    "name": "Moby Dick OP16-021 Alternate Art",
-    "note": "Moby Dick (Alternate Art) - OP16-021 [The Time of Battle] \u00b7 US market \u2248 $22.93 \u00b7 in stock, listed 11% over market",
-    "price": 21.7,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle",
-    "value_pick": true
-   },
-   "t": 1793532121
-  },
-  "card|pick|https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54900095942947:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future",
-    "kind": "Single",
-    "name": "Monkey.D.Dragon OP07-015 Regular",
-    "note": "Monkey.D.Dragon - OP07-015 [500 Years in the Future] \u00b7 US market \u2248 $2.85 \u00b7 in stock, listed 30% under market",
-    "price": 2.0,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future",
-    "value_pick": true
-   },
-   "t": 1793532121
-  },
-  "card|pick|https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will": {
-   "f": {
-    "cart": "https://elementalarcade.com.au/cart/54900326170915:1",
-    "cond": "NM",
-    "deck": "value pick",
-    "id": "card|pick|https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will",
-    "kind": "Single",
-    "name": "Sabo OP13-004 Regular",
-    "note": "Sabo - OP13-004 [Carrying On His Will] \u00b7 US market \u2248 $4.02 \u00b7 in stock, listed 75% under market",
-    "price": 1.0,
-    "priority": false,
-    "qty": 1,
-    "shop": "Elemental Arcade",
-    "url": "https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will",
-    "value_pick": true
-   },
-   "t": 1793532121
-  },
-  "list|Overhauled Games TCG|22302": {
-   "f": {
-    "available": false,
-    "box_id": "box|Overhauled Games TCG|22302",
-    "cart": "",
-    "group": "box",
-    "id": "list|Overhauled Games TCG|22302",
-    "kind": "New listing",
-    "max": 260.0,
-    "name": "EB-05 Heroines Edition Vol. 2 Booster Box &#8211; English One Piece TCG",
-    "note": "listed, not buyable yet",
-    "page": 1,
-    "price": 599.95,
-    "shop": "Overhauled Games TCG",
-    "url": "https://overhauledgames.com.au/product/eb-05-heroines-edition-vol-2-booster-box-english-one-piece-tcg"
-   },
-   "t": 1793531950
-  }
- },
+ "ebay_ts": 1793550059,
+ "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -217,7 +41,7 @@
   "TCGroup": 99,
   "The Wandering Collector": 99
  },
- "pc_on": true,
+ "pc_on": false,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -227,7 +51,24 @@
   "2026-10-30|day": 1793306039
  },
  "pokemon_state": "live",
- "recent_alerts": {},
+ "recent_alerts": {
+  "list|Good Games (sealed)|don-buggy-premium-booster-the-best-vol-2": [
+   0.66,
+   1793550070
+  ],
+  "list|Good Games (sealed)|don-nami-gold-premium-booster-the-best-vol-2-foil": [
+   73.32,
+   1793550070
+  ],
+  "list|Good Games (sealed)|don-trafalgar-law-gold-premium-booster-the-best-foil": [
+   102.95,
+   1793550070
+  ],
+  "list|Overhauled Games TCG|22302": [
+   599.95,
+   1793550070
+  ]
+ },
  "robots": {
   "alphagaming.com.au": {
    "rules": [
@@ -488,7 +329,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793451537.8341737
+   "t": 1793550039.4528043
   },
   "cardbot.com.au": {
    "rules": [
@@ -749,7 +590,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793451538.512021
+   "t": 1793550040.1399257
   },
   "cardplustcg.com.au": {
    "rules": [
@@ -1043,268 +884,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793451538.504998
+   "t": 1793550040.0882094
   },
   "elementalarcade.com.au": {
-   "rules": [
-    [
-     1,
-     "/"
-    ],
-    [
-     1,
-     "/products/account"
-    ],
-    [
-     1,
-     "/products/orders"
-    ],
-    [
-     1,
-     "/products/checkout"
-    ],
-    [
-     1,
-     "/*/products/account"
-    ],
-    [
-     1,
-     "/*/products/orders"
-    ],
-    [
-     1,
-     "/*/products/checkout"
-    ],
-    [
-     1,
-     "/collections/account"
-    ],
-    [
-     1,
-     "/collections/orders"
-    ],
-    [
-     1,
-     "/collections/checkout"
-    ],
-    [
-     1,
-     "/*/collections/account"
-    ],
-    [
-     1,
-     "/*/collections/orders"
-    ],
-    [
-     1,
-     "/*/collections/checkout"
-    ],
-    [
-     1,
-     "/pages/checkout"
-    ],
-    [
-     1,
-     "/*/pages/checkout"
-    ],
-    [
-     1,
-     "/blogs/*account"
-    ],
-    [
-     1,
-     "/blogs/*orders"
-    ],
-    [
-     1,
-     "/blogs/*checkout"
-    ],
-    [
-     1,
-     "/*/blogs/*account"
-    ],
-    [
-     1,
-     "/*/blogs/*orders"
-    ],
-    [
-     1,
-     "/*/blogs/*checkout"
-    ],
-    [
-     0,
-     "/admin"
-    ],
-    [
-     0,
-     "/cart/"
-    ],
-    [
-     0,
-     "/*/cart/"
-    ],
-    [
-     0,
-     "/checkout"
-    ],
-    [
-     0,
-     "/*/checkout"
-    ],
-    [
-     0,
-     "/checkouts/"
-    ],
-    [
-     0,
-     "/*/checkouts/"
-    ],
-    [
-     0,
-     "/orders"
-    ],
-    [
-     0,
-     "/*/orders"
-    ],
-    [
-     1,
-     "/account/login"
-    ],
-    [
-     1,
-     "/*/account/login"
-    ],
-    [
-     0,
-     "/account"
-    ],
-    [
-     0,
-     "/*/account"
-    ],
-    [
-     0,
-     "/97416118563"
-    ],
-    [
-     0,
-     "/cdn/wpm/*.js"
-    ],
-    [
-     0,
-     "/services"
-    ],
-    [
-     0,
-     "/sf_*"
-    ],
-    [
-     0,
-     "/.well-known/shopify/monorail"
-    ],
-    [
-     0,
-     "/cart.js"
-    ],
-    [
-     0,
-     "/*/cart.js"
-    ],
-    [
-     0,
-     "/recommendations/products"
-    ],
-    [
-     0,
-     "/*/recommendations/products"
-    ],
-    [
-     0,
-     "/collections/*sort_by*"
-    ],
-    [
-     0,
-     "/*/collections/*sort_by*"
-    ],
-    [
-     0,
-     "/collections/*+*"
-    ],
-    [
-     0,
-     "/collections/*%2B*"
-    ],
-    [
-     0,
-     "/collections/*%2b*"
-    ],
-    [
-     0,
-     "/*/collections/*+*"
-    ],
-    [
-     0,
-     "/*/collections/*%2B*"
-    ],
-    [
-     0,
-     "/*/collections/*%2b*"
-    ],
-    [
-     0,
-     "/collections/*filter*&*filter*"
-    ],
-    [
-     0,
-     "/*/collections/*filter*&*filter*"
-    ],
-    [
-     0,
-     "/blogs/*+*"
-    ],
-    [
-     0,
-     "/blogs/*%2B*"
-    ],
-    [
-     0,
-     "/blogs/*%2b*"
-    ],
-    [
-     0,
-     "/*/blogs/*+*"
-    ],
-    [
-     0,
-     "/*/blogs/*%2B*"
-    ],
-    [
-     0,
-     "/*/blogs/*%2b*"
-    ],
-    [
-     0,
-     "/*?*ls=*&ls=*"
-    ],
-    [
-     0,
-     "/*?*ls%3*ls%3*"
-    ],
-    [
-     0,
-     "/*?*oseid=*"
-    ],
-    [
-     0,
-     "/*?*preview_theme_id=*"
-    ],
-    [
-     0,
-     "/*?*preview_script_id=*"
-    ]
-   ],
-   "t": 1793451545.6727068
+   "rules": [],
+   "t": 1793550045.0776973
   },
   "goldfieldsgames.com.au": {
    "rules": [
@@ -1826,7 +1410,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793451538.5003781
+   "t": 1793550040.0828679
   },
   "lightofcards.com.au": {
    "rules": [
@@ -2352,7 +1936,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793451537.8321316
+   "t": 1793550039.4467783
   },
   "rogueonline.com.au": {
    "rules": [
@@ -2874,268 +2458,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793451537.82773
+   "t": 1793550039.4908278
   },
   "tcg.goodgames.com.au": {
-   "rules": [
-    [
-     1,
-     "/"
-    ],
-    [
-     1,
-     "/products/account"
-    ],
-    [
-     1,
-     "/products/orders"
-    ],
-    [
-     1,
-     "/products/checkout"
-    ],
-    [
-     1,
-     "/*/products/account"
-    ],
-    [
-     1,
-     "/*/products/orders"
-    ],
-    [
-     1,
-     "/*/products/checkout"
-    ],
-    [
-     1,
-     "/collections/account"
-    ],
-    [
-     1,
-     "/collections/orders"
-    ],
-    [
-     1,
-     "/collections/checkout"
-    ],
-    [
-     1,
-     "/*/collections/account"
-    ],
-    [
-     1,
-     "/*/collections/orders"
-    ],
-    [
-     1,
-     "/*/collections/checkout"
-    ],
-    [
-     1,
-     "/pages/checkout"
-    ],
-    [
-     1,
-     "/*/pages/checkout"
-    ],
-    [
-     1,
-     "/blogs/*account"
-    ],
-    [
-     1,
-     "/blogs/*orders"
-    ],
-    [
-     1,
-     "/blogs/*checkout"
-    ],
-    [
-     1,
-     "/*/blogs/*account"
-    ],
-    [
-     1,
-     "/*/blogs/*orders"
-    ],
-    [
-     1,
-     "/*/blogs/*checkout"
-    ],
-    [
-     0,
-     "/admin"
-    ],
-    [
-     0,
-     "/cart/"
-    ],
-    [
-     0,
-     "/*/cart/"
-    ],
-    [
-     0,
-     "/checkout"
-    ],
-    [
-     0,
-     "/*/checkout"
-    ],
-    [
-     0,
-     "/checkouts/"
-    ],
-    [
-     0,
-     "/*/checkouts/"
-    ],
-    [
-     0,
-     "/orders"
-    ],
-    [
-     0,
-     "/*/orders"
-    ],
-    [
-     1,
-     "/account/login"
-    ],
-    [
-     1,
-     "/*/account/login"
-    ],
-    [
-     0,
-     "/account"
-    ],
-    [
-     0,
-     "/*/account"
-    ],
-    [
-     0,
-     "/51813548211"
-    ],
-    [
-     0,
-     "/cdn/wpm/*.js"
-    ],
-    [
-     0,
-     "/services"
-    ],
-    [
-     0,
-     "/sf_*"
-    ],
-    [
-     0,
-     "/.well-known/shopify/monorail"
-    ],
-    [
-     0,
-     "/cart.js"
-    ],
-    [
-     0,
-     "/*/cart.js"
-    ],
-    [
-     0,
-     "/recommendations/products"
-    ],
-    [
-     0,
-     "/*/recommendations/products"
-    ],
-    [
-     0,
-     "/collections/*sort_by*"
-    ],
-    [
-     0,
-     "/*/collections/*sort_by*"
-    ],
-    [
-     0,
-     "/collections/*+*"
-    ],
-    [
-     0,
-     "/collections/*%2B*"
-    ],
-    [
-     0,
-     "/collections/*%2b*"
-    ],
-    [
-     0,
-     "/*/collections/*+*"
-    ],
-    [
-     0,
-     "/*/collections/*%2B*"
-    ],
-    [
-     0,
-     "/*/collections/*%2b*"
-    ],
-    [
-     0,
-     "/collections/*filter*&*filter*"
-    ],
-    [
-     0,
-     "/*/collections/*filter*&*filter*"
-    ],
-    [
-     0,
-     "/blogs/*+*"
-    ],
-    [
-     0,
-     "/blogs/*%2B*"
-    ],
-    [
-     0,
-     "/blogs/*%2b*"
-    ],
-    [
-     0,
-     "/*/blogs/*+*"
-    ],
-    [
-     0,
-     "/*/blogs/*%2B*"
-    ],
-    [
-     0,
-     "/*/blogs/*%2b*"
-    ],
-    [
-     0,
-     "/*?*ls=*&ls=*"
-    ],
-    [
-     0,
-     "/*?*ls%3*ls%3*"
-    ],
-    [
-     0,
-     "/*?*oseid=*"
-    ],
-    [
-     0,
-     "/*?*preview_theme_id=*"
-    ],
-    [
-     0,
-     "/*?*preview_script_id=*"
-    ]
-   ],
-   "t": 1793451548.635107
+   "rules": [],
+   "t": 1793550045.2263558
   },
   "thewanderingcollector.com.au": {
    "rules": [
@@ -3661,7 +2988,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1793451537.8358736
+   "t": 1793550039.453793
   },
   "www.gameology.com.au": {
    "rules": [
@@ -3918,7 +3245,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793451537.8259315
+   "t": 1793550039.442954
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -4340,7 +3667,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1793451537.8370261
+   "t": 1793550039.4541268
   },
   "www.gumnut.com.au": {
    "rules": [
@@ -4601,272 +3928,24 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793451537.825356
+   "t": 1793550039.4425664
   },
   "www.jtoys.com.au": {
-   "rules": [],
-   "t": 1793451537.8749232
-  },
-  "www.kollecter.com.au": {
    "rules": [
     [
-     1,
-     "/"
-    ],
-    [
-     1,
-     "/products/account"
+     0,
+     "/wp-admin/"
     ],
     [
      1,
-     "/products/orders"
-    ],
-    [
-     1,
-     "/products/checkout"
-    ],
-    [
-     1,
-     "/*/products/account"
-    ],
-    [
-     1,
-     "/*/products/orders"
-    ],
-    [
-     1,
-     "/*/products/checkout"
-    ],
-    [
-     1,
-     "/collections/account"
-    ],
-    [
-     1,
-     "/collections/orders"
-    ],
-    [
-     1,
-     "/collections/checkout"
-    ],
-    [
-     1,
-     "/*/collections/account"
-    ],
-    [
-     1,
-     "/*/collections/orders"
-    ],
-    [
-     1,
-     "/*/collections/checkout"
-    ],
-    [
-     1,
-     "/pages/checkout"
-    ],
-    [
-     1,
-     "/*/pages/checkout"
-    ],
-    [
-     1,
-     "/blogs/*account"
-    ],
-    [
-     1,
-     "/blogs/*orders"
-    ],
-    [
-     1,
-     "/blogs/*checkout"
-    ],
-    [
-     1,
-     "/*/blogs/*account"
-    ],
-    [
-     1,
-     "/*/blogs/*orders"
-    ],
-    [
-     1,
-     "/*/blogs/*checkout"
-    ],
-    [
-     0,
-     "/admin"
-    ],
-    [
-     0,
-     "/cart/"
-    ],
-    [
-     0,
-     "/*/cart/"
-    ],
-    [
-     0,
-     "/checkout"
-    ],
-    [
-     0,
-     "/*/checkout"
-    ],
-    [
-     0,
-     "/checkouts/"
-    ],
-    [
-     0,
-     "/*/checkouts/"
-    ],
-    [
-     0,
-     "/orders"
-    ],
-    [
-     0,
-     "/*/orders"
-    ],
-    [
-     1,
-     "/account/login"
-    ],
-    [
-     1,
-     "/*/account/login"
-    ],
-    [
-     0,
-     "/account"
-    ],
-    [
-     0,
-     "/*/account"
-    ],
-    [
-     0,
-     "/59635990685"
-    ],
-    [
-     0,
-     "/cdn/wpm/*.js"
-    ],
-    [
-     0,
-     "/services"
-    ],
-    [
-     0,
-     "/sf_*"
-    ],
-    [
-     0,
-     "/.well-known/shopify/monorail"
-    ],
-    [
-     0,
-     "/cart.js"
-    ],
-    [
-     0,
-     "/*/cart.js"
-    ],
-    [
-     0,
-     "/recommendations/products"
-    ],
-    [
-     0,
-     "/*/recommendations/products"
-    ],
-    [
-     0,
-     "/collections/*sort_by*"
-    ],
-    [
-     0,
-     "/*/collections/*sort_by*"
-    ],
-    [
-     0,
-     "/collections/*+*"
-    ],
-    [
-     0,
-     "/collections/*%2B*"
-    ],
-    [
-     0,
-     "/collections/*%2b*"
-    ],
-    [
-     0,
-     "/*/collections/*+*"
-    ],
-    [
-     0,
-     "/*/collections/*%2B*"
-    ],
-    [
-     0,
-     "/*/collections/*%2b*"
-    ],
-    [
-     0,
-     "/collections/*filter*&*filter*"
-    ],
-    [
-     0,
-     "/*/collections/*filter*&*filter*"
-    ],
-    [
-     0,
-     "/blogs/*+*"
-    ],
-    [
-     0,
-     "/blogs/*%2B*"
-    ],
-    [
-     0,
-     "/blogs/*%2b*"
-    ],
-    [
-     0,
-     "/*/blogs/*+*"
-    ],
-    [
-     0,
-     "/*/blogs/*%2B*"
-    ],
-    [
-     0,
-     "/*/blogs/*%2b*"
-    ],
-    [
-     0,
-     "/*?*ls=*&ls=*"
-    ],
-    [
-     0,
-     "/*?*ls%3*ls%3*"
-    ],
-    [
-     0,
-     "/*?*oseid=*"
-    ],
-    [
-     0,
-     "/*?*preview_theme_id=*"
-    ],
-    [
-     0,
-     "/*?*preview_script_id=*"
+     "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793451572.5226803
+   "t": 1793550039.4807892
+  },
+  "www.kollecter.com.au": {
+   "rules": [],
+   "t": 1793550046.336203
   },
   "www.m-g.com.au": {
    "rules": [
@@ -4899,272 +3978,15 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793451538.2580981
+   "t": 1793550039.7479877
   },
   "www.mayhemcollectables.com.au": {
-   "rules": [
-    [
-     1,
-     "/"
-    ],
-    [
-     1,
-     "/products/account"
-    ],
-    [
-     1,
-     "/products/orders"
-    ],
-    [
-     1,
-     "/products/checkout"
-    ],
-    [
-     1,
-     "/*/products/account"
-    ],
-    [
-     1,
-     "/*/products/orders"
-    ],
-    [
-     1,
-     "/*/products/checkout"
-    ],
-    [
-     1,
-     "/collections/account"
-    ],
-    [
-     1,
-     "/collections/orders"
-    ],
-    [
-     1,
-     "/collections/checkout"
-    ],
-    [
-     1,
-     "/*/collections/account"
-    ],
-    [
-     1,
-     "/*/collections/orders"
-    ],
-    [
-     1,
-     "/*/collections/checkout"
-    ],
-    [
-     1,
-     "/pages/checkout"
-    ],
-    [
-     1,
-     "/*/pages/checkout"
-    ],
-    [
-     1,
-     "/blogs/*account"
-    ],
-    [
-     1,
-     "/blogs/*orders"
-    ],
-    [
-     1,
-     "/blogs/*checkout"
-    ],
-    [
-     1,
-     "/*/blogs/*account"
-    ],
-    [
-     1,
-     "/*/blogs/*orders"
-    ],
-    [
-     1,
-     "/*/blogs/*checkout"
-    ],
-    [
-     0,
-     "/admin"
-    ],
-    [
-     0,
-     "/cart/"
-    ],
-    [
-     0,
-     "/*/cart/"
-    ],
-    [
-     0,
-     "/checkout"
-    ],
-    [
-     0,
-     "/*/checkout"
-    ],
-    [
-     0,
-     "/checkouts/"
-    ],
-    [
-     0,
-     "/*/checkouts/"
-    ],
-    [
-     0,
-     "/orders"
-    ],
-    [
-     0,
-     "/*/orders"
-    ],
-    [
-     1,
-     "/account/login"
-    ],
-    [
-     1,
-     "/*/account/login"
-    ],
-    [
-     0,
-     "/account"
-    ],
-    [
-     0,
-     "/*/account"
-    ],
-    [
-     0,
-     "/64522092784"
-    ],
-    [
-     0,
-     "/cdn/wpm/*.js"
-    ],
-    [
-     0,
-     "/services"
-    ],
-    [
-     0,
-     "/sf_*"
-    ],
-    [
-     0,
-     "/.well-known/shopify/monorail"
-    ],
-    [
-     0,
-     "/cart.js"
-    ],
-    [
-     0,
-     "/*/cart.js"
-    ],
-    [
-     0,
-     "/recommendations/products"
-    ],
-    [
-     0,
-     "/*/recommendations/products"
-    ],
-    [
-     0,
-     "/collections/*sort_by*"
-    ],
-    [
-     0,
-     "/*/collections/*sort_by*"
-    ],
-    [
-     0,
-     "/collections/*+*"
-    ],
-    [
-     0,
-     "/collections/*%2B*"
-    ],
-    [
-     0,
-     "/collections/*%2b*"
-    ],
-    [
-     0,
-     "/*/collections/*+*"
-    ],
-    [
-     0,
-     "/*/collections/*%2B*"
-    ],
-    [
-     0,
-     "/*/collections/*%2b*"
-    ],
-    [
-     0,
-     "/collections/*filter*&*filter*"
-    ],
-    [
-     0,
-     "/*/collections/*filter*&*filter*"
-    ],
-    [
-     0,
-     "/blogs/*+*"
-    ],
-    [
-     0,
-     "/blogs/*%2B*"
-    ],
-    [
-     0,
-     "/blogs/*%2b*"
-    ],
-    [
-     0,
-     "/*/blogs/*+*"
-    ],
-    [
-     0,
-     "/*/blogs/*%2B*"
-    ],
-    [
-     0,
-     "/*/blogs/*%2b*"
-    ],
-    [
-     0,
-     "/*?*ls=*&ls=*"
-    ],
-    [
-     0,
-     "/*?*ls%3*ls%3*"
-    ],
-    [
-     0,
-     "/*?*oseid=*"
-    ],
-    [
-     0,
-     "/*?*preview_theme_id=*"
-    ],
-    [
-     0,
-     "/*?*preview_script_id=*"
-    ]
-   ],
-   "t": 1793451547.2318716
+   "rules": [],
+   "t": 1793550045.3175552
   },
   "www.monstermart.com.au": {
    "rules": [],
-   "t": 1793451573.2682018
+   "t": 1793550046.5523853
   },
   "www.pokebox.com.au": {
    "rules": [
@@ -5325,7 +4147,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1793451537.8699048
+   "t": 1793550039.4435806
   },
   "www.tcgroupau.com.au": {
    "rules": [
@@ -5586,7 +4408,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793451537.8263564
+   "t": 1793550039.4432616
   }
  },
  "shop_down": [
@@ -5626,5 +4448,5 @@
  "shop_retry": {
   "tcg.goodgames.com.au": 1793533019
  },
- "sweep_ts": 1793531941
+ "sweep_ts": 1793550059
 }
