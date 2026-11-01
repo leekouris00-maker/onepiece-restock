@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-02 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793565402,
+ "ebay_ts": 1793577093,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -4462,7 +4462,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 1,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -4476,5 +4476,5 @@
  "shop_retry": {
   "tcg.goodgames.com.au": 1793533019
  },
- "sweep_ts": 1793565402
+ "sweep_ts": 1793577093
 }
