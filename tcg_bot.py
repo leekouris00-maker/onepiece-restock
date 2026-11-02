@@ -122,6 +122,7 @@ The cloud copy (GitHub Actions) uses these so the webhooks stay secret:
 import argparse
 import base64
 import gzip
+import html
 import http.client
 import json
 import os
@@ -160,7 +161,7 @@ try:
 except ImportError:
     onepiece_instore = None
 
-VERSION = "2.10.3"
+VERSION = "2.10.4"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -342,7 +343,7 @@ SINGLE_NUM_RE = re.compile(r"\b(?:OP|EB|ST|PRB)\d{2}-\d{3}\b|\bP-\d{3}\b", re.I)
 # the cards, so a new sealed listing must also say it's the card game (seen in the first v2.4 cloud run).
 TCG_RE = re.compile(r"card game|\btcg\b|card collection|\b(?:OP|EB|ST|DP|PRB|PEB|IB|TS|GC|GB|DF|LD|SD)-?\d{1,2}\b|"
                     r"booster|starter deck|double pack|ultra deck|tin pack", re.I)
-SINGLE_HINT_RE = re.compile(r"alternate art|alt art|\((?:common|uncommon|rare|super rare|secret rare|leader|sec|sr)\b|"
+SINGLE_HINT_RE = re.compile(r"^\s*don(?:!!|\s+card)|\s-\s*(?:non[\s-]?)?foil\s*$|alternate art|alt art|\((?:common|uncommon|rare|super rare|secret rare|leader|sec|sr)\b|"
                             r"manga rare|#\d{3}\b|\bpsa\b|\bcgc\b|\bbgs\b|graded", re.I)
 SEALED_OPTS = {"new": True, "packs": False}      # set from config.json in begin_check()
 
@@ -1420,7 +1421,8 @@ def is_sealed_listing(title, variants=None):
         return False                 # sold by condition (Near Mint, Lightly Played...): a single
     if not SEALED_OPTS.get("packs") and any(w in t for w in PACK_WORDS):
         return False
-    return bool(SEALED_WORD_RE.search(title))
+    # v2.10.4: a sealed word only inside a single's set name doesn't count ("Buggy (Premium Booster -The Best-)")
+    return bool(SEALED_WORD_RE.search(re.sub(r"\([^)]*\)", " ", title)))
 
 
 def classify(title, watch, max_price, variants=None):
@@ -1721,7 +1723,7 @@ def woo_boxes(shop_name, url, max_price, watch=(), page_no=1):
         return [], None
     finds, listings = [], []
     for p in data:
-        name = re.sub("<[^>]+>", "", p.get("name", ""))
+        name = html.unescape(re.sub("<[^>]+>", "", p.get("name", ""))).strip()   # v2.10.4: "&#8211;" -> "–"
         if "one piece" not in name.lower():
             continue
         c = classify(name, watch, max_price)

@@ -67,6 +67,21 @@ class Repeats(unittest.TestCase):
         self.assertEqual(len(tb.new_only([f("card|x", 82.0)], {"card|x": 83.1}, rs=rs)), 1)
 
 
+class DonCards(unittest.TestCase):
+    """v2.10.4: Good Games' DON!! singles were posting as new sealed listings."""
+    def test_don_singles_arent_sealed(self):
+        for t in ("DON!! Buggy  (Premium Booster -The Best- Vol. 2)",
+                  "DON!! - Trafalgar Law (Gold)  (Premium Booster -The Best-)  - Foil",
+                  "DON Card Yamato  (Premium Booster -The Best-)"):
+            self.assertIsNone(tb.classify(t, WATCH, 260), t)
+
+    def test_sealed_with_brackets_still_count(self):
+        for t in ("One Piece Card Game Premium Card Collection (Live Action Edition)",
+                  "One Piece Card Game Starter Deck (ST-29)",
+                  "One Piece Card Game - Double Pack Set Vol.10 (DP-10)"):
+            self.assertIsNotNone(tb.classify(t, WATCH, 260), t)
+
+
 class GroupMove(unittest.TestCase):
     def test_product_moving_group_isnt_new(self):
         l = {"id": "list|Grailborne|ib-07", "box_id": "sealed|Grailborne|ib-07", "group": "new", "kind": "New listing",
