@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-02 06",
+ "drops_slot": "2026-11-02 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793578191,
+ "ebay_ts": 1793587716,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -52,6 +52,10 @@
  },
  "pokemon_state": "live",
  "recent_alerts": {
+  "list|Gameology|one-piece-card-game-st-43-starter-deck": [
+   34.99,
+   1793587729
+  ],
   "list|Good Games (sealed)|don-bonney-premium-booster-the-best-vol-2-foil": [
    1.85,
    1793565415
@@ -651,7 +655,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793500466.7324386
+   "t": 1793587693.0380242
   },
   "collectiblemadness.com.au": {
    "rules": [
@@ -1177,7 +1181,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793500466.3936238
+   "t": 1793587692.3334606
   },
   "grailborne.com.au": {
    "rules": [
@@ -1703,7 +1707,7 @@
   },
   "overhauledgames.com.au": {
    "rules": [],
-   "t": 1793500466.7131994
+   "t": 1793587692.8960378
   },
   "pocketgames.com.au": {
    "rules": [
@@ -2225,7 +2229,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793500466.3866696
+   "t": 1793587692.3217995
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -2751,7 +2755,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793500466.3887665
+   "t": 1793587692.3219838
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -3534,7 +3538,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793500466.4176579
+   "t": 1793587692.34974
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -4476,5 +4480,5 @@
  "shop_retry": {
   "tcg.goodgames.com.au": 1793533019
  },
- "sweep_ts": 1793578191
+ "sweep_ts": 1793587716
 }
