@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-02 12",
+ "drops_slot": "2026-11-02 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793587716,
+ "ebay_ts": 1793613852,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -4480,5 +4480,5 @@
  "shop_retry": {
   "tcg.goodgames.com.au": 1793533019
  },
- "sweep_ts": 1793587716
+ "sweep_ts": 1793613852
 }
