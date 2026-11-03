@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-03 12",
+ "drops_slot": "2026-11-03 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793672513,
+ "ebay_ts": 1793699023,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -99,6 +99,10 @@
   "list|Good Games (sealed)|don-trafalgar-law-gold-premium-booster-the-best-foil": [
    102.95,
    1793550070
+  ],
+  "list|JToys|89681": [
+   349.99,
+   1793699036
   ],
   "list|Overhauled Games TCG|22302": [
    599.95,
@@ -667,7 +671,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793587693.0380242
+   "t": 1793698999.1838822
   },
   "collectiblemadness.com.au": {
    "rules": [
@@ -1193,7 +1197,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793587692.3334606
+   "t": 1793698998.5322633
   },
   "grailborne.com.au": {
    "rules": [
@@ -1719,7 +1723,7 @@
   },
   "overhauledgames.com.au": {
    "rules": [],
-   "t": 1793587692.8960378
+   "t": 1793698999.159425
   },
   "pocketgames.com.au": {
    "rules": [
@@ -2241,7 +2245,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793587692.3217995
+   "t": 1793698998.5300744
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -2767,7 +2771,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793587692.3219838
+   "t": 1793698998.530903
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -3550,7 +3554,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793587692.34974
+   "t": 1793698998.546997
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -4486,5 +4490,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1793672513
+ "sweep_ts": 1793699023
 }
