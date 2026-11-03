@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-03 06",
+ "drops_slot": "2026-11-03 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793650522,
+ "ebay_ts": 1793672513,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -15,7 +15,7 @@
  "offline_streak": 0,
  "page_hints": {
   "https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250": 14,
-  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 3,
+  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 4,
   "https://tcg.goodgames.com.au/collections/one-piece-card-game-singles-in-stock/products.json?limit=250": 6,
   "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250": 2
  },
@@ -103,6 +103,14 @@
   "list|Overhauled Games TCG|22302": [
    599.95,
    1793550070
+  ],
+  "list|The Wandering Collector|one-piece-tcg-heroines-booster-box-case-eb-05": [
+   6999.95,
+   1793672525
+  ],
+  "list|The Wandering Collector|one-piece-tcg-heroines-booster-box-eb-05": [
+   549.95,
+   1793672525
   ]
  },
  "robots": {
@@ -1707,7 +1715,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793565384.4238195
+   "t": 1793672484.3654637
   },
   "overhauledgames.com.au": {
    "rules": [],
@@ -4447,9 +4455,7 @@
    "t": 1793650496.4691794
   }
  },
- "shop_down": [
-  "tcg.goodgames.com.au"
- ],
+ "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -4463,7 +4469,7 @@
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
   "shop.goodgames.com.au": 0,
-  "tcg.goodgames.com.au": 3,
+  "tcg.goodgames.com.au": 0,
   "thewanderingcollector.com.au": 0,
   "www.cherrycollectables.com.au": 0,
   "www.gameology.com.au": 0,
@@ -4478,11 +4484,7 @@
   "www.pokebox.com.au": 0,
   "www.tcgroupau.com.au": 0
  },
- "shop_locked": [
-  "tcg.goodgames.com.au"
- ],
- "shop_retry": {
-  "tcg.goodgames.com.au": 1793533019
- },
- "sweep_ts": 1793650522
+ "shop_locked": [],
+ "shop_retry": {},
+ "sweep_ts": 1793672513
 }
