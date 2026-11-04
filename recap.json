@@ -1,5 +1,5 @@
 {
- "date": "2026-11-03",
+ "date": "2026-11-04",
  "snapshot": {
   "list|Gumnut|one-piece-card-game-ultra-deck-the-three-captains-st-10-one-per-customer": {
    "name": "One Piece Card Game Ultra Deck The Three Captains (ST-10) - One Per Customer",
@@ -2640,13 +2640,6 @@
    "available": true,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-01-romance-dawn-booster-blue-bottom-release-print-12-box-case"
   },
-  "list|Cherry Collectables|one-piece-card-game-op-15-booster-box": {
-   "name": "One Piece Card Game [OP15-EB04] Adventures of Kami's Island Booster Box",
-   "shop": "Cherry Collectables",
-   "price": 419.99,
-   "available": false,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-15-booster-box"
-  },
   "list|Cherry Collectables|one-piece-card-game-op-14-booster-box": {
    "name": "One Piece Card Game [OP14-EB04] The Azure Sea's Seven - Booster Box",
    "shop": "Cherry Collectables",
@@ -2710,19 +2703,19 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/super-prerelease-one-piece-card-game-st-04-animal-kingdom-pirates-starter-deck"
   },
-  "list|Cherry Collectables|one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck": {
-   "name": "One Piece Card Game [ST-18] (Purple) Monkey D. Luffy Starter Deck",
-   "shop": "Cherry Collectables",
-   "price": 149.99,
-   "available": false,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck"
-  },
   "list|Cherry Collectables|one-piece-card-game-dp-11-double-pack-random": {
    "name": "One Piece Card Game [DP-11] OP-16 Time of Battle Double Pack",
    "shop": "Cherry Collectables",
    "price": 44.99,
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-dp-11-double-pack-random"
+  },
+  "list|Cherry Collectables|one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck": {
+   "name": "One Piece Card Game [ST-18] (Purple) Monkey D. Luffy Starter Deck",
+   "shop": "Cherry Collectables",
+   "price": 149.99,
+   "available": false,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck"
   },
   "list|Cherry Collectables|one-piece-card-game-op-09-tba-booster-box": {
    "name": "One Piece Card Game [OP-09] Emperors in the New World Booster Box",
@@ -2731,6 +2724,13 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-09-tba-booster-box"
   },
+  "list|Cherry Collectables|one-piece-card-game-prb-01-premium-booster-box": {
+   "name": "One Piece Card Game [PRB-01] Premium Collection Booster THE BEST - Booster Box",
+   "shop": "Cherry Collectables",
+   "price": 1600.0,
+   "available": true,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-prb-01-premium-booster-box"
+  },
   "list|Cherry Collectables|one-piece-card-game-english-2nd-anniversary-set": {
    "name": "One Piece Card Game [ English Version 2nd Anniversary Set ]",
    "shop": "Cherry Collectables",
@@ -2738,12 +2738,12 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-english-2nd-anniversary-set"
   },
-  "list|Cherry Collectables|one-piece-card-game-prb-01-premium-booster-box": {
-   "name": "One Piece Card Game [PRB-01] Premium Collection Booster THE BEST - Booster Box",
+  "list|Cherry Collectables|one-piece-card-game-op-15-booster-box": {
+   "name": "One Piece Card Game [OP15-EB04] Adventures of Kami's Island Booster Box",
    "shop": "Cherry Collectables",
-   "price": 1600.0,
-   "available": true,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-prb-01-premium-booster-box"
+   "price": 419.99,
+   "available": false,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-15-booster-box"
   },
   "list|Cherry Collectables|one-piece-card-game-dp-12-double-pack-random": {
    "name": "One Piece Card Game [DP-12] Double Pack (Random)",
@@ -3221,27 +3221,6 @@
    "available": true,
    "url": "https://thewanderingcollector.com.au/products/one-piece-card-game-booster-display-romance-dawn-op-01-white-bottom"
   },
-  "list|JToys|78683": {
-   "name": "One Piece Card Game PRB02 Premium Booster Box",
-   "shop": "JToys",
-   "price": 649.99,
-   "available": true,
-   "url": "https://www.jtoys.com.au/product/one-piece-card-game-prb02-premium-booster-box/"
-  },
-  "list|JToys|88102": {
-   "name": "One Piece Card Game OP17 The World\u2019s Strongest Warriors Booster Box",
-   "shop": "JToys",
-   "price": 599.99,
-   "available": true,
-   "url": "https://www.jtoys.com.au/product/one-piece-card-game-op17-the-worlds-strongest-warriors-booster-box/"
-  },
-  "list|JToys|83985": {
-   "name": "One Piece OP15 Booster Box \u2013 Adventure on Kami\u2019s Island",
-   "shop": "JToys",
-   "price": 379.99,
-   "available": false,
-   "url": "https://www.jtoys.com.au/product/one-piece-card-game-op15-adventure-on-kamis-island-booster-box/"
-  },
   "list|Overhauled Games TCG|22302": {
    "name": "EB-05 Heroines Edition Vol. 2 Booster Box \u2013 English One Piece TCG",
    "shop": "Overhauled Games TCG",
@@ -3396,6 +3375,13 @@
    "available": false,
    "url": "https://overhauledgames.com.au/product/one-piece-tcg-500-years-in-the-future-op-07-booster-box-english"
   },
+  "list|CardPlus TCG|18925": {
+   "name": "One Piece CG OP-20 Booster Display Box (English) \u2013 Release Date 4 Jun 2027 (PRE-ORDER)",
+   "shop": "CardPlus TCG",
+   "price": 300.0,
+   "available": false,
+   "url": "https://cardplustcg.com.au/product/one-piece-cg-op-20-booster-display-box-english-release-date-4-jun-2027-pre-order/"
+  },
   "list|CardPlus TCG|18384": {
    "name": "One Piece CG: Premium Extra Booster Display [PEB-01] (Release Date: 23 Apr 2027) I",
    "shop": "CardPlus TCG",
@@ -3504,7 +3490,7 @@
   "list|Grailborne|one-piece-card-game-op-18-booster-box-english": {
    "name": "One Piece Card Game: OP-18 The Dominance of God Booster Box (English) (Releases 20 Nov 2026)",
    "shop": "Grailborne",
-   "price": 499.0,
+   "price": 489.0,
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-op-18-booster-box-english"
   },
@@ -3561,7 +3547,7 @@
    "name": "One Piece Card Game: OP-14 The Azure Sea's Seven Booster Box (English)",
    "shop": "Grailborne",
    "price": 459.0,
-   "available": true,
+   "available": false,
    "url": "https://grailborne.com.au/products/one-piece-card-game-op-14-the-azure-seas-seven-booster-box-english"
   },
   "list|Grailborne|one-piece-card-game-peb-01-premium-extra-booster-box-releases-mar-2027": {
@@ -3599,13 +3585,6 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-illustration-box-vol-2-ib-02-english-sealed"
   },
-  "list|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed": {
-   "name": "One Piece Card Game: Illustration Box Vol.7 (IB-07) - English Sealed",
-   "shop": "Grailborne",
-   "price": 69.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed"
-  },
   "list|Light of Cards|one-piece-op-17-the-worlds-strongest-warriors-booster-box": {
    "name": "One Piece\uff5cOP-17 The World's Strongest Warriors Booster Box",
    "shop": "Light of Cards",
@@ -3634,101 +3613,59 @@
    "available": true,
    "url": "https://elementalarcade.com.au/products/belo-betty-jolly-roger-foil-op05015-premium-booster-the-best"
   },
-  "card|Elemental Arcade|OP05-021|revolutionary-army-hq-op05021-awakening-of-the-new-era": {
-   "name": "Revolutionary Army HQ OP05-021",
-   "shop": "Elemental Arcade",
-   "price": 0.7,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/revolutionary-army-hq-op05021-awakening-of-the-new-era"
-  },
-  "card|Elemental Arcade|OP05-021|revolutionary-army-hq-reprint-op05021-premium-booster-the-best-vol-2": {
-   "name": "Revolutionary Army HQ OP05-021",
-   "shop": "Elemental Arcade",
-   "price": 0.7,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/revolutionary-army-hq-reprint-op05021-premium-booster-the-best-vol-2"
-  },
-  "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": {
-   "name": "Revolutionary Army HQ OP05-021",
-   "shop": "Mayhem",
-   "price": 0.3,
-   "available": true,
-   "url": "https://www.mayhemcollectables.com.au/products/revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2"
-  },
-  "card|pick|https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will": {
-   "name": "Sabo OP13-004 Regular",
-   "shop": "Elemental Arcade",
-   "price": 1.0,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will"
-  },
-  "card|pick|https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future": {
-   "name": "Monkey.D.Dragon OP07-015 Regular",
-   "shop": "Elemental Arcade",
-   "price": 2.0,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future"
-  },
   "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island": {
    "name": "Brook OP15-022 Alternate Art",
    "shop": "Elemental Arcade",
-   "price": 78.1,
+   "price": 77.5,
    "available": true,
    "url": "https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island"
   },
   "card|pick|https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle": {
    "name": "Tashigi OP14-029 SP",
    "shop": "Elemental Arcade",
-   "price": 80.2,
+   "price": 79.9,
    "available": true,
    "url": "https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle"
-  },
-  "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle": {
-   "name": "Moby Dick OP16-021 Alternate Art",
-   "shop": "Elemental Arcade",
-   "price": 21.9,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle"
   },
   "ebay|v1|366683562606|0": {
    "name": "Gomu Gomu DON!! card (Japanese) + Mera Mera DON!! card (Japanese) + Ope Ope DON!! card (Japanese)",
    "shop": "eBay (from Japan)",
-   "price": 91.16,
+   "price": 91.6,
    "available": true,
    "url": "https://www.ebay.com.au/itm/366683562606"
   },
   "ebay|v1|820082175327|0": {
    "name": "Nike x One Piece Gomu Gomu DON!! card (Japanese)",
    "shop": "eBay (from Japan)",
-   "price": 135.92,
+   "price": 136.57,
    "available": true,
    "url": "https://www.ebay.com.au/itm/820082175327"
   },
   "ebay|v1|820082180571|0": {
    "name": "Nike x One Piece Mera Mera DON!! card (Japanese)",
    "shop": "eBay (from Japan)",
-   "price": 135.92,
+   "price": 136.57,
    "available": true,
    "url": "https://www.ebay.com.au/itm/820082180571"
   },
   "ebay|v1|820082186334|0": {
    "name": "Nike x One Piece Ope Ope DON!! card (Japanese)",
    "shop": "eBay (from Japan)",
-   "price": 135.92,
+   "price": 136.57,
    "available": true,
    "url": "https://www.ebay.com.au/itm/820082186334"
   },
   "ebay|v1|178490730493|0": {
    "name": "Nike x One Piece Mera Mera DON!! card (English)",
    "shop": "eBay (from Korea)",
-   "price": 266.71,
+   "price": 267.97,
    "available": true,
    "url": "https://www.ebay.com.au/itm/178490730493"
   },
   "ebay|v1|366725971268|0": {
    "name": "Nike x One Piece Mera Mera DON!! card (English)",
    "shop": "eBay (from Japan)",
-   "price": 295.97,
+   "price": 297.35,
    "available": true,
    "url": "https://www.ebay.com.au/itm/366725971268"
   }
