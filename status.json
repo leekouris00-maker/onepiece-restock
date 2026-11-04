@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-04 06",
+ "drops_slot": "2026-11-04 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793744565,
+ "ebay_ts": 1793759303,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,6 +55,10 @@
   "ebay|v1|366683562606|0": [
    91.16,
    1793650534
+  ],
+  "list|CardPlus TCG|18925": [
+   300.0,
+   1793759314
   ],
   "list|Gameology|one-piece-card-game-st-43-starter-deck": [
    34.99,
@@ -1719,7 +1723,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793672484.3654637
+   "t": 1793759279.279228
   },
   "overhauledgames.com.au": {
    "rules": [],
@@ -4490,5 +4494,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1793744565
+ "sweep_ts": 1793759303
 }
