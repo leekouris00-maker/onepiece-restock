@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-04 12",
+ "drops_slot": "2026-11-05 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793759303,
+ "ebay_ts": 1793813398,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -60,6 +60,10 @@
    300.0,
    1793759314
   ],
+  "list|Gameology|one-piece-card-game-op-17-booster-box": [
+   599.95,
+   1793813410
+  ],
   "list|Gameology|one-piece-card-game-st-43-starter-deck": [
    34.99,
    1793587729
@@ -67,10 +71,6 @@
   "list|Good Games (sealed)|don-bonney-premium-booster-the-best-vol-2-foil": [
    1.85,
    1793565415
-  ],
-  "list|Good Games (sealed)|don-buggy-premium-booster-the-best-vol-2": [
-   0.66,
-   1793550070
   ],
   "list|Good Games (sealed)|don-card-yamato-premium-booster-the-best": [
    1.18,
@@ -92,25 +92,17 @@
    1.13,
    1793565415
   ],
-  "list|Good Games (sealed)|don-nami-gold-premium-booster-the-best-vol-2-foil": [
-   73.32,
-   1793550070
-  ],
   "list|Good Games (sealed)|don-teach-gold-premium-booster-the-best-vol-2-foil": [
    46.51,
    1793565415
   ],
-  "list|Good Games (sealed)|don-trafalgar-law-gold-premium-booster-the-best-foil": [
-   102.95,
-   1793550070
+  "list|Grailborne|one-piece-card-game-premium-card-collection-best-selection-vol-6": [
+   139.0,
+   1793813410
   ],
   "list|JToys|89681": [
    349.99,
    1793699036
-  ],
-  "list|Overhauled Games TCG|22302": [
-   599.95,
-   1793550070
   ],
   "list|The Wandering Collector|one-piece-tcg-heroines-booster-box-case-eb-05": [
    6999.95,
@@ -119,6 +111,10 @@
   "list|The Wandering Collector|one-piece-tcg-heroines-booster-box-eb-05": [
    549.95,
    1793672525
+  ],
+  "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
+   99.0,
+   1793813410
   ]
  },
  "robots": {
@@ -675,7 +671,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793698999.1838822
+   "t": 1793813374.9002743
   },
   "collectiblemadness.com.au": {
    "rules": [
@@ -1201,7 +1197,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793698998.5322633
+   "t": 1793813374.3739457
   },
   "grailborne.com.au": {
    "rules": [
@@ -1727,7 +1723,7 @@
   },
   "overhauledgames.com.au": {
    "rules": [],
-   "t": 1793698999.159425
+   "t": 1793813374.882823
   },
   "pocketgames.com.au": {
    "rules": [
@@ -2249,7 +2245,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793698998.5300744
+   "t": 1793813374.3564517
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -2775,7 +2771,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793698998.530903
+   "t": 1793813374.371974
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -3558,7 +3554,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793698998.546997
+   "t": 1793813374.3801866
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -4484,7 +4480,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 1,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -4494,5 +4490,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1793759303
+ "sweep_ts": 1793813398
 }
