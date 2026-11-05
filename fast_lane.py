@@ -260,6 +260,12 @@ def deliver(tb, cfg, finds, drop=None):
     """Post fast-lane finds the same way the full check does. Returns the ids Discord confirmed."""
     label = "⚡ Fast lane" + (f" ({drop['name']})" if drop and drop.get("name") else "")
     add_qty_links(cfg, finds)
+    ab = getattr(tb, "auto_buy", None)
+    if ab:                       # v2.11: auto-checkout first, so the alert can say it's on it
+        try:
+            ab.offer(tb, cfg, finds)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! auto-buy skipped ({e})")
     text = tb.report(finds, label)
     print("\n" + text)
     stamp = time.strftime("%a %d %b %Y %I:%M:%S %p")
@@ -321,7 +327,7 @@ def desk_open(tb, finds, now=None, opener=None):
     opener = opener or (lambda url: webbrowser.open(url, new=2))
     order = {True: 0}
     picks = [f for f in finds if f.get("cart") and f.get("kind") in ("Booster box", "Sealed")
-             and f.get("game") != "pokemon"]
+             and f.get("game") != "pokemon" and not f.get("autobuy")]     # v2.11: auto-buy has it
     picks.sort(key=lambda f: (order.get(bool(f.get("link_watch")), 1), f.get("kind") != "Booster box",
                               f.get("price") or 0))
     opened = []

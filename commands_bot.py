@@ -42,6 +42,9 @@ Type these in your Discord server:
     /bought <card> [qty]             log a pickup; the card stops alerting once you have them all
   v2.6 (admins):
     /desk on [hours] | off           the PC opens the checkout tab itself for target finds (fast_lane.py)
+  v2.11 (admins):
+    /autobuy set mode:<off|test|live> [per_order] [per_day] [hours]   auto-checkout of restocks (auto_buy.py)
+    /autobuy try link:<product page> a test checkout now (never pays) · /autobuy status
 
   Admin only (people with Manage Server, or listed in "admin_user_ids" under "alerts"):
     /want list | add | remove | enable   change the singles want list without editing config.json
@@ -142,6 +145,14 @@ def _fetch_missing(module):
               "run update_bot.bat again", flush=True)
 
 
+try:
+    import auto_buy as ab      # v2.11: /autobuy
+except ImportError:
+    _fetch_missing("auto_buy")
+    try:
+        import auto_buy as ab
+    except ImportError:
+        ab = None
 try:
     import deck_price as dk    # v2.9: /pricecheck
 except ImportError:
@@ -473,6 +484,14 @@ def build_status(cfg):
              + (f" · paused (429): {', '.join(fl['paused'])}" if fl.get("paused") else "")
              + (f" · slow, top targets only: {', '.join(fl['slow'])}" if fl.get("slow") else "")
              if win and fl.get("window") else "on, runs during drop windows"))
+    if ab:
+        abs_ = ab.settings(tb, cfg)
+        spent, n = ab.spent_today(ab.load_ledger(tb))
+        fields.append({"name": "🤖 Auto-buy", "value": (
+            "off (`/autobuy set mode:test`)" if abs_["mode"] == "off" else
+            f"**{abs_['mode']}**" + (f" until {datetime.fromtimestamp(abs_['until']):%a %I:%M %p}" if abs_["until"] else "")
+            + f" · {tb.money(abs_['per_order'])}/order, {tb.money(abs_['per_day'])}/day · today: {n} order(s), "
+              f"{tb.money(spent)}")})
     fields.append({"name": "⚡ Fast lane · 🖥️ Desk mode",
                    "value": f"{lane}\nDesk mode: " + (f"on until {datetime.fromtimestamp(desk):%a %I:%M %p}"
                                                      if desk > time.time() else "off (`/desk on`)")})
@@ -586,6 +605,8 @@ HELP = (
     "eBay watch items too)\n"
     "🃏 DON!! cards have no number: `/want add num:Gomu Gomu DON max:<price>`\n"
     "🖥️ `/desk on` the PC opens the checkout tab itself when a target comes in stock (`/desk off`)\n"
+    "🤖 `/autobuy set mode:test|live|off` the PC checks out restocks by itself, within your limits · "
+    "`/autobuy try link:<product>` · `/autobuy status`\n"
     "⚡ In drop windows the bot also checks that release's listings and your /watch links every 15 seconds.\n\n"
     "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`, "
     "`/onepiece setup`, "
@@ -1690,6 +1711,104 @@ async def desk_cmd(inter: discord.Interaction, mode: app_commands.Choice[str], h
         await fail(inter, e)
         return
     await inter.response.send_message(msg, ephemeral=True)
+
+
+if ab:
+    autobuy = app_commands.Group(name="autobuy", description="The PC checks out restocks by itself, within your limits (admins)",
+                                 default_permissions=discord.Permissions(manage_guild=True))
+
+    def _ab_save(update):
+        controls = tb.read_controls()
+        cur = dict(controls.get("autobuy") or {})
+        cur.update(update)
+        controls["autobuy"] = {k: v for k, v in cur.items() if v is not None}
+        tb.atomic_write_json(tb.CONTROLS_PATH, controls)
+
+    @autobuy.command(name="set", description="Turn auto-buy on (test or live) or off, and set its limits")
+    @app_commands.describe(mode="off, test (everything but paying) or live (really buys)",
+                           per_order="Most a single order may cost, postage included (A$)",
+                           per_day="Most it may spend in a day (A$)",
+                           hours="Switch itself off after this many hours (0 = stays on until you turn it off)")
+    @app_commands.choices(mode=[app_commands.Choice(name=m, value=m) for m in ("off", "test", "live")])
+    async def autobuy_set(inter: discord.Interaction, mode: app_commands.Choice[str], per_order: Optional[float] = None,
+                          per_day: Optional[float] = None, hours: Optional[float] = None):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        upd = {"mode": mode.value}
+        if per_order is not None:
+            upd["per_order"] = max(0.0, float(per_order))
+        if per_day is not None:
+            upd["per_day"] = max(0.0, float(per_day))
+        if hours is not None:
+            upd["until"] = round(time.time() + float(hours) * 3600) if hours > 0 else 0
+        elif mode.value != "off":
+            upd["until"] = 0
+        try:
+            _ab_save(upd)
+            _audit(_who(inter), f"autobuy set {upd}")
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        s = ab.settings(tb, cfg)
+        limits = f"{tb.money(s['per_order'])} an order (postage included), {tb.money(s['per_day'])} a day, " \
+                 f"{s['orders_per_day']} orders a day, the same product once every {s['same_product_days']:g} days"
+        what = " + ".join({"boxes": "booster boxes", "watch": "/watch links", "sealed": "watched sealed"}.get(w, w)
+                          for w in s["what"]) + ("" if s["preorders"] else ", no pre-orders")
+        if s["mode"] == "off":
+            msg = "🤖 **Auto-buy off.** Alerts and desk mode carry on as usual."
+        else:
+            msg = (("🧪 **Auto-buy TEST mode on.** When a restock comes in it goes all the way to the Pay button, "
+                    "doesn't press it, and posts a screenshot in #bot-status." if s["mode"] == "test" else
+                    "🤖 **Auto-buy LIVE.** The PC will check out restocks by itself and pay.")
+                   + f"\nBuys: {what} (Shopify shops, PC copy only).\nLimits: {limits}."
+                   + (f"\nSwitches off {datetime.fromtimestamp(s['until']):%a %d %b %I:%M %p}." if s["until"] else "")
+                   + "\nNeeds the buyer profile signed in to Shop Pay: run **setup_autobuy.bat** on the PC once.")
+        await inter.response.send_message(msg, ephemeral=True)
+
+    @autobuy.command(name="try", description="A test checkout of any Shopify product now (never pays)")
+    @app_commands.describe(link="A product page (…/products/…) on a Shopify shop")
+    async def autobuy_try(inter: discord.Interaction, link: str):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        if not re.match(r"https://[^/]+/(products/|cart/\d)", link.strip()):
+            await inter.response.send_message("That needs to be a Shopify product link, like "
+                                              "`https://shop.com.au/products/op-13-booster-box`.", ephemeral=True)
+            return
+        try:
+            _ab_save({"try": link.strip()})
+            _audit(_who(inter), f"autobuy try {link.strip()}")
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        await inter.response.send_message("🧪 Queued. Within a minute the PC opens the checkout, stops before "
+                                          "paying and posts what it saw in #bot-status. (The restock bot needs to be "
+                                          "running on the PC.)", ephemeral=True)
+
+    @autobuy.command(name="status", description="Auto-buy settings and the last few attempts")
+    async def autobuy_status(inter: discord.Interaction):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        s = ab.settings(tb, cfg)
+        led = ab.load_ledger(tb)
+        spent, n = ab.spent_today(led)
+        icons = {"paid": "✅", "test": "🧪", "declined": "❌", "unclear": "❓", "bank": "🏦", "paying": "⏳"}
+        lines = [f"{icons.get(o.get('status'), '✋')} {datetime.fromtimestamp(o.get('t', 0)):%d %b %I:%M %p} · "
+                 f"{str(o.get('name'))[:50]} · {o.get('shop')}"
+                 + (f" · {tb.money(o['total'])}" if o.get("total") else "")
+                 + (f" · {str(o.get('detail'))[:80]}" if o.get("detail") and o.get("status") not in ("paid", "test") else "")
+                 for o in led["orders"][-8:][::-1]]
+        e = embed("🤖 Auto-buy", [
+            {"name": "Mode", "value": s["mode"] + (f" until {datetime.fromtimestamp(s['until']):%a %I:%M %p}"
+                                                  if s["until"] and s["mode"] != "off" else "")},
+            {"name": "Limits", "value": f"{tb.money(s['per_order'])}/order · {tb.money(s['per_day'])}/day · "
+                                        f"{s['orders_per_day']} orders/day · today {n} order(s), {tb.money(spent)}"},
+            lines_field("Last attempts", lines, "None yet.", 8)], BLUE)
+        await inter.response.send_message(embed=e, ephemeral=True)
+
+    bot.tree.add_command(autobuy)
 
 
 async def bought_autocomplete(inter: discord.Interaction, current: str):

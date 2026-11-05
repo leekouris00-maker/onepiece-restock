@@ -7,3 +7,7 @@ secrets.json
 *.bak
 *.damaged
 misses.json
+# v2.11 auto-buy: the signed-in buyer browser profile, its ledger and screenshots (PC only, never commit)
+buyer_profile/
+autobuy.json
+autobuy_shots/

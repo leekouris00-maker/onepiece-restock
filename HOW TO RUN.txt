@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.10.1)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.11.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -38,3 +38,17 @@ New in v2.10: One Piece in-store section (#onepiece-in-store), the One Piece twi
   to GitHub so the cloud copy can post when the PC is off. Until then the section is quiet (nothing else changes).
   Options in config.json, all optional:  "instore": {"evening": "18:00", "morning": "07:00", "ping": true,
   "online": true, "stores": ["EB Games / Zing", "Big W", "Kmart", "Target", "JB Hi-Fi", "your local game store"]}
+New in v2.11: AUTO-BUY. The PC checks out restocks by itself (booster boxes and /watch links, Shopify shops,
+  no pre-orders), within limits you set. It never types or stores your card: it uses its own Chrome profile that
+  you sign in to Shop Pay with, once.
+  Set it up once:  double-click setup_autobuy.bat. It installs what it needs and opens a Chrome window.
+                   Sign in to Shop Pay (shop.app) with your address and card saved, sign in to any shops you
+                   have accounts with, then close the window.
+  Then in Discord: /autobuy try link:<a product page at a shop you buy from>  - a test run, never pays,
+                   posts a screenshot of the checkout in #bot-status. Try each shop you care about.
+                   /autobuy set mode:test  - real restocks go all the way to the Pay button, but no further
+                   /autobuy set mode:live per_order:300 per_day:300  - really buys
+                   /autobuy set mode:off   /autobuy status
+  It stops and posts the checkout link for you whenever a shop wants a sign-in, captcha, card or address, or
+  the total (with postage) is over your limits. If your bank asks to approve the payment, you get a phone push.
+  Limits and options: "auto_buy" in config.json (see the top of auto_buy.py).

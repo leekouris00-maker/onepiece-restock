@@ -160,8 +160,12 @@ try:
     import onepiece_instore    # v2.10: One Piece in-store section (#onepiece-in-store); optional
 except ImportError:
     onepiece_instore = None
+try:
+    import auto_buy            # v2.11: auto-checkout of restocks (PC copy, /autobuy); optional
+except ImportError:
+    auto_buy = None
 
-VERSION = "2.10.4"
+VERSION = "2.11.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -1136,7 +1140,7 @@ KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "relea
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
                   "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
-                  "fast_lane", "tcgplayer", "instore", "pause_shops"}
+                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -4045,6 +4049,11 @@ def run_once(cfg, args, drop=None):
     undelivered = set()
     if deliver and not args.all:
         desktop_beep()
+        if auto_buy and role != "listen":      # v2.11: before the alert goes out, so it can say "auto-buying"
+            try:
+                auto_buy.offer(sys.modules[__name__], cfg, deliver)
+            except Exception as e:  # noqa: BLE001
+                print(f"   ! auto-buy skipped ({redact(e)})")
         if fast_lane:
             fast_lane.desk_open(sys.modules[__name__], deliver)
         dtext = text if deliver == show else report(deliver, "New since the PC copy went quiet" if from_held
@@ -4397,6 +4406,8 @@ def main():
     post_status(cfg, f"🟢 **Bot online** ({'PC' if heartbeat_role(cfg) != 'listen' else 'cloud'}, v{VERSION}). "
                      f"Checking every {every}.{poke}{nxt}", GREEN)
     good_cfg, was_dropping, problem, warned = cfg, None, None, ""
+    if auto_buy and not IN_ACTIONS and heartbeat_role(cfg) != "listen":
+        auto_buy.start(sys.modules[__name__])     # v2.11: picks up /autobuy try requests from Discord
     while True:
         try:
             try:
