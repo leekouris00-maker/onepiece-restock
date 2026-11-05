@@ -61,6 +61,8 @@ class Base(unittest.TestCase):
             "Elemental Arcade|sabo-sp": {"n": "Sabo - OP13-120 (Wanted Poster) [Carrying On His Will]", "p": [[ts(8), 300.0, 1], [ts(1), 330.0, 1]]},
             "Elemental Arcade|sabo": {"n": "Sabo - OP13-120 [Carrying On His Will]", "p": [[ts(8), 10.0, 1], [ts(2), 12.0, 1]]},
             "Elemental Arcade|sabo-jp": {"n": "Sabo - OP13-120 (Japanese) [Carrying On His Will]", "p": [[ts(1), 5.0, 1]]},
+            "Elemental Arcade|luffy-aa": {"n": "Monkey.D.Luffy - OP09-119 (Alternate Art) [Emperors]", "p": [[ts(1), 50.0, 1]]},
+            "Elemental Arcade|luffy-ok": {"n": "Monkey.D.Luffy - OP09-119 [Emperors]", "p": [[ts(1), 0.5, 0]]},
         }})
         tp.load_for = lambda cfg=None: {"fx": {"rate": 1.5}, "items": {
             "111": {"n": "Monkey.D.Luffy - OP05-119", "t": "card", "num": "OP05-119", "m": 20.0,
@@ -107,6 +109,40 @@ class Pricing(Base):
         self.assertEqual(rows["Sabo wanted"]["now"], 330.0)
         self.assertEqual(rows["Sabo JP"]["now"], 5.0)
         self.assertEqual(rows["Sabo wanted"]["week"]["pct"], 10.0)
+
+    def test_plain_number_is_the_regular_print(self):
+        # v2.11.6: only the alt art was in stock, so a plain OP09-119 must not be priced as the alt art
+        col.upsert(tb, {"name": "Luffy SEC", "kind": "Card", "card": "OP09-119", "state": "Raw"})
+        col.upsert(tb, {"name": "Luffy SEC AA", "kind": "Card", "card": "OP09-119", "match": "alternate art", "state": "Raw"})
+        rows = {r["name"]: r for r in col.snapshot(tb)["items"]}
+        self.assertNotEqual(rows["Luffy SEC"]["now"], 50.0)
+        self.assertEqual(rows["Luffy SEC AA"]["now"], 50.0)
+
+    def test_sold_out_everywhere_uses_middle_price(self):
+        hist = tb.read_json(tb.HISTORY_PATH, {})
+        for n, (shop, price) in enumerate((("P", 29.99), ("Q", 34.95), ("R", 46.0), ("S", 59.99))):
+            hist[f"item|{shop}|ts03"] = {"name": "One Piece Card Game Mini Case Set Vol. 3 [TS-03] Tin", "shop": shop,
+                                         "url": "", "points": [[day(0), price, False]]}
+        tb.atomic_write_json(tb.HISTORY_PATH, hist)
+        q = col.quote(tb, col.clean({"name": "t", "kind": "Tin", "match": "ts-03"}))
+        self.assertAlmostEqual(q["price"], 40.475)              # (34.95 + 46) / 2, not the A$29.99 shop
+        self.assertIn("middle", q["source"])
+
+    def test_import_a_list(self):
+        rows = [{"name": "Shanks tin (TS-03)", "kind": "Tin", "paid": 40, "match": "ts-02 tin"},
+                {"name": "Sabo", "kind": "Card", "card": "OP13-120", "state": "Raw", "id": "deadbeef"},
+                {"name": "Bad", "paid": "lots"}, "nope"]
+        added, skipped, problems = col.import_items(tb, rows)
+        self.assertEqual((len(added), len(skipped), len(problems)), (2, 0, 2))
+        added, skipped, problems = col.import_items(tb, rows[:2])          # pasting again changes nothing
+        self.assertEqual((added, len(skipped)), ([], 2))
+        items = col.load(tb)
+        self.assertEqual(len(items), 2)
+        self.assertNotEqual(items[1]["id"], "deadbeef")
+        with self.assertRaises(ValueError):
+            col.import_items(tb, [])
+        with self.assertRaises(ValueError):
+            col.import_items(tb, [{}] * (col.IMPORT_MAX + 1))
 
     def test_tcgplayer_when_no_shop_has_it(self):
         col.upsert(tb, {"name": "Luffy", "kind": "Card", "card": "OP05-119", "state": "Raw"})
@@ -240,6 +276,12 @@ class Page(Base):
         self.assertEqual(self.call(f"/cphoto/{iid}.jpg", key=False)[0], 404)
         code, d = self.call("/api/collection")
         self.assertEqual(d["totals"]["paid"], 40.0)
+        code, d = self.call("/api/collection/import", {"items": [{"name": "Sabo", "kind": "Card", "card": "OP13-120"}]})
+        self.assertEqual((code, d["note"]), (200, "Added 1."))
+        self.assertEqual(self.call("/api/collection/import", {"items": "x"})[0], 400)
+        self.assertEqual(self.call("/api/collection/import", {"items": []}, key=False)[0], 401)
+        sabo = [i["id"] for i in d["collection"]["items"] if i["name"] == "Sabo"][0]
+        self.call("/api/collection/remove", {"id": sabo})
         code, d = self.call("/api/collection/remove", {"id": iid})
         self.assertEqual((code, d["collection"]["items"]), (200, []))
 

@@ -46,6 +46,7 @@ PHOTO_MAX = 1_500_000
 ID_RE = re.compile(r"^[0-9a-f]{8}$")
 CARD_RE = re.compile(r"^(?:(?:OP|EB|ST|PRB)\d{2}|P)-\d{3}$")
 BIG_LOT_WORDS = {"display", "case", "master", "displays", "cases"}
+NOT_VERSIONS = {"japanese", "jp", "english", "en", "eng", "jpn"}
 JP_WORDS = ("japanese", "jp ver", "(jp)", "[jp]", " jp ")
 
 _lock = threading.RLock()
@@ -91,6 +92,8 @@ def _words_ok(name, words):
     """Every word you gave is in the title; big lots (displays, cases, set of N) only when asked for."""
     have = set(tokens(name))
     want = tokens(words)
+    if re.search(r"\bmini[ -]?case\b", str(name).lower()) and not re.search(r"\bdisplay|\(\d+|\[\d+|\bof \d+", str(name).lower()):
+        have.discard("case")              # "Mini Case Set" is Bandai's name for one tin, not a case of them
     if not want or not all(w in have for w in want):
         return False
     if (have & BIG_LOT_WORDS) and not (set(want) & BIG_LOT_WORDS):
@@ -98,6 +101,17 @@ def _words_ok(name, words):
     if re.search(r"\bset of \d+|\(\d+ tins?\)|\[\d+ tins?\]", name.lower()) and not (set(want) & {"set", "tins"}):
         return False
     return True
+
+
+def _version(name):
+    """A shop title's version, e.g. ('alternate art',) for 'Luffy - OP09-119 (Alternate Art) [Set]'."""
+    try:
+        import tcgplayer as tp
+        found = tp.shop_version(name)
+    except Exception:  # noqa: BLE001
+        found = tuple(p.strip().lower() for p in re.findall(r"\(([^()]*)\)", str(name or ""))
+                      if not re.fullmatch(r"\s*\d+\s*", p))
+    return tuple(v for v in found if v not in NOT_VERSIONS)   # language is set by the item's EN/JP
 
 
 def _lang_ok(name, lang):
@@ -176,6 +190,39 @@ def upsert(tb, d, cfg=None):
         return it
 
 
+IMPORT_MAX = 100
+
+
+def import_items(tb, rows, cfg=None):
+    """Add a pasted list (from Claude or a backup). Items already in the collection (same name and card
+    number) are skipped, so pasting the same list twice changes nothing. -> (added, skipped, problems)."""
+    if not isinstance(rows, list) or not rows:
+        raise ValueError("paste a list of items: [ {\"name\": ...}, ... ]")
+    if len(rows) > IMPORT_MAX:
+        raise ValueError(f"that's more than {IMPORT_MAX} items; paste them in parts")
+    added, skipped, problems = [], [], []
+    for n, d in enumerate(rows, 1):
+        if not isinstance(d, dict):
+            problems.append(f"#{n}: not an item")
+            continue
+        d = {k: v for k, v in d.items() if k != "id"}
+        try:
+            it = clean(d)
+        except ValueError as e:
+            problems.append(f"#{n} {str(d.get('name') or '')[:40]}: {e}")
+            continue
+        key = (it["name"].lower(), it.get("card") or "")
+        if any((x.get("name", "").lower(), x.get("card") or "") == key for x in load(tb)):
+            skipped.append(it["name"])
+            continue
+        try:
+            upsert(tb, d, cfg)
+            added.append(it["name"])
+        except ValueError as e:
+            problems.append(f"#{n} {it['name'][:40]}: {e}")
+    return added, skipped, problems
+
+
 def remove(tb, iid):
     with _lock:
         items = load(tb)
@@ -242,7 +289,14 @@ def _sealed_shops(tb, it):
                     pt = p
             if pt and pt[1] and str(pt[0]) >= (date.fromisoformat(d) - timedelta(days=3)).isoformat():
                 (stock if pt[2] else listed).append((float(pt[1]), v))
-        pick = min(stock or listed, key=lambda x: x[0], default=None)
+        if stock:
+            pick = min(stock, key=lambda x: x[0])
+        elif listed:                       # sold out everywhere: the middle of what shops last asked, not the
+            listed.sort(key=lambda x: x[0])   # one cheap shop that sold out at RRP (v2.11.6)
+            pick = listed[(len(listed) - 1) // 2] if len(listed) % 2 else (
+                (listed[len(listed) // 2 - 1][0] + listed[len(listed) // 2][0]) / 2, listed[len(listed) // 2][1])
+        else:
+            pick = None
         if pick:
             series[d] = (pick[0], bool(stock), pick[1])
     if not series:
@@ -252,7 +306,7 @@ def _sealed_shops(tb, it):
     return {"price": last[0], "series": {d: v[0] for d, v in series.items()}, "url": last[2].get("url", ""),
             "where": last[2].get("shop", ""), "in_stock": last[1],
             "source": (f"cheapest in stock · {n_stock} listing{'s' if n_stock != 1 else ''}" if last[1]
-                       else "sold out everywhere · last listed")}
+                       else "sold out everywhere · middle of last asking prices")}
 
 
 def _singles(tb, it):
@@ -268,6 +322,8 @@ def _singles(tb, it):
             continue
         if it.get("match") and not _words_ok(name, it["match"]):
             continue
+        if not it.get("match") and _version(name):
+            continue                      # no version words: only the regular print (not the alt art, SP...)
         if not _lang_ok(name, it.get("lang")) or re.search(r"damaged|played|proxy", name, re.I):
             continue
         rows.append((key, v))

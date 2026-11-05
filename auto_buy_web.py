@@ -302,7 +302,7 @@ def make_handler(tb, ab, lan=False):
                     ("The page restarts in a moment" + (": if Windows asks about Python, allow Private networks only."
                                                         if on else ".") if live else "Run restart_bot.bat to apply it."))})
             try:
-                d = self._body(PHOTO_BODY if path == "/api/collection/photo" else MAX_BODY)
+                d = self._body(PHOTO_BODY if path in ("/api/collection/photo", "/api/collection/import") else MAX_BODY)
                 if path.startswith("/api/collection"):
                     col = _collection()
                     if not col:
@@ -310,6 +310,11 @@ def make_handler(tb, ab, lan=False):
                     if path == "/api/collection/item":
                         it = col.upsert(tb, d, tb.load_config())
                         note = ("Saved " if d.get("id") else "Added ") + it["name"] + "."
+                    elif path == "/api/collection/import":
+                        added, skipped, problems = col.import_items(tb, d.get("items"), tb.load_config())
+                        note = f"Added {len(added)}." + (f" {len(skipped)} already there." if skipped else "") + (
+                            f" {len(problems)} couldn't be added: " + "; ".join(problems[:3]) if problems else "")
+                        d = {"items": f"({len(added)} added, {len(skipped)} skipped, {len(problems)} problems)"}
                     elif path == "/api/collection/remove":
                         col.remove(tb, str(d.get("id") or ""))
                         note = "Removed."
@@ -441,7 +446,7 @@ h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
 th{font-size:12px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
 td input{width:84px}.name{font-weight:600}.sub{color:var(--mute);font-size:13px}
-input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
 label{display:block;font-size:13px;color:var(--mute);margin:8px 0 4px}
 .btn{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px;padding:8px 12px;cursor:pointer}
 .btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}.btn.small{padding:5px 9px;font-size:13px}
@@ -549,6 +554,10 @@ fieldset{border:1px dashed var(--line);border-radius:12px;padding:6px 12px 12px;
   <label>Notes</label><input name="notes" maxlength="300" placeholder="holding sealed, birthday present…">
   <p style="margin:14px 0 0" class="actions"><button class="btn primary" id="csubmit">➕ Add to collection</button><button type="button" class="btn" id="ccancel" hidden>Cancel</button></p>
  </form></section>
+ <details class="card" id="cimport"><summary><b>📋 Add a list</b> <span class="muted">· paste a list Claude made for you</span></summary>
+  <textarea id="cimporttext" rows="6" style="width:100%;margin-top:10px;font:13px ui-monospace,Menlo,Consolas,monospace" placeholder='[{"name": "Shanks tin (TS-03)", "kind": "Tin", "paid": 40, "match": "ts-03"}]'></textarea>
+  <p class="hint">Anything already in your collection (same name and card number) is skipped, so pasting twice is fine.</p>
+  <p class="actions" style="margin:10px 0 0"><button class="btn primary" id="cimportbtn" type="button">Add them</button></p></details>
  <input type="file" id="cphoto" accept="image/*" hidden>
 </div>
 </div>
@@ -659,6 +668,9 @@ $('#tabs').addEventListener('click',e=>{const t=e.target.closest('button')?.data
 $('#cfilter').addEventListener('click',e=>{const f=e.target.closest('button')?.dataset.f;if(f){FILTER=f;renderCol()}});
 $('#cform').addEventListener('submit',async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));if(!d.id)delete d.id;if(await cact('/api/collection/item',d))resetForm()});
 $('#ccancel').addEventListener('click',resetForm);
+$('#cimportbtn').addEventListener('click',async()=>{let items;const t=$('#cimporttext').value.trim();
+ try{items=JSON.parse(t);if(!Array.isArray(items))items=items&&items.items}catch(e){toast("That isn't a list I can read. Paste the whole block, from [ to ].",true);return}
+ if(await cact('/api/collection/import',{items})){$('#cimporttext').value='';$('#cimport').open=false}});
 $('#citems').addEventListener('click',e=>{const a=e.target.dataset.c;if(!a)return;const id=e.target.closest('.citem').dataset.id,i=C.items.find(x=>x.id===id);
  if(a==='edit')editItem(i);
  if(a==='arrived')cact('/api/collection/item',{id,status:'have'});
@@ -669,7 +681,7 @@ $('#cphoto').addEventListener('change',async e=>{const file=e.target.files[0];e.
   const k=Math.min(1,1000/Math.max(img.naturalWidth,img.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(img.naturalWidth*k);cv.height=Math.round(img.naturalHeight*k);
   cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(img.src);await cact('/api/collection/photo',{id:photoFor,data:cv.toDataURL('image/jpeg',.82)})}catch(err){toast(err.message,true)}});
 fillSelects();{let t='buy';try{t=location.hash==='#collection'?'col':(sessionStorage.getItem('abtab')||'buy')}catch(e){}if(t==='col')showTab('col')}
-setInterval(()=>{if(TAB==='col'&&KEY&&!PAIRING&&!document.hidden&&!document.activeElement.matches('input,select'))loadCol()},60000);
+setInterval(()=>{if(TAB==='col'&&KEY&&!PAIRING&&!document.hidden&&!document.activeElement.matches('input,select,textarea'))loadCol()},60000);
 
 // ---------------------------------------------------------------- phone (v2.11.5)
 let PAIRING=false;
