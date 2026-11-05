@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Auto-buy dashboard: a web page on the PC (v2.11.2)
-==================================================
+Auto-buy dashboard and My collection: a private web page on the PC (v2.11.2, collection v2.11.4)
+=================================================================================================
 
 The PC copy of the restock bot serves a small page where you can switch auto-buy off / test / live,
 change the spend limits, edit the list of things it looks for, test a link, and see what it tried
-(with the checkout screenshots).
+(with the checkout screenshots). Its second tab, My collection, lists what you own with what it's worth
+now and the change over the week (collection.py).
 
 Open it:  double-click open_autobuy.bat   (it opens http://localhost:8765/?t=<your key> in your browser)
 
@@ -28,7 +29,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 TOKEN_PATH = os.path.join(HERE, "autobuy_web_token.txt")
 DEFAULT_PORT = 8765
 MAX_BODY = 16_000
+PHOTO_BODY = 2_200_000          # a phone photo, shrunk by the page to about 1000 px, as base64
 SHOT_RE = re.compile(r"^[\w.\-]+\.png$")
+PHOTO_RE = re.compile(r"^([0-9a-f]{8})\.jpg$")
 _server = [None]
 
 
@@ -58,6 +61,14 @@ def token():
 
 def page_url(cfg, host="localhost"):
     return f"http://{host}:{web_settings(cfg)['port']}/?t={token()}"
+
+
+def _collection():
+    try:
+        import collection
+        return collection
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def make_handler(tb, ab, lan=False):
@@ -93,9 +104,9 @@ def make_handler(tb, ab, lan=False):
             given = self.headers.get("X-Token") or (query or {}).get("t", [""])[0]
             return secrets.compare_digest(str(given), key)
 
-        def _body(self):
+        def _body(self, limit=MAX_BODY):
             n = int(self.headers.get("Content-Length") or 0)
-            if n > MAX_BODY:
+            if n > limit:
                 raise ValueError("too much data")
             data = json.loads(self.rfile.read(n) or b"{}")
             if not isinstance(data, dict):
@@ -116,6 +127,23 @@ def make_handler(tb, ab, lan=False):
                 if not self._authed(q):
                     return self._send(401, {"error": "wrong or missing key: open the page with open_autobuy.bat"})
                 return self._send(200, ab.snapshot(tb))
+            if u.path == "/api/collection":
+                if not self._authed(q):
+                    return self._send(401, {"error": "wrong or missing key: open the page with open_autobuy.bat"})
+                col = _collection()
+                if not col:
+                    return self._send(500, {"error": "collection.py is missing: run update_bot.bat"})
+                return self._send(200, col.snapshot(tb, tb.load_config()))
+            if u.path.startswith("/cphoto/"):
+                m = PHOTO_RE.match(urllib.parse.unquote(u.path[len("/cphoto/"):]))
+                col = _collection()
+                if not self._authed(q) or not m or not col:
+                    return self._send(404, {"error": "not found"})
+                path = col.photo_path(m.group(1))
+                if not os.path.isfile(path):
+                    return self._send(404, {"error": "not found"})
+                with open(path, "rb") as f:
+                    return self._send(200, f.read(), "image/jpeg")
             if u.path.startswith("/shot/"):
                 name = urllib.parse.unquote(u.path[len("/shot/"):])
                 if not self._authed(q) or not SHOT_RE.match(name):
@@ -134,7 +162,25 @@ def make_handler(tb, ab, lan=False):
                 return self._send(401, {"error": "wrong or missing key: open the page with open_autobuy.bat"})
             path = urllib.parse.urlsplit(self.path).path
             try:
-                d = self._body()
+                d = self._body(PHOTO_BODY if path == "/api/collection/photo" else MAX_BODY)
+                if path.startswith("/api/collection"):
+                    col = _collection()
+                    if not col:
+                        raise ValueError("collection.py is missing: run update_bot.bat")
+                    if path == "/api/collection/item":
+                        it = col.upsert(tb, d, tb.load_config())
+                        note = ("Saved " if d.get("id") else "Added ") + it["name"] + "."
+                    elif path == "/api/collection/remove":
+                        col.remove(tb, str(d.get("id") or ""))
+                        note = "Removed."
+                    elif path == "/api/collection/photo":
+                        it = col.set_photo(tb, str(d.get("id") or ""), d.get("data"))
+                        d = {"id": d.get("id"), "data": "(photo)"}
+                        note = f"Photo saved for {it['name']}."
+                    else:
+                        return self._send(404, {"error": "not found"})
+                    self._audit(path, d)
+                    return self._send(200, {"ok": True, "note": note, "collection": col.snapshot(tb, tb.load_config())})
                 if path == "/api/mode":
                     ab.set_mode(tb, d.get("mode"), d.get("hours"))
                     note = f"Auto-buy {d.get('mode')}."
@@ -158,12 +204,15 @@ def make_handler(tb, ab, lan=False):
                 return self._send(400, {"error": str(e)})
             except Exception as e:  # noqa: BLE001
                 return self._send(500, {"error": f"{type(e).__name__}: {str(e)[:200]}"})
+            self._audit(path, d)
+            return self._send(200, {"ok": True, "note": note, "state": ab.snapshot(tb)})
+
+        def _audit(self, path, d):
             try:
                 tb.append_text(os.path.join(HERE, "commands_audit.log"),
                                f"web page  {path} {json.dumps(d)[:300]}\n", 500_000)
             except Exception:  # noqa: BLE001
                 pass
-            return self._send(200, {"ok": True, "note": note, "state": ab.snapshot(tb)})
 
     return H
 
@@ -181,6 +230,9 @@ def start(tb, ab, cfg):
     srv.daemon_threads = True
     threading.Thread(target=srv.serve_forever, name="auto-buy page", daemon=True).start()
     _server[0] = srv
+    col = _collection()
+    if col and not getattr(tb, "IN_ACTIONS", False) and ws["port"] != 0:
+        col.keep_ticking(tb, tb.load_config)   # one price a day for each collection item, page open or not
     print(f"   (auto-buy page on port {srv.server_address[1]} - open_autobuy.bat opens it)")
     return srv
 
@@ -239,9 +291,39 @@ font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;max-width:9
  #items tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;padding:12px 0;border-bottom:1px solid var(--line)}
  #items td{border:0;padding:0}#items td:first-child,#items td:last-child{grid-column:1/-1}
  #items td input{width:100%}#items td[data-l]::before{content:attr(data-l);display:block;font-size:12px;color:var(--mute);margin-bottom:3px}}
+.tabs{display:inline-flex;gap:4px;background:var(--chip);border-radius:12px;padding:4px}
+.tabs button{border:0;background:transparent;color:var(--mute);font:inherit;font-weight:700;font-size:16px;padding:8px 14px;border-radius:9px;cursor:pointer}
+.tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.hl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}#ver{color:var(--mute);font-size:13px;font-weight:500}
+[hidden]{display:none!important}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}@media(min-width:760px){.stats{grid-template-columns:1.4fr 1fr 1fr 1fr}}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+.stat .k{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.stat .v{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-top:4px;font-variant-numeric:tabular-nums}.stat.big .v{font-size:30px}
+.stat .s{font-size:13px;color:var(--mute);margin-top:2px}
+.up{color:var(--ok)}.down{color:var(--bad)}.flat{color:var(--mute)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.chips button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:6px 12px;cursor:pointer}
+.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}.chips button span{color:var(--mute);font-weight:500;margin-left:4px}.chips button.on span{color:inherit;opacity:.7}
+.cgrid{display:grid;gap:14px;grid-template-columns:1fr;margin-bottom:16px}@media(min-width:620px){.cgrid{grid-template-columns:1fr 1fr}}@media(min-width:900px){.cgrid{grid-template-columns:1fr 1fr 1fr}}
+.citem{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.ph{height:150px;background:var(--chip);display:flex;align-items:center;justify-content:center;font-size:54px;position:relative}
+.ph img{width:100%;height:100%;object-fit:cover}.ph .flag{position:absolute;top:10px;left:10px}
+.cbody{padding:14px 14px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.cbody .name{font-size:16px;font-weight:700;line-height:1.25}.tags{font-size:13px;color:var(--mute)}
+.pricerow{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:4px}
+.pricerow b{font-size:22px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.chg{font-size:14px;font-weight:700;white-space:nowrap}.chg small{font-weight:500;color:var(--mute)}
+.spark{display:block;width:100%;height:38px}.src{font-size:12px;color:var(--mute)}.src a{color:inherit}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13px;margin:6px 0 4px;padding-top:8px;border-top:1px solid var(--line)}
+.facts dt{color:var(--mute)}.facts dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.citem .actions{margin-top:auto;padding-top:6px}.pill.coming{background:rgba(43,108,176,.14);color:var(--info)}
+.empty{text-align:center;padding:30px 16px;color:var(--mute)}.empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+.row3{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(min-width:760px){.row3{grid-template-columns:1fr 1fr 1fr}}
+fieldset{border:1px dashed var(--line);border-radius:12px;padding:6px 12px 12px;margin:14px 0 0}legend{font-size:13px;font-weight:700;padding:0 6px}
+.hint{font-size:12.5px;color:var(--mute);margin:6px 0 0}
 </style></head><body><div class="wrap">
-<header><h1>🤖 Auto-buy <small id="ver"></small></h1>
+<header><div class="hl"><nav class="tabs" id="tabs"><button data-tab="buy" class="on">🤖 Auto-buy</button><button data-tab="col">📦 My collection</button></nav><span id="ver"></span></div>
 <div class="seg" id="modes"><button data-m="off">Off</button><button data-m="test">Test</button><button data-m="live" class="livebtn">Live</button></div></header>
+<div id="pane-buy">
 <div id="banner" class="banner off">Loading…</div>
 <div class="grid">
  <section class="card"><h2>Spent</h2><div id="meters"></div></section>
@@ -269,10 +351,41 @@ font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;max-width:9
  <section class="card"><h2>Last attempts</h2><div id="recent" class="list-attempts"></div></section>
 </div>
 <section class="card"><h2>Checkout screenshots</h2><div id="shots" class="shots"></div></section>
+</div>
+<div id="pane-col" hidden>
+ <div class="stats" id="cstats"></div>
+ <div class="chips" id="cfilter"></div>
+ <div class="cgrid" id="citems"><div class="empty">Loading…</div></div>
+ <section class="card" id="cformcard"><h2 id="cformtitle">Add to my collection</h2>
+ <form id="cform"><input type="hidden" name="id">
+  <label>Name</label><input name="name" required maxlength="80" placeholder="Shanks tin, Nike Gomu Gomu DON!! card…">
+  <div class="row3">
+   <div><label>Kind</label><select name="kind"></select></div>
+   <div><label>Language</label><select name="lang"></select></div>
+   <div><label>Condition</label><select name="state"></select></div>
+   <div id="gradebox"><label>Grade</label><input name="grade" maxlength="20" placeholder="PSA 10"></div>
+   <div><label>How many</label><input name="qty" inputmode="numeric" value="1"></div>
+   <div><label>Paid each (A$)</label><input name="paid" inputmode="decimal" placeholder="40"></div>
+   <div><label>Got it on</label><input name="got" type="date"></div>
+   <div><label>Status</label><select name="status"><option value="have">Have it</option><option value="coming">On its way</option></select></div>
+  </div>
+  <fieldset><legend>How to price it</legend>
+   <div class="row3">
+    <div><label>Card number</label><input name="card" maxlength="12" placeholder="OP05-119"></div>
+    <div><label>Words to look for at shops</label><input name="match" maxlength="80" placeholder="ts-02 tin · alternate art"></div>
+    <div><label>Or your own estimate (A$)</label><input name="value" inputmode="decimal" placeholder="for things shops don't sell"></div>
+   </div>
+   <p class="hint">Cards: the number, plus words to pick the version. Sealed: words from shop titles. The price is checked every hour and kept once a day, so the week's change builds up; new items start with the last week from the bot's records.</p>
+  </fieldset>
+  <label>Notes</label><input name="notes" maxlength="300" placeholder="holding sealed, birthday present…">
+  <p style="margin:14px 0 0" class="actions"><button class="btn primary" id="csubmit">➕ Add to collection</button><button type="button" class="btn" id="ccancel" hidden>Cancel</button></p>
+ </form></section>
+ <input type="file" id="cphoto" accept="image/*" hidden>
+</div>
 </div><div class="toast" id="toast"></div>
 <script>
 const q=new URLSearchParams(location.search);let KEY=q.get('t')||'';
-try{if(KEY){sessionStorage.setItem('abk',KEY);history.replaceState(null,'','/')}else{KEY=sessionStorage.getItem('abk')||''}}catch(e){}
+try{if(KEY){sessionStorage.setItem('abk',KEY);history.replaceState(null,'','/'+location.hash)}else{KEY=sessionStorage.getItem('abk')||''}}catch(e){}
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=v=>'$'+Number(v||0).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
 let S=null,editing=false;
@@ -316,6 +429,68 @@ $('#items').addEventListener('click',e=>{const a=e.target.dataset.a;if(!a)return
  if(a==='toggle')act('/api/item/edit',{id,on:!it.on});
  if(a==='reset')act('/api/item/edit',{id,reset:true});
  if(a==='remove'&&confirm('Remove '+it.name+'?'))act('/api/item/edit',{id,remove:true})});
+
+// ---------------------------------------------------------------- My collection
+const EMOJI={Tin:'🥫',Sealed:'📦',Card:'🃏',Promo:'⭐',Collectible:'🏆',Other:'🎁'};
+const PLURAL={Tin:'Tins',Sealed:'Sealed',Card:'Cards',Promo:'Promos',Collectible:'Collectibles',Other:'Other'};
+let C=null,TAB='buy',FILTER='all',photoFor=null;
+const pct=v=>(v>0?'+':'')+v.toFixed(1)+'%',cls=v=>v>0.05?'up':v<-0.05?'down':'flat',arrow=v=>v>0.05?'▲':v<-0.05?'▼':'■';
+const dshort=d=>d?new Date(d+'T00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'}):'';
+function spark(pts,dir){if(!pts||pts.length<2)return '';const v=pts.map(p=>p[1]),lo=Math.min(...v),hi=Math.max(...v),r=hi-lo||1,W=300,H=38;
+ const xy=v.map((y,i)=>[(i/(v.length-1))*(W-6)+3,H-4-((y-lo)/r)*(H-10)]),col=dir==='up'?'var(--ok)':dir==='down'?'var(--bad)':'var(--mute)';
+ const last=xy[xy.length-1];return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="price over the last ${v.length} days"><polyline fill="none" stroke="${col}" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" points="${xy.map(p=>p.map(n=>n.toFixed(1)).join(',')).join(' ')}"/><circle cx="${last[0]}" cy="${last[1]}" r="3" fill="${col}"/></svg>`}
+function renderCol(){
+ const T=C.totals,g=T.gain,gp=T.paid?g/T.paid*100:0;
+ $('#cstats').innerHTML=`<div class="stat big"><div class="k">Worth now</div><div class="v">${money(T.worth)}</div><div class="s">${T.items} item(s) · ${T.priced} priced</div></div>
+  <div class="stat"><div class="k">Total cost</div><div class="v">${money(T.paid)}</div><div class="s">${T.no_cost?T.no_cost+' item(s) with no price paid':'everything you paid'}</div></div>
+  <div class="stat"><div class="k">Up / down</div><div class="v ${cls(g)}">${g<0?'−':'+'}${money(Math.abs(g))}</div><div class="s ${cls(gp)}">${T.paid?pct(gp)+' on what you paid':'&nbsp;'}</div></div>
+  <div class="stat"><div class="k">This week</div><div class="v ${T.week_pct==null?'flat':cls(T.week_pct)}">${T.week_pct==null?'—':arrow(T.week_pct)+' '+pct(T.week_pct)}</div><div class="s">${T.week_pct==null?'builds up day by day':'last 7 days'}</div></div>`;
+ const counts={};C.items.forEach(i=>counts[i.kind]=(counts[i.kind]||0)+1);
+ $('#cfilter').innerHTML=C.items.length?[['all','All',C.items.length],...C.kinds.filter(k=>counts[k]).map(k=>[k,PLURAL[k],counts[k]])].map(([k,n,c])=>`<button data-f="${k}" class="${FILTER===k?'on':''}">${n}<span>${c}</span></button>`).join(''):'';
+ const list=C.items.filter(i=>FILTER==='all'||i.kind===FILTER);
+ $('#citems').innerHTML=list.length?list.map(i=>{
+  const w=i.week,dir=w?cls(w.pct):'flat',q=i.qty||1,gain=(i.now!=null&&i.paid!=null)?(i.now-i.paid)*q:null;
+  const img=i.photo?`<img src="/cphoto/${i.id}.jpg?t=${encodeURIComponent(KEY)}&v=${i.photo}" alt="${esc(i.name)}" loading="lazy">`:EMOJI[i.kind]||'🎁';
+  const tags=[i.kind,i.lang,i.state==='Graded'&&i.grade?i.grade:i.state,q>1?'×'+q:'',i.card].filter(Boolean).map(esc).join(' · ');
+  const src=i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">${esc(i.source)}${i.where&&i.where!=='TCGplayer'?' · '+esc(i.where):''}</a>`:esc(i.source)+(i.where?' · '+esc(i.where):'');
+  return `<article class="citem" data-id="${esc(i.id)}"><div class="ph">${img}${i.status==='coming'?'<span class="pill coming flag">On its way</span>':''}</div><div class="cbody">
+   <div class="name">${esc(i.name)}</div><div class="tags">${tags}</div>
+   <div class="pricerow"><b>${i.now!=null?money(i.now):'<span class="muted">—</span>'}</b>${w?`<span class="chg ${dir}">${arrow(w.pct)} ${pct(w.pct)} <small>${esc(w.label)}</small></span>`:`<span class="chg flat"><small>${i.source==='your estimate'?'changes when you edit it':i.now!=null?'change shows after a day':''}</small></span>`}</div>
+   ${spark(i.spark,dir)}<div class="src">${src}</div>
+   <dl class="facts">${i.paid!=null?`<dt>Paid</dt><dd>${money(i.paid)}${q>1?' each':''}${i.got?' · '+dshort(i.got):''}</dd>`:''}
+    ${i.start?`<dt>When added</dt><dd>${money(i.start.price)} · ${dshort(i.start.date)}</dd>`:''}
+    ${w?`<dt>A week ago</dt><dd>${money(w.from)}</dd>`:''}
+    ${gain!=null?`<dt>Up / down</dt><dd class="${cls(gain)}">${gain<0?'−':'+'}${money(Math.abs(gain))}${i.paid?' ('+pct((i.now-i.paid)/i.paid*100)+')':''}</dd>`:''}
+    ${i.notes?`<dt>Notes</dt><dd>${esc(i.notes)}</dd>`:''}</dl>
+   <div class="actions"><button class="btn small" data-c="edit">Edit</button><button class="btn small" data-c="photo">📷 Photo</button>${i.status==='coming'?'<button class="btn small" data-c="arrived">Arrived</button>':''}<button class="btn small danger" data-c="remove">Remove</button></div>
+  </div></article>`}).join(''):`<div class="empty card" style="grid-column:1/-1"><b>Nothing here yet</b>Add your tins, sealed product and special cards below.</div>`;
+}
+async function loadCol(){try{C=await api('/api/collection');renderCol()}catch(e){$('#citems').innerHTML='<div class="empty err" style="grid-column:1/-1">'+esc(e.message)+'</div>'}}
+async function cact(path,body){try{const d=await api(path,body);toast(d.note||'Saved');C=d.collection;renderCol();return true}catch(e){toast(e.message,true);return false}}
+function fillSelects(){const f=$('#cform');[['kind',['Tin','Sealed','Card','Promo','Collectible','Other']],['lang',['EN','JP','Other']],['state',['Sealed','Opened','Raw','Graded']]].forEach(([n,o])=>{
+ f.elements[n].innerHTML=o.map(x=>`<option>${x}</option>`).join('')});f.elements.state.addEventListener('change',gradeBox);gradeBox()}
+function gradeBox(){$('#gradebox').hidden=$('#cform').elements.state.value!=='Graded'}
+function resetForm(){const f=$('#cform');f.reset();f.elements.id.value='';$('#cformtitle').textContent='Add to my collection';$('#csubmit').textContent='➕ Add to collection';$('#ccancel').hidden=true;gradeBox()}
+function editItem(i){const f=$('#cform');for(const k of ['id','name','kind','lang','state','grade','qty','paid','got','status','card','match','value','notes'])f.elements[k].value=i[k]??'';
+ $('#cformtitle').textContent='Edit '+i.name;$('#csubmit').textContent='Save changes';$('#ccancel').hidden=false;gradeBox();$('#cformcard').scrollIntoView({behavior:'smooth'})}
+function showTab(t){TAB=t;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+ $('#pane-buy').hidden=t!=='buy';$('#pane-col').hidden=t!=='col';$('#modes').hidden=t!=='buy';document.title=t==='col'?'My collection':'Auto-buy';
+ try{history.replaceState(null,'',t==='col'?'#collection':location.pathname);sessionStorage.setItem('abtab',t)}catch(e){}if(t==='col'&&!C)loadCol()}
+$('#tabs').addEventListener('click',e=>{const t=e.target.closest('button')?.dataset.tab;if(t)showTab(t)});
+$('#cfilter').addEventListener('click',e=>{const f=e.target.closest('button')?.dataset.f;if(f){FILTER=f;renderCol()}});
+$('#cform').addEventListener('submit',async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));if(!d.id)delete d.id;if(await cact('/api/collection/item',d))resetForm()});
+$('#ccancel').addEventListener('click',resetForm);
+$('#citems').addEventListener('click',e=>{const a=e.target.dataset.c;if(!a)return;const id=e.target.closest('.citem').dataset.id,i=C.items.find(x=>x.id===id);
+ if(a==='edit')editItem(i);
+ if(a==='arrived')cact('/api/collection/item',{id,status:'have'});
+ if(a==='remove'&&confirm('Remove '+i.name+' from your collection?'))cact('/api/collection/remove',{id});
+ if(a==='photo'){photoFor=id;$('#cphoto').click()}});
+$('#cphoto').addEventListener('change',async e=>{const file=e.target.files[0];e.target.value='';if(!file||!photoFor)return;
+ try{const img=await new Promise((ok,bad)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>bad(new Error("couldn't read that picture"));im.src=URL.createObjectURL(file)});
+  const k=Math.min(1,1000/Math.max(img.naturalWidth,img.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(img.naturalWidth*k);cv.height=Math.round(img.naturalHeight*k);
+  cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(img.src);await cact('/api/collection/photo',{id:photoFor,data:cv.toDataURL('image/jpeg',.82)})}catch(err){toast(err.message,true)}});
+fillSelects();{let t='buy';try{t=location.hash==='#collection'?'col':(sessionStorage.getItem('abtab')||'buy')}catch(e){}if(t==='col')showTab('col')}
+setInterval(()=>{if(TAB==='col'&&!document.hidden&&!document.activeElement.matches('input,select'))loadCol()},60000);
 load();setInterval(()=>{if(!document.hidden&&!document.activeElement.matches('input'))load()},10000);
 </script></body></html>"""
 

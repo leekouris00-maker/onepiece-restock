@@ -13,3 +13,6 @@ autobuy.json
 autobuy_list.json
 autobuy_web_token.txt
 autobuy_shots/
+# v2.11.4 My collection: what you own, what you paid, and its photos (PC only, never commit)
+collection.json
+collection_photos/

@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.11.3)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.11.4)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -68,3 +68,12 @@ New in v2.11.3: AUTO-BUY IS PRIVATE. Friends in the server can't see or use it, 
   checkout screenshots (which show your address) go to 🔒・auto-buy, a channel only you can see; the first
   /autobuy panel or /autobuy set makes it. Shared alerts no longer say a find is being auto-bought, and /status
   and /help don't mention auto-buy.
+New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just for you (nothing goes to Discord or
+  GitHub). Add your tins, sealed product, cards and promos with what you paid. For each one it shows the price now,
+  the price on the day you added it, the change over the last 7 days (with a little trend line), and your total
+  cost, what it's all worth and how much you're up or down. How it prices things, from the bot's own records:
+    a card - its number (e.g. OP05-119), plus words for the version ("alternate art"): cheapest copy in stock
+             at the singles shops, else TCGplayer;
+    sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
+    either - or type your own estimate, for things shops don't sell.
+  It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
