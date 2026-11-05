@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-05 12",
+ "drops_slot": "2026-11-05 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793847089,
+ "ebay_ts": 1793872553,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -48,7 +48,8 @@
  },
  "pokemon_reminders": {
   "2026-10-24|day": 1792793323,
-  "2026-10-30|day": 1793306039
+  "2026-10-30|day": 1793306039,
+  "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
  "recent_alerts": {
@@ -4478,5 +4479,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1793847089
+ "sweep_ts": 1793872553
 }
