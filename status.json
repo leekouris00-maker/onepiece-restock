@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-06 00",
+ "drops_slot": "2026-11-06 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793900760,
+ "ebay_ts": 1793919261,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -49,6 +49,7 @@
  "pokemon_reminders": {
   "2026-10-24|day": 1792793323,
   "2026-10-30|day": 1793306039,
+  "2026-11-06|day": 1793919272,
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
@@ -366,7 +367,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793832408.123
+   "t": 1793919241.7393756
   },
   "cardbot.com.au": {
    "rules": [
@@ -627,7 +628,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793832408.8517776
+   "t": 1793919242.5227833
   },
   "cardplustcg.com.au": {
    "rules": [
@@ -921,11 +922,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793832408.7791593
+   "t": 1793919242.3811262
   },
   "elementalarcade.com.au": {
    "rules": [],
-   "t": 1793832414.2143238
+   "t": 1793919247.2843046
   },
   "goldfieldsgames.com.au": {
    "rules": [
@@ -1447,7 +1448,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793832408.7697003
+   "t": 1793919242.3281224
   },
   "lightofcards.com.au": {
    "rules": [
@@ -1973,7 +1974,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793832408.1139896
+   "t": 1793919241.7292895
   },
   "rogueonline.com.au": {
    "rules": [
@@ -2495,11 +2496,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793832408.1082814
+   "t": 1793919241.7740479
   },
   "tcg.goodgames.com.au": {
    "rules": [],
-   "t": 1793832414.7866056
+   "t": 1793919247.9452643
   },
   "thewanderingcollector.com.au": {
    "rules": [
@@ -3025,7 +3026,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1793832408.1239982
+   "t": 1793919241.739829
   },
   "www.gameology.com.au": {
    "rules": [
@@ -3282,7 +3283,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793832408.1066985
+   "t": 1793919241.7282908
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -3704,7 +3705,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1793832408.1253426
+   "t": 1793919241.7410128
   },
   "www.gumnut.com.au": {
    "rules": [
@@ -3965,7 +3966,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793832408.1062531
+   "t": 1793919241.7277656
   },
   "www.jtoys.com.au": {
    "rules": [
@@ -3978,11 +3979,11 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793832408.157995
+   "t": 1793919241.7671075
   },
   "www.kollecter.com.au": {
    "rules": [],
-   "t": 1793832416.2812471
+   "t": 1793919248.4884667
   },
   "www.m-g.com.au": {
    "rules": [
@@ -4015,15 +4016,15 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793832408.4351385
+   "t": 1793919242.070723
   },
   "www.mayhemcollectables.com.au": {
    "rules": [],
-   "t": 1793832414.810508
+   "t": 1793919247.5475729
   },
   "www.monstermart.com.au": {
    "rules": [],
-   "t": 1793832416.3932357
+   "t": 1793919248.5004964
   },
   "www.pokebox.com.au": {
    "rules": [
@@ -4184,7 +4185,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1793832408.1530015
+   "t": 1793919241.7580094
   },
   "www.tcgroupau.com.au": {
    "rules": [
@@ -4445,7 +4446,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793832408.1090233
+   "t": 1793919241.7286744
   }
  },
  "shop_down": [],
@@ -4479,5 +4480,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1793900760
+ "sweep_ts": 1793919261
 }
