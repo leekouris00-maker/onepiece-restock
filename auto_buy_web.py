@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Auto-buy dashboard and My collection: a private web page on the PC (v2.11.2, collection v2.11.4)
+Auto-buy dashboard and My collection: a private web page on the PC (v2.11.2, collection v2.11.4, phone v2.11.5)
 =================================================================================================
 
 The PC copy of the restock bot serves a small page where you can switch auto-buy off / test / live,
@@ -12,7 +12,10 @@ Open it:  double-click open_autobuy.bat   (it opens http://localhost:8765/?t=<yo
 
 Only this PC can open it, and only with the key in autobuy_web_token.txt (made the first time; never
 committed). To open it from your phone on the home Wi-Fi as well, add to config.json:
-    "auto_buy": {"web_lan": true}        (then open http://<PC's address>:8765/?t=<key> on the phone)
+    "auto_buy": {"web_lan": true}        (then open http://<PC's address>:8765 on the phone)
+On your phone (v2.11.5): on the PC page press 📱 Phone. It can switch phone access on for you, then shows the
+address to open on the phone and a 6-digit code (good for 10 minutes, one use). The phone remembers the key
+after that, so "Add to Home Screen" gives you a Collection icon that opens like an app. Home Wi-Fi only.
 Other settings: "web_port": 8765, "web": false to switch the page off.
 """
 import json
@@ -21,6 +24,7 @@ import re
 import secrets
 import sys
 import threading
+import time
 import urllib.parse
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -63,6 +67,89 @@ def page_url(cfg, host="localhost"):
     return f"http://{host}:{web_settings(cfg)['port']}/?t={token()}"
 
 
+def lan_addresses():
+    """This PC's addresses on the home network (what a phone on the same Wi-Fi opens)."""
+    import socket
+    found = []
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(("10.255.255.255", 1))          # nothing is sent; this just picks the outgoing address
+            found.append(s.getsockname()[0])
+        finally:
+            s.close()
+    except OSError:
+        pass
+    try:
+        found += socket.gethostbyname_ex(socket.gethostname())[2]
+    except OSError:
+        pass
+    out = []
+    for ip in found:
+        a = [int(x) for x in ip.split(".")] if re.fullmatch(r"\d+\.\d+\.\d+\.\d+", ip) else None
+        private = a and (a[0] == 10 or (a[0] == 172 and 16 <= a[1] <= 31) or (a[0] == 192 and a[1] == 168))
+        if private and ip not in out:
+            out.append(ip)
+    return out
+
+
+def set_lan(on):
+    """Switch phone access on/off in config.json ("auto_buy": {"web_lan": ...}), keeping a backup."""
+    import tcg_bot as tb
+    with open(tb.CONFIG_PATH, encoding="utf-8-sig") as f:
+        old = f.read()
+    raw = json.loads(old)
+    ab_cfg = raw.get("auto_buy") if isinstance(raw.get("auto_buy"), dict) else {}
+    ab_cfg["web_lan"] = bool(on)
+    raw["auto_buy"] = ab_cfg
+    with open(tb.CONFIG_PATH + ".bak", "w", encoding="utf-8") as f:
+        f.write(old)
+    tb.atomic_write_json(tb.CONFIG_PATH, raw, indent=1, ensure_ascii=False)
+
+
+def _png(size):
+    """The Home Screen icon: a parcel on red, drawn here so there's no image file to ship."""
+    import struct
+    import zlib
+    bg, box, band, dark = (200, 16, 46), (255, 247, 236), (232, 182, 112), (150, 10, 32)
+    rows = []
+    for y in range(size):
+        row = bytearray([0])
+        for x in range(size):
+            u, v = x / size, y / size
+            c = bg
+            if 0.24 <= u <= 0.76 and 0.30 <= v <= 0.76:
+                c = box
+                if 0.45 <= u <= 0.55 or 0.30 <= v <= 0.40:
+                    c = band
+            elif 0.20 <= u <= 0.80 and 0.24 <= v < 0.30:
+                c = dark if 0.45 <= u <= 0.55 else box
+            row += bytes(c)
+        rows.append(bytes(row))
+
+    def chunk(t, d):
+        return struct.pack(">I", len(d)) + t + d + struct.pack(">I", zlib.crc32(t + d) & 0xFFFFFFFF)
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 2, 0, 0, 0))
+            + chunk(b"IDAT", zlib.compress(b"".join(rows), 9)) + chunk(b"IEND", b""))
+
+
+_ICONS = {}
+
+
+def icon(size):
+    if size not in _ICONS:
+        _ICONS[size] = _png(size)
+    return _ICONS[size]
+
+
+MANIFEST = {"name": "My collection", "short_name": "Collection", "start_url": "/#collection", "scope": "/",
+            "display": "standalone", "background_color": "#f6f4ef", "theme_color": "#c8102e",
+            "icons": [{"src": "/icon-192.png", "sizes": "192x192", "type": "image/png"},
+                      {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png"}]}
+PAIR_SECONDS = 600
+PAIR_TRIES = 5
+
+
 def _collection():
     try:
         import collection
@@ -73,6 +160,8 @@ def _collection():
 
 def make_handler(tb, ab, lan=False):
     key = token()
+    pair = {"code": None, "exp": 0.0, "tries": 0}
+    pair_lock = threading.Lock()
 
     class H(BaseHTTPRequestHandler):
         server_version = "autobuy"
@@ -100,6 +189,10 @@ def make_handler(tb, ab, lan=False):
             host = (self.headers.get("Host") or "").split(":")[0].strip("[]").lower()
             return host in ("localhost", "127.0.0.1", "::1")
 
+        def _local(self):
+            """Asked for from the PC itself (not from a phone on the Wi-Fi)."""
+            return (self.client_address[0] in ("127.0.0.1", "::1", "::ffff:127.0.0.1"))
+
         def _authed(self, query=None):
             given = self.headers.get("X-Token") or (query or {}).get("t", [""])[0]
             return secrets.compare_digest(str(given), key)
@@ -123,6 +216,17 @@ def make_handler(tb, ab, lan=False):
                 return self._send(200, PAGE, "text/html", {"Content-Security-Policy":
                                   "default-src 'self'; img-src 'self' data:; style-src 'unsafe-inline' 'self'; "
                                   "script-src 'unsafe-inline' 'self'; connect-src 'self'; frame-ancestors 'none'"})
+            if u.path == "/manifest.webmanifest":
+                return self._send(200, json.dumps(MANIFEST).encode(), "application/manifest+json")
+            m = re.fullmatch(r"/(?:icon-(192|512)|apple-touch-icon)\.png", u.path)
+            if m:
+                return self._send(200, icon(int(m.group(1) or 180)), "image/png")
+            if u.path == "/api/phone":
+                if not self._authed(q):
+                    return self._send(401, {"error": "wrong or missing key"})
+                port = self.server.server_address[1]
+                return self._send(200, {"lan": lan, "port": port, "local": self._local(),
+                                        "urls": [f"http://{ip}:{port}" for ip in lan_addresses()]})
             if u.path == "/api/state":
                 if not self._authed(q):
                     return self._send(401, {"error": "wrong or missing key: open the page with open_autobuy.bat"})
@@ -158,9 +262,45 @@ def make_handler(tb, ab, lan=False):
         def do_POST(self):
             if not self._host_ok():
                 return self._send(403, {"error": "open this page as localhost"})
+            path = urllib.parse.urlsplit(self.path).path
+            if path == "/api/pair":                      # a phone swapping the 6-digit code for the key
+                try:
+                    code = re.sub(r"\D", "", str(self._body().get("code") or ""))
+                except ValueError:
+                    code = ""
+                with pair_lock:
+                    live = pair["code"] and time.time() < pair["exp"]
+                    if live and code and secrets.compare_digest(code, pair["code"]):
+                        pair.update(code=None, exp=0.0, tries=0)
+                        self._audit(path, {"paired": self.client_address[0]})
+                        return self._send(200, {"ok": True, "key": key})
+                    if live:
+                        pair["tries"] += 1
+                        if pair["tries"] >= PAIR_TRIES:
+                            pair.update(code=None, exp=0.0)
+                    msg = ("That code isn't right. Check the 📱 Phone box on the PC." if live and pair["code"] else
+                           "No code is waiting (they last 10 minutes, one try each). On the PC press 📱 Phone for a new one.")
+                return self._send(403, {"error": msg})
             if not self._authed():
                 return self._send(401, {"error": "wrong or missing key: open the page with open_autobuy.bat"})
-            path = urllib.parse.urlsplit(self.path).path
+            if path == "/api/phone/code":
+                with pair_lock:
+                    pair.update(code=f"{secrets.randbelow(1_000_000):06d}", exp=time.time() + PAIR_SECONDS, tries=0)
+                    return self._send(200, {"code": pair["code"], "seconds": PAIR_SECONDS})
+            if path == "/api/phone/lan":
+                if not self._local():
+                    return self._send(403, {"error": "phone access can only be switched from the PC itself"})
+                try:
+                    on = bool(self._body().get("on"))
+                    set_lan(on)
+                except Exception as e:  # noqa: BLE001
+                    return self._send(500, {"error": f"couldn't change config.json ({type(e).__name__}: {str(e)[:120]})"})
+                self._audit(path, {"on": on})
+                live = restart_soon(tb, ab)
+                return self._send(200, {"ok": True, "restarting": live, "note": (
+                    ("Phone access on. " if on else "Phone access off. ") +
+                    ("The page restarts in a moment" + (": if Windows asks about Python, allow Private networks only."
+                                                        if on else ".") if live else "Run restart_bot.bat to apply it."))})
             try:
                 d = self._body(PHOTO_BODY if path == "/api/collection/photo" else MAX_BODY)
                 if path.startswith("/api/collection"):
@@ -217,6 +357,23 @@ def make_handler(tb, ab, lan=False):
     return H
 
 
+_ticking = [False]
+
+
+def restart_soon(tb, ab, delay=0.6):
+    """After phone access is switched, serve again with the new setting (the bot keeps running).
+    Returns False when this page isn't the bot's own (open_autobuy.bat serving it by itself)."""
+    if not _server[0]:
+        return False
+
+    def go():
+        time.sleep(delay)
+        stop()
+        start(tb, ab, tb.load_config())
+    threading.Thread(target=go, name="auto-buy page restart", daemon=True).start()
+    return True
+
+
 def start(tb, ab, cfg):
     """Start the page in the background (PC copy). Quietly does nothing if it's off or the port is taken."""
     ws = web_settings(cfg)
@@ -231,9 +388,12 @@ def start(tb, ab, cfg):
     threading.Thread(target=srv.serve_forever, name="auto-buy page", daemon=True).start()
     _server[0] = srv
     col = _collection()
-    if col and not getattr(tb, "IN_ACTIONS", False) and ws["port"] != 0:
+    if col and not getattr(tb, "IN_ACTIONS", False) and ws["port"] != 0 and not _ticking[0]:
+        _ticking[0] = True
         col.keep_ticking(tb, tb.load_config)   # one price a day for each collection item, page open or not
-    print(f"   (auto-buy page on port {srv.server_address[1]} - open_autobuy.bat opens it)")
+    print(f"   (auto-buy page on port {srv.server_address[1]} - open_autobuy.bat opens it"
+          + (f"; phones on the Wi-Fi: {', '.join(f'http://{ip}:{srv.server_address[1]}' for ip in lan_addresses())}"
+             if ws["lan"] and lan_addresses() else "") + ")")
     return srv
 
 
@@ -245,15 +405,24 @@ def stop():
 
 
 PAGE = r"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Auto-buy</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Auto-buy</title><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Collection"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#c8102e">
 <style>
 :root{--bg:#f6f4ef;--card:#fff;--ink:#1d1b18;--mute:#6f6a62;--line:#e6e1d8;--accent:#c8102e;--accent-ink:#fff;
 --ok:#1f8a5b;--warn:#b7791f;--bad:#c8102e;--info:#2b6cb0;--chip:#f0ece4;--shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04)}
 @media (prefers-color-scheme:dark){:root{--bg:#141311;--card:#1d1c19;--ink:#f1ede6;--mute:#a39d93;--line:#2e2c28;
 --chip:#26241f;--shadow:none;--accent:#e5484d}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.wrap{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+.wrap{max-width:980px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(60px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.phonebtn{margin-left:auto}.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.sheet .card{max-width:460px;width:100%;margin:0;max-height:90vh;overflow:auto}.sheet ol{padding-left:20px;margin:8px 0}.sheet li{margin:8px 0}
+.code{font:700 34px/1.1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;text-align:center;background:var(--chip);border-radius:12px;padding:14px 8px;margin:6px 0}
+.addr{font:600 16px ui-monospace,Menlo,Consolas,monospace;background:var(--chip);border-radius:8px;padding:6px 10px;display:inline-block;word-break:break-all;user-select:all}
+.pairbox{max-width:380px;margin:12vh auto 0;text-align:center}.pairbox input{font:700 30px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3em;text-align:center;width:100%;margin:10px 0}
+@media(max-width:620px){.tabs button{font-size:15px;padding:8px 10px}.citem .actions .btn{padding:8px 11px}}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
 h1{font-size:22px;margin:0;letter-spacing:-.01em}h1 small{color:var(--mute);font-weight:500;font-size:13px;margin-left:6px}
 h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:0 0 12px}
@@ -321,7 +490,7 @@ font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;max-width:9
 fieldset{border:1px dashed var(--line);border-radius:12px;padding:6px 12px 12px;margin:14px 0 0}legend{font-size:13px;font-weight:700;padding:0 6px}
 .hint{font-size:12.5px;color:var(--mute);margin:6px 0 0}
 </style></head><body><div class="wrap">
-<header><div class="hl"><nav class="tabs" id="tabs"><button data-tab="buy" class="on">🤖 Auto-buy</button><button data-tab="col">📦 My collection</button></nav><span id="ver"></span></div>
+<header><div class="hl"><nav class="tabs" id="tabs"><button data-tab="buy" class="on">🤖 Auto-buy</button><button data-tab="col">📦 My collection</button></nav><span id="ver"></span><button class="btn small phonebtn" id="phonebtn" hidden>📱 Phone</button></div>
 <div class="seg" id="modes"><button data-m="off">Off</button><button data-m="test">Test</button><button data-m="live" class="livebtn">Live</button></div></header>
 <div id="pane-buy">
 <div id="banner" class="banner off">Loading…</div>
@@ -382,16 +551,26 @@ fieldset{border:1px dashed var(--line);border-radius:12px;padding:6px 12px 12px;
  </form></section>
  <input type="file" id="cphoto" accept="image/*" hidden>
 </div>
-</div><div class="toast" id="toast"></div>
+</div>
+<div class="sheet" id="phonesheet" hidden><section class="card"><h2>📱 Use it on your phone</h2><div id="phonebody">Loading…</div>
+ <p class="actions" style="margin:14px 0 0"><button class="btn" id="phoneclose">Close</button></p></section></div>
+<div id="pairpane" hidden><section class="card pairbox"><h2>📦 My collection</h2>
+ <p>On the PC, open this page and press <b>📱 Phone</b>. Type the 6-digit code it shows.</p>
+ <form id="pairform"><input id="paircode" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000000" required>
+ <button class="btn primary" style="width:100%">Connect</button></form><p class="muted" id="pairmsg" style="min-height:1.4em"></p></section></div>
+<div class="toast" id="toast"></div>
 <script>
 const q=new URLSearchParams(location.search);let KEY=q.get('t')||'';
-try{if(KEY){sessionStorage.setItem('abk',KEY);history.replaceState(null,'','/'+location.hash)}else{KEY=sessionStorage.getItem('abk')||''}}catch(e){}
+function keep(k){try{localStorage.setItem('abk',k)}catch(e){}try{sessionStorage.setItem('abk',k)}catch(e){}}
+if(KEY){keep(KEY);try{history.replaceState(null,'','/'+location.hash)}catch(e){}}
+else{try{KEY=localStorage.getItem('abk')||''}catch(e){}if(!KEY){try{KEY=sessionStorage.getItem('abk')||''}catch(e){}}}
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=v=>'$'+Number(v||0).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
 let S=null,editing=false;
 function toast(t,bad){const el=$('#toast');el.textContent=t;el.style.background=bad?'var(--bad)':'';el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),3200)}
 async function api(path,body){const r=await fetch(path,{method:body?'POST':'GET',headers:{'X-Token':KEY,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
- const d=await r.json().catch(()=>({error:'bad reply'}));if(!r.ok)throw new Error(d.error||('HTTP '+r.status));return d}
+ const d=await r.json().catch(()=>({error:'bad reply'}));if(r.status===401&&!path.startsWith('/api/pair')){needPair();throw new Error('Not connected yet')}
+ if(!r.ok)throw new Error(d.error||('HTTP '+r.status));return d}
 async function act(path,body){try{const d=await api(path,body);toast(d.note||'Saved');S=d.state;render()}catch(e){toast(e.message,true)}}
 function when(t){return new Date(t*1000).toLocaleString('en-AU',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})}
 function render(){
@@ -490,8 +669,43 @@ $('#cphoto').addEventListener('change',async e=>{const file=e.target.files[0];e.
   const k=Math.min(1,1000/Math.max(img.naturalWidth,img.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(img.naturalWidth*k);cv.height=Math.round(img.naturalHeight*k);
   cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(img.src);await cact('/api/collection/photo',{id:photoFor,data:cv.toDataURL('image/jpeg',.82)})}catch(err){toast(err.message,true)}});
 fillSelects();{let t='buy';try{t=location.hash==='#collection'?'col':(sessionStorage.getItem('abtab')||'buy')}catch(e){}if(t==='col')showTab('col')}
-setInterval(()=>{if(TAB==='col'&&!document.hidden&&!document.activeElement.matches('input,select'))loadCol()},60000);
-load();setInterval(()=>{if(!document.hidden&&!document.activeElement.matches('input'))load()},10000);
+setInterval(()=>{if(TAB==='col'&&KEY&&!PAIRING&&!document.hidden&&!document.activeElement.matches('input,select'))loadCol()},60000);
+
+// ---------------------------------------------------------------- phone (v2.11.5)
+let PAIRING=false;
+function needPair(){if(PAIRING)return;PAIRING=true;try{localStorage.removeItem('abk');sessionStorage.removeItem('abk')}catch(e){}KEY='';
+ document.querySelector('header').hidden=true;$('#pane-buy').hidden=true;$('#pane-col').hidden=true;$('#pairpane').hidden=false;document.title='My collection';setTimeout(()=>$('#paircode').focus(),50)}
+$('#pairform').addEventListener('submit',async e=>{e.preventDefault();$('#pairmsg').textContent='Connecting…';
+ try{const d=await api('/api/pair',{code:$('#paircode').value});keep(d.key);location.replace('/#collection');location.reload()}catch(err){$('#pairmsg').textContent=err.message;$('#pairmsg').className='err'}});
+let codeTimer=null;
+async function phoneSheet(){const b=$('#phonebody');$('#phonesheet').hidden=false;b.innerHTML='Loading…';
+ try{const p=await api('/api/phone');
+  if(!p.lan){b.innerHTML=`<p>Phone access is off, so only this PC can open the page.</p><p>Turning it on lets phones and iPads <b>on your home Wi-Fi</b> open it (they still need a code from here). The connection isn't encrypted, so only do this on a network you trust.</p>
+   ${p.local?'<button class="btn primary" id="lanon">Turn on phone access</button>':'<p class="muted">Switch it on from the PC itself.</p>'}`;
+   const on=$('#lanon');if(on)on.onclick=async()=>{on.disabled=true;try{const d=await api('/api/phone/lan',{on:true});toast(d.note);
+    if(d.restarting){b.innerHTML='<p>Restarting the page… If Windows asks whether Python can use networks, allow <b>Private networks</b> only.</p>';setTimeout(()=>phoneSheet(),2500)}
+    else b.innerHTML='<p>'+esc(d.note)+'</p>'}catch(e){toast(e.message,true);on.disabled=false}};return}
+  const c=await api('/api/phone/code',{});const urls=p.urls.length?p.urls:['http://<this PC\'s address>:'+p.port];
+  b.innerHTML=`<ol><li>Join the phone to the same Wi-Fi as this PC.</li>
+   <li>In Safari (iPhone) or Chrome (Android) open<br>${urls.map(u=>`<span class="addr">${esc(u)}</span>`).join('<br>')}</li>
+   <li>Type this code:<div class="code">${c.code.slice(0,3)} ${c.code.slice(3)}</div><span class="muted" id="codeleft"></span></li>
+   <li>Then add it to the Home Screen: iPhone <b>Share → Add to Home Screen</b>, Android <b>⋮ → Add to Home screen</b>. The 📦 Collection icon opens straight to your collection.</li></ol>
+   <p class="muted">The phone remembers it after that. If you add the icon first, enter a code inside the icon's app too (iPhone keeps them apart).</p>
+   ${p.local?'<p style="margin:10px 0 0"><button class="btn small" id="newcode">New code</button> <button class="btn small danger" id="lanoff">Turn phone access off</button></p>':''}`;
+  const end=Date.now()+c.seconds*1000;clearInterval(codeTimer);codeTimer=setInterval(()=>{const el=$('#codeleft');if(!el||$('#phonesheet').hidden){clearInterval(codeTimer);return}
+   const s=Math.max(0,Math.round((end-Date.now())/1000));el.textContent=s?`Works once, for ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} more`:'Expired: press New code'},1000);
+  const nc=$('#newcode');if(nc)nc.onclick=phoneSheet;
+  const off=$('#lanoff');if(off)off.onclick=async()=>{if(!confirm('Turn phone access off? Phones stop working until you turn it back on.'))return;
+   try{const d=await api('/api/phone/lan',{on:false});toast(d.note);$('#phonesheet').hidden=true}catch(e){toast(e.message,true)}};
+ }catch(e){if(!PAIRING)b.innerHTML='<p class="err">'+esc(e.message)+'</p>'}}
+$('#phonebtn').addEventListener('click',phoneSheet);
+$('#phoneclose').addEventListener('click',()=>{$('#phonesheet').hidden=true;clearInterval(codeTimer)});
+$('#phonesheet').addEventListener('click',e=>{if(e.target.id==='phonesheet')$('#phonesheet').hidden=true});
+{const standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone;
+ if(!standalone&&!/iPhone|iPad|Android/i.test(navigator.userAgent))$('#phonebtn').hidden=false;
+ if(standalone&&location.hash!=='#collection')showTab('col')}
+if(!KEY)needPair();
+if(KEY)load();setInterval(()=>{if(KEY&&!PAIRING&&!document.hidden&&!document.activeElement.matches('input'))load()},10000);
 </script></body></html>"""
 
 

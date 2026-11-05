@@ -65,6 +65,59 @@ class Page(unittest.TestCase):
         self.assertEqual(self.call("/api/mode", {"mode": "live"}, key=False)[0], 401)
         self.assertEqual(ab.settings(tb, {})["mode"], "off")
 
+    def test_phone_pairing(self):
+        # v2.11.5: the PC page makes a 6-digit code; a phone swaps it (once) for the key
+        self.assertEqual(self.call("/api/phone/code", {}, key=False)[0], 401)
+        self.assertEqual(self.call("/api/pair", {"code": "123456"}, key=False)[0], 403)   # nothing waiting
+        code, p = self.call("/api/phone")
+        self.assertEqual((code, p["lan"], p["local"]), (200, False, True))
+        c = self.call("/api/phone/code", {})[1]["code"]
+        self.assertRegex(c, r"^\d{6}$")
+        wrong = "000000" if c != "000000" else "111111"
+        self.assertEqual(self.call("/api/pair", {"code": wrong}, key=False)[0], 403)
+        code, d = self.call("/api/pair", {"code": c[:3] + " " + c[3:]}, key=False)
+        self.assertEqual((code, d["key"]), (200, self.key))
+        self.assertEqual(self.call("/api/pair", {"code": c}, key=False)[0], 403)          # one use only
+        # too many wrong guesses kill the code
+        c = self.call("/api/phone/code", {})[1]["code"]
+        for _ in range(web.PAIR_TRIES):
+            self.call("/api/pair", {"code": wrong if wrong != c else "222222"}, key=False)
+        self.assertEqual(self.call("/api/pair", {"code": c}, key=False)[0], 403)
+
+    def test_home_screen_bits(self):
+        code, m = self.call("/manifest.webmanifest", key=False)
+        self.assertEqual(code, 200)
+        self.assertEqual(json.loads(m)["start_url"], "/#collection")
+        for path in ("/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"):
+            code, png = self.call(path, key=False)
+            self.assertEqual(code, 200)
+            self.assertTrue(png.startswith(b"\x89PNG"))
+        html = self.call("/", key=False)[1]
+        self.assertIn(b'rel="manifest"', html)
+        self.assertIn(b"apple-mobile-web-app-capable", html)
+
+    def test_phone_access_switch(self):
+        cfg = os.path.join(self.dir, "config.json")
+        with open(cfg, "w", encoding="utf-8") as f:
+            json.dump({"auto_buy": {"web_port": 0}, "keep": "me"}, f)
+        saved, saved_restart = tb.CONFIG_PATH, web.restart_soon
+        tb.CONFIG_PATH, web.restart_soon = cfg, lambda *a, **k: False
+        try:
+            code, d = self.call("/api/phone/lan", {"on": True})
+            self.assertEqual(code, 200)
+            self.assertIn("restart_bot.bat", d["note"])
+            with open(cfg, encoding="utf-8") as f:
+                raw = json.load(f)
+            self.assertEqual((raw["auto_buy"], raw["keep"]), ({"web_port": 0, "web_lan": True}, "me"))
+            self.assertTrue(os.path.isfile(cfg + ".bak"))
+            self.assertEqual(self.call("/api/phone/lan", {"on": True}, key=False)[0], 401)
+        finally:
+            tb.CONFIG_PATH, web.restart_soon = saved, saved_restart
+
+    def test_lan_addresses_are_private(self):
+        for ip in web.lan_addresses():
+            self.assertRegex(ip, r"^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)")
+
     def test_only_localhost_names(self):
         self.assertEqual(self.call("/api/state", host="evil.example:8765")[0], 403)
         self.assertEqual(self.call("/api/mode", {"mode": "live"}, host="evil.example")[0], 403)
