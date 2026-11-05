@@ -77,3 +77,14 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.12: DEAL FINDER (PC copy, private). Every 15 minutes it reads the newest One Piece singles on eBay Australia
+  (Buy It Now, posts to Australia) and compares each one with TCGplayer's market for the same card and version, in A$.
+  A listing 25%+ under market, delivered (item + postage + GST from overseas), with at least A$10 profit left after
+  13% selling fees, goes to 🔒・auto-buy (only you can see it), and a phone push when the profit is A$25+.
+  It never buys, bids or makes offers: you decide. It uses the same free eBay key as the eBay watch.
+  It values every listing as the CHEAPEST version its title fits (no "alt art" in the title = the plain card), and skips
+  Japanese, graded, lots/playsets, damaged, proxies, low-feedback sellers and anything under 20% of market (fakes).
+  Always check the photos before buying.   Try it:  py -3 deal_finder.py   (prints today's deals, posts nothing)
+  Settings, all optional, in config.json:  "deal_finder": {"min_pct": 25, "min_profit": 10, "min_market": 30,
+  "sell_fee_pct": 13, "push_min_profit": 25, "every_minutes": 15, "searches_per_hour": 40}
+  Its own channel instead of 🔒・auto-buy (optional): "discord_webhook_deals" under "alerts".

@@ -164,8 +164,12 @@ try:
     import auto_buy            # v2.11: auto-checkout of restocks (PC copy, /autobuy); optional
 except ImportError:
     auto_buy = None
+try:
+    import deal_finder         # v2.12: eBay singles under TCGplayer's market, to the private channel (PC copy)
+except ImportError:
+    deal_finder = None
 
-VERSION = "2.11.6"
+VERSION = "2.12"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -1140,7 +1144,7 @@ KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "relea
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
                   "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
-                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy"}
+                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy", "deal_finder"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -3136,6 +3140,7 @@ HOOK_LABELS = {"discord_webhook_boxes": "#booster-boxes", "discord_webhook_singl
                "discord_webhook_status": "#bot-status", "discord_webhook_drops": "price drops",
                "discord_webhook_prices": "#tcgplayer-prices", "discord_webhook_instore": "#onepiece-in-store",
                "discord_webhook_recap": "daily recap", "discord_webhook_autobuy": "🔒 auto-buy",
+               "discord_webhook_deals": "🔒 deals",
                "discord_webhook": "main channel"}
 
 
@@ -4009,6 +4014,11 @@ def run_once(cfg, args, drop=None):
                 print("\n" + drops_report(drops, ds["every_hours"], ds["min_pct"]))
         except Exception as e:  # noqa: BLE001
             print(f"   ! price drops skipped this check ({redact(e)})")
+    if deal_finder and do_singles and role != "listen" and not args.all:
+        try:            # v2.12: eBay deals, PC copy only; never in the way of restock alerts
+            deal_finder.run(sys.modules[__name__], cfg)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! deal finder skipped this check ({redact(e)})")
     poke_posted = pokemon_posts(cfg, status, intro, role, pc_poke) if not args.all else []
     op_posted = onepiece_posts(cfg, status, role, pc_on) if not args.all else []
 
@@ -4353,15 +4363,16 @@ def self_test(cfg):
 def fetch_new_files():
     """v2.11: an update_bot.bat from before v2.11 doesn't know about auto_buy.py or setup_autobuy.bat, and never
     updates itself. Fetch those (and the newer update_bot.bat) once from the bot's GitHub repo. PC copy only."""
-    global auto_buy
+    global auto_buy, deal_finder
     if IN_ACTIONS:
         return
-    for name in ("auto_buy.py", "auto_buy_web.py", "collection.py", "setup_autobuy.bat", "open_autobuy.bat", "update_bot.bat"):
+    for name in ("auto_buy.py", "auto_buy_web.py", "collection.py", "deal_finder.py", "setup_autobuy.bat",
+                 "open_autobuy.bat", "update_bot.bat"):
         path = os.path.join(HERE, name)
         try:
             if os.path.exists(path):
                 with open(path, "rb") as fh:
-                    if name != "update_bot.bat" or b"collection.py" in fh.read():
+                    if name != "update_bot.bat" or b"deal_finder.py" in fh.read():
                         continue
             body = HTTP.fetch(f"{REPO_RAW_URL}/{name}", tries=2, robots=False, memo=False)
             if name.endswith(".py"):
@@ -4374,6 +4385,12 @@ def fetch_new_files():
         try:
             import auto_buy as _ab
             auto_buy = _ab
+        except ImportError:
+            pass
+    if deal_finder is None:
+        try:
+            import deal_finder as _df
+            deal_finder = _df
         except ImportError:
             pass
 
