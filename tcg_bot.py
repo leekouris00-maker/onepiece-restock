@@ -4349,6 +4349,34 @@ def self_test(cfg):
     return ok
 
 
+def fetch_new_files():
+    """v2.11: an update_bot.bat from before v2.11 doesn't know about auto_buy.py or setup_autobuy.bat, and never
+    updates itself. Fetch those (and the newer update_bot.bat) once from the bot's GitHub repo. PC copy only."""
+    global auto_buy
+    if IN_ACTIONS:
+        return
+    for name in ("auto_buy.py", "setup_autobuy.bat", "update_bot.bat"):
+        path = os.path.join(HERE, name)
+        try:
+            if os.path.exists(path):
+                with open(path, "rb") as fh:
+                    if name != "update_bot.bat" or b"auto_buy.py" in fh.read():
+                        continue
+            body = HTTP.fetch(f"{REPO_RAW_URL}/{name}", tries=2, robots=False, memo=False)
+            if name.endswith(".py"):
+                compile(body.decode("utf-8"), path, "exec")      # only keep it if it's real Python
+            atomic_write_bytes(path, body)
+            print(f"   fetched {name} from GitHub (your update_bot.bat is older than it)")
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! couldn't fetch {name} ({redact(e)}); run update_bot.bat again")
+    if auto_buy is None:
+        try:
+            import auto_buy as _ab
+            auto_buy = _ab
+        except ImportError:
+            pass
+
+
 def main():
     # Windows writes bot_output in an old encoding that has no emoji; don't let that crash the bot
     for stream in (sys.stdout, sys.stderr):
@@ -4406,6 +4434,7 @@ def main():
     post_status(cfg, f"🟢 **Bot online** ({'PC' if heartbeat_role(cfg) != 'listen' else 'cloud'}, v{VERSION}). "
                      f"Checking every {every}.{poke}{nxt}", GREEN)
     good_cfg, was_dropping, problem, warned = cfg, None, None, ""
+    fetch_new_files()
     if auto_buy and not IN_ACTIONS and heartbeat_role(cfg) != "listen":
         auto_buy.start(sys.modules[__name__])     # v2.11: picks up /autobuy try requests from Discord
     while True:
