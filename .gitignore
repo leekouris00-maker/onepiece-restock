@@ -11,4 +11,5 @@ misses.json
 buyer_profile/
 autobuy.json
 autobuy_list.json
+autobuy_web_token.txt
 autobuy_shots/

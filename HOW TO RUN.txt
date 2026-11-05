@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.11.1)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.11.2)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -57,3 +57,9 @@ New in v2.11.1: the AUTO-BUY LIST. Auto-buy only buys what's on your list, each 
   to $260, 1 each.   /autobuy list  ·  /autobuy add code:OP-15 max:240 qty:2  ·  /autobuy add match:premium|prb-02
   max:300  ·  /autobuy remove.   Weekly and monthly budgets too (default $500 a week, $1,000 a month):
   /autobuy set mode:live per_week:500 per_month:1000
+New in v2.11.2: AUTO-BUY CONTROLS. Two ways, same settings:
+  Discord:  /autobuy panel  - buttons for Off / Test / Live, a dropdown of your items (change max / qty, pause,
+            reset, remove), and Add item, Limits and Test a link forms. Works from your phone.
+  The PC:   double-click open_autobuy.bat - a page in your browser with the same controls, spend bars for the
+            day / week / month, the last attempts and the checkout screenshots. Only this PC can open it (with
+            the key in autobuy_web_token.txt). For your phone on home Wi-Fi: "auto_buy": {"web_lan": true}.

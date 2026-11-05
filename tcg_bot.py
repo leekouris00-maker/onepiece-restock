@@ -165,7 +165,7 @@ try:
 except ImportError:
     auto_buy = None
 
-VERSION = "2.11.1"
+VERSION = "2.11.2"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -4355,12 +4355,12 @@ def fetch_new_files():
     global auto_buy
     if IN_ACTIONS:
         return
-    for name in ("auto_buy.py", "setup_autobuy.bat", "update_bot.bat"):
+    for name in ("auto_buy.py", "auto_buy_web.py", "setup_autobuy.bat", "open_autobuy.bat", "update_bot.bat"):
         path = os.path.join(HERE, name)
         try:
             if os.path.exists(path):
                 with open(path, "rb") as fh:
-                    if name != "update_bot.bat" or b"auto_buy.py" in fh.read():
+                    if name != "update_bot.bat" or b"auto_buy_web.py" in fh.read():
                         continue
             body = HTTP.fetch(f"{REPO_RAW_URL}/{name}", tries=2, robots=False, memo=False)
             if name.endswith(".py"):
@@ -4437,6 +4437,11 @@ def main():
     fetch_new_files()
     if auto_buy and not IN_ACTIONS and heartbeat_role(cfg) != "listen":
         auto_buy.start(sys.modules[__name__])     # v2.11: picks up /autobuy try requests from Discord
+        try:
+            import auto_buy_web                   # v2.11.2: the auto-buy page on the PC (open_autobuy.bat)
+            auto_buy_web.start(sys.modules[__name__], auto_buy, cfg)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! auto-buy page skipped ({redact(e)})")
     while True:
         try:
             try:

@@ -285,6 +285,107 @@ def count_bought(tb, item_id, qty):
     return None
 
 
+# ---------------------------------------------------------------- controls (shared by Discord and the PC web page)
+def _controls_update(tb, update):
+    controls = tb.read_controls()
+    cur = dict(controls.get("autobuy") or {})
+    cur.update(update)
+    controls["autobuy"] = {k: v for k, v in cur.items() if v is not None}
+    tb.atomic_write_json(tb.CONTROLS_PATH, controls)
+
+
+def set_mode(tb, mode, hours=None):
+    """off / test / live; hours > 0 switches it off after that long, 0 or None keeps it on."""
+    mode = str(mode).lower()
+    if mode not in MODES:
+        raise ValueError("mode is off, test or live")
+    upd = {"mode": mode}
+    h = _num(hours)
+    upd["until"] = round(time.time() + h * 3600) if h and h > 0 and mode != "off" else 0
+    _controls_update(tb, upd)
+
+
+def set_limits(tb, **limits):
+    upd = {}
+    for k, v in limits.items():
+        if k in LIMITS and v not in (None, ""):
+            n = _num(v)
+            if n is None or n < 0:
+                raise ValueError(f"{k} should be a number of dollars")
+            upd[k] = round(n, 2)
+    if upd:
+        _controls_update(tb, upd)
+    return upd
+
+
+def queue_try(tb, url):
+    if not re.match(r"https://[^/\s]+/(products/|cart/\d)", str(url or "").strip()):
+        raise ValueError("that needs to be a Shopify product link (https://…/products/…)")
+    _controls_update(tb, {"try": str(url).strip()})
+
+
+def upsert_item(tb, code="", match="", max=None, qty=1, name="", reset=False):
+    """Add an item, or change the one with the same code / words. Returns (item, was it there already)."""
+    if code and not norm_code(code):
+        raise ValueError("the code should look like OP-15, EB-05 or PRB-02")
+    if _num(max) is None or _num(max) <= 0:
+        raise ValueError("give a max price above $0")
+    new = make_item(code=code or "", match=match, max=_num(max), qty=qty or 1, name=name or "")
+    if not new:
+        raise ValueError("give a set code (like OP-15) or words from the product name")
+    items = load_items(tb)
+    old = next((it for it in items if it["id"] == new["id"]), None)
+    if old:
+        new["name"] = name or old["name"]
+        new["bought"] = 0 if reset else old["bought"]
+        new["on"] = old["on"]
+        items[items.index(old)] = new
+    else:
+        items.append(new)
+    save_items(tb, items)
+    return new, bool(old)
+
+
+def edit_item(tb, item_id, **changes):
+    """remove=True, on=True/False, reset=True, or max / qty / name. Returns the item (None once removed)."""
+    items = load_items(tb)
+    it = next((x for x in items if x["id"] == item_id), None)
+    if not it:
+        raise ValueError("that item isn't on the list any more")
+    if changes.get("remove"):
+        save_items(tb, [x for x in items if x["id"] != item_id])
+        return None
+    if "on" in changes:
+        it["on"] = bool(changes["on"])
+    if changes.get("reset"):
+        it["bought"] = 0
+    if _num(changes.get("max")) is not None:
+        if _num(changes["max"]) <= 0:
+            raise ValueError("give a max price above $0")
+        it["max"] = _num(changes["max"])
+    if _num(changes.get("qty")) is not None:
+        it["qty"] = max_int(changes["qty"], 1)
+    if changes.get("name"):
+        it["name"] = str(changes["name"])[:80]
+    save_items(tb, items)
+    return it
+
+
+def snapshot(tb, cfg=None):
+    """Everything a dashboard shows, as plain data."""
+    s = settings(tb, cfg if cfg is not None else tb.load_config())
+    led = load_ledger(tb)
+    spend = {p: dict(zip(("spent", "orders"), spent(led, p))) for p in ("day", "week", "month")}
+    shots = set(os.listdir(SHOTS_DIR)) if os.path.isdir(SHOTS_DIR) else set()
+    recent = []
+    for o in led.get("orders", [])[-15:][::-1]:
+        recent.append({k: o.get(k) for k in ("t", "name", "shop", "mode", "status", "total", "detail")})
+    return {"mode": s["mode"], "until": s["until"], "limits": {k: s[k] for k in LIMITS},
+            "orders_per_day": s["orders_per_day"], "preorders": s["preorders"], "what": s["what"],
+            "spend": spend, "items": load_items(tb), "recent": recent,
+            "shots": sorted(shots)[-12:][::-1], "version": getattr(tb, "VERSION", "")}
+
+
 # ---------------------------------------------------------------- what can be auto-bought
 def is_preorder(f):
     return bool(re.search(r"pre-?order", f"{f.get('name', '')} {f.get('note', '')}", re.I))

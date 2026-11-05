@@ -45,6 +45,7 @@ Type these in your Discord server:
   v2.11 (admins):
     /autobuy set mode:<off|test|live> [per_order] [per_day] [per_week] [per_month] [hours]   auto-checkout (auto_buy.py)
     /autobuy list | add code:<OP-15>|match:<words> max:<A$> [qty] | remove   what it buys (v2.11.1)
+    /autobuy panel                   buttons and forms for all of it (v2.11.2)
     /autobuy try link:<product page> a test checkout now (never pays) · /autobuy status
 
   Admin only (people with Manage Server, or listed in "admin_user_ids" under "alerts"):
@@ -607,7 +608,7 @@ HELP = (
     "🃏 DON!! cards have no number: `/want add num:Gomu Gomu DON max:<price>`\n"
     "🖥️ `/desk on` the PC opens the checkout tab itself when a target comes in stock (`/desk off`)\n"
     "🤖 `/autobuy set mode:test|live|off` the PC checks out restocks on your list by itself, within your limits · "
-    "`/autobuy list|add|remove` · `/autobuy try link:<product>` · `/autobuy status`\n"
+    "`/autobuy panel` (buttons) · `/autobuy list|add|remove` · `/autobuy try link:<product>` · `/autobuy status`\n"
     "⚡ In drop windows the bot also checks that release's listings and your /watch links every 15 seconds.\n\n"
     "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`, "
     "`/onepiece setup`, "
@@ -1900,6 +1901,229 @@ if ab:
             await fail(inter, e)
             return
         await inter.response.send_message(f"➖ Removed **{gone[0]['name']}** from the auto-buy list.", ephemeral=True)
+
+    # ------------------------------------------------------------ v2.11.2: /autobuy panel (buttons and forms)
+    MODE_LOOK = {"off": ("⚪", "Off"), "test": ("🧪", "Test: goes to the Pay button, never pays"),
+                 "live": ("🔴", "LIVE: really buys")}
+
+    def panel_embed(note=""):
+        snap = ab.snapshot(tb, cfg_now())
+        icon, label = MODE_LOOK.get(snap["mode"], ("⚪", snap["mode"]))
+        lim, sp = snap["limits"], snap["spend"]
+        until = (f" until {datetime.fromtimestamp(snap['until']):%a %d %b %I:%M %p}"
+                 if snap["until"] and snap["mode"] != "off" else "")
+        lines = [_item_line(it) for it in snap["items"]]
+        last = [f"{ {'paid': '✅', 'test': '🧪', 'declined': '❌', 'unclear': '❓', 'bank': '🏦'}.get(o['status'], '✋')} "
+                f"{datetime.fromtimestamp(o['t'] or 0):%d %b %I:%M %p} · {str(o['name'])[:40]}"
+                + (f" · {tb.money(o['total'])}" if o.get("total") else "") for o in snap["recent"][:4]]
+        fields = [
+            {"name": "Mode", "value": f"{icon} **{label}**{until}"},
+            {"name": "Limits", "value": f"{tb.money(lim['per_order'])}/order · {tb.money(lim['per_day'])}/day · "
+                                        f"{tb.money(lim['per_week'])}/week · {tb.money(lim['per_month'])}/month"},
+            {"name": "Spent", "value": f"today {tb.money(sp['day']['spent'])} · week {tb.money(sp['week']['spent'])} · "
+                                       f"month {tb.money(sp['month']['spent'])}"},
+            lines_field("Looking for", lines, "Nothing yet. Press ➕ Add item.", 15),
+            lines_field("Last attempts", last, "None yet.", 4)]
+        return embed("🤖 Auto-buy", fields, 0xE63946 if snap["mode"] == "live" else BLUE,
+                     description=note or None, footer="Only you can see this panel · it stops working after 15 minutes")
+
+    async def _panel_refresh(inter, note=""):
+        e = panel_embed(note)
+        view = AutoBuyPanel(inter.user.id)
+        if inter.response.is_done():
+            await inter.edit_original_response(embed=e, view=view)
+        else:
+            await inter.response.edit_message(embed=e, view=view)
+
+    async def _panel_do(inter, fn, note):
+        try:
+            await asyncio.to_thread(fn)
+            _audit(_who(inter), f"autobuy panel: {note}")
+        except ValueError as e:
+            await inter.response.send_message(f"⚠️ {e}", ephemeral=True)
+            return False
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return False
+        return True
+
+    class ItemModal(discord.ui.Modal):
+        def __init__(self, panel_inter, item=None):
+            super().__init__(title="Change item" if item else "Add an item to look for")
+            self.panel_inter, self.item = panel_inter, item
+            self.code = discord.ui.TextInput(label="Set code (for a booster box)", placeholder="OP-15, EB-05, PRB-02",
+                                             required=False, max_length=10, default=(item or {}).get("code") or None)
+            self.words = discord.ui.TextInput(label="Or words in the product name", required=False, max_length=100,
+                                              placeholder="premium|prb, english  (comma = all of, | = either)",
+                                              default=", ".join((item or {}).get("match") or []) or None)
+            self.max = discord.ui.TextInput(label="Most you'd pay each (A$, before postage)", max_length=10,
+                                            placeholder="240", default=(f"{item['max']:g}" if item else None))
+            self.qty = discord.ui.TextInput(label="How many you want in total", max_length=3, required=False,
+                                            default=str(item["qty"]) if item else "1")
+            self.nm = discord.ui.TextInput(label="Name (optional)", required=False, max_length=80,
+                                           default=(item or {}).get("name") or None)
+            for x in ((self.max, self.qty, self.nm) if item else (self.code, self.words, self.max, self.qty, self.nm)):
+                self.add_item(x)
+
+        async def on_submit(self, inter: discord.Interaction):
+            if self.item:
+                fn = lambda: ab.edit_item(tb, self.item["id"], max=self.max.value, qty=self.qty.value or 1,  # noqa: E731
+                                          name=self.nm.value)
+                note = f"✏️ Changed {self.item['name']}."
+            else:
+                fn = lambda: ab.upsert_item(tb, code=self.code.value.strip(), match=self.words.value,  # noqa: E731
+                                            max=self.max.value, qty=self.qty.value or 1, name=self.nm.value.strip())
+                note = "➕ Added (or updated) the item."
+            if await _panel_do(inter, fn, note):
+                await inter.response.edit_message(embed=panel_embed(note), view=AutoBuyPanel(inter.user.id))
+
+    class LimitsModal(discord.ui.Modal, title="Spend limits (A$)"):
+        def __init__(self):
+            super().__init__()
+            lim = ab.settings(tb, cfg_now())
+            self.boxes = {}
+            for k, label in (("per_order", "Most one order may cost (postage included)"), ("per_day", "Most a day"),
+                             ("per_week", "Most a week (Monday to Sunday)"), ("per_month", "Most a calendar month")):
+                self.boxes[k] = discord.ui.TextInput(label=label, default=f"{lim[k]:g}", max_length=10)
+                self.add_item(self.boxes[k])
+
+        async def on_submit(self, inter: discord.Interaction):
+            vals = {k: b.value.replace("$", "").strip() for k, b in self.boxes.items()}
+            if await _panel_do(inter, lambda: ab.set_limits(tb, **vals), f"limits {vals}"):
+                await inter.response.edit_message(embed=panel_embed("💰 Limits saved."), view=AutoBuyPanel(inter.user.id))
+
+    class TryModal(discord.ui.Modal, title="Test checkout (never pays)"):
+        link = discord.ui.TextInput(label="Shopify product link", placeholder="https://shop.com.au/products/...",
+                                    max_length=400)
+
+        async def on_submit(self, inter: discord.Interaction):
+            if await _panel_do(inter, lambda: ab.queue_try(tb, self.link.value), f"try {self.link.value}"):
+                await inter.response.edit_message(
+                    embed=panel_embed("🧪 Test queued: within a minute the PC opens the checkout, stops before paying "
+                                      "and posts a screenshot in #bot-status."), view=AutoBuyPanel(inter.user.id))
+
+    class LiveConfirm(discord.ui.View):
+        def __init__(self, owner):
+            super().__init__(timeout=120)
+            self.owner = owner
+
+        @discord.ui.button(label="Yes, go live", style=discord.ButtonStyle.danger, emoji="🔴")
+        async def yes(self, inter: discord.Interaction, _b):
+            if await _panel_do(inter, lambda: ab.set_mode(tb, "live"), "mode live"):
+                await inter.response.edit_message(content="🔴 **Live.** The PC will buy list items that restock within "
+                                                          "your limits. Use the panel or `/autobuy set mode:off` to stop.",
+                                                  view=None)
+
+        @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
+        async def no(self, inter: discord.Interaction, _b):
+            await inter.response.edit_message(content="Cancelled. Nothing changed.", view=None)
+
+    class ItemActions(discord.ui.View):
+        def __init__(self, owner, item):
+            super().__init__(timeout=600)
+            self.owner, self.item = owner, item
+            self.toggle.label = "Pause" if item["on"] else "Resume"
+            self.toggle.emoji = "⏸️" if item["on"] else "▶️"
+
+        async def _done(self, inter, note):
+            await inter.response.edit_message(embed=panel_embed(note), view=AutoBuyPanel(inter.user.id))
+
+        @discord.ui.button(label="Change max / qty", emoji="✏️", style=discord.ButtonStyle.primary)
+        async def edit(self, inter: discord.Interaction, _b):
+            await inter.response.send_modal(ItemModal(inter, self.item))
+
+        @discord.ui.button(label="Pause", style=discord.ButtonStyle.secondary)
+        async def toggle(self, inter: discord.Interaction, _b):
+            on = not self.item["on"]
+            if await _panel_do(inter, lambda: ab.edit_item(tb, self.item["id"], on=on), f"{self.item['id']} on={on}"):
+                await self._done(inter, f"{'▶️ Looking for' if on else '⏸️ Paused'} {self.item['name']}.")
+
+        @discord.ui.button(label="Reset bought count", emoji="🔁", style=discord.ButtonStyle.secondary)
+        async def reset(self, inter: discord.Interaction, _b):
+            if await _panel_do(inter, lambda: ab.edit_item(tb, self.item["id"], reset=True), f"{self.item['id']} reset"):
+                await self._done(inter, f"🔁 {self.item['name']}: bought count back to 0, so it looks for it again.")
+
+        @discord.ui.button(label="Remove", emoji="🗑️", style=discord.ButtonStyle.danger)
+        async def remove(self, inter: discord.Interaction, _b):
+            if await _panel_do(inter, lambda: ab.edit_item(tb, self.item["id"], remove=True), f"{self.item['id']} remove"):
+                await self._done(inter, f"🗑️ Removed {self.item['name']}.")
+
+        @discord.ui.button(label="Back", style=discord.ButtonStyle.secondary)
+        async def back(self, inter: discord.Interaction, _b):
+            await self._done(inter, "")
+
+    class ItemSelect(discord.ui.Select):
+        def __init__(self, items):
+            opts = [discord.SelectOption(label=it["name"][:100], value=it["id"][:100],
+                                         emoji="✅" if it["bought"] >= it["qty"] else ("⏸️" if not it["on"] else "🔎"),
+                                         description=f"up to {tb.money(it['max'])} each · {it['bought']}/{it['qty']} bought"[:100])
+                    for it in items[:25]]
+            super().__init__(placeholder="Pick an item to change, pause or remove…", options=opts, row=1)
+
+        async def callback(self, inter: discord.Interaction):
+            it = next((x for x in ab.load_items(tb) if x["id"] == self.values[0]), None)
+            if not it:
+                await _panel_refresh(inter, "That item isn't on the list any more.")
+                return
+            e = embed(f"📋 {it['name']}", [{"name": "Now", "value": _item_line(it)}], BLUE)
+            await inter.response.edit_message(embed=e, view=ItemActions(inter.user.id, it))
+
+    class AutoBuyPanel(discord.ui.View):
+        def __init__(self, owner):
+            super().__init__(timeout=900)
+            self.owner = owner
+            items = ab.load_items(tb)
+            if items:
+                self.add_item(ItemSelect(items))
+            mode = ab.settings(tb, cfg_now())["mode"]
+            for b, m in ((self.off, "off"), (self.test, "test"), (self.live, "live")):
+                if m == mode:
+                    b.label = "✓ " + b.label
+                    b.disabled = True
+
+        async def interaction_check(self, inter: discord.Interaction):
+            if inter.user.id != self.owner:
+                await inter.response.send_message("Open your own with `/autobuy panel`.", ephemeral=True)
+                return False
+            return True
+
+        @discord.ui.button(label="Off", emoji="⚪", style=discord.ButtonStyle.secondary, row=0)
+        async def off(self, inter: discord.Interaction, _b):
+            if await _panel_do(inter, lambda: ab.set_mode(tb, "off"), "mode off"):
+                await _panel_refresh(inter, "⚪ Auto-buy off.")
+
+        @discord.ui.button(label="Test", emoji="🧪", style=discord.ButtonStyle.primary, row=0)
+        async def test(self, inter: discord.Interaction, _b):
+            if await _panel_do(inter, lambda: ab.set_mode(tb, "test"), "mode test"):
+                await _panel_refresh(inter, "🧪 Test mode: restocks go to the Pay button and stop, with a screenshot.")
+
+        @discord.ui.button(label="Live", emoji="🔴", style=discord.ButtonStyle.danger, row=0)
+        async def live(self, inter: discord.Interaction, _b):
+            await inter.response.send_message("🔴 **Go live?** The PC will really pay for list items that restock within "
+                                              "your limits.", view=LiveConfirm(inter.user.id), ephemeral=True)
+
+        @discord.ui.button(label="Refresh", emoji="🔄", style=discord.ButtonStyle.secondary, row=0)
+        async def refresh(self, inter: discord.Interaction, _b):
+            await _panel_refresh(inter)
+
+        @discord.ui.button(label="Add item", emoji="➕", style=discord.ButtonStyle.success, row=2)
+        async def add(self, inter: discord.Interaction, _b):
+            await inter.response.send_modal(ItemModal(inter))
+
+        @discord.ui.button(label="Limits", emoji="💰", style=discord.ButtonStyle.secondary, row=2)
+        async def limits(self, inter: discord.Interaction, _b):
+            await inter.response.send_modal(LimitsModal())
+
+        @discord.ui.button(label="Test a link", emoji="🔗", style=discord.ButtonStyle.secondary, row=2)
+        async def try_link(self, inter: discord.Interaction, _b):
+            await inter.response.send_modal(TryModal())
+
+    @autobuy.command(name="panel", description="Buttons and forms for auto-buy: mode, list, limits")
+    async def autobuy_panel(inter: discord.Interaction):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        await inter.response.send_message(embed=panel_embed(), view=AutoBuyPanel(inter.user.id), ephemeral=True)
 
     bot.tree.add_command(autobuy)
 
