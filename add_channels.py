@@ -191,6 +191,47 @@ def setup(token, guild_id=None, only=None, log=print, ask=True):
     return {"guild": guild.get("name", ""), "hooks": hooks, "created": created}
 
 
+# v2.11.3: auto-buy's own channel, which only you (and the bot) can see. Not in CHANNELS on purpose: the others
+# are read-only for everyone, this one is hidden from everyone but the people named here. PC copy only.
+VIEW, HISTORY, EMBED, ATTACH, HOOKS = 1 << 10, 1 << 16, 1 << 14, 1 << 15, 1 << 29
+PRIVATE_NAME, PRIVATE_KEY = "🔒・auto-buy", "discord_webhook_autobuy"
+
+
+def make_private(token, guild_id, user_ids):
+    """Make (or find) 🔒・auto-buy, visible only to user_ids and the bot, with a webhook.
+    -> {"hooks": {PRIVATE_KEY: (link, "", name)}, "created": [names]}"""
+    gid = str(guild_id)
+    me = api(token, "GET", "/users/@me")
+    existing = api(token, "GET", f"/guilds/{gid}/channels") or []
+    cat = next((c for c in existing if c.get("type") == 4 and c.get("name") == CATEGORY), None)
+    see = VIEW | HISTORY | SEND_MESSAGES | EMBED | ATTACH
+    over = [{"id": gid, "type": 0, "allow": "0", "deny": str(VIEW)},
+            {"id": str(me["id"]), "type": 1, "allow": str(see | HOOKS), "deny": "0"}]
+    over += [{"id": str(u), "type": 1, "allow": str(VIEW | HISTORY), "deny": "0"} for u in user_ids if str(u) != str(me["id"])]
+    created = []
+    ch = next((c for c in existing if c.get("type") == 0 and c.get("name") == PRIVATE_NAME), None)
+    if ch is None:
+        body = {"name": PRIVATE_NAME, "type": 0, "topic": "Auto-buy results and checkout screenshots. Only you can see this.",
+                "permission_overwrites": over}
+        if cat:
+            body["parent_id"] = cat["id"]
+        ch = api(token, "POST", f"/guilds/{gid}/channels", body)
+        created.append(PRIVATE_NAME)
+    else:                                   # already there: make sure it's still private
+        api(token, "PATCH", f"/channels/{ch['id']}", {"permission_overwrites": over})
+    current = api(token, "GET", f"/channels/{ch['id']}/webhooks") or []
+    hook = next((h for h in current if h.get("name") == HOOK_NAME and h.get("token")), None)
+    if hook is None:
+        hook = api(token, "POST", f"/channels/{ch['id']}/webhooks", {"name": HOOK_NAME})
+        url = f"https://discord.com/api/webhooks/{hook['id']}/{hook['token']}"
+        api(token, "POST", "", {"username": HOOK_NAME, "allowed_mentions": {"parse": []},
+                                "content": "🔒 **Auto-buy posts here from now on**: test runs, what it bought, anything it "
+                                           "needs you for, with checkout screenshots. Only you can see this channel."},
+            auth=False, url=url + "?wait=true")
+    url = f"https://discord.com/api/webhooks/{hook['id']}/{hook['token']}"
+    return {"hooks": {PRIVATE_KEY: (url, "", PRIVATE_NAME)}, "created": created}
+
+
 def save(hooks, cfg=None, sec=None):
     """Save next to the other webhooks: secrets.json if that's where they are, otherwise config.json.
     Keeps a backup. Returns the file name."""

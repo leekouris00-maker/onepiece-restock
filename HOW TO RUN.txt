@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.11.2)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.11.3)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -63,3 +63,8 @@ New in v2.11.2: AUTO-BUY CONTROLS. Two ways, same settings:
   The PC:   double-click open_autobuy.bat - a page in your browser with the same controls, spend bars for the
             day / week / month, the last attempts and the checkout screenshots. Only this PC can open it (with
             the key in autobuy_web_token.txt). For your phone on home Wi-Fi: "auto_buy": {"web_lan": true}.
+New in v2.11.3: AUTO-BUY IS PRIVATE. Friends in the server can't see or use it, even if they're admins: only the
+  server owner can (add others by Discord user id: "autobuy_user_ids": ["123..."] under "alerts"). Its results and
+  checkout screenshots (which show your address) go to 🔒・auto-buy, a channel only you can see; the first
+  /autobuy panel or /autobuy set makes it. Shared alerts no longer say a find is being auto-bought, and /status
+  and /help don't mention auto-buy.

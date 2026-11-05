@@ -265,7 +265,7 @@ font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;max-width:9
 <div class="grid">
  <section class="card"><h2>Test a link (never pays)</h2>
   <form id="try"><input name="url" placeholder="https://shop.com.au/products/…"><p style="margin:12px 0 0"><button class="btn">🔗 Run a test checkout</button></p></form>
-  <p class="muted" style="font-size:13px">The PC opens the checkout, stops before paying and posts a screenshot in #bot-status.</p></section>
+  <p class="muted" style="font-size:13px">The PC opens the checkout, stops before paying and posts a screenshot in your private 🔒・auto-buy channel.</p></section>
  <section class="card"><h2>Last attempts</h2><div id="recent" class="list-attempts"></div></section>
 </div>
 <section class="card"><h2>Checkout screenshots</h2><div id="shots" class="shots"></div></section>

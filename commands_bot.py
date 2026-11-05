@@ -486,14 +486,7 @@ def build_status(cfg):
              + (f" · paused (429): {', '.join(fl['paused'])}" if fl.get("paused") else "")
              + (f" · slow, top targets only: {', '.join(fl['slow'])}" if fl.get("slow") else "")
              if win and fl.get("window") else "on, runs during drop windows"))
-    if ab:
-        abs_ = ab.settings(tb, cfg)
-        spent, n = ab.spent_today(ab.load_ledger(tb))
-        fields.append({"name": "🤖 Auto-buy", "value": (
-            "off (`/autobuy set mode:test`)" if abs_["mode"] == "off" else
-            f"**{abs_['mode']}**" + (f" until {datetime.fromtimestamp(abs_['until']):%a %I:%M %p}" if abs_["until"] else "")
-            + f" · {tb.money(abs_['per_order'])}/order, {tb.money(abs_['per_day'])}/day · today: {n} order(s), "
-              f"{tb.money(spent)}")})
+    # v2.11.3: no auto-buy line here: /status is public and friends are in the server (/autobuy status is private)
     fields.append({"name": "⚡ Fast lane · 🖥️ Desk mode",
                    "value": f"{lane}\nDesk mode: " + (f"on until {datetime.fromtimestamp(desk):%a %I:%M %p}"
                                                      if desk > time.time() else "off (`/desk on`)")})
@@ -607,8 +600,6 @@ HELP = (
     "eBay watch items too)\n"
     "🃏 DON!! cards have no number: `/want add num:Gomu Gomu DON max:<price>`\n"
     "🖥️ `/desk on` the PC opens the checkout tab itself when a target comes in stock (`/desk off`)\n"
-    "🤖 `/autobuy set mode:test|live|off` the PC checks out restocks on your list by itself, within your limits · "
-    "`/autobuy panel` (buttons) · `/autobuy list|add|remove` · `/autobuy try link:<product>` · `/autobuy status`\n"
     "⚡ In drop windows the bot also checks that release's listings and your /watch links every 15 seconds.\n\n"
     "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`, "
     "`/onepiece setup`, "
@@ -1716,8 +1707,50 @@ async def desk_cmd(inter: discord.Interaction, mode: app_commands.Choice[str], h
 
 
 if ab:
-    autobuy = app_commands.Group(name="autobuy", description="The PC checks out restocks by itself, within your limits (admins)",
+    autobuy = app_commands.Group(name="autobuy", description="Your PC checks out restocks by itself (server owner only)",
                                  default_permissions=discord.Permissions(manage_guild=True))
+
+    # v2.11.3: friends are in the server, so auto-buy is the server owner's alone (plus anyone listed in
+    # "autobuy_user_ids" under "alerts"), even if they're admins; and its posts go to a channel only they can see.
+    def autobuy_people(inter, cfg):
+        ids = {str(x) for x in ((cfg.get("alerts") or {}).get("autobuy_user_ids") or [])}
+        owner = getattr(inter.guild, "owner_id", None)
+        if owner:
+            ids.add(str(owner))
+        return ids
+
+    async def autobuy_only(inter):
+        cfg = cfg_now()
+        if inter.guild is not None and str(inter.user.id) in autobuy_people(inter, cfg):
+            return cfg
+        await inter.response.send_message("Auto-buy belongs to the server owner, so only they can see or change it.",
+                                          ephemeral=True)
+        return None
+
+    async def ensure_private(inter, cfg):
+        """Make 🔒・auto-buy (only you and the bot can see it) the first time. Returns a line to tell you, or ""."""
+        if (cfg.get("alerts") or {}).get("discord_webhook_autobuy"):
+            return ""
+        if ac is None or not hasattr(ac, "make_private"):
+            return "\n⚠️ Run update_bot.bat so the bot can make your private 🔒・auto-buy channel; until then results stay on the PC."
+        token = os.environ.get("DISCORD_BOT_TOKEN") or (cfg.get("alerts") or {}).get("discord_bot_token")
+        if not inter.response.is_done():
+            await inter.response.defer(ephemeral=True, thinking=True)
+        try:
+            people = autobuy_people(inter, cfg) | {str(inter.user.id)}
+            res = await asyncio.to_thread(ac.make_private, token, inter.guild_id, sorted(people))
+            await asyncio.to_thread(ac.save, res["hooks"])
+            _audit(_who(inter), "autobuy private channel")
+        except Exception as e:  # noqa: BLE001
+            return (f"\n⚠️ Couldn't make the private 🔒・auto-buy channel ({tb.redact(str(e))[:150]}). Until it exists, "
+                    "results stay in bot_output.log on the PC. The bot needs Manage Channels and Manage Webhooks.")
+        return "\n🔒 Made **🔒・auto-buy**, a channel only you can see. Results and checkout screenshots go there."
+
+    async def reply(inter, content=None, **kw):
+        if inter.response.is_done():
+            await inter.followup.send(content, ephemeral=True, **kw)
+        else:
+            await inter.response.send_message(content, ephemeral=True, **kw)
 
     def _ab_save(update):
         controls = tb.read_controls()
@@ -1737,7 +1770,7 @@ if ab:
     async def autobuy_set(inter: discord.Interaction, mode: app_commands.Choice[str], per_order: Optional[float] = None,
                           per_day: Optional[float] = None, per_week: Optional[float] = None,
                           per_month: Optional[float] = None, hours: Optional[float] = None):
-        cfg = await admin_only(inter)
+        cfg = await autobuy_only(inter)
         if cfg is None:
             return
         upd = {"mode": mode.value}
@@ -1769,17 +1802,18 @@ if ab:
             msg = "🤖 **Auto-buy off.** Alerts and desk mode carry on as usual."
         else:
             msg = (("🧪 **Auto-buy TEST mode on.** When a restock comes in it goes all the way to the Pay button, "
-                    "doesn't press it, and posts a screenshot in #bot-status." if s["mode"] == "test" else
+                    "doesn't press it, and posts a screenshot in your private 🔒・auto-buy channel." if s["mode"] == "test" else
                     "🤖 **Auto-buy LIVE.** The PC will check out restocks by itself and pay.")
                    + f"\nBuys: {what} (Shopify shops, PC copy only).\nLimits: {limits}."
                    + (f"\nSwitches off {datetime.fromtimestamp(s['until']):%a %d %b %I:%M %p}." if s["until"] else "")
                    + "\nNeeds the buyer profile signed in to Shop Pay: run **setup_autobuy.bat** on the PC once.")
-        await inter.response.send_message(msg, ephemeral=True)
+            msg += await ensure_private(inter, cfg)
+        await reply(inter, msg)
 
     @autobuy.command(name="try", description="A test checkout of any Shopify product now (never pays)")
     @app_commands.describe(link="A product page (…/products/…) on a Shopify shop")
     async def autobuy_try(inter: discord.Interaction, link: str):
-        cfg = await admin_only(inter)
+        cfg = await autobuy_only(inter)
         if cfg is None:
             return
         if not re.match(r"https://[^/]+/(products/|cart/\d)", link.strip()):
@@ -1793,12 +1827,12 @@ if ab:
             await fail(inter, e)
             return
         await inter.response.send_message("🧪 Queued. Within a minute the PC opens the checkout, stops before "
-                                          "paying and posts what it saw in #bot-status. (The restock bot needs to be "
+                                          "paying and posts what it saw in your private 🔒・auto-buy channel. (The restock bot needs to be "
                                           "running on the PC.)", ephemeral=True)
 
     @autobuy.command(name="status", description="Auto-buy settings and the last few attempts")
     async def autobuy_status(inter: discord.Interaction):
-        cfg = await admin_only(inter)
+        cfg = await autobuy_only(inter)
         if cfg is None:
             return
         s = ab.settings(tb, cfg)
@@ -1831,7 +1865,7 @@ if ab:
 
     @autobuy.command(name="list", description="What auto-buy looks for, the max for each and how many it has bought")
     async def autobuy_list(inter: discord.Interaction):
-        cfg = await admin_only(inter)
+        cfg = await autobuy_only(inter)
         if cfg is None:
             return
         items = ab.load_items(tb)
@@ -1849,7 +1883,7 @@ if ab:
     async def autobuy_add(inter: discord.Interaction, max: float, code: Optional[str] = None,
                           match: Optional[str] = None, qty: Optional[int] = 1, name: Optional[str] = None,
                           reset: Optional[bool] = False):
-        cfg = await admin_only(inter)
+        cfg = await autobuy_only(inter)
         if cfg is None:
             return
         if code and not ab.norm_code(code):
@@ -1886,7 +1920,7 @@ if ab:
     @app_commands.describe(item="The item")
     @app_commands.autocomplete(item=item_autocomplete)
     async def autobuy_remove(inter: discord.Interaction, item: str):
-        cfg = await admin_only(inter)
+        cfg = await autobuy_only(inter)
         if cfg is None:
             return
         items = ab.load_items(tb)
@@ -2000,7 +2034,7 @@ if ab:
             if await _panel_do(inter, lambda: ab.queue_try(tb, self.link.value), f"try {self.link.value}"):
                 await inter.response.edit_message(
                     embed=panel_embed("🧪 Test queued: within a minute the PC opens the checkout, stops before paying "
-                                      "and posts a screenshot in #bot-status."), view=AutoBuyPanel(inter.user.id))
+                                      "and posts a screenshot in your private 🔒・auto-buy channel."), view=AutoBuyPanel(inter.user.id))
 
     class LiveConfirm(discord.ui.View):
         def __init__(self, owner):
@@ -2120,10 +2154,11 @@ if ab:
 
     @autobuy.command(name="panel", description="Buttons and forms for auto-buy: mode, list, limits")
     async def autobuy_panel(inter: discord.Interaction):
-        cfg = await admin_only(inter)
+        cfg = await autobuy_only(inter)
         if cfg is None:
             return
-        await inter.response.send_message(embed=panel_embed(), view=AutoBuyPanel(inter.user.id), ephemeral=True)
+        note = (await ensure_private(inter, cfg)).strip()
+        await reply(inter, embed=panel_embed(note), view=AutoBuyPanel(inter.user.id))
 
     bot.tree.add_command(autobuy)
 

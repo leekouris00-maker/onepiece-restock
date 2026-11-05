@@ -165,7 +165,7 @@ try:
 except ImportError:
     auto_buy = None
 
-VERSION = "2.11.2"
+VERSION = "2.11.3"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -3135,7 +3135,8 @@ HOOK_LABELS = {"discord_webhook_boxes": "#booster-boxes", "discord_webhook_singl
                "discord_webhook_watch": "#watched-links",
                "discord_webhook_status": "#bot-status", "discord_webhook_drops": "price drops",
                "discord_webhook_prices": "#tcgplayer-prices", "discord_webhook_instore": "#onepiece-in-store",
-               "discord_webhook_recap": "daily recap", "discord_webhook": "main channel"}
+               "discord_webhook_recap": "daily recap", "discord_webhook_autobuy": "🔒 auto-buy",
+               "discord_webhook": "main channel"}
 
 
 def _note_hook(hook, ok, err="", code=None):

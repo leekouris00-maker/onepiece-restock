@@ -205,7 +205,8 @@ class Wiring(unittest.TestCase):
         finds = [box(), box(id="list|x", kind="New listing"), box(id="box|y|z", game="pokemon")]
         taken = quiet(ab.offer, tb, {}, finds)
         self.assertEqual([f["id"] for f in taken], ["box|Gumnut|op-13"])
-        self.assertIn("🤖 auto-buying", finds[0]["note"])
+        self.assertTrue(finds[0]["autobuy"])
+        self.assertEqual(finds[0]["note"], "")                 # friends see the alert: it doesn't say it's auto-buying
         self.assertEqual(ab._q.qsize(), 1)
         quiet(ab.offer, tb, {}, [box()])                       # already queued: not twice
         self.assertEqual(ab._q.qsize(), 1)
@@ -414,6 +415,65 @@ class Handle(unittest.TestCase):
         tb.atomic_write_json(tb.CONTROLS_PATH, {"autobuy": {"mode": "off"}})
         tb.DRY_RUN[0] = True
         self.assertIsNone(quiet(b.handle, {"f": box(), "t": time.time(), "mode": "live"}))
+
+
+class Private(unittest.TestCase):
+    """v2.11.3: friends are in the server. Auto-buy posts only to its own private channel."""
+
+    def setUp(self):
+        self.sent, self.status = [], []
+        self.saved = (tb.discord_send, tb.post_status, tb.load_config, tb.DRY_RUN[0], ab._no_channel_said[0])
+        tb.discord_send = lambda alerts, hook, payload, tries=3: self.sent.append(hook) or True
+        tb.post_status = lambda cfg, text, color=0: self.status.append(text)
+        tb.DRY_RUN[0] = False
+        ab._no_channel_said[0] = 0.0
+
+    def tearDown(self):
+        tb.discord_send, tb.post_status, tb.load_config, tb.DRY_RUN[0], ab._no_channel_said[0] = self.saved
+
+    def test_never_to_shared_channels(self):
+        cfg = {"alerts": {"discord_webhook_status": "https://discord.test/status", "discord_webhook": "https://discord.test/main",
+                          "discord_webhook_boxes": "https://discord.test/boxes"}}
+        quiet(ab.post, tb, "✅ Bought it: OP-15 box, delivered to 1 Test St", tb.GREEN, cfg=cfg)
+        quiet(ab.post, tb, "✅ Bought another", tb.GREEN, cfg=cfg)
+        self.assertEqual(self.sent, [])
+        self.assertEqual(len(self.status), 1)                  # one heads-up, with no details in it
+        self.assertNotIn("OP-15", self.status[0])
+        self.assertNotIn("Test St", self.status[0])
+        cfg["alerts"]["discord_webhook_autobuy"] = "https://discord.test/private"
+        quiet(ab.post, tb, "✅ Bought it", tb.GREEN, cfg=cfg)
+        self.assertEqual(self.sent, ["https://discord.test/private"])
+
+    def test_private_channel_overwrites(self):
+        import add_channels as ac
+        calls = []
+
+        def api(token, method, path, body=None, auth=True, url=None):
+            calls.append((method, path, body))
+            if path == "/users/@me":
+                return {"id": "999"}
+            if path.endswith("/channels") and method == "GET":
+                return [{"id": "50", "type": 4, "name": ac.CATEGORY}]
+            if method == "POST" and path.endswith("/channels"):
+                return {"id": "77", **body}
+            if path.endswith("/webhooks") and method == "GET":
+                return []
+            if path.endswith("/webhooks"):
+                return {"id": "1", "token": "abc"}
+            return {}
+        old = ac.api
+        ac.api = api
+        try:
+            res = ac.make_private("tok", 123, ["555"])
+        finally:
+            ac.api = old
+        self.assertEqual(res["hooks"]["discord_webhook_autobuy"][0], "https://discord.com/api/webhooks/1/abc")
+        body = next(b for m, p, b in calls if m == "POST" and p == "/guilds/123/channels")
+        over = {o["id"]: o for o in body["permission_overwrites"]}
+        self.assertEqual(over["123"]["deny"], str(ac.VIEW))           # @everyone can't see it
+        self.assertTrue(int(over["555"]["allow"]) & ac.VIEW)           # you can
+        self.assertTrue(int(over["999"]["allow"]) & ac.HOOKS)          # the bot can post
+        self.assertEqual(body["parent_id"], "50")
 
 
 if __name__ == "__main__":

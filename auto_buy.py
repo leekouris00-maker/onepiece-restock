@@ -506,9 +506,7 @@ def offer(tb, cfg, finds):
             _busy.add(f["id"])
         if it:
             picked.add(it["id"])
-        f["autobuy"] = True
-        tag = "🤖 auto-buying now (test run, won't pay)" if s["mode"] == "test" else "🤖 auto-buying now"
-        f["note"] = (str(f.get("note") or "") + "\n" + tag).strip()
+        f["autobuy"] = True              # desk mode leaves it alone; the shared alert doesn't say (v2.11.3: private)
         taken.append(f)
     if taken:
         start(tb)
@@ -591,16 +589,25 @@ def resolve_cart(tb, url):
 
 
 # ---------------------------------------------------------------- reporting
+_no_channel_said = [0.0]
+
+
 def post(tb, text, color, shot=None, cfg=None, phone=None):
-    """To #bot-status (or "discord_webhook_autobuy"), with the screenshot when there is one."""
+    """To the private 🔒・auto-buy channel only ("discord_webhook_autobuy"), with the screenshot when there is one.
+    v2.11.3: never to the shared channels, since friends are in the server and a checkout shows your address."""
     cfg = cfg or tb.load_config()
     alerts = cfg.get("alerts") or {}
     print(f"   [auto-buy] {text}")
     if phone:
         tb.push_phone(cfg, phone, re.sub(r"[*`]", "", text)[:3000])
-    hook = (alerts.get("discord_webhook_autobuy") or alerts.get("discord_webhook_status")
-            or alerts.get("discord_webhook_boxes") or alerts.get("discord_webhook"))
-    if not hook or tb.DRY_RUN[0]:
+    hook = alerts.get("discord_webhook_autobuy")
+    if tb.DRY_RUN[0]:
+        return
+    if not hook:
+        if time.time() - _no_channel_said[0] > 6 * 3600:
+            _no_channel_said[0] = time.time()
+            tb.post_status(cfg, "🔒 Auto-buy has something for you, but its private channel isn't set up yet, so it's "
+                                "only in bot_output.log on the PC. Open `/autobuy panel` once to make it.", tb.AMBER)
         return
     embed = {"description": text[:4000], "color": color, "footer": {"text": "Auto-buy · PC copy"}}
     payload = {"username": alerts.get("bot_name") or "One Piece Restock", "embeds": [embed],
