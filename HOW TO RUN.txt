@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.11.0)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.11.1)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -52,3 +52,8 @@ New in v2.11: AUTO-BUY. The PC checks out restocks by itself (booster boxes and 
   It stops and posts the checkout link for you whenever a shop wants a sign-in, captcha, card or address, or
   the total (with postage) is over your limits. If your bank asks to approve the payment, you get a phone push.
   Limits and options: "auto_buy" in config.json (see the top of auto_buy.py).
+New in v2.11.1: the AUTO-BUY LIST. Auto-buy only buys what's on your list, each with its own max price and how
+  many you want in total (it stops once it has them). It starts with OP-14 to OP-18 and EB-05 booster boxes at up
+  to $260, 1 each.   /autobuy list  ·  /autobuy add code:OP-15 max:240 qty:2  ·  /autobuy add match:premium|prb-02
+  max:300  ·  /autobuy remove.   Weekly and monthly budgets too (default $500 a week, $1,000 a month):
+  /autobuy set mode:live per_week:500 per_month:1000

@@ -12,18 +12,29 @@ setup_autobuy.bat: Shop Pay (shop.app) and the shops you buy from, with your add
 there. The bot never sees, types or stores card numbers or passwords. If a checkout ever needs
 typing (card, address, a sign-in, a captcha), it stops and posts the checkout link for you instead.
 
+WHAT IT BUYS (v2.11.1): only what's on your auto-buy list (autobuy_list.json, PC only), each item with its
+own max price per box and how many you want in total. Once it has bought that many it stops buying that item.
+It starts with this season's One Piece booster boxes (OP-14 to OP-18 and EB-05) at up to A$260 each, 1 of each.
+    /autobuy list                                what's on it and how many it has bought of each
+    /autobuy add code:OP-15 max:240 qty:2        a booster box by set code
+    /autobuy add match:premium booster|prb-02 max:300   anything else, by words in the product's name
+    /autobuy remove item:<item>                  /autobuy add on an item already there changes it
+
 Turn it on from Discord (admins):
     /autobuy set mode:test   does everything except press Pay; posts a screenshot of what it would buy
     /autobuy set mode:live   really buys          /autobuy set mode:off   stops it
-    /autobuy set per_order:<A$> per_day:<A$> hours:<n>   limits (hours 0 = until you turn it off)
+    /autobuy set per_order:<A$> per_day:<A$> per_week:<A$> per_month:<A$> hours:<n>
+                             spend limits (hours 0 = until you turn it off)
     /autobuy try link:<product page>   a test run on any Shopify product now (never pays)
     /autobuy status          settings and the last few attempts
 
 Safety rails (all in autobuy.json's ledger, PC only, never committed):
-  * Shopify shops only, booster boxes + /watch links by default ("what" setting), no pre-orders
+  * Shopify shops only, only items on your list (the "what" setting can widen that), no pre-orders
     unless "preorders": true, never "new listing" alerts, never Pokémon unless "games" includes it
-  * total at checkout (with postage) must be within per_order, and today's spend plus it within
-    per_day; at most orders_per_day orders a day; the same product at most once every same_product_days
+  * the box price must be within that item's max, and you never get more than the item's qty in total
+  * total at checkout (with postage) must be within per_order, and the spend today / this week (Mon-Sun) /
+    this month plus it within per_day / per_week / per_month; at most orders_per_day orders a day;
+    the same product at most once every same_product_days
   * a payment the bot pressed Pay on counts toward the day's spend even if the result is unclear,
     so a slow bank page can never lead to a second order
   * one checkout at a time; anything older than 3 minutes in the queue is dropped (it's sold out by then)
@@ -31,8 +42,8 @@ Safety rails (all in autobuy.json's ledger, PC only, never committed):
     says "🤖 auto-buying" so nobody buys it twice by hand
 
 Optional config.json section (Discord's /autobuy set overrides the limits):
-    "auto_buy": {"per_order": 300, "per_day": 300, "orders_per_day": 2, "same_product_days": 7,
-                 "what": ["boxes", "watch"], "preorders": false, "games": ["onepiece"], "max_qty": 2,
+    "auto_buy": {"per_order": 300, "per_day": 300, "per_week": 500, "per_month": 1000, "orders_per_day": 2,
+                 "same_product_days": 7, "what": ["list"], "preorders": false, "games": ["onepiece"], "max_qty": 2,
                  "headless": false, "browser": "chrome", "pay_wait_seconds": 180}
 
 Needs (once):  py -3 -m pip install playwright   then   setup_autobuy.bat
@@ -50,12 +61,15 @@ from datetime import datetime
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROFILE_DIR = os.path.join(HERE, "buyer_profile")
 LEDGER_PATH = os.path.join(HERE, "autobuy.json")
+LIST_PATH = os.path.join(HERE, "autobuy_list.json")
 SHOTS_DIR = os.path.join(HERE, "autobuy_shots")
 
-DEFAULTS = {"per_order": 300.0, "per_day": 300.0, "orders_per_day": 2, "same_product_days": 7,
-            "what": ["boxes", "watch"], "preorders": False, "games": ["onepiece"], "max_qty": 2,
+DEFAULTS = {"per_order": 300.0, "per_day": 300.0, "per_week": 500.0, "per_month": 1000.0, "orders_per_day": 2,
+            "same_product_days": 7, "what": ["list"], "preorders": False, "games": ["onepiece"], "max_qty": 2,
             "headless": False, "browser": "chrome", "pay_wait_seconds": 180}
 MODES = ("off", "test", "live")
+LIMITS = ("per_order", "per_day", "per_week", "per_month")
+START_LIST = [{"code": c, "max": 260.0, "qty": 1} for c in ("OP-14", "OP-15", "OP-16", "OP-17", "OP-18", "EB-05")]
 STALE_SECONDS = 180
 IDLE_CLOSE_SECONDS = 20 * 60
 SPENT = ("paid", "paying", "bank", "unclear")          # statuses that count toward the day's spend
@@ -108,10 +122,10 @@ def settings(tb, cfg=None):
         ctl = (tb.read_controls() or {}).get("autobuy") or {}
     except Exception:  # noqa: BLE001
         ctl = {}
-    for k in ("per_order", "per_day"):
+    for k in LIMITS:
         if _num(ctl.get(k)) is not None:
             s[k] = ctl[k]
-    for k in ("per_order", "per_day", "orders_per_day", "same_product_days", "max_qty", "pay_wait_seconds"):
+    for k in LIMITS + ("orders_per_day", "same_product_days", "max_qty", "pay_wait_seconds"):
         v = _num(s.get(k))
         s[k] = v if v is not None and v >= 0 else DEFAULTS[k]
     s["orders_per_day"], s["max_qty"] = int(s["orders_per_day"]), max(1, int(s["max_qty"]))
@@ -144,11 +158,35 @@ def _today(ts):
     return datetime.fromtimestamp(ts).date()
 
 
-def spent_today(led, now=None):
+def _same(period, a, b):
+    da, db = _today(a), _today(b)
+    if period == "day":
+        return da == db
+    if period == "week":                       # Monday to Sunday
+        return da.isocalendar()[:2] == db.isocalendar()[:2]
+    return (da.year, da.month) == (db.year, db.month)
+
+
+def spent(led, period="day", now=None):
+    """(A$ spent, orders) today / this week / this month. Anything the bot pressed Pay on counts."""
     now = now or time.time()
-    day = [o for o in led.get("orders", []) if o.get("mode") == "live" and o.get("status") in SPENT
-           and _today(o.get("t", 0)) == _today(now)]
-    return sum(_num(o.get("total")) or _num(o.get("expect")) or 0 for o in day), len(day)
+    os_ = [o for o in led.get("orders", []) if o.get("mode") == "live" and o.get("status") in SPENT
+           and _same(period, o.get("t", 0), now)]
+    return sum(_num(o.get("total")) or _num(o.get("expect")) or 0 for o in os_), len(os_)
+
+
+def spent_today(led, now=None):
+    return spent(led, "day", now)
+
+
+def over_budget(led, amount, s, now=None):
+    """Why spending `amount` more would break the day / week / month limit, or ""."""
+    for period, key in (("day", "per_day"), ("week", "per_week"), ("month", "per_month")):
+        sp, _ = spent(led, period, now)
+        if sp + amount > s[key] + 0.001:
+            label = {"day": "today's", "week": "this week's", "month": "this month's"}[period]
+            return f"would take {label} spend past {money(s[key])} (spent {money(sp)})"
+    return ""
 
 
 def recently_bought(led, fid, days, now=None):
@@ -157,32 +195,126 @@ def recently_bought(led, fid, days, now=None):
                and now - o.get("t", 0) < days * 86400 for o in led.get("orders", []))
 
 
+# ---------------------------------------------------------------- the auto-buy list
+CODE_RE = re.compile(r"^\s*([A-Za-z]{2,3})\s*-?\s*(\d{1,2})\s*$")
+
+
+def norm_code(code):
+    m = CODE_RE.match(str(code or ""))
+    return f"{m.group(1).upper()}-{int(m.group(2)):02d}" if m else ""
+
+
+def code_rx(code):
+    """OP-15 matches 'OP-15', 'OP15', 'op 15' (not 'OP-150'); EB-05 also 'EB5'."""
+    a, n = code.split("-")
+    num = ("0?" + str(int(n))) if n.startswith("0") else n
+    return re.compile(rf"\b{a}[\s\-]?{num}\b", re.I)
+
+
+def make_item(code="", match=None, max=None, qty=1, name="", bought=0, on=True):
+    code = norm_code(code)
+    words = [w.strip().lower() for w in (match if isinstance(match, list) else str(match or "").split(","))
+             if w and w.strip()]
+    if not code and not words:
+        return None
+    iid = code.lower() if code else re.sub(r"[^a-z0-9]+", "-", words[0])[:40].strip("-")
+    return {"id": iid, "name": name or (f"{code} booster box" if code else " + ".join(words)), "code": code,
+            "match": words, "max": float(max or 0), "qty": max_int(qty, 1), "bought": max_int(bought, 0),
+            "on": bool(on)}
+
+
+def max_int(x, lo):
+    v = _num(x)
+    return max(lo, int(v)) if v is not None else lo
+
+
+def load_items(tb):
+    """The list (autobuy_list.json). The first time, it starts with this season's booster boxes."""
+    raw = tb.read_json(LIST_PATH, None)
+    if raw is None:
+        items = [make_item(**x) for x in START_LIST]
+        save_items(tb, items)
+        return items
+    out = []
+    for x in raw.get("items", []) if isinstance(raw, dict) else []:
+        if isinstance(x, dict):
+            it = make_item(**{k: x.get(k) for k in ("code", "match", "max", "qty", "name", "bought", "on")
+                              if x.get(k) is not None})
+            if it:
+                out.append(it)
+    return out
+
+
+def save_items(tb, items):
+    tb.atomic_write_json(LIST_PATH, {"_help": "The auto-buy list. Change it from Discord with /autobuy add / remove.",
+                                     "items": items})
+
+
+def item_matches(it, f):
+    text = f"{f.get('name', '')} {f.get('url', '')}"
+    if it["code"]:
+        if not code_rx(it["code"]).search(text):
+            return False
+        if not it["match"] and f.get("kind") != "Booster box":
+            return False                       # a code item means the booster box, not a sleeve or deck
+    t = text.lower()
+    return all(any(alt.strip() in t for alt in w.split("|")) for w in it["match"])
+
+
+def item_for(f, items):
+    """The list item this find is for, if it's within that item's max and you still want more of it."""
+    price = _num(f.get("price")) or 0
+    for it in items:
+        if it["on"] and it["bought"] < it["qty"] and item_matches(it, f) and price <= it["max"] + 0.001:
+            return it
+    return None
+
+
+def item_of(f, items):
+    """Like item_for, but whatever the price / count (for saying why something wasn't bought)."""
+    return next((it for it in items if it["on"] and item_matches(it, f)), None)
+
+
+def count_bought(tb, item_id, qty):
+    items = load_items(tb)
+    for it in items:
+        if it["id"] == item_id:
+            it["bought"] += qty
+            save_items(tb, items)
+            return it
+    return None
+
+
 # ---------------------------------------------------------------- what can be auto-bought
 def is_preorder(f):
     return bool(re.search(r"pre-?order", f"{f.get('name', '')} {f.get('note', '')}", re.I))
 
 
-def cart_for(f, s):
-    """(checkout link, qty) for a find, or (None, why not)."""
+def cart_for(f, s, item=None):
+    """(checkout link, qty) for a find, or (None, why not). A list item buys what's still wanted of it."""
     m = CART_RE.match(f.get("cart") or "")
     if not m:
         return None, "not a Shopify shop (no one-item cart link)"
     qty = int(m.group(3))
     if f.get("link_watch") and int(_num(f.get("cart_qty")) or 1) > 1:
         qty = int(_num(f.get("cart_qty")))
+    if item:
+        qty = item["qty"] - item["bought"]
     qty = max(1, min(qty, s["max_qty"]))
     return f"{m.group(1)}/cart/{m.group(2)}:{qty}", qty
 
 
-def eligible(f, s):
-    """(True, "") or (False, why). Only the kinds of finds the settings allow."""
+def eligible(f, s, items=None):
+    """(True, "") or (False, why). Only what's on the list (or the kinds of finds "what" allows)."""
     if f.get("kind") == "New listing":
         return False, "new listings are never auto-bought"
     game = "pokemon" if f.get("game") == "pokemon" else "onepiece"
     if game not in s["games"]:
         return False, f"{game} isn't in auto_buy games"
     what = set(s["what"])
-    if f.get("link_watch"):
+    if "list" in what and items is not None and item_for(f, items):
+        ok = f.get("kind") in ("Booster box", "Sealed")
+    elif f.get("link_watch"):
         ok = "watch" in what
     elif f.get("kind") == "Booster box":
         ok = "boxes" in what
@@ -191,7 +323,8 @@ def eligible(f, s):
     else:
         ok = False
     if not ok:
-        return False, f"{f.get('kind', 'this kind')} isn't in auto_buy what"
+        return False, ("not on your auto-buy list (or over that item's max / already bought)" if "list" in what
+                       else f"{f.get('kind', 'this kind')} isn't in auto_buy what")
     if is_preorder(f) and not s["preorders"]:
         return False, "pre-order (auto_buy preorders is off)"
     if not _num(f.get("price")):
@@ -206,11 +339,12 @@ def budget_ok(led, fid, expect, s, now=None):
     """Before starting a live checkout: (True, "") or (False, why). expect = item price x qty."""
     if expect > s["per_order"] + 0.001:
         return False, f"{money(expect)} is over your per-order limit of {money(s['per_order'])}"
-    spent, n = spent_today(led, now)
+    _, n = spent_today(led, now)
     if n >= s["orders_per_day"]:
         return False, f"already {n} order(s) today (limit {s['orders_per_day']})"
-    if spent + expect > s["per_day"] + 0.001:
-        return False, f"would take today's spend past {money(s['per_day'])} (spent {money(spent)})"
+    why = over_budget(led, expect, s, now)
+    if why:
+        return False, why
     if recently_bought(led, fid, s["same_product_days"], now):
         return False, f"bought in the last {s['same_product_days']:g} days"
     return True, ""
@@ -220,9 +354,9 @@ def total_ok(led, total, s, now=None):
     """At checkout, with postage: (True, "") or (False, why)."""
     if total > s["per_order"] + 0.001:
         return False, f"total {money(total)} (with postage) is over your per-order limit of {money(s['per_order'])}"
-    spent, _ = spent_today(led, now)
-    if spent + total > s["per_day"] + 0.001:
-        return False, f"total {money(total)} would take today's spend past {money(s['per_day'])} (spent {money(spent)})"
+    why = over_budget(led, total, s, now)
+    if why:
+        return False, f"total {money(total)} {why}"
     return True, ""
 
 
@@ -252,18 +386,25 @@ def offer(tb, cfg, finds):
     if s["mode"] == "off":
         return []
     taken = []
+    items = load_items(tb) if "list" in s["what"] else None
+    picked = set()                              # one of each list item per batch (the cheapest shop first)
     for f in sorted(finds, key=lambda f: (not f.get("link_watch"), f.get("kind") != "Booster box", f.get("price") or 0)):
-        ok, _ = eligible(f, s)
+        ok, _ = eligible(f, s, items)
         if not ok:
+            continue
+        it = item_for(f, items) if items is not None else None
+        if it and it["id"] in picked:
             continue
         with _lock:
             if f["id"] in _busy:
                 continue
             try:
-                _q.put_nowait({"f": dict(f), "t": time.time(), "mode": s["mode"]})
+                _q.put_nowait({"f": dict(f), "t": time.time(), "mode": s["mode"], "item": it["id"] if it else None})
             except queue.Full:
                 break
             _busy.add(f["id"])
+        if it:
+            picked.add(it["id"])
         f["autobuy"] = True
         tag = "🤖 auto-buying now (test run, won't pay)" if s["mode"] == "test" else "🤖 auto-buying now"
         f["note"] = (str(f.get("note") or "") + "\n" + tag).strip()
@@ -442,7 +583,13 @@ class Buyer:
         if time.time() - job["t"] > STALE_SECONDS:
             print(f"   (auto-buy: dropped {f['name'][:40]}, waited over {STALE_SECONDS // 60} minutes)")
             return None
-        link, qty = cart_for(f, s)
+        item = None
+        if job.get("item"):
+            item = next((it for it in load_items(tb) if it["id"] == job["item"]), None)
+            if not item or item_for(f, [item]) is None:
+                print(f"   (auto-buy: {f['name'][:40]} is no longer wanted on the list)")
+                return None
+        link, qty = cart_for(f, s, item)
         expect = (_num(f.get("price")) or 0) * qty
         led = load_ledger(tb)
         if mode == "live" and not job.get("try"):
@@ -458,6 +605,7 @@ class Buyer:
             r = checkout(page, link, expect, s, mode, led, f, tb=tb)
         finally:
             self.last = time.time()
+        r["item"] = item["id"] if item else None
         self._report(f, link, qty, mode, r, led, cfg)
         try:
             page.close()
@@ -483,16 +631,23 @@ class Buyer:
             led["orders"].append({"t": round(time.time()), "id": f["id"], "name": f["name"], "shop": f.get("shop"),
                                   "mode": "test", "status": st, "total": total, "detail": r.get("why", "")})
             save_ledger(tb, led)
+        done = ""
+        if mode == "live" and st in ("paid", "unclear") and r.get("item"):
+            it = count_bought(tb, r["item"], qty)
+            if it:
+                done = (f"\n📋 {it['name']}: {it['bought']}/{it['qty']} bought"
+                        + (", so it's done: no more auto-buys of it (`/autobuy add` to want more)."
+                           if it["bought"] >= it["qty"] else "."))
         if st == "test":
             post(tb, f"🧪 **Auto-buy test run:** would have paid for {what}{tot}. Everything was filled in, so in "
                      f"live mode it would have pressed Pay. (`/autobuy set mode:live` when you're happy.)",
                  tb.BLUE, r.get("shot"), cfg)
         elif st == "paid":
-            post(tb, f"✅ **Bought it:** {what}{tot}. Check your email for the order confirmation.",
+            post(tb, f"✅ **Bought it:** {what}{tot}. Check your email for the order confirmation.{done}",
                  tb.GREEN, r.get("shot"), cfg, phone=f"Bought: {f['name'][:60]}")
         elif st == "unclear":
             post(tb, f"❓ **Pressed Pay for {what}{tot}, but couldn't confirm the order.** {r.get('why', '')} "
-                     "Check your email / bank before buying it again (it counts toward today's limit).",
+                     f"Check your email / bank before buying it again (it counts toward your limits).{done}",
                  tb.AMBER, r.get("shot"), cfg, phone=f"Check order: {f['name'][:60]}")
         elif st == "declined":
             post(tb, f"❌ **Payment didn't go through** for {what}{tot}: {r.get('why', '')}\n[Try yourself]({link})",

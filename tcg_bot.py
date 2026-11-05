@@ -165,7 +165,7 @@ try:
 except ImportError:
     auto_buy = None
 
-VERSION = "2.11.0"
+VERSION = "2.11.1"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 

@@ -95,7 +95,8 @@ class Limits(unittest.TestCase):
         led["orders"][0]["t"] = now - 8 * 86400
         self.assertTrue(ab.budget_ok(led, "x", 10, S, now)[0])
         yesterday = self.led({"t": now - 86400 - 3600, "id": "y", "mode": "live", "status": "paid", "total": 290})
-        self.assertTrue(ab.budget_ok(yesterday, "x", 240, S, now)[0])     # yesterday's spend doesn't count today
+        roomy = dict(S, per_week=5000, per_month=5000)
+        self.assertTrue(ab.budget_ok(yesterday, "x", 240, roomy, now)[0])  # yesterday's spend doesn't count today
 
     def test_total_with_postage(self):
         self.assertFalse(ab.total_ok({"orders": []}, 312.50, S)[0])
@@ -116,12 +117,63 @@ class Totals(unittest.TestCase):
         self.assertIsNone(ab.read_total("Subtotal $10.00"))
 
 
+class List(unittest.TestCase):
+    def items(self):
+        return [ab.make_item(code="OP-15", max=240, qty=2), ab.make_item(code="EB-05", max=230),
+                ab.make_item(match="premium booster|prb, 02", max=300, name="PRB-02")]
+
+    def test_codes(self):
+        self.assertEqual(ab.norm_code("op15"), "OP-15")
+        self.assertEqual(ab.norm_code(" eb-5 "), "EB-05")
+        self.assertEqual(ab.norm_code("PRB-02"), "PRB-02")
+        self.assertEqual(ab.norm_code("OP-15 box"), "")
+        rx = ab.code_rx("EB-05")
+        self.assertTrue(rx.search("Extra Booster EB05 Booster Box") and rx.search("eb-5 box"))
+        self.assertFalse(ab.code_rx("OP-15").search("OP-150 promo"))
+
+    def test_matching_max_and_kind(self):
+        its = self.items()
+        self.assertEqual(ab.item_for(box(name="OP-15 Adventure on Kami's Island Booster Box", price=230), its)["id"], "op-15")
+        self.assertIsNone(ab.item_for(box(name="OP-15 Booster Box", price=245), its))          # over its max
+        self.assertIsNone(ab.item_for(box(name="OP-15 Card Sleeves", kind="Sealed", price=20), its))
+        self.assertIsNone(ab.item_for(box(name="OP-16 Booster Box", price=200), its))          # not on the list
+        prb = box(name="Premium Booster Box PRB-02 (English)", kind="Sealed", link_watch=True, price=290)
+        self.assertEqual(ab.item_for(prb, its)["name"], "PRB-02")
+        self.assertFalse(ab.eligible(box(name="OP-16 Booster Box"), dict(S, what=["list"]), its)[0])
+        self.assertTrue(ab.eligible(box(name="OP-15 Booster Box", price=230), dict(S, what=["list"]), its)[0])
+
+    def test_quantity_left(self):
+        its = self.items()
+        f = box(name="OP-15 Booster Box", price=230)
+        self.assertEqual(ab.cart_for(f, S, its[0]), ("https://gumnut.test/cart/111:2", 2))
+        its[0]["bought"] = 1
+        self.assertEqual(ab.cart_for(f, S, its[0])[1], 1)
+        its[0]["bought"] = 2
+        self.assertIsNone(ab.item_for(f, its))                                                 # got them all
+
+    def test_week_and_month_budgets(self):
+        now = time.time()
+        s = dict(S, per_day=1000, per_week=500, per_month=700)
+        led = {"orders": [{"t": now - 60, "id": "y", "mode": "live", "status": "paid", "total": 300}]}
+        self.assertIn("this week", ab.budget_ok(led, "x", 240, s, now)[1])
+        self.assertTrue(ab.budget_ok(led, "x", 190, s, now)[0])
+        from datetime import date, timedelta as td
+        d = date.fromtimestamp(now)
+        earlier = [t for t in (now - k * 86400 for k in range(7, 28))
+                   if date.fromtimestamp(t).month == d.month and date.fromtimestamp(t).isocalendar()[1] != d.isocalendar()[1]]
+        if earlier:                                       # an order earlier this month, in another week
+            led = {"orders": [{"t": earlier[0], "id": "y", "mode": "live", "status": "paid", "total": 500}]}
+            self.assertIn("this month", ab.budget_ok(led, "x", 240, s, now)[1])
+            self.assertIn("this month", ab.total_ok(led, 250, s, now)[1])
+
+
 class Wiring(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.mkdtemp()
-        self.paths = (tb.CONTROLS_PATH, ab.LEDGER_PATH)
+        self.paths = (tb.CONTROLS_PATH, ab.LEDGER_PATH, ab.LIST_PATH)
         tb.CONTROLS_PATH = os.path.join(self.dir, "controls.json")
         ab.LEDGER_PATH = os.path.join(self.dir, "autobuy.json")
+        ab.LIST_PATH = os.path.join(self.dir, "autobuy_list.json")
         self.start = ab.start
         ab.start = lambda _tb: None
         while not ab._q.empty():
@@ -129,7 +181,7 @@ class Wiring(unittest.TestCase):
         ab._busy.clear()
 
     def tearDown(self):
-        tb.CONTROLS_PATH, ab.LEDGER_PATH = self.paths
+        tb.CONTROLS_PATH, ab.LEDGER_PATH, ab.LIST_PATH = self.paths
         ab.start = self.start
         while not ab._q.empty():
             ab._q.get_nowait()
@@ -149,6 +201,7 @@ class Wiring(unittest.TestCase):
 
     def test_offer_marks_the_alert_and_desk_mode_skips_it(self):
         self.ctl(mode="live", until=0)
+        ab.save_items(tb, [ab.make_item(code="OP-13", max=250)])
         finds = [box(), box(id="list|x", kind="New listing"), box(id="box|y|z", game="pokemon")]
         taken = quiet(ab.offer, tb, {}, finds)
         self.assertEqual([f["id"] for f in taken], ["box|Gumnut|op-13"])
@@ -160,6 +213,24 @@ class Wiring(unittest.TestCase):
         opened = []
         quiet(fl.desk_open, tb, [finds[0], box(id="box|b|c", cart="https://b.test/cart/9:1")], opener=opened.append)
         self.assertEqual(opened, ["https://b.test/cart/9:1"])
+
+    def test_list_starts_with_this_seasons_boxes_and_counts_buys(self):
+        items = ab.load_items(tb)
+        self.assertEqual([it["code"] for it in items], ["OP-14", "OP-15", "OP-16", "OP-17", "OP-18", "EB-05"])
+        self.assertTrue(all(it["max"] == 260 and it["qty"] == 1 for it in items))
+        it = ab.count_bought(tb, "op-15", 1)
+        self.assertEqual(it["bought"], 1)
+        self.assertIsNone(ab.item_for(box(name="OP-15 Booster Box", price=220), ab.load_items(tb)))
+
+    def test_offer_takes_one_per_item_cheapest_shop(self):
+        self.ctl(mode="test", until=0)
+        ab.save_items(tb, [ab.make_item(code="OP-15", max=250)])
+        a = box(id="box|A|op15", name="OP-15 Booster Box", price=240, cart="https://a.test/cart/1:1")
+        b = box(id="box|B|op15", name="OP-15 Booster Box", price=225, cart="https://b.test/cart/2:1")
+        c = box(id="box|C|op16", name="OP-16 Booster Box", price=200, cart="https://c.test/cart/3:1")
+        taken = quiet(ab.offer, tb, {}, [a, b, c])
+        self.assertEqual([f["id"] for f in taken], ["box|B|op15"])
+        self.assertEqual(ab._q.get_nowait()["item"], "op-15")
 
     def test_offer_does_nothing_when_off(self):
         self.assertEqual(quiet(ab.offer, tb, {}, [box()]), [])
@@ -307,13 +378,14 @@ class Handle(unittest.TestCase):
 
     def setUp(self):
         self.dir = tempfile.mkdtemp()
-        self.saved = (tb.CONTROLS_PATH, ab.LEDGER_PATH, ab.SHOTS_DIR, tb.DRY_RUN[0])
+        self.saved = (tb.CONTROLS_PATH, ab.LEDGER_PATH, ab.SHOTS_DIR, tb.DRY_RUN[0], ab.LIST_PATH)
+        ab.LIST_PATH = os.path.join(self.dir, "autobuy_list.json")
         tb.CONTROLS_PATH = os.path.join(self.dir, "controls.json")
         ab.LEDGER_PATH = os.path.join(self.dir, "autobuy.json")
         ab.SHOTS_DIR = os.path.join(self.dir, "shots")
 
     def tearDown(self):
-        tb.CONTROLS_PATH, ab.LEDGER_PATH, ab.SHOTS_DIR, tb.DRY_RUN[0] = self.saved
+        tb.CONTROLS_PATH, ab.LEDGER_PATH, ab.SHOTS_DIR, tb.DRY_RUN[0], ab.LIST_PATH = self.saved
         shutil.rmtree(self.dir)
 
     def test_budget_blocks_before_opening_a_browser(self):
@@ -324,6 +396,14 @@ class Handle(unittest.TestCase):
         r = quiet(b.handle, {"f": box(), "t": time.time(), "mode": "live"})
         self.assertEqual(r["status"], "skipped")
         self.assertEqual(opened, [])
+
+    def test_item_already_bought_dropped(self):
+        tb.atomic_write_json(tb.CONTROLS_PATH, {"autobuy": {"mode": "live"}})
+        ab.save_items(tb, [ab.make_item(code="OP-15", max=250, bought=1)])
+        tb.DRY_RUN[0] = True
+        b = ab.Buyer(tb, launcher=lambda s: self.fail("opened"))
+        job = {"f": box(name="OP-15 Booster Box", price=230), "t": time.time(), "mode": "live", "item": "op-15"}
+        self.assertIsNone(quiet(b.handle, job))
 
     def test_stale_and_off_jobs_dropped(self):
         tb.atomic_write_json(tb.CONTROLS_PATH, {"autobuy": {"mode": "live"}})

@@ -43,7 +43,8 @@ Type these in your Discord server:
   v2.6 (admins):
     /desk on [hours] | off           the PC opens the checkout tab itself for target finds (fast_lane.py)
   v2.11 (admins):
-    /autobuy set mode:<off|test|live> [per_order] [per_day] [hours]   auto-checkout of restocks (auto_buy.py)
+    /autobuy set mode:<off|test|live> [per_order] [per_day] [per_week] [per_month] [hours]   auto-checkout (auto_buy.py)
+    /autobuy list | add code:<OP-15>|match:<words> max:<A$> [qty] | remove   what it buys (v2.11.1)
     /autobuy try link:<product page> a test checkout now (never pays) · /autobuy status
 
   Admin only (people with Manage Server, or listed in "admin_user_ids" under "alerts"):
@@ -605,8 +606,8 @@ HELP = (
     "eBay watch items too)\n"
     "🃏 DON!! cards have no number: `/want add num:Gomu Gomu DON max:<price>`\n"
     "🖥️ `/desk on` the PC opens the checkout tab itself when a target comes in stock (`/desk off`)\n"
-    "🤖 `/autobuy set mode:test|live|off` the PC checks out restocks by itself, within your limits · "
-    "`/autobuy try link:<product>` · `/autobuy status`\n"
+    "🤖 `/autobuy set mode:test|live|off` the PC checks out restocks on your list by itself, within your limits · "
+    "`/autobuy list|add|remove` · `/autobuy try link:<product>` · `/autobuy status`\n"
     "⚡ In drop windows the bot also checks that release's listings and your /watch links every 15 seconds.\n\n"
     "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`, "
     "`/onepiece setup`, "
@@ -1728,18 +1729,22 @@ if ab:
     @app_commands.describe(mode="off, test (everything but paying) or live (really buys)",
                            per_order="Most a single order may cost, postage included (A$)",
                            per_day="Most it may spend in a day (A$)",
+                           per_week="Most it may spend Monday to Sunday (A$)",
+                           per_month="Most it may spend in a calendar month (A$)",
                            hours="Switch itself off after this many hours (0 = stays on until you turn it off)")
     @app_commands.choices(mode=[app_commands.Choice(name=m, value=m) for m in ("off", "test", "live")])
     async def autobuy_set(inter: discord.Interaction, mode: app_commands.Choice[str], per_order: Optional[float] = None,
-                          per_day: Optional[float] = None, hours: Optional[float] = None):
+                          per_day: Optional[float] = None, per_week: Optional[float] = None,
+                          per_month: Optional[float] = None, hours: Optional[float] = None):
         cfg = await admin_only(inter)
         if cfg is None:
             return
         upd = {"mode": mode.value}
         if per_order is not None:
             upd["per_order"] = max(0.0, float(per_order))
-        if per_day is not None:
-            upd["per_day"] = max(0.0, float(per_day))
+        for k, v in (("per_day", per_day), ("per_week", per_week), ("per_month", per_month)):
+            if v is not None:
+                upd[k] = max(0.0, float(v))
         if hours is not None:
             upd["until"] = round(time.time() + float(hours) * 3600) if hours > 0 else 0
         elif mode.value != "off":
@@ -1752,8 +1757,12 @@ if ab:
             return
         s = ab.settings(tb, cfg)
         limits = f"{tb.money(s['per_order'])} an order (postage included), {tb.money(s['per_day'])} a day, " \
-                 f"{s['orders_per_day']} orders a day, the same product once every {s['same_product_days']:g} days"
-        what = " + ".join({"boxes": "booster boxes", "watch": "/watch links", "sealed": "watched sealed"}.get(w, w)
+                 f"{tb.money(s['per_week'])} a week, {tb.money(s['per_month'])} a month, " \
+                 f"{s['orders_per_day']} orders a day"
+        items = ab.load_items(tb)
+        want = [it for it in items if it["on"] and it["bought"] < it["qty"]]
+        what = " + ".join({"boxes": "booster boxes", "watch": "/watch links", "sealed": "watched sealed",
+                           "list": f"your list ({len(want)} item(s) still wanted, `/autobuy list`)"}.get(w, w)
                           for w in s["what"]) + ("" if s["preorders"] else ", no pre-orders")
         if s["mode"] == "off":
             msg = "🤖 **Auto-buy off.** Alerts and desk mode carry on as usual."
@@ -1794,6 +1803,7 @@ if ab:
         s = ab.settings(tb, cfg)
         led = ab.load_ledger(tb)
         spent, n = ab.spent_today(led)
+        wk, mo = ab.spent(led, "week")[0], ab.spent(led, "month")[0]
         icons = {"paid": "✅", "test": "🧪", "declined": "❌", "unclear": "❓", "bank": "🏦", "paying": "⏳"}
         lines = [f"{icons.get(o.get('status'), '✋')} {datetime.fromtimestamp(o.get('t', 0)):%d %b %I:%M %p} · "
                  f"{str(o.get('name'))[:50]} · {o.get('shop')}"
@@ -1804,9 +1814,92 @@ if ab:
             {"name": "Mode", "value": s["mode"] + (f" until {datetime.fromtimestamp(s['until']):%a %I:%M %p}"
                                                   if s["until"] and s["mode"] != "off" else "")},
             {"name": "Limits", "value": f"{tb.money(s['per_order'])}/order · {tb.money(s['per_day'])}/day · "
-                                        f"{s['orders_per_day']} orders/day · today {n} order(s), {tb.money(spent)}"},
+                                        f"{tb.money(s['per_week'])}/week · {tb.money(s['per_month'])}/month · "
+                                        f"{s['orders_per_day']} orders/day"},
+            {"name": "Spent", "value": f"today {tb.money(spent)} ({n} order(s)) · this week {tb.money(wk)} · "
+                                       f"this month {tb.money(mo)}"},
             lines_field("Last attempts", lines, "None yet.", 8)], BLUE)
         await inter.response.send_message(embed=e, ephemeral=True)
+
+    def _item_line(it):
+        state = "✅ done" if it["bought"] >= it["qty"] else ("⏸️ off" if not it["on"] else "🔎 looking")
+        how = f"code {it['code']}" if it["code"] else ""
+        if it["match"]:
+            how += (" + " if how else "") + "words: " + ", ".join(it["match"])
+        return f"{state} · **{it['name']}** · up to {tb.money(it['max'])} each · {it['bought']}/{it['qty']} bought · {how}"
+
+    @autobuy.command(name="list", description="What auto-buy looks for, the max for each and how many it has bought")
+    async def autobuy_list(inter: discord.Interaction):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        items = ab.load_items(tb)
+        e = embed(f"📋 Auto-buy list ({len(items)})", [lines_field("Items", [_item_line(it) for it in items],
+                                                               "Empty. `/autobuy add code:OP-15 max:240`", 25)], BLUE,
+                  footer="Only these are auto-bought. /autobuy add changes an item that's already there.")
+        await inter.response.send_message(embed=e, ephemeral=True)
+
+    @autobuy.command(name="add", description="Add (or change) an item auto-buy looks for")
+    @app_commands.describe(code="A booster box set code, e.g. OP-15, EB-05, PRB-02",
+                           match="Or words that must all be in the product's name, comma separated "
+                                 "(use | for either: premium|prb)",
+                           max="Most you'd pay per item (A$, before postage)", qty="How many you want in total (default 1)",
+                           name="A name for it (optional)", reset="Start the bought count again from 0")
+    async def autobuy_add(inter: discord.Interaction, max: float, code: Optional[str] = None,
+                          match: Optional[str] = None, qty: Optional[int] = 1, name: Optional[str] = None,
+                          reset: Optional[bool] = False):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        if code and not ab.norm_code(code):
+            await inter.response.send_message("The code should look like `OP-15`, `EB-05` or `PRB-02`.", ephemeral=True)
+            return
+        new = ab.make_item(code=code or "", match=match, max=max, qty=qty or 1, name=name or "")
+        if not new or max <= 0:
+            await inter.response.send_message("Give a `code` (like OP-15) or `match` words, and a `max` price.",
+                                              ephemeral=True)
+            return
+        items = ab.load_items(tb)
+        old = next((it for it in items if it["id"] == new["id"]), None)
+        if old:
+            if not name:
+                new["name"] = old["name"]
+            new["bought"] = 0 if reset else old["bought"]
+            items[items.index(old)] = new
+        else:
+            items.append(new)
+        try:
+            ab.save_items(tb, items)
+            _audit(_who(inter), f"autobuy add {new}")
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        await inter.response.send_message(("✏️ Changed: " if old else "➕ Added: ") + _item_line(new), ephemeral=True)
+
+    async def item_autocomplete(inter: discord.Interaction, current: str):
+        cur = current.lower()
+        return [app_commands.Choice(name=it["name"][:100], value=it["id"]) for it in ab.load_items(tb)
+                if cur in it["name"].lower() or cur in it["id"]][:25]
+
+    @autobuy.command(name="remove", description="Take an item off the auto-buy list")
+    @app_commands.describe(item="The item")
+    @app_commands.autocomplete(item=item_autocomplete)
+    async def autobuy_remove(inter: discord.Interaction, item: str):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        items = ab.load_items(tb)
+        gone = [it for it in items if it["id"] == item]
+        if not gone:
+            await inter.response.send_message("That isn't on the list (`/autobuy list`).", ephemeral=True)
+            return
+        try:
+            ab.save_items(tb, [it for it in items if it["id"] != item])
+            _audit(_who(inter), f"autobuy remove {item}")
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+            return
+        await inter.response.send_message(f"➖ Removed **{gone[0]['name']}** from the auto-buy list.", ephemeral=True)
 
     bot.tree.add_command(autobuy)
 
