@@ -134,3 +134,5 @@
 {"t": 1793847100, "event": "in_stock", "id": "poke|delta-reign|Overhauled Games TCG|21242", "name": "Delta Reign Booster Bundle ME06 – English Pokemon TCG", "shop": "Overhauled Games TCG", "price": 79.95, "was": 998860}
 {"t": 1793847100, "event": "in_stock", "id": "poke|delta-reign|Overhauled Games TCG|21238", "name": "Delta Reign Three-Booster Blister ME06 – English Pokemon TCG", "shop": "Overhauled Games TCG", "price": 37.95, "was": 998860}
 {"t": 1793872563, "event": "sold_out", "id": "poke|30th-celebration|JToys|89316", "name": "Pokemon TCG 30th Celebration Battle Deck – Espeon ex", "shop": "JToys", "price": 89.99, "was": 222029}
+{"t": 1793900783, "event": "sold_out", "id": "poke|delta-reign|JToys|89821", "name": "Pokémon TCG Mega Evolution Delta Reign Elite Trainer Box", "shop": "JToys", "price": 149.99, "was": 68340}
+{"t": 1793900783, "event": "sold_out", "id": "poke|delta-reign|M-G|133253", "name": "Pokemon – Delta Reign – Booster (Box)", "shop": "M-G", "price": 349.0, "was": 1423720}

@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-05 18",
+ "drops_slot": "2026-11-06 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793872553,
+ "ebay_ts": 1793900760,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -660,7 +660,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1793813374.9002743
+   "t": 1793900739.18656
   },
   "collectiblemadness.com.au": {
    "rules": [
@@ -1186,7 +1186,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793813374.3739457
+   "t": 1793900738.9514127
   },
   "grailborne.com.au": {
    "rules": [
@@ -1712,7 +1712,7 @@
   },
   "overhauledgames.com.au": {
    "rules": [],
-   "t": 1793813374.882823
+   "t": 1793900739.1851015
   },
   "pocketgames.com.au": {
    "rules": [
@@ -2234,7 +2234,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793813374.3564517
+   "t": 1793900738.9391434
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -2760,7 +2760,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793813374.371974
+   "t": 1793900738.9451602
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -3543,7 +3543,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793813374.3801866
+   "t": 1793900738.9641457
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -4479,5 +4479,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1793872553
+ "sweep_ts": 1793900760
 }
