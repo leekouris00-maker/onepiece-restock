@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-06 18",
+ "drops_slot": "2026-11-07 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793959709,
+ "ebay_ts": 1793986023,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -62,9 +62,17 @@
    300.0,
    1793759314
   ],
+  "list|Gameology|one-piece-card-game-dp-15-double-pack": [
+   49.95,
+   1793986036
+  ],
   "list|Gameology|one-piece-card-game-op-17-booster-box": [
    599.95,
    1793813410
+  ],
+  "list|Gameology|one-piece-card-game-op-20-booster-box": [
+   279.95,
+   1793986036
   ],
   "list|Good Games (sealed)|one-piece-card-game-premium-booster-box-prb-02": [
    619.0,
@@ -4472,5 +4480,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1793959709
+ "sweep_ts": 1793986023
 }
