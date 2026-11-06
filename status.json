@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-06 06",
+ "drops_slot": "2026-11-06 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793919261,
+ "ebay_ts": 1793933746,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,8 +55,8 @@
  "pokemon_state": "live",
  "recent_alerts": {
   "ebay|v1|366683562606|0": [
-   91.16,
-   1793650534
+   86.33,
+   1793933757
   ],
   "list|CardPlus TCG|18925": [
    300.0,
@@ -66,9 +66,9 @@
    599.95,
    1793813410
   ],
-  "list|Gameology|one-piece-card-game-st-43-starter-deck": [
-   34.99,
-   1793587729
+  "list|Good Games (sealed)|one-piece-card-game-premium-booster-box-prb-02": [
+   619.0,
+   1793933757
   ],
   "list|Grailborne|one-piece-card-game-premium-card-collection-best-selection-vol-6": [
    139.0,
@@ -82,13 +82,9 @@
    349.99,
    1793699036
   ],
-  "list|The Wandering Collector|one-piece-tcg-heroines-booster-box-case-eb-05": [
-   6999.95,
-   1793672525
-  ],
-  "list|The Wandering Collector|one-piece-tcg-heroines-booster-box-eb-05": [
-   549.95,
-   1793672525
+  "list|Pocket Games|one-piece-egghead-crisis-eb-04-booster-box-jap": [
+   7.0,
+   1793933757
   ],
   "poke|delta-reign|JToys|88614": [
    349.99,
@@ -1709,7 +1705,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793847067.6675413
+   "t": 1793933719.899323
   },
   "overhauledgames.com.au": {
    "rules": [],
@@ -4480,5 +4476,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1793919261
+ "sweep_ts": 1793933746
 }
