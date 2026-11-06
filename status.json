@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-06 12",
+ "drops_slot": "2026-11-06 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1793933746,
+ "ebay_ts": 1793959709,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -78,10 +78,6 @@
    79.0,
    1793832443
   ],
-  "list|JToys|89681": [
-   349.99,
-   1793699036
-  ],
   "list|Pocket Games|one-piece-egghead-crisis-eb-04-booster-box-jap": [
    7.0,
    1793933757
@@ -92,7 +88,7 @@
   ],
   "poke|delta-reign|JToys|89821": [
    149.99,
-   1793832443
+   1793959719
   ],
   "poke|delta-reign|JToys|89824": [
    69.99,
@@ -4476,5 +4472,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1793933746
+ "sweep_ts": 1793959709
 }
