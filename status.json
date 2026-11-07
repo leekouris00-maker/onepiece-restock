@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-07 12",
+ "drops_slot": "2026-11-07 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794016592,
+ "ebay_ts": 1794038769,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -15,7 +15,7 @@
  "offline_streak": 0,
  "page_hints": {
   "https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250": 14,
-  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 3,
+  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 4,
   "https://tcg.goodgames.com.au/collections/one-piece-card-game-singles-in-stock/products.json?limit=250": 6,
   "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250": 2
  },
@@ -41,7 +41,7 @@
   "TCGroup": 99,
   "The Wandering Collector": 99
  },
- "pc_on": false,
+ "pc_on": true,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -1709,7 +1709,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1793933719.899323
+   "t": 1794038737.484985
   },
   "overhauledgames.com.au": {
    "rules": [],
@@ -4480,5 +4480,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1794016592
+ "sweep_ts": 1794038769
 }
