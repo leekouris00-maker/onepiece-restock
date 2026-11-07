@@ -4,11 +4,36 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-07 18",
+ "drops_slot": "2026-11-08 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794038769,
- "held": {},
+ "ebay_ts": 1794063108,
+ "held": {
+  "plist|30th-celebration|JToys|90008": {
+   "f": {
+    "available": true,
+    "box_id": "poke|30th-celebration|JToys|90008",
+    "cart": "https://www.jtoys.com.au/checkout/?add-to-cart=90008&quantity=1",
+    "game": "pokemon",
+    "group": "pokemon",
+    "id": "plist|30th-celebration|JToys|90008",
+    "kind": "New listing",
+    "max": 45.0,
+    "name": "Pokemon TCG 30th Celebration Tin \u2013 Sylveon ex / Greninja ex Assorted",
+    "note": "Tin, out Fri 4 Dec \u00b7 in stock (over your $45 max)",
+    "page": 1,
+    "poke_id": "poke|30th-celebration|JToys|90008",
+    "preorder": false,
+    "price": 99.99,
+    "ptype": "Tin",
+    "section": "30th-celebration",
+    "section_name": "30th Celebration",
+    "shop": "JToys",
+    "url": "https://www.jtoys.com.au/product/pokemon-tcg-30th-celebration-tin-sylveon-ex-greninja-ex-assorted/"
+   },
+   "t": 1794063117
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -4480,5 +4505,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1794038769
+ "sweep_ts": 1794063108
 }
