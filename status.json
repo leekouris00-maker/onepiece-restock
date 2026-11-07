@@ -4,36 +4,11 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-08 00",
+ "drops_slot": "2026-11-08 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794063108,
- "held": {
-  "plist|30th-celebration|JToys|90008": {
-   "f": {
-    "available": true,
-    "box_id": "poke|30th-celebration|JToys|90008",
-    "cart": "https://www.jtoys.com.au/checkout/?add-to-cart=90008&quantity=1",
-    "game": "pokemon",
-    "group": "pokemon",
-    "id": "plist|30th-celebration|JToys|90008",
-    "kind": "New listing",
-    "max": 45.0,
-    "name": "Pokemon TCG 30th Celebration Tin \u2013 Sylveon ex / Greninja ex Assorted",
-    "note": "Tin, out Fri 4 Dec \u00b7 in stock (over your $45 max)",
-    "page": 1,
-    "poke_id": "poke|30th-celebration|JToys|90008",
-    "preorder": false,
-    "price": 99.99,
-    "ptype": "Tin",
-    "section": "30th-celebration",
-    "section_name": "30th Celebration",
-    "shop": "JToys",
-    "url": "https://www.jtoys.com.au/product/pokemon-tcg-30th-celebration-tin-sylveon-ex-greninja-ex-assorted/"
-   },
-   "t": 1794063117
-  }
- },
+ "ebay_ts": 1794078345,
+ "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -66,7 +41,7 @@
   "TCGroup": 99,
   "The Wandering Collector": 99
  },
- "pc_on": true,
+ "pc_on": false,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -83,17 +58,9 @@
    86.33,
    1793933757
   ],
-  "list|CardPlus TCG|18925": [
-   300.0,
-   1793759314
-  ],
   "list|Gameology|one-piece-card-game-dp-15-double-pack": [
    49.95,
    1793986036
-  ],
-  "list|Gameology|one-piece-card-game-op-17-booster-box": [
-   599.95,
-   1793813410
   ],
   "list|Gameology|one-piece-card-game-op-20-booster-box": [
    279.95,
@@ -103,10 +70,6 @@
    619.0,
    1793933757
   ],
-  "list|Grailborne|one-piece-card-game-premium-card-collection-best-selection-vol-6": [
-   139.0,
-   1793813410
-  ],
   "list|Grailborne|one-piece-tcg-ace-luffy-starter-deck-ex-st-30": [
    79.0,
    1793832443
@@ -114,6 +77,10 @@
   "list|Pocket Games|one-piece-egghead-crisis-eb-04-booster-box-jap": [
    7.0,
    1793933757
+  ],
+  "plist|30th-celebration|JToys|90008": [
+   99.99,
+   1794078356
   ],
   "poke|delta-reign|JToys|88614": [
    349.99,
@@ -126,10 +93,6 @@
   "poke|delta-reign|JToys|89824": [
    69.99,
    1793832443
-  ],
-  "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
-   99.0,
-   1793813410
   ]
  },
  "robots": {
@@ -4505,5 +4468,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1794063108
+ "sweep_ts": 1794078345
 }
