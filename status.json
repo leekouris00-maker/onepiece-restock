@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-10 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794266358,
+ "ebay_ts": 1794267305,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -53,8 +53,12 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794266358,
+ "pokemon_ts": 1794267109,
  "recent_alerts": {
+  "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
+   214.0,
+   1794267109
+  ],
   "open|item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-34|498393": [
    40.0,
    1794218144
@@ -3977,6 +3981,223 @@
    ],
    "t": 1794218109.0740383
   },
+  "www.jbhifi.com.au": {
+   "rules": [
+    [
+     0,
+     "/a/downloads/ -/*"
+    ],
+    [
+     0,
+     "/admin"
+    ],
+    [
+     0,
+     "/cart"
+    ],
+    [
+     0,
+     "/orders"
+    ],
+    [
+     0,
+     "/checkout"
+    ],
+    [
+     0,
+     "/2498035810/checkouts"
+    ],
+    [
+     0,
+     "/2498035810/orders"
+    ],
+    [
+     0,
+     "/carts"
+    ],
+    [
+     0,
+     "/account"
+    ],
+    [
+     0,
+     "/collections/*sort_by*sort_by*"
+    ],
+    [
+     0,
+     "/collections/*+*"
+    ],
+    [
+     0,
+     "/collections/*%2B*"
+    ],
+    [
+     0,
+     "/collections/*%2b*"
+    ],
+    [
+     0,
+     "/*/collections/*+*"
+    ],
+    [
+     0,
+     "/*/collections/*%2B*"
+    ],
+    [
+     0,
+     "/*/collections/*%2b*"
+    ],
+    [
+     0,
+     "/blogs/*+*"
+    ],
+    [
+     0,
+     "/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*/blogs/*+*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*design_theme_id*"
+    ],
+    [
+     0,
+     "/*preview_theme_id*"
+    ],
+    [
+     0,
+     "/*preview_script_id*"
+    ],
+    [
+     0,
+     "/search"
+    ],
+    [
+     0,
+     "/*?q*"
+    ],
+    [
+     0,
+     "/*?*hPP=*"
+    ],
+    [
+     0,
+     "/*?*idx=*"
+    ],
+    [
+     0,
+     "/*?*dFR%5Bfacets.*"
+    ],
+    [
+     0,
+     "/*cdn-cgi/beacon/performance*"
+    ],
+    [
+     0,
+     "/*?*s="
+    ],
+    [
+     0,
+     "/*?*sd=*"
+    ],
+    [
+     0,
+     "/*?*fc=*"
+    ],
+    [
+     0,
+     "/*?*mf=*"
+    ],
+    [
+     0,
+     "/*?*fm=*"
+    ],
+    [
+     0,
+     "/*?*?to=*"
+    ],
+    [
+     0,
+     "/*?*ie=*"
+    ],
+    [
+     0,
+     "/products/gift-card-*"
+    ],
+    [
+     0,
+     "/products/extra-care-*"
+    ],
+    [
+     0,
+     "/search?page=*"
+    ],
+    [
+     0,
+     "/*?*queryID=*"
+    ],
+    [
+     0,
+     "/pages/sku/*"
+    ],
+    [
+     0,
+     "/*?*oseid=*"
+    ],
+    [
+     0,
+     "/.well-known/shopify/monorail"
+    ],
+    [
+     0,
+     "/cdn/wpm/*.js"
+    ],
+    [
+     0,
+     "/wpm@*"
+    ],
+    [
+     0,
+     "/web-pixel*"
+    ],
+    [
+     0,
+     "/*.atom$"
+    ],
+    [
+     0,
+     "/*.oembed$"
+    ],
+    [
+     1,
+     "/products/gift-card-digital-500"
+    ],
+    [
+     1,
+     "/*?page=*"
+    ],
+    [
+     0,
+     "/apple-app-site-association"
+    ]
+   ],
+   "t": 1794266733.9236114
+  },
   "www.jtoys.com.au": {
    "rules": [],
    "t": 1794218109.110347
@@ -4449,7 +4670,7 @@
    "t": 1794218109.0752587
   }
  },
- "sealed_ts": 1794266551,
+ "sealed_ts": 1794267305,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -4471,6 +4692,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
+  "www.jbhifi.com.au": 0,
   "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
@@ -4481,6 +4703,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794266358,
- "sweep_ts": 1794266358
+ "singles_ts": 1794267305,
+ "sweep_ts": 1794267305
 }
