@@ -18,3 +18,5 @@ collection.json
 collection_photos/
 # v2.12 deal finder: which eBay deals it has already told you about (PC only)
 deal_finder.json
+# v2.13: the cloud loop reads this between checks
+next_wait.txt

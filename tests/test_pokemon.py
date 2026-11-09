@@ -13,7 +13,7 @@ import time
 import unittest
 import urllib.error
 import urllib.parse
-from datetime import datetime
+from datetime import datetime, timedelta
 from types import SimpleNamespace
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
@@ -830,7 +830,10 @@ class ChannelSetup(unittest.TestCase):
         self.assertNotIn(" ", vals["POKEMON_WEBHOOKS"])
 
     def test_channel_topics_say_whats_next(self):
-        topics = {k: t for k, _, t, _ in apc.plan({})}
+        # a release with an in-store day still to come (dates in the built-in list pass, so make one)
+        soon = (datetime.now() + timedelta(days=10)).strftime("%Y-%m-%d")
+        cfg = {"pokemon": {"sections": [{"name": 'Delta Reign', "dates": [{"date": soon, "what": "booster boxes"}]}]}}
+        topics = {k: t for k, _, t, _ in apc.plan(cfg)}
         self.assertIn("Next in stores:", topics["delta-reign"])
 
 

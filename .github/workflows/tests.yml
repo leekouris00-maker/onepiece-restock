@@ -1,0 +1,26 @@
+# Runs the bot's tests whenever its code changes, so a broken update shows up as a red cross here
+# instead of as missed alerts.
+name: Tests
+
+on:
+  push:
+    branches: [master]
+    paths: ["**.py", "config.json", ".github/workflows/tests.yml"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests
+        env:
+          TZ: Australia/Melbourne

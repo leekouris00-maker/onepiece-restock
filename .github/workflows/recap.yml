@@ -11,7 +11,7 @@ permissions:
   contents: write             # saves recap.json so tomorrow's recap can compare prices
 
 concurrency:
-  group: restock              # waits for any running restock check, so the two never clash
+  group: recap                # its own queue: the restock check now runs all the time (v2.13)
   cancel-in-progress: false
 
 jobs:
@@ -19,9 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -50,5 +50,8 @@ jobs:
           [ -f recap.json ] && git add recap.json
           if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
           git commit -m "Daily recap snapshot"
-          git pull --rebase
-          git push
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash; then git push && exit 0; else git rebase --abort 2>/dev/null || true; fi
+            sleep $((i * 5))
+          done
+          exit 1

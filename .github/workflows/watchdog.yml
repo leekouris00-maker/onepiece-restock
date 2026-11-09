@@ -1,0 +1,35 @@
+# Makes sure the cloud copy ("Restock check") is running. That workflow restarts itself every 50 minutes;
+# if the chain ever breaks (GitHub outage, a failed job), this starts it again. It does nothing otherwise.
+name: Watchdog
+
+on:
+  schedule:
+    - cron: "11,26,41,56 * * * *"   # every 15 minutes (GitHub often runs these late - that's fine here)
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: [".github/workflows/main.yml"]   # a new version of the cloud loop: make sure it's going
+
+permissions:
+  actions: write
+
+concurrency:
+  group: watchdog
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Start the restock check if it isn't running
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          live=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/main.yml/runs?per_page=10" \
+                 -q '[.workflow_runs[] | select(.status != "completed")] | length')
+          echo "restock jobs running or queued: $live"
+          if [ "$live" = "0" ]; then
+            gh workflow run main.yml --repo "$GITHUB_REPOSITORY" --ref master
+            echo "started the restock check"
+          fi

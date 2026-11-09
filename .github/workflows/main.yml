@@ -1,13 +1,17 @@
 # Runs the One Piece restock bot on GitHub's computers, so it keeps checking when your PC is off.
+#
+# v2.13: one long job that checks again and again (every EVERY_MINUTES, every minute inside a drop
+# window) for RUN_MINUTES, then starts the next job itself. GitHub's own timer ("schedule") was only
+# starting a check every 4-7 hours, so it's no longer used here; watchdog.yml restarts this if the
+# chain ever stops. To stop the cloud copy: Actions > Restock check > "..." > Disable workflow.
 name: Restock check
 
 on:
-  schedule:
-    - cron: "*/5 * * * *"    # every 5 minutes, GitHub's fastest (it often runs a few minutes late)
-  workflow_dispatch:          # adds a "Run workflow" button so you can test it any time
+  workflow_dispatch:          # the "Run workflow" button, the watchdog, and the job before this one
 
 permissions:
   contents: write             # lets it save seen.json back to the repo
+  actions: write              # lets it start the next job
 
 concurrency:
   group: restock              # never two checks at once
@@ -16,44 +20,106 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 70
+    env:
+      EVERY_MINUTES: "3"      # gap between checks (boxes and sealed); singles and Pokémon keep their own pace
+      RUN_MINUTES: "50"       # how long one job keeps going before handing over to the next
+      DISCORD_WEBHOOK_BOXES: ${{ secrets.DISCORD_WEBHOOK_BOXES }}
+      DISCORD_WEBHOOK_SINGLES: ${{ secrets.DISCORD_WEBHOOK_SINGLES }}
+      DISCORD_WEBHOOK_SEALED: ${{ secrets.DISCORD_WEBHOOK_SEALED }}
+      DISCORD_WEBHOOK_INSTORE: ${{ secrets.DISCORD_WEBHOOK_INSTORE }}   # optional: #onepiece-in-store (v2.10, /onepiece setup)
+      DISCORD_WEBHOOK_EBAY: ${{ secrets.DISCORD_WEBHOOK_EBAY }}       # optional: eBay finds get their own channel
+      DISCORD_WEBHOOK_STATUS: ${{ secrets.DISCORD_WEBHOOK_STATUS }}   # optional: bot status posts get their own channel
+      DISCORD_WEBHOOK_DROPS: ${{ secrets.DISCORD_WEBHOOK_DROPS }}     # optional: the 6-hourly price drops get their own channel
+      DISCORD_PING: ${{ secrets.DISCORD_PING }}
+      HEARTBEAT_TOPIC: ${{ secrets.HEARTBEAT_TOPIC }}
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}                   # optional: phone pushes (and "Discord posts failing")
+      EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}           # eBay watch (ebay_watch.json); off until set
+      EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
+      POKEMON_WEBHOOKS: ${{ secrets.POKEMON_WEBHOOKS }}       # Pokémon channels (one line of JSON); quiet until set
+      POKEMON_PING: ${{ secrets.POKEMON_PING }}               # the Pokémon Ping role
+      HEARTBEAT_ROLE: listen          # stay quiet while the PC copy is on
+      BOT_NAME: "One Piece Restock (cloud)"
+      TZ: Australia/Melbourne
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Make sure tcg_bot.py is the cloud-ready version
-        run: grep -q DISCORD_WEBHOOK_BOXES tcg_bot.py || { echo "::error::tcg_bot.py is an old version - upload the newest one"; exit 1; }
+        run: grep -q -- "--pace" tcg_bot.py || { echo "::error::tcg_bot.py is an old version - upload the newest one"; exit 1; }
 
-      - name: Check shops
-        env:
-          DISCORD_WEBHOOK_BOXES: ${{ secrets.DISCORD_WEBHOOK_BOXES }}
-          DISCORD_WEBHOOK_SINGLES: ${{ secrets.DISCORD_WEBHOOK_SINGLES }}
-          DISCORD_WEBHOOK_SEALED: ${{ secrets.DISCORD_WEBHOOK_SEALED }}
-          DISCORD_WEBHOOK_INSTORE: ${{ secrets.DISCORD_WEBHOOK_INSTORE }}   # optional: #onepiece-in-store (v2.10, /onepiece setup)
-          DISCORD_WEBHOOK_EBAY: ${{ secrets.DISCORD_WEBHOOK_EBAY }}       # optional: eBay finds get their own channel
-          DISCORD_WEBHOOK_STATUS: ${{ secrets.DISCORD_WEBHOOK_STATUS }}   # optional: bot status posts get their own channel
-          DISCORD_WEBHOOK_DROPS: ${{ secrets.DISCORD_WEBHOOK_DROPS }}     # optional: the 6-hourly price drops get their own channel
-          DISCORD_PING: ${{ secrets.DISCORD_PING }}
-          HEARTBEAT_TOPIC: ${{ secrets.HEARTBEAT_TOPIC }}
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}                   # optional: phone pushes (and "Discord posts failing")
-          EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}           # eBay watch (ebay_watch.json); off until set
-          EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
-          POKEMON_WEBHOOKS: ${{ secrets.POKEMON_WEBHOOKS }}       # Pokémon channels (one line of JSON); quiet until set
-          POKEMON_PING: ${{ secrets.POKEMON_PING }}               # the Pokémon Ping role
-          HEARTBEAT_ROLE: listen          # stay quiet while the PC copy is on
-          BOT_NAME: "One Piece Restock (cloud)"
-          TZ: Australia/Melbourne
-        run: python tcg_bot.py
+      - name: Check shops, again and again
+        run: |
+          git config user.name "restock-bot"
+          git config user.email "restock-bot@users.noreply.github.com"
+          save() {            # remember what's in stock and what's listed; never stops the checks
+            for f in seen.json known_products.json status.json price_history.json singles_prices.json events.jsonl; do
+              [ -f "$f" ] && git add "$f"
+            done
+            git diff --cached --quiet && return 0
+            git commit -q -m "Update bot memory" || return 0
+            for i in 1 2 3 4; do
+              if git pull -q --rebase --autostash; then
+                git push -q && return 0
+              else
+                git rebase --abort 2>/dev/null || true
+              fi
+              sleep $((i * 5))
+            done
+            echo "::warning::Couldn't save the bot's memory to GitHub just now; it tries again in a few minutes"
+          }
+          end=$((SECONDS + RUN_MINUTES * 60)); ok=0; bad=0; row=0; saved=$SECONDS
+          while [ "$SECONDS" -lt "$end" ]; do
+            rm -f next_wait.txt
+            if timeout 480 python tcg_bot.py --pace "$EVERY_MINUTES"; then
+              ok=$((ok + 1)); row=0
+            else
+              bad=$((bad + 1)); row=$((row + 1))
+              echo "::warning::A check failed (failed checks this job: $bad)"
+            fi
+            [ "$row" -ge 5 ] && break                      # five in a row: stop and let the watchdog start fresh
+            if [ $((SECONDS - saved)) -ge 600 ]; then save; saved=$SECONDS; fi
+            wait=$(cat next_wait.txt 2>/dev/null || true)
+            case "$wait" in ''|*[!0-9]*) wait=$((EVERY_MINUTES * 60)) ;; esac
+            left=$((end - SECONDS))
+            [ "$left" -le 0 ] && break
+            [ "$wait" -gt "$left" ] && wait=$left
+            sleep "$wait"
+          done
+          echo "checks that worked: $ok, failed: $bad"
+          [ "$ok" -gt 0 ] || { echo "::error::Every check in this job failed"; exit 1; }
 
       - name: Remember what's in stock and what's listed
+        if: always()
         run: |
           git config user.name "restock-bot"
           git config user.email "restock-bot@users.noreply.github.com"
           for f in seen.json known_products.json status.json price_history.json singles_prices.json events.jsonl; do [ -f "$f" ] && git add "$f"; done
           if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
           git commit -m "Update bot memory"
-          git pull --rebase
-          git push
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash; then git push && exit 0; else git rebase --abort 2>/dev/null || true; fi
+            sleep $((i * 5))
+          done
+          exit 1
+
+      - name: Start the next job
+        if: success() && github.ref == 'refs/heads/master'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in 1 2 3; do
+            gh workflow run main.yml --repo "$GITHUB_REPOSITORY" --ref master && exit 0
+            sleep $((i * 10))
+          done
+          echo "::warning::Couldn't start the next job; the watchdog will within the hour"
+
+      - name: Tell Discord if the cloud copy stopped
+        if: failure()
+        run: |
+          [ -n "$DISCORD_WEBHOOK_STATUS" ] || exit 0
+          curl -sS -m 20 -H "Content-Type: application/json" -X POST "$DISCORD_WEBHOOK_STATUS" \
+            -d "{\"username\":\"$BOT_NAME\",\"allowed_mentions\":{\"parse\":[]},\"content\":\"⚠️ **The cloud copy stopped** (its checks or saving failed). The watchdog restarts it within the hour. Details: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}" || true

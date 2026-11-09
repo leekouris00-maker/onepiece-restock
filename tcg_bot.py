@@ -169,7 +169,7 @@ try:
 except ImportError:
     deal_finder = None
 
-VERSION = "2.12"
+VERSION = "2.13"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -2669,7 +2669,7 @@ def _game(x):
     return POKE if g.startswith("poke") else ONE_PIECE
 
 
-def parse_windows(cfg):
+def parse_windows(cfg, now=None):
     out = []
     for w in cfg.get("drop_windows", []) or []:
         try:
@@ -2685,10 +2685,10 @@ def parse_windows(cfg):
                     "sealed_only": w.get("sealed_only", True), "games": [_game(w.get("game"))],
                     "sections": [str(x) for x in w.get("sections") or []]})
     mine = list(out)
-    autos = [dict(w, games=w.get("games") or [ONE_PIECE]) for w in auto_windows(cfg)]
+    autos = [dict(w, games=w.get("games") or [ONE_PIECE]) for w in auto_windows(cfg, now)]
     if pokemon_watch:
         try:
-            autos += pokemon_watch.auto_windows(cfg)
+            autos += pokemon_watch.auto_windows(cfg, now)
         except Exception as e:  # noqa: BLE001
             print(f"   ! Pokémon drop windows skipped ({e})")
     for w in autos:                    # yours win where they overlap (for the same game)
@@ -2703,7 +2703,7 @@ def active_window(cfg, now=None):
     """The drop window on now. If several overlap (e.g. a One Piece and a Pokémon release), one merged
     window: the fastest pace, every game and Pokémon release in any of them."""
     now = now or datetime.now()
-    act = [w for w in parse_windows(cfg) if w["start"] <= now < w["end"]]
+    act = [w for w in parse_windows(cfg, now) if w["start"] <= now < w["end"]]
     if len(act) <= 1:
         return act[0] if act else None
     op = [w for w in act if ONE_PIECE in w.get("games", [ONE_PIECE])]
@@ -2731,7 +2731,7 @@ def seconds_until_next_check(cfg, normal_minutes, now=None):
     if w:
         return min(w["every"], max(1.0, (w["end"] - now).total_seconds()))
     normal = normal_minutes * 60
-    starts = [x["start"] for x in parse_windows(cfg) if x["start"] > now]
+    starts = [x["start"] for x in parse_windows(cfg, now) if x["start"] > now]
     if starts:
         wait = (min(starts) - now).total_seconds()
         if wait < normal:
@@ -4412,6 +4412,9 @@ def main():
     ap.add_argument("--recap", action="store_true", help="post the daily recap to Discord and stop")
     ap.add_argument("--dry-run", action="store_true", help="check and print, but post and save nothing")
     ap.add_argument("--self-test", action="store_true", help="check config, files and one shop, then stop")
+    ap.add_argument("--pace", type=float, metavar="MINUTES",
+                    help="one check, paced as if looping every N minutes (singles and Pokémon only when due, drop "
+                         "windows on); writes the seconds to wait before the next one to next_wait.txt")
     args = ap.parse_args()
     DRY_RUN[0] = args.dry_run
 
@@ -4439,6 +4442,24 @@ def main():
         run_recap(cfg)
         return
 
+    if args.pace and not args.loop:
+        # v2.13: the cloud copy's loop (main.yml) runs this again and again inside one long GitHub job
+        pace = max(1.0, args.pace)
+        args.loop = pace
+        wait = pace * 60
+        try:
+            run_once(cfg, args, active_window(cfg))
+        finally:
+            try:
+                wait = seconds_until_next_check(cfg, pace)
+            except Exception as e:  # noqa: BLE001
+                print(f"   ! couldn't work out the next check time ({redact(e)})")
+            try:
+                with open(os.path.join(HERE, "next_wait.txt"), "w", encoding="utf-8") as f:
+                    f.write(str(int(max(1, wait))))
+            except OSError:
+                pass
+        return
     if not args.loop:
         run_once(cfg, args)
         return

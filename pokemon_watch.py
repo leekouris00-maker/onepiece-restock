@@ -838,7 +838,7 @@ def _embed(day, items, which):
 
 
 # ---------------------------------------------------------------- drop mode
-def auto_windows(cfg):
+def auto_windows(cfg, now=None):
     """Drop-mode windows for release days with "drop": the evening before (6pm-midnight) and that
     morning (7am-1pm), every 60 seconds, checking only the releases out that day."""
     if cfg.get("auto_drop_windows", True) is False:
@@ -847,7 +847,7 @@ def auto_windows(cfg):
     if not pc["enabled"] or not pc["drop_windows"]:
         return []
     out = []
-    for when, items in release_days(cfg, datetime.now(), days=400, past=1):
+    for when, items in release_days(cfg, now or datetime.now(), days=400, past=1):
         drops = [s for s, d in items if d["drop"] and s["queries"]]
         if not drops:
             continue
