@@ -149,7 +149,8 @@
  "Cherry Collectables (pokemon:delta-reign)": [
   "plist|delta-reign|Cherry Collectables|pokemon-tcg-mega-evolution-delta-reign-booster-box",
   "plist|delta-reign|Cherry Collectables|pokemon-tcg-mega-evolution-delta-reign-booster-bundle",
-  "plist|delta-reign|Cherry Collectables|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box"
+  "plist|delta-reign|Cherry Collectables|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box",
+  "plist|delta-reign|Cherry Collectables|pokemon-tcg-mega-evolution-delta-reign-three-booster-blister"
  ],
  "Collectible Madness": [
   "list|Collectible Madness|one-piece-card-game-tba-eb-05-booster-box",
@@ -405,7 +406,8 @@
  "Gametraders Modbury Heights (pokemon:30th-celebration)": [
   "plist|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-booster-bundle-2nd-october",
   "plist|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-elite-trainer-box-16th-september",
-  "plist|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-poster-collection-16th-september"
+  "plist|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-poster-collection-16th-september",
+  "plist|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-sylveon-ex-box-greninja-ex-box-16th-september"
  ],
  "Gametraders Modbury Heights (pokemon:delta-reign)": [
   "plist|delta-reign|Gametraders Modbury Heights|pre-order-pokemon-tcg-mega-evolution-chaos-rising-booster-bundle-6th-november",
@@ -917,6 +919,7 @@
  ],
  "Rogue Online (pokemon:delta-reign)": [
   "plist|delta-reign|Rogue Online|pre-order-pokemon-tcg-mega-evolution-delta-reign-3-pack-blister",
+  "plist|delta-reign|Rogue Online|pre-order-pokemon-tcg-mega-evolution-delta-reign-booster-bundle-box",
   "plist|delta-reign|Rogue Online|pre-order-pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box"
  ],
  "TCGroup": [
