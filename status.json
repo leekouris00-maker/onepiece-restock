@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-09 12",
+ "drops_slot": "2026-11-09 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794190736,
+ "ebay_ts": 1794218134,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -54,10 +54,6 @@
  },
  "pokemon_state": "live",
  "recent_alerts": {
-  "ebay|v1|366683562606|0": [
-   86.33,
-   1793933757
-  ],
   "list|Gameology|one-piece-card-game-dp-15-double-pack": [
    49.95,
    1793986036
@@ -66,41 +62,41 @@
    279.95,
    1793986036
   ],
-  "list|Good Games (sealed)|one-piece-card-game-premium-booster-box-prb-02": [
-   619.0,
-   1793933757
+  "open|item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-34|498393": [
+   40.0,
+   1794218144
   ],
-  "list|Grailborne|one-piece-tcg-ace-luffy-starter-deck-ex-st-30": [
-   79.0,
-   1793832443
+  "open|item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-35|498393": [
+   40.0,
+   1794218144
   ],
-  "list|Pocket Games|one-piece-egghead-crisis-eb-04-booster-box-jap": [
-   7.0,
-   1793933757
+  "open|item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-36|498393": [
+   40.0,
+   1794218144
   ],
   "plist|30th-celebration|JToys|90008": [
    99.99,
    1794078356
   ],
-  "poke|delta-reign|JToys|88614": [
-   349.99,
-   1793832443
-  ],
   "poke|delta-reign|JToys|89821": [
    149.99,
    1793959719
   ],
-  "poke|delta-reign|JToys|89824": [
-   69.99,
-   1793832443
+  "poke|delta-reign|Overhauled Games TCG|21238": [
+   34.95,
+   1794218144
+  ],
+  "poke|delta-reign|Overhauled Games TCG|21242": [
+   69.95,
+   1794218144
   ],
   "poke|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-3-booster-blister": [
    27.99,
    1794091232
   ],
   "poke|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-booster-box": [
-   329.99,
-   1794091232
+   349.99,
+   1794218144
   ],
   "poke|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-elite-trainer-box-etb": [
    149.99,
@@ -367,7 +363,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794124888.5090256
+   "t": 1794218109.0771194
   },
   "cardbot.com.au": {
    "rules": [
@@ -628,7 +624,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794124889.2959912
+   "t": 1794218109.8240993
   },
   "cardplustcg.com.au": {
    "rules": [
@@ -922,11 +918,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794124889.220143
+   "t": 1794218109.7554615
   },
   "elementalarcade.com.au": {
    "rules": [],
-   "t": 1794124895.0961607
+   "t": 1794218114.9629571
   },
   "goldfieldsgames.com.au": {
    "rules": [
@@ -1448,7 +1444,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794124889.107928
+   "t": 1794218109.7405639
   },
   "lightofcards.com.au": {
    "rules": [
@@ -1974,7 +1970,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794124888.499822
+   "t": 1794218109.0758228
   },
   "rogueonline.com.au": {
    "rules": [
@@ -2496,11 +2492,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794124888.5167212
+   "t": 1794218109.1273906
   },
   "tcg.goodgames.com.au": {
    "rules": [],
-   "t": 1794124895.705896
+   "t": 1794218116.0762067
   },
   "thewanderingcollector.com.au": {
    "rules": [
@@ -3026,7 +3022,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1794124888.5100698
+   "t": 1794218109.0799325
   },
   "www.gameology.com.au": {
    "rules": [
@@ -3283,7 +3279,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794124888.4981833
+   "t": 1794218109.0750124
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -3705,7 +3701,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1794124888.510581
+   "t": 1794218109.0824873
   },
   "www.gumnut.com.au": {
    "rules": [
@@ -3966,24 +3962,15 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794124888.4976776
+   "t": 1794218109.0740383
   },
   "www.jtoys.com.au": {
-   "rules": [
-    [
-     0,
-     "/wp-admin/"
-    ],
-    [
-     1,
-     "/wp-admin/admin-ajax.php"
-    ]
-   ],
-   "t": 1794124888.5416682
+   "rules": [],
+   "t": 1794218109.110347
   },
   "www.kollecter.com.au": {
    "rules": [],
-   "t": 1794124897.1408558
+   "t": 1794218117.1964355
   },
   "www.m-g.com.au": {
    "rules": [
@@ -4016,15 +4003,15 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1794124888.8102918
+   "t": 1794218109.588459
   },
   "www.mayhemcollectables.com.au": {
    "rules": [],
-   "t": 1794124895.6541724
+   "t": 1794218115.6559496
   },
   "www.monstermart.com.au": {
    "rules": [],
-   "t": 1794124897.4602602
+   "t": 1794218117.4012818
   },
   "www.pokebox.com.au": {
    "rules": [
@@ -4185,7 +4172,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1794124888.498924
+   "t": 1794218109.1064086
   },
   "www.tcgroupau.com.au": {
    "rules": [
@@ -4446,7 +4433,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794124888.4986248
+   "t": 1794218109.0752587
   }
  },
  "shop_down": [],
@@ -4470,7 +4457,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 1,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -4480,5 +4467,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1794190736
+ "sweep_ts": 1794218134
 }
