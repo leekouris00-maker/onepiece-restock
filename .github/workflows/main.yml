@@ -56,7 +56,7 @@ jobs:
           git config user.name "restock-bot"
           git config user.email "restock-bot@users.noreply.github.com"
           save() {            # remember what's in stock and what's listed; never stops the checks
-            for f in seen.json known_products.json status.json price_history.json singles_prices.json events.jsonl; do
+            for f in seen.json known_products.json status.json price_history.json singles_prices.json events.jsonl chain_state.json; do
               [ -f "$f" ] && git add "$f"
             done
             git diff --cached --quiet && return 0
@@ -97,7 +97,7 @@ jobs:
         run: |
           git config user.name "restock-bot"
           git config user.email "restock-bot@users.noreply.github.com"
-          for f in seen.json known_products.json status.json price_history.json singles_prices.json events.jsonl; do [ -f "$f" ] && git add "$f"; done
+          for f in seen.json known_products.json status.json price_history.json singles_prices.json events.jsonl chain_state.json; do [ -f "$f" ] && git add "$f"; done
           if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
           git commit -m "Update bot memory"
           for i in 1 2 3 4 5; do
