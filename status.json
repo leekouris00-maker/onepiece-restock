@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1792843525
  },
- "drops_slot": "2026-11-09 18",
+ "drops_slot": "2026-11-10 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794218134,
+ "ebay_ts": 1794255387,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -1705,7 +1705,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794149838.7495027
+   "t": 1794255363.9668746
   },
   "overhauledgames.com.au": {
    "rules": [],
@@ -4457,7 +4457,7 @@
   "www.gametradersinglefarm.com.au": 0,
   "www.gdgames.com.au": 0,
   "www.gumnut.com.au": 0,
-  "www.jtoys.com.au": 1,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -4467,5 +4467,5 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "sweep_ts": 1794218134
+ "sweep_ts": 1794255387
 }
