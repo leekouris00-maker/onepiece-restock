@@ -53,7 +53,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794267109,
+ "pokemon_ts": 1794267755,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -78,6 +78,18 @@
   "plist|delta-reign|Rogue Online|pre-order-pokemon-tcg-mega-evolution-delta-reign-booster-bundle-box": [
    49.99,
    1794265016
+  ],
+  "plist|delta-reign|The Wandering Collector|in-hand-pokemon-tcg-mega-evolution-6-delta-reign-3-pack-blister": [
+   39.95,
+   1794267756
+  ],
+  "plist|delta-reign|The Wandering Collector|in-hand-pokemon-tcg-mega-evolution-6-delta-reign-booster-bundle": [
+   79.95,
+   1794267756
+  ],
+  "plist|delta-reign|The Wandering Collector|pokemon-tcg-mega-evolution-6-delta-reign-booster-box": [
+   389.95,
+   1794267756
   ],
   "poke|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-sylveon-ex-box-greninja-ex-box-16th-september": [
    79.99,
@@ -4670,7 +4682,7 @@
    "t": 1794218109.0752587
   }
  },
- "sealed_ts": 1794267305,
+ "sealed_ts": 1794268123,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,

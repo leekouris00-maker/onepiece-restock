@@ -1,0 +1,54 @@
+{
+ "JB Hi-Fi": {
+  "bf_ts": 1794267378,
+  "cache": {
+   "finds": [
+    {
+     "cart": "https://www.jbhifi.com.au/cart/40427809177801:1",
+     "id": "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03",
+     "kind": "Booster box",
+     "name": "One Piece Card Game Extra Booster Display Heroines Edition Box 24 Pack EB-03",
+     "note": "sold by SuperGamers on JB Marketplace",
+     "price": 214.0,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03"
+    }
+   ],
+   "listings": [
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03",
+     "cart": "https://www.jbhifi.com.au/cart/40427809177801:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "One Piece Card Game Extra Booster Display Heroines Edition Box 24 Pack EB-03",
+     "note": "sold by SuperGamers on JB Marketplace",
+     "page": 1,
+     "price": 214.0,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03"
+    }
+   ]
+  },
+  "cursor": 2,
+  "files": 110,
+  "handles": {
+   "kotomi-one-piece-plush-keyring-blind-box-collectible": {
+    "ok": false
+   },
+   "megahouse-tsumichen-stack-up-change-one-piece": {
+    "ok": false
+   },
+   "one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": {
+    "ok": true
+   },
+   "s-h-figuarts-chopper-a-netflix-series-one-piece": {
+    "ok": false
+   }
+  },
+  "ts": 1794267378
+ }
+}

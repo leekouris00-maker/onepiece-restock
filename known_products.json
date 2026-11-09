@@ -1035,5 +1035,9 @@
   "plist|30th-celebration|The Wandering Collector|pokemon-tcg-mega-evolution-30th-celebration-booster-bundle",
   "plist|30th-celebration|The Wandering Collector|pre-order-pokemon-tcg-30th-celebration-elite-trainer-box"
  ],
- "The Wandering Collector (pokemon:delta-reign)": []
+ "The Wandering Collector (pokemon:delta-reign)": [
+  "plist|delta-reign|The Wandering Collector|in-hand-pokemon-tcg-mega-evolution-6-delta-reign-3-pack-blister",
+  "plist|delta-reign|The Wandering Collector|in-hand-pokemon-tcg-mega-evolution-6-delta-reign-booster-bundle",
+  "plist|delta-reign|The Wandering Collector|pokemon-tcg-mega-evolution-6-delta-reign-booster-box"
+ ]
 }
