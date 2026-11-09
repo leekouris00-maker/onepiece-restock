@@ -77,6 +77,12 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.14: JB HI-FI. The bot now watches JB Hi-Fi's One Piece card products: new ones as JB lists them, and stock
+and price for each (JB's own stock and its marketplace sellers). It reads JB every 10 minutes (every 2 in a drop window)
+and takes about 9 hours after the first run to work through JB's back catalogue; older products it finds that way only
+alert when they're buyable within your max. Off with "chain_shops": false in config.json, or pause "JB Hi-Fi" like any
+shop. Details at the top of chain_shops.py.
+
 New in v2.13: THE CLOUD COPY CHECKS EVERY 3 MINUTES. GitHub's timer was only starting a check every 4-7 hours.
 The cloud copy is now one long job that checks every 3 minutes (every minute in a drop window, e.g. release eve and
 release morning), singles every 15, and starts the next job itself every 50 minutes. A "Watchdog" restarts it if it

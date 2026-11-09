@@ -168,8 +168,12 @@ try:
     import deal_finder         # v2.12: eBay singles under TCGplayer's market, to the private channel (PC copy)
 except ImportError:
     deal_finder = None
+try:
+    import chain_shops         # v2.14: chain retailers (JB Hi-Fi); optional
+except ImportError:
+    chain_shops = None
 
-VERSION = "2.13"
+VERSION = "2.14"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -1144,7 +1148,7 @@ KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "relea
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
                   "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
-                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy", "deal_finder"}
+                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy", "deal_finder", "chain_shops"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -1829,6 +1833,11 @@ def sweep_jobs(cfg, max_price, watch):
     return jobs
 
 
+def chain_boxes(shop_name, max_price, watch, fast):
+    """v2.14: JB Hi-Fi (chain_shops.py). Same answer shape as shopify_boxes."""
+    return chain_shops.jb_boxes(_me(), max_price, watch, fast=fast)
+
+
 def check_sealed(cfg, sweep=False):
     """Returns (finds, listings_by_shop). listings_by_shop[shop] is None when that shop failed.
     sweep: also run the release-code sweep (v2.4) this check."""
@@ -1847,6 +1856,8 @@ def check_sealed(cfg, sweep=False):
         jobs.append((woo_boxes, shop["name"], shop["url"], mx, watch))
     for shop in search:
         jobs.append((shopify_search_boxes, shop["name"], shop["base"], mx, watch))
+    if chain_shops and chain_shops.enabled(cfg, _me()):
+        jobs.append((chain_boxes, chain_shops.JB_NAME, mx, watch, bool(sweep)))
     if sweep:
         SWEPT.clear()
         jobs += sweep_jobs(cfg, mx, watch)
@@ -1940,6 +1951,8 @@ def new_listings(by_shop, known, box_finds, pages_seen=None, swept=()):
                 continue            # already known, or already alerting as a buyable box
             if int(l.get("page", 1)) > read_to:
                 continue            # first time we've read this deep into the shop (or swept it): just remember it
+            if l.get("quiet"):
+                continue            # v2.14: found in a shop's back catalogue (chain_shops): just remember it
             status = ("in stock" if l["available"] else "listed, not buyable yet")
             if l["available"] and (l.get("max") or 0) > 0 and l["price"] > l["max"]:
                 status += f" (over your {money(l['max'])} max)"
@@ -2861,6 +2874,9 @@ def shop_names(cfg):
             names.setdefault(urllib.parse.urlparse(shop.get("url") or shop.get("base")).netloc, shop["name"])
     for name, base in cfg.get("singles", {}).get("shops", {}).items():
         names.setdefault(urllib.parse.urlparse(base).netloc, name)
+    if chain_shops and chain_shops.enabled(cfg, _me()):
+        for host, name in chain_shops.hosts().items():
+            names.setdefault(host, name)
     if pokemon_watch:
         try:
             for s in pokemon_watch.shops(cfg, _me()):
@@ -4363,10 +4379,10 @@ def self_test(cfg):
 def fetch_new_files():
     """v2.11: an update_bot.bat from before v2.11 doesn't know about auto_buy.py or setup_autobuy.bat, and never
     updates itself. Fetch those (and the newer update_bot.bat) once from the bot's GitHub repo. PC copy only."""
-    global auto_buy, deal_finder
+    global auto_buy, deal_finder, chain_shops
     if IN_ACTIONS:
         return
-    for name in ("auto_buy.py", "auto_buy_web.py", "collection.py", "deal_finder.py", "setup_autobuy.bat",
+    for name in ("auto_buy.py", "auto_buy_web.py", "collection.py", "deal_finder.py", "chain_shops.py", "setup_autobuy.bat",
                  "open_autobuy.bat", "update_bot.bat"):
         path = os.path.join(HERE, name)
         try:
@@ -4391,6 +4407,12 @@ def fetch_new_files():
         try:
             import deal_finder as _df
             deal_finder = _df
+        except ImportError:
+            pass
+    if chain_shops is None:
+        try:
+            import chain_shops as _cs
+            chain_shops = _cs
         except ImportError:
             pass
 
