@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794289243,
+  "bf_ts": 1794290018,
   "cache": {
    "finds": [
     {
@@ -785,7 +785,7 @@
     }
    ]
   },
-  "cursor": 52,
+  "cursor": 54,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1337,8 +1337,14 @@
    "megahouse-lookup-one-piece-trafalgar-law-childhood-ver": {
     "q": 1
    },
+   "megahouse-mega-cat-project-one-piece-good-night-nyanpiecenyan": {
+    "q": 1
+   },
    "megahouse-tsumichen-stack-up-change-one-piece": {
     "ok": false
+   },
+   "megahouse-yuracolle-series-one-piece-grand-line-collection": {
+    "q": 1
    },
    "minix-one-piece-buggy-152-anime-manga-action-figure-collectible-toy-12cm": {
     "q": 1
@@ -1418,6 +1424,9 @@
    "one-piece-demonio-fleur-pop-vinyl-pop-vinyl": {
     "ok": false
    },
+   "one-piece-desk-mat-desk-mat": {
+    "q": 1
+   },
    "one-piece-doflamingo-pop-vinyl-pop-vinyl": {
     "q": 1
    },
@@ -1480,6 +1489,9 @@
    },
    "one-piece-live-action-chopper-poster-poster": {
     "ok": false
+   },
+   "one-piece-logo-light-light": {
+    "q": 1
    },
    "one-piece-luffy-gear-5-pop-keychain-pop-vinyl": {
     "q": 1
@@ -1569,6 +1581,9 @@
     "q": 1
    },
    "one-piece-straw-hat-crew-badge-pack-badges": {
+    "q": 1
+   },
+   "one-piece-straw-hat-posable-light-light": {
     "q": 1
    },
    "one-piece-the-shukko-logia-borsalino-figure-figure": {
