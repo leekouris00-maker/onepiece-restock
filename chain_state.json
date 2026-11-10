@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794326099,
+  "bf_ts": 1794326952,
   "cache": {
    "finds": [],
    "listings": [
@@ -870,102 +870,6 @@
     },
     {
      "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-28",
-     "cart": "https://www.jbhifi.com.au/cart/40429493321929:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-28",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Starter Deck ST-28",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 166.45,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-30",
-     "cart": "https://www.jbhifi.com.au/cart/40429217611977:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-30",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Starter Deck ST-30",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 133.15,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-30"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-32",
-     "cart": "https://www.jbhifi.com.au/cart/40429729480905:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-32",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Starter Deck ST-32",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 88.75,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-32"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-36",
-     "cart": "https://www.jbhifi.com.au/cart/40429731053769:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-36",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Starter Deck ST-36",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 72.1,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-36"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck",
-     "cart": "https://www.jbhifi.com.au/cart/40429493682377:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game The Seven Warlords of the Sea ST-03 Starter Deck",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 166.45,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-worst-generation-st-02-starter-deck",
-     "cart": "https://www.jbhifi.com.au/cart/40429493289161:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-worst-generation-st-02-starter-deck",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Worst Generation ST-02 Starter Deck",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 122.05,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-worst-generation-st-02-starter-deck"
-    },
-    {
-     "available": true,
      "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-24",
      "cart": "https://www.jbhifi.com.au/cart/40428905693385:1",
      "group": "new",
@@ -1030,167 +934,39 @@
     },
     {
      "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-straw-hat-crew-st-01-starter-deck",
-     "cart": "https://www.jbhifi.com.au/cart/40428862963913:1",
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-28",
+     "cart": "https://www.jbhifi.com.au/cart/40429493321929:1",
      "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-straw-hat-crew-st-01-starter-deck",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-28",
      "kind": "New listing",
      "max": 0.0,
-     "name": "Bandai One Piece Card Game Straw Hat Crew ST-01 Starter Deck",
+     "name": "Bandai One Piece Card Game Starter Deck ST-28",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
-     "price": 244.15,
+     "price": 166.45,
      "quiet": true,
      "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-straw-hat-crew-st-01-starter-deck"
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28"
     },
     {
      "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-the-three-brothers-ultra-deck-st-13",
-     "cart": "https://www.jbhifi.com.au/cart/40428862308553:1",
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-30",
+     "cart": "https://www.jbhifi.com.au/cart/40429217611977:1",
      "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-the-three-brothers-ultra-deck-st-13",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-30",
      "kind": "New listing",
      "max": 0.0,
-     "name": "Bandai One Piece Card Game The Three Brothers Ultra Deck ST-13",
+     "name": "Bandai One Piece Card Game Starter Deck ST-30",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
-     "price": 266.35,
+     "price": 133.15,
      "quiet": true,
      "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-the-three-brothers-ultra-deck-st-13"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-tin-pack-set-vol-1-ts-01-random",
-     "cart": "https://www.jbhifi.com.au/cart/40428907528393:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-tin-pack-set-vol-1-ts-01-random",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Tin Pack Set Vol 1 TS-01 (Random)",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 122.05,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-tin-pack-set-vol-1-ts-01-random"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-tin-pack-vol-2-ts-02-random-select",
-     "cart": "https://www.jbhifi.com.au/cart/40428906676425:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-tin-pack-vol-2-ts-02-random-select",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Tin Pack Vol 2 TS-02 (Random Select)",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 155.35,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-tin-pack-vol-2-ts-02-random-select"
-    },
-    {
-     "available": true,
-     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-two-legends-op-08-booster-box",
-     "cart": "https://www.jbhifi.com.au/cart/40428907299017:1",
-     "group": "box",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-two-legends-op-08-booster-box",
-     "kind": "New listing",
-     "max": 260.0,
-     "name": "Bandai One Piece Card Game Two Legends OP-08 Booster Box",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 577.15,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-two-legends-op-08-booster-box"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-uta-starter-deck-st-11",
-     "cart": "https://www.jbhifi.com.au/cart/40428861948105:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-uta-starter-deck-st-11",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Uta Starter Deck ST-11",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 99.85,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-uta-starter-deck-st-11"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-uta-starter-deck-st-16-green",
-     "cart": "https://www.jbhifi.com.au/cart/40428862734537:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-uta-starter-deck-st-16-green",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Uta Starter Deck ST-16 Green",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 188.65,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-uta-starter-deck-st-16-green"
-    },
-    {
-     "available": true,
-     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-wings-of-the-captain-op-06-booster-box",
-     "cart": "https://www.jbhifi.com.au/cart/40428907888841:1",
-     "group": "box",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-wings-of-the-captain-op-06-booster-box",
-     "kind": "New listing",
-     "max": 260.0,
-     "name": "Bandai One Piece Card Game Wings of the Captain OP-06 Booster Box",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 765.85,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-wings-of-the-captain-op-06-booster-box"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-yamato-st-09-starter-deck",
-     "cart": "https://www.jbhifi.com.au/cart/40428909560009:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-yamato-st-09-starter-deck",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Yamato ST-09 Starter Deck",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 66.55,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-yamato-st-09-starter-deck"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-zoro-and-sanji-starter-deck-st-12",
-     "cart": "https://www.jbhifi.com.au/cart/40428860309705:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-zoro-and-sanji-starter-deck-st-12",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Zoro and Sanji Starter Deck ST-12",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 210.85,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-zoro-and-sanji-starter-deck-st-12"
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-30"
     }
    ]
   },
-  "cursor": 100,
+  "cursor": 102,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1590,49 +1366,49 @@
     "ok": false
    },
    "bandai-one-piece-grand-ship-collection-marshall-d-teachs-ship-model-kit": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-grand-ship-collection-moby-dick-model-kit": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-grand-ship-collection-oro-jackson-model-kit": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-grand-ship-collection-red-force-scaled-replica-model-kit": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-grand-ship-collection-spade-pirates-ship-model-kit": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-grand-ship-collection-trafalgar-laws-submarine-model-kit": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-japanese-1st-anniversary-release-celebration-set-english-cards": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-no-mi-wave-1": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-portrait-of-pirates-neo-maximum-white-beard-edward-newgate-limited-reprint": {
     "ok": false
    },
    "bandai-one-piece-premium-card-collection-leader-collection-japanese": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-tcg-japanese-extra-booster-box-anime-25th-collection-eb-02": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-tcg-two-legends-op-08-booster-box-japanese": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-the-best-vol-2-prb-02-booster-box-japanese": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-vinsmoke-milk-box-japanese-ac-01-vol-1-asia-exclusive": {
-    "q": 1
+    "ok": false
    },
    "blade-custom-kit-for-ps5-controllers-one-piece-fire": {
-    "q": 1
+    "ok": false
    },
    "clementoni-one-piece-1000pc-jigsaw-puzzle-set-design-1": {
     "ok": false
@@ -1644,55 +1420,55 @@
     "ok": false
    },
    "cluedo-one-piece-board-game": {
-    "q": 1
+    "ok": false
    },
    "controller-add-on-one-piece-buggy-holdems-mini-cable-guys-phone-stand-and-device-holder": {
-    "q": 1
+    "ok": false
    },
    "controller-add-on-one-piece-luffy-wanted-poster-cable-guys-controller-and-phone-holder": {
     "ok": false
    },
    "controller-add-on-one-piece-tony-tony-chopper-cable-guys-controller-and-phone-holder": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-color-walk-compendium-east-blue-to-skypiea-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-color-walk-compendium-new-world-to-wano-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-color-walk-compendium-water-seven-to-paramount-war-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-omnibus-edition-vol-1-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-omnibus-edition-vol-2-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-omnibus-edition-vol-3-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-vol-1-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-vol-104-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-vol-105-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-vol-2-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-vol-3-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-vol-4-book": {
-    "q": 1
+    "ok": false
    },
    "eiichiro-oda-one-piece-vol-5-book": {
-    "q": 1
+    "ok": false
    },
    "funko-one-piece-going-merry-bitty-pop-playset": {
     "ok": false
@@ -1716,13 +1492,13 @@
     "ok": false
    },
    "g-e-m-series-one-piece-nami-runrunrun": {
-    "q": 1
+    "ok": false
    },
    "g-e-m-series-one-piece-sabo-runrunrun": {
-    "q": 1
+    "ok": false
    },
    "g-e-m-series-one-piece-uta-run-run-run": {
-    "q": 1
+    "ok": false
    },
    "jada-one-piece-luffy-zoro-nami-chopper-metalfigs-2-5-diecast-figure-4-pack": {
     "ok": false
@@ -1731,56 +1507,58 @@
     "ok": false
    },
    "lego-75639-the-going-merry-pirate-ship-netflix-one-piece": {
-    "q": 1
+    "ok": false
    },
    "lego-75641-dr-hiriluks-hideout-one-piece": {
-    "q": 1
+    "ok": false
    },
    "lego-75642-showdown-with-captain-smoker-one-piece": {
-    "q": 1
+    "ok": false
    },
    "lego-75643-tony-tony-chopper-one-piece": {
-    "q": 1
+    "ok": false
    },
    "lego-75644-dorry-vs-brogy-giants-of-little-garden-one-piece": {
-    "q": 1
+    "ok": false
    },
    "lego-75645-battle-at-drum-castle-one-piece": {
-    "q": 1
+    "ok": false
    },
    "lego-75646-garps-marine-battleship-one-piece": {
-    "q": 1
+    "ok": false
    },
-   "lego-75647-gum-gum-fruit-one-piece": {},
+   "lego-75647-gum-gum-fruit-one-piece": {
+    "ok": false
+   },
    "lego-one-piece-battle-at-arlong-park": {
-    "q": 1
+    "ok": false
    },
    "lego-one-piece-buggy-the-clowns-circus-tent": {
-    "q": 1
+    "ok": false
    },
    "lego-one-piece-the-baratie-floating-restaurant": {
-    "q": 1
+    "ok": false
    },
    "lego-one-piece-windmill-village-hut": {
-    "q": 1
+    "ok": false
    },
    "lookup-one-piece-big-mom": {
-    "q": 1
+    "ok": false
    },
    "lookup-one-piece-corazon": {
     "ok": false
    },
    "lookup-one-piece-kaido-the-beast": {
-    "q": 1
+    "ok": false
    },
    "lookup-one-piece-monkey-d-luffy-gear-5-repeat": {
-    "q": 1
+    "ok": false
    },
    "lookup-one-piece-sabo-repeat": {
-    "q": 1
+    "ok": false
    },
    "lookup-one-piece-sanji-ver-future-island-egghead": {
-    "q": 1
+    "ok": false
    },
    "lookup-one-piece-tony-tony-chopper": {
     "ok": false
@@ -1984,6 +1762,12 @@
     "ok": false
    },
    "one-piece-enel-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
+   "one-piece-episode-of-east-blue-luffy-and-his-four-friends-great-adventure-2017-blu-ray": {
+    "q": 1
+   },
+   "one-piece-episode-of-skypiea-2018-dvd-1": {
     "q": 1
    },
    "one-piece-erasable-gel-pen-assorted-styles-stationery": {
@@ -2401,6 +2185,6 @@
     "q": 1
    }
   },
-  "ts": 1794326320
+  "ts": 1794327382
  }
 }
