@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794278189,
+  "bf_ts": 1794278943,
   "cache": {
    "finds": [
     {
@@ -321,7 +321,7 @@
     }
    ]
   },
-  "cursor": 28,
+  "cursor": 30,
   "files": 110,
   "handles": {
    "abystyle-one-piece-flame-flame-fruit-replica": {
@@ -845,6 +845,9 @@
    },
    "one-piece-saul-with-nico-robin-6-pop-vinyl-pop-vinyl": {
     "ok": false
+   },
+   "one-piece-uncut-collection-78-2020-2-dvd": {
+    "q": 1
    },
    "one-piece-uncut-collection-79-2021-2-dvd": {
     "q": 1
