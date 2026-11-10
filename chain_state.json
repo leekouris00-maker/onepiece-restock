@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794272304,
+  "bf_ts": 1794273053,
   "cache": {
    "finds": [
     {
@@ -241,7 +241,7 @@
     }
    ]
   },
-  "cursor": 14,
+  "cursor": 16,
   "files": 110,
   "handles": {
    "abystyle-one-piece-flame-flame-fruit-replica": {
@@ -255,6 +255,9 @@
    },
    "bandai-one-piece-card-game-big-mom-pirates-st-07-starter-deck": {
     "ok": true
+   },
+   "bandai-one-piece-card-game-double-pack-set-vol-2-dp-02": {
+    "q": 1
    },
    "bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red": {
     "ok": true
@@ -273,6 +276,9 @@
    },
    "bandai-one-piece-card-game-op-17-the-worlds-strongest-warriors-booster-box-japanese": {
     "ok": false
+   },
+   "bandai-one-piece-card-game-playmat-and-storage-box-set-yamato": {
+    "q": 1
    },
    "bandai-one-piece-card-game-prb-01-premium-booster-box": {
     "ok": true
@@ -300,6 +306,27 @@
    },
    "bandai-one-piece-card-game-worst-generation-st-02-starter-deck": {
     "ok": true
+   },
+   "funko-one-piece-going-merry-bitty-pop-playset": {
+    "q": 1
+   },
+   "funko-one-piece-kuro-pop-vinyl": {
+    "q": 1
+   },
+   "funko-one-piece-luffy-bitty-pop-4-pack": {
+    "q": 1
+   },
+   "funko-one-piece-luffy-w-going-merry-bitty-pop-ride": {
+    "q": 1
+   },
+   "funko-one-piece-mini-vinyl-figure-random-select": {
+    "q": 1
+   },
+   "funko-one-piece-tony-tony-chopper-flocked-pop-vinyl": {
+    "q": 1
+   },
+   "funko-one-piece-zoro-king-of-hell-pop-premium": {
+    "q": 1
    },
    "kotomi-one-piece-plush-keyring-blind-box-collectible": {
     "ok": false
@@ -331,6 +358,12 @@
    "one-piece-mystery-pop-vinyl-blind-box-collectible": {
     "ok": false
    },
+   "one-piece-roronoa-zoro-dressrosa-glow-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
+   "one-piece-roronoa-zoro-young-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
    "one-piece-sanji-ifrit-jambe-glow-pop-vinyl-pop-vinyl": {
     "q": 1
    },
@@ -340,11 +373,20 @@
    "one-piece-usopp-angry-pop-vinyl-pop-vinyl": {
     "ok": false
    },
+   "one-piece-young-luffy-with-devil-fruit-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
    "one-piece-zoro-sleeping-pop-premium-pop-vinyl": {
     "q": 1
    },
    "s-h-figuarts-chopper-a-netflix-series-one-piece": {
     "ok": false
+   },
+   "tamashii-nations-figuarts-zero-one-piece-monkey-d-luffy-gear-4-three-captains-battle-of-monsters-on-onigashima": {
+    "q": 1
+   },
+   "ultimate-guard-playmat-one-piece-devil-fruits": {
+    "q": 1
    }
   },
   "ts": 1794272304
