@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794284976,
+  "bf_ts": 1794285652,
   "cache": {
    "finds": [
     {
@@ -785,7 +785,7 @@
     }
    ]
   },
-  "cursor": 42,
+  "cursor": 44,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1298,6 +1298,12 @@
    "one-piece-blackbeard-black-hole-pop-vinyl-pop-vinyl": {
     "ok": false
    },
+   "one-piece-bon-clay-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
+   "one-piece-brook-pop-vinyl-pop-vinyl-1": {
+    "q": 1
+   },
    "one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": {
     "ok": true
    },
@@ -1332,6 +1338,9 @@
     "ok": false
    },
    "one-piece-enel-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
+   "one-piece-franky-pop-vinyl-pop-vinyl": {
     "q": 1
    },
    "one-piece-ghost-brook-pop-vinyl-pop-vinyl": {
@@ -1388,6 +1397,9 @@
    "one-piece-netflix-miss-wednesday-pop-vinyl": {
     "q": 1
    },
+   "one-piece-nico-robin-pop-vinyl-pop-vinyl-1": {
+    "q": 1
+   },
    "one-piece-premium-card-collection-bandai-card-games-fest-23-24-edition-japanese-edition": {
     "q": 1
    },
@@ -1430,6 +1442,9 @@
    "one-piece-tony-tony-chopper-build-a-scene-flocked-pop-vinyl-pop-vinyl": {
     "q": 1
    },
+   "one-piece-uncut-collection-76-2020-2-dvd": {
+    "q": 1
+   },
    "one-piece-uncut-collection-77-2020-2-dvd": {
     "q": 1
    },
@@ -1465,6 +1480,9 @@
    },
    "tamashii-nations-figuarts-zero-one-piece-monkey-d-luffy-gear-4-three-captains-battle-of-monsters-on-onigashima": {
     "ok": false
+   },
+   "tamashii-nations-going-merry-chogokin-one-piece-25th": {
+    "q": 1
    },
    "ultimate-guard-playmat-one-piece-devil-fruits": {
     "ok": false
