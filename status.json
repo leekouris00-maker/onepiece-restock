@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-11 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794338127,
+ "ebay_ts": 1794339181,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,11 +55,15 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794338925,
+ "pokemon_ts": 1794339570,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
    1794326138
+  ],
+  "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
+   0.3,
+   1794339194
   ],
   "list|Cherry Collectables|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box": [
    499.99,
@@ -199,7 +203,7 @@
   ],
   "sealed|GUF|boa-hancock-gift-collection-2023-one-piece-promotion-cards": [
    74.6,
-   1794324336
+   1794339194
   ],
   "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
    99.0,
@@ -6143,7 +6147,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794338925,
+ "sealed_ts": 1794339570,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -6184,6 +6188,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794338127,
- "sweep_ts": 1794338127
+ "singles_ts": 1794339181,
+ "sweep_ts": 1794339181
 }
