@@ -528,7 +528,7 @@ class InTheCheck(Quiet):
         super().setUp()
         self.tmp = tempfile.mkdtemp()
         names = ("STATE_PATH", "KNOWN_PATH", "STATUS_PATH", "SNAPSHOT_PATH", "HISTORY_PATH", "EVENTS_PATH",
-                 "LOG_PATH", "CONTROLS_PATH", "RECAP_PATH", "PICKS_PATH", "DROPS_PATH")
+                 "LOG_PATH", "CONTROLS_PATH", "RECAP_PATH", "PICKS_PATH", "DROPS_PATH", "UPTIME_PATH")
         self.paths = {k: getattr(tb, k) for k in names}
         for k in names:
             setattr(tb, k, os.path.join(self.tmp, k.lower() + ".json"))

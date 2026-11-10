@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.11.4)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.19.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -77,6 +77,17 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.19: THE SCORECARD - is the bot good enough to charge for? /scorecard show grades the bot against another
+group's alerts (Fellowship), checks it was running every hour, and says ready / not ready against targets
+(28 days of data, 30 drops compared, first or within 1 minute on 8 in 10, checking 99% of hours). Set it up once:
+  1. /scorecard feed channel:#fellowship-feed   (make a private channel for it first)
+  2. discord.com/developers > your bot > Bot > turn on "Message Content Intent", then run restart_bot.bat.
+  3. In Fellowship's server press Follow on their alert channel and pick #fellowship-feed (or forward alerts there).
+Every link posted there is graded 30 minutes later (so a slightly late bot alert counts as late, not missed) and the
+bot replies under it. Right-click any message > Apps > "Grade against bot" does one by hand. Grade every alert, not
+only the misses. A scorecard posts there every Monday morning. Settings: "scorecard" in config.json.
+Also in v2.19: the auto-buy Chrome now runs with Chrome's sandbox ON (the "--no-sandbox" banner is gone).
+
 New in v2.18: RESTOCK TRENDS PER SHOP. /restocks in Discord shows every shop busiest first: how many restocks in
   the last 30 days, up or down against the 30 before, a bar per week, how often it restocks and how long the stock
   lasts. /restocks shop:<name> shows one shop: weekly chart, busiest day and hour, a rough guess at the next

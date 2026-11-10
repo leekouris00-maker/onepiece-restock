@@ -452,7 +452,7 @@ class Pacing(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp()
         self.paths = {k: getattr(tb, k) for k in ("STATE_PATH", "KNOWN_PATH", "STATUS_PATH", "SNAPSHOT_PATH",
-                                                  "HISTORY_PATH", "EVENTS_PATH", "LOG_PATH", "CONTROLS_PATH")}
+                                                  "HISTORY_PATH", "EVENTS_PATH", "LOG_PATH", "CONTROLS_PATH", "UPTIME_PATH")}
         for k in self.paths:
             setattr(tb, k, os.path.join(self.tmp, k.lower() + ".json"))
         self._run, self._ebay, self._oi = tb.run_checks_all, tb.ebay_watch, tb.onepiece_instore
@@ -508,7 +508,7 @@ class FullRuns(Patched):
         super().setUp()
         self.tmp = tempfile.mkdtemp()
         self.paths = {k: getattr(tb, k) for k in ("STATE_PATH", "KNOWN_PATH", "STATUS_PATH", "SNAPSHOT_PATH",
-                                                  "HISTORY_PATH", "EVENTS_PATH", "LOG_PATH", "CONTROLS_PATH",
+                                                  "HISTORY_PATH", "EVENTS_PATH", "LOG_PATH", "CONTROLS_PATH", "UPTIME_PATH",
                                                   "RECAP_PATH", "PICKS_PATH")}
         for k in self.paths:
             setattr(tb, k, os.path.join(self.tmp, k.lower() + ".json"))

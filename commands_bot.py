@@ -20,6 +20,7 @@ Type these in your Discord server:
     /recap            the daily recap, right now
     /status           is the bot healthy? last check, speed, shops not loading, Discord posts failing
     /missed <link>    someone posted it before the bot? paste the link and see what happened (misses.py)
+    /scorecard        is the bot good enough to charge for? Every alert in the feed channel graded (scorecard.py)
     /misses           which kind of miss happens most, over the last 30 days
     /help             this list
 
@@ -172,6 +173,14 @@ except ImportError:
         import restock_trend as rt
     except ImportError:
         rt = None
+try:
+    import scorecard as sc     # v2.19: /scorecard and the Fellowship feed
+except ImportError:
+    _fetch_missing("scorecard")
+    try:
+        import scorecard as sc
+    except ImportError:
+        sc = None
 if oi is None and "onepiece_instore" in _fetch_missing_later:
     _fetch_missing("onepiece_instore")
     try:
@@ -597,7 +606,9 @@ HELP = (
     "`/recap` the daily recap, right now\n"
     "`/status` last check, speed, shops not loading, drop mode\n"
     "`/missed <link>` someone posted it before the bot? paste the link: the bot says what happened\n"
-    "`/misses` what kind of misses happen most, over the last 30 days\n\n"
+    "`/misses` what kind of misses happen most, over the last 30 days\n"
+    "📊 `/scorecard show` is the bot good enough to charge for? Graded against every alert in the feed channel "
+    "(`/scorecard feed` picks it; right-click a message > Apps > **Grade against bot** for one)\n\n"
     "`/deals`, `/boxes` and `/sealed` answer instantly from the last check; add `fresh:True` to check the shops now.\n\n"
     "📍 **In store**: `/onepiece releases` · `/onepiece report` (spotted One Piece stock on a shelf? it pings "
     "everyone in #onepiece-in-store) · `/onepiece instore` (last 24 hours). Release days get a post the night "
@@ -707,7 +718,12 @@ class Bot(discord.Client):
     def __init__(self):
         # v2.15: in the container the only way out is the VPN container's proxy
         proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy") or None
-        super().__init__(intents=discord.Intents.default(), **({"proxy": proxy} if proxy else {}))
+        intents = discord.Intents.default()
+        # v2.19: reading the scorecard feed channel needs the Message Content intent (Developer Portal > Bot >
+        # Privileged Gateway Intents). Only asked for when a feed channel is set, and dropped (with a note) if
+        # Discord refuses it, so the slash commands always start.
+        intents.message_content = bool(sc and feed_channel() and not os.environ.get("BOT_NO_CONTENT_INTENT"))
+        super().__init__(intents=intents, **({"proxy": proxy} if proxy else {}))
         self.tree = app_commands.CommandTree(self)
         self.synced = False
 
@@ -715,6 +731,8 @@ class Bot(discord.Client):
         if not getattr(self, "watching", False):
             self.watching = True
             asyncio.create_task(watch_discord_health())
+            if sc:
+                asyncio.create_task(scorecard_loop())
         if not self.synced:
             for g in self.guilds:                  # per-server commands appear instantly
                 self.tree.copy_global_to(guild=g)
@@ -722,6 +740,13 @@ class Bot(discord.Client):
             self.synced = True
         print(f"[{datetime.now():%H:%M:%S}] commands ready as {self.user} in: {', '.join(g.name for g in self.guilds)}",
               flush=True)
+
+
+def feed_channel():
+    try:
+        return sc.settings(tb.load_config())["feed_channel_id"] if sc else None
+    except Exception:  # noqa: BLE001
+        return None
 
 
 bot = Bot()
@@ -1106,6 +1131,138 @@ if ms:
     @bot.tree.command(name="misses", description="What kind of misses happen most (last 30 days)")
     async def misses_cmd(inter: discord.Interaction, days: int = 30):
         await respond(inter, build_misses, max(1, min(365, days)))
+
+
+# ---------------------------------------------------------------- v2.19: the scorecard
+async def post_grades(results):
+    """Reply under each graded feed post with its one-line result."""
+    for item, res in results:
+        ref = item.get("ref") or {}
+        if not ref.get("channel_id"):
+            continue
+        try:
+            ch = bot.get_channel(int(ref["channel_id"])) or await bot.fetch_channel(int(ref["channel_id"]))
+            mref = discord.MessageReference(message_id=int(ref["message_id"]), channel_id=int(ref["channel_id"]),
+                                            fail_if_not_exists=False) if ref.get("message_id") else None
+            await ch.send(sc.one_line(res) + f"\n<{item['link']}>", reference=mref,
+                          allowed_mentions=discord.AllowedMentions.none())
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! couldn't post a scorecard grade ({tb.redact(e)})", flush=True)
+
+
+def build_scorecard(cfg, days):
+    title, lines = sc.render(sc.summary(tb, cfg, days))
+    color = TEAL if title.startswith("🟢") else ORANGE
+    return embed(title, [], color, description="\n".join(lines)[:4000],
+                 footer="Targets are in config.json under \"scorecard\" > \"ready\" · /scorecard feed sets the feed")
+
+
+async def scorecard_loop():
+    """Every minute: grade feed links whose wait is over and reply under them. Monday 9am: the weekly scorecard."""
+    await bot.wait_until_ready()
+    while not bot.is_closed():
+        try:
+            cfg = cfg_now()
+            await post_grades(await asyncio.to_thread(sc.grade_due, tb, cfg))
+            s = sc.settings(cfg)
+            where = s["post_channel_id"] or s["feed_channel_id"]
+            if where and await asyncio.to_thread(sc.weekly_due, tb, cfg):
+                e = await asyncio.to_thread(build_scorecard, cfg, 28)
+                ch = bot.get_channel(where) or await bot.fetch_channel(where)
+                await ch.send(embed=e)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! scorecard round skipped ({tb.redact(e)})", flush=True)
+        await asyncio.sleep(60)
+
+
+@bot.event
+async def on_message(message):
+    if not sc or message.author == bot.user or not message.guild:
+        return
+    cid = feed_channel()
+    if not cid or message.channel.id != cid:
+        return
+    links, when = sc.message_links(message)
+    if not links:
+        return
+    ref = {"channel_id": message.channel.id, "message_id": message.id}
+    added = await asyncio.to_thread(sc.queue, tb, cfg_now(), links, when, ref, "feed", str(message.author))
+    if added:
+        try:
+            await message.add_reaction("⏳")
+        except Exception:  # noqa: BLE001
+            pass
+
+
+if sc:
+    @bot.tree.context_menu(name="Grade against bot")
+    async def grade_menu(inter: discord.Interaction, message: discord.Message):
+        await inter.response.defer(ephemeral=True, thinking=True)
+        try:
+            cfg = cfg_now()
+            links, when = sc.message_links(message)
+            if not links:
+                await inter.followup.send("No product links in that message.", ephemeral=True)
+                return
+            added = await asyncio.to_thread(sc.queue, tb, cfg, links, when, None, "feed", str(inter.user))
+            if not added:
+                await inter.followup.send("Already graded (or waiting to be): the same link was posted for this drop.",
+                                          ephemeral=True)
+                return
+            results = await asyncio.to_thread(sc.grade_due, tb, cfg)
+            mine = [res for it, res in results if it["link"] in added and not (it.get("ref") or {}).get("channel_id")]
+            await post_grades([(it, res) for it, res in results if (it.get("ref") or {}).get("channel_id")])
+            wait = round((when + sc.settings(cfg)["grade_after_minutes"] * 60 - time.time()) / 60)
+            text = "\n".join(sc.one_line(r) for r in mine) if mine else (
+                f"Queued. It's graded {wait} min from now, so a bot alert in the next few minutes still counts.")
+            await inter.followup.send(text[:1900], ephemeral=True)
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+    scorecard_group = app_commands.Group(name="scorecard", description="Is the bot good enough to charge for?")
+
+    @scorecard_group.command(name="show", description="The scorecard: head to head against the feed, uptime, verdict")
+    @app_commands.describe(days="How many days back (28 by default)")
+    async def scorecard_show(inter: discord.Interaction, days: int = 28):
+        cfg = await admin_only(inter)
+        if cfg is None:
+            return
+        await inter.response.defer(ephemeral=True, thinking=True)
+        try:
+            e = await asyncio.to_thread(build_scorecard, cfg, max(1, min(120, days)))
+            if sc.settings(cfg)["feed_channel_id"] and not bot.intents.message_content:
+                e.description = ("⚠️ The feed channel is set but the bot can't read messages: turn on **Message Content "
+                                 "Intent** (discord.com/developers > your bot > Bot > Privileged Gateway Intents), "
+                                 "then run restart_bot.bat.\n\n" + (e.description or ""))[:4000]
+            await inter.followup.send(embed=e, ephemeral=True)
+        except Exception as ex:  # noqa: BLE001
+            await fail(inter, ex)
+
+    @scorecard_group.command(name="feed", description="Pick the channel where another group's alerts arrive")
+    @app_commands.describe(channel="Where Fellowship's alerts are followed or forwarded to")
+    async def scorecard_feed(inter: discord.Interaction, channel: discord.TextChannel):
+        if await admin_only(inter) is None:
+            return
+
+        def change(raw):
+            raw.setdefault("scorecard", {})["feed_channel_id"] = str(channel.id)
+
+        try:
+            _, problems = await asyncio.to_thread(edit_config, change, str(inter.user), f"scorecard feed -> #{channel.name}")
+            msg = (f"✅ Feed channel set to {channel.mention}. Next:\n"
+                   "1. Turn on **Message Content Intent**: discord.com/developers > your bot > Bot > Privileged "
+                   "Gateway Intents.\n"
+                   "2. Run **restart_bot.bat** so the bot starts reading the channel.\n"
+                   "3. In Fellowship's server, press **Follow** on their alert channel and pick this channel. If "
+                   "they don't offer Follow, forward their alerts here instead.\n"
+                   "Grade every alert, not only the ones the bot missed, or the numbers come out worse than the bot is.")
+            if problems:
+                msg += "\n\n⚠️ " + "; ".join(problems)[:500]
+            await inter.response.send_message(msg, ephemeral=True)
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
+
+    bot.tree.add_command(scorecard_group)
 
 
 @bot.tree.command(name="help", description="What the restock bot's commands do")
@@ -2660,7 +2817,15 @@ def main():
             if tb.netguard.settings(cfg)["enabled"]:
                 sys.exit("Security is switched on but couldn't start, so the commands bot won't run without it.")
     print(f"[{datetime.now():%H:%M:%S}] starting Discord commands (v{tb.VERSION})...", flush=True)
-    bot.run(token.strip(), log_handler=None)
+    try:
+        bot.run(token.strip(), log_handler=None)
+    except discord.PrivilegedIntentsRequired:
+        # v2.19: the scorecard feed is set but the Message Content intent isn't switched on for this bot.
+        # Start again without it so every other command still works; /scorecard show says how to fix it.
+        print("   ! The scorecard feed needs Message Content Intent (discord.com/developers > your bot > Bot > "
+              "Privileged Gateway Intents). Starting without it.", flush=True)
+        os.environ["BOT_NO_CONTENT_INTENT"] = "1"
+        os.execv(sys.executable, [sys.executable] + sys.argv)
 
 
 if __name__ == "__main__":
