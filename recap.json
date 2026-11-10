@@ -1,5 +1,5 @@
 {
- "date": "2026-11-09",
+ "date": "2026-11-10",
  "snapshot": {
   "list|Gumnut|one-piece-card-game-ultra-deck-the-three-captains-st-10-one-per-customer": {
    "name": "One Piece Card Game Ultra Deck The Three Captains (ST-10) - One Per Customer",
@@ -565,21 +565,21 @@
    "name": "One Piece Card Game Starter Deck \u2013 Charlotte Katakuri (Purple) - ST-34",
    "shop": "Good Games (sealed)",
    "price": 40.0,
-   "available": false,
+   "available": true,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-starter-deck-tba-st-34"
   },
   "list|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-36": {
    "name": "One Piece Card Game Starter Deck \u2013 Eustass \"Captain\" Kid (Yellow) - ST-36",
    "shop": "Good Games (sealed)",
    "price": 40.0,
-   "available": false,
+   "available": true,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-starter-deck-tba-st-36"
   },
   "list|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-35": {
    "name": "One Piece Card Game Starter Deck \u2013 Sabo (Red/Black) - ST-35",
    "shop": "Good Games (sealed)",
    "price": 40.0,
-   "available": false,
+   "available": true,
    "url": "https://shop.goodgames.com.au/products/one-piece-card-game-starter-deck-tba-st-35"
   },
   "list|Good Games (sealed)|one-piece-card-game-premium-card-collection-one-piece-film-red-edition-preorder": {
@@ -1488,7 +1488,7 @@
   "list|Gameology|one-piece-card-game-english-1st-anniversary-set": {
    "name": "One Piece Card Game English 1st Anniversary Set",
    "shop": "Gameology",
-   "price": 9799.95,
+   "price": 6999.95,
    "available": true,
    "url": "https://www.gameology.com.au/products/one-piece-card-game-english-1st-anniversary-set"
   },
@@ -2598,6 +2598,13 @@
    "available": true,
    "url": "https://alphagaming.com.au/products/in-transit-one-piece-premium-booster-box-prb-02-limit-2-per-customer"
   },
+  "list|Cherry Collectables|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box": {
+   "name": "One Piece Card Game [EB-05] Heroines Edition Vol.2 Booster Box",
+   "shop": "Cherry Collectables",
+   "price": 459.99,
+   "available": true,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box"
+  },
   "list|Cherry Collectables|one-piece-card-game-op-04-kingdoms-of-intrigue-booster-box": {
    "name": "One Piece Card Game [OP-04] Kingdoms of Intrigue Booster Box",
    "shop": "Cherry Collectables",
@@ -2668,13 +2675,6 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-14-booster-box"
   },
-  "list|Cherry Collectables|one-piece-card-game-starter-deck-st-31-red-monkey-d-luffy": {
-   "name": "One Piece Card Game: Starter Deck [ST-31] RED Monkey.D.Luffy",
-   "shop": "Cherry Collectables",
-   "price": 59.99,
-   "available": false,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-starter-deck-st-31-red-monkey-d-luffy"
-  },
   "list|Cherry Collectables|one-piece-card-game-eb-02-extra-booster-booster-box": {
    "name": "One Piece Card Game [EB-02] Anime 25th Collection Extra Booster Box",
    "shop": "Cherry Collectables",
@@ -2689,19 +2689,12 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-eb-01-memorial-collection-extra-booster-booster-box"
   },
-  "list|Cherry Collectables|one-piece-card-game-op-16-booster-box": {
-   "name": "One Piece Card Game [OP-16] The Time Of Battle - Booster Box",
+  "list|Cherry Collectables|one-piece-card-game-starter-deck-st-31-red-monkey-d-luffy": {
+   "name": "One Piece Card Game: Starter Deck [ST-31] RED Monkey.D.Luffy",
    "shop": "Cherry Collectables",
-   "price": 399.99,
+   "price": 59.99,
    "available": false,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-16-booster-box"
-  },
-  "list|Cherry Collectables|one-piece-card-game-prb-01-premium-booster-box": {
-   "name": "One Piece Card Game [PRB-01] Premium Collection Booster THE BEST - Booster Box",
-   "shop": "Cherry Collectables",
-   "price": 1600.0,
-   "available": true,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-prb-01-premium-booster-box"
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-starter-deck-st-31-red-monkey-d-luffy"
   },
   "list|Cherry Collectables|one-piece-card-game-starter-deck-st-35-red-black-sabo": {
    "name": "One Piece Card Game: Starter Deck [ST-35] RED/BLACK Sabo",
@@ -2717,19 +2710,19 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-03-pillars-of-strength-booster-box"
   },
+  "list|Cherry Collectables|one-piece-card-game-op-16-booster-box": {
+   "name": "One Piece Card Game [OP-16] The Time Of Battle - Booster Box",
+   "shop": "Cherry Collectables",
+   "price": 399.99,
+   "available": false,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-16-booster-box"
+  },
   "list|Cherry Collectables|super-prerelease-one-piece-card-game-st-02-worst-generation-starter-deck": {
    "name": "[SUPER PRERELEASE] One Piece Card Game St-02 Worst Generation Starter Deck",
    "shop": "Cherry Collectables",
    "price": 599.99,
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/super-prerelease-one-piece-card-game-st-02-worst-generation-starter-deck"
-  },
-  "list|Cherry Collectables|one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck": {
-   "name": "One Piece Card Game [ST-18] (Purple) Monkey D. Luffy Starter Deck",
-   "shop": "Cherry Collectables",
-   "price": 149.99,
-   "available": false,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck"
   },
   "list|Cherry Collectables|super-prerelease-one-piece-card-game-st-04-animal-kingdom-pirates-starter-deck": {
    "name": "[SUPER PRERELEASE] One Piece Card Game St-04 Animal Kingdom Pirates Starter Deck",
@@ -2738,13 +2731,6 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/super-prerelease-one-piece-card-game-st-04-animal-kingdom-pirates-starter-deck"
   },
-  "list|Cherry Collectables|one-piece-card-game-english-2nd-anniversary-set": {
-   "name": "One Piece Card Game [ English Version 2nd Anniversary Set ]",
-   "shop": "Cherry Collectables",
-   "price": 2799.99,
-   "available": false,
-   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-english-2nd-anniversary-set"
-  },
   "list|Cherry Collectables|one-piece-card-game-dp-11-double-pack-random": {
    "name": "One Piece Card Game [DP-11] OP-16 Time of Battle Double Pack",
    "shop": "Cherry Collectables",
@@ -2752,12 +2738,33 @@
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-dp-11-double-pack-random"
   },
+  "list|Cherry Collectables|one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck": {
+   "name": "One Piece Card Game [ST-18] (Purple) Monkey D. Luffy Starter Deck",
+   "shop": "Cherry Collectables",
+   "price": 149.99,
+   "available": false,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-st-18-purple-monkey-d-luffy-starter-deck"
+  },
   "list|Cherry Collectables|one-piece-card-game-op-09-tba-booster-box": {
    "name": "One Piece Card Game [OP-09] Emperors in the New World Booster Box",
    "shop": "Cherry Collectables",
    "price": 999.99,
    "available": false,
    "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-op-09-tba-booster-box"
+  },
+  "list|Cherry Collectables|one-piece-card-game-english-2nd-anniversary-set": {
+   "name": "One Piece Card Game [ English Version 2nd Anniversary Set ]",
+   "shop": "Cherry Collectables",
+   "price": 2799.99,
+   "available": false,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-english-2nd-anniversary-set"
+  },
+  "list|Cherry Collectables|one-piece-card-game-prb-01-premium-booster-box": {
+   "name": "One Piece Card Game [PRB-01] Premium Collection Booster THE BEST - Booster Box",
+   "shop": "Cherry Collectables",
+   "price": 1600.0,
+   "available": true,
+   "url": "https://www.cherrycollectables.com.au/products/one-piece-card-game-prb-01-premium-booster-box"
   },
   "list|Cherry Collectables|one-piece-card-game-op-15-booster-box": {
    "name": "One Piece Card Game [OP15-EB04] Adventures of Kami's Island Booster Box",
@@ -3245,7 +3252,7 @@
   "list|JToys|89681": {
    "name": "One Piece Card Game OP18 The Dominance of God Booster Box",
    "shop": "JToys",
-   "price": 379.99,
+   "price": 399.99,
    "available": true,
    "url": "https://www.jtoys.com.au/product/one-piece-card-game-op18-the-dominance-of-god-booster-box/"
   },
@@ -3550,19 +3557,19 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-the-time-of-battle-op-16-booster-box-english"
   },
-  "list|Grailborne|one-piece-card-game-op-19-booster-box-releases-5-mar-2027": {
-   "name": "One Piece Card Game: OP-19 Booster Box (Expected Mar 2027)",
-   "shop": "Grailborne",
-   "price": 499.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-op-19-booster-box-releases-5-mar-2027"
-  },
   "list|Grailborne|one-piece-card-game-op-08-two-legends-booster-box-english": {
    "name": "One Piece Card Game OP-08 Two Legends Booster Box (English)",
    "shop": "Grailborne",
    "price": 429.0,
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-op-08-two-legends-booster-box-english"
+  },
+  "list|Grailborne|one-piece-card-game-op-19-booster-box-releases-5-mar-2027": {
+   "name": "One Piece Card Game: OP-19 Booster Box (Expected Mar 2027)",
+   "shop": "Grailborne",
+   "price": 499.0,
+   "available": true,
+   "url": "https://grailborne.com.au/products/one-piece-card-game-op-19-booster-box-releases-5-mar-2027"
   },
   "list|Grailborne|one-piece-card-game-adventure-on-kamis-island-op-15-sealed-booster-box-english": {
    "name": "One Piece Card Game: Adventure on KAMI\u2019s Island (OP-15) Sealed Booster Box (English)",
@@ -3578,19 +3585,19 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-op-14-the-azure-seas-seven-booster-box-english"
   },
-  "list|Grailborne|one-piece-card-game-peb-01-premium-extra-booster-box-releases-mar-2027": {
-   "name": "One Piece Card Game: PEB-01 Premium Extra Booster Box (Expected Mar 2027)",
-   "shop": "Grailborne",
-   "price": 599.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-peb-01-premium-extra-booster-box-releases-mar-2027"
-  },
   "list|Grailborne|one-piece-card-game-eb-06-extra-booster-box-releases-29-jan-2027": {
    "name": "One Piece Card Game: EB-06 Extra Booster Box (Expected Jan 2027)",
    "shop": "Grailborne",
    "price": 499.0,
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-eb-06-extra-booster-box-releases-29-jan-2027"
+  },
+  "list|Grailborne|one-piece-card-game-peb-01-premium-extra-booster-box-releases-mar-2027": {
+   "name": "One Piece Card Game: PEB-01 Premium Extra Booster Box (Expected Mar 2027)",
+   "shop": "Grailborne",
+   "price": 599.0,
+   "available": true,
+   "url": "https://grailborne.com.au/products/one-piece-card-game-peb-01-premium-extra-booster-box-releases-mar-2027"
   },
   "list|Grailborne|one-piece-card-game-mini-case-set-display-vol-3-ts-03-english-preorder": {
    "name": "One Piece Card Game: Mini Case Set Display - Vol. 3 [TS-03] (English) - 12 Mini Tins",
@@ -3613,19 +3620,12 @@
    "available": true,
    "url": "https://grailborne.com.au/products/one-piece-card-game-premium-card-collection-best-selection-vol-6"
   },
-  "list|Grailborne|one-piece-card-game-starter-deck-green-roronoa-zoro-st-32": {
-   "name": "One Piece Card Game: STARTER DECK -GREEN Roronoa Zoro- [ST-32]",
+  "list|Grailborne|one-piece-card-game-illustration-box-vol-8-ib-08-english-sealed": {
+   "name": "One Piece Card Game: Illustration Box Vol.8 (IB-08) - English Sealed",
    "shop": "Grailborne",
-   "price": 59.0,
+   "price": 69.0,
    "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-starter-deck-green-roronoa-zoro-st-32"
-  },
-  "list|Grailborne|one-piece-card-game-gift-collection-heroines-gc-2026": {
-   "name": "One Piece Card Game: Gift Collection - Heroines [GC-2026] (Releases 20 Nov 2026)",
-   "shop": "Grailborne",
-   "price": 299.0,
-   "available": true,
-   "url": "https://grailborne.com.au/products/one-piece-card-game-gift-collection-heroines-gc-2026"
+   "url": "https://grailborne.com.au/products/one-piece-card-game-illustration-box-vol-8-ib-08-english-sealed"
   },
   "list|Grailborne|one-piece-card-game-op-13-carrying-on-his-will-booster-box-english": {
    "name": "One Piece Card Game OP-13 Carrying on His Will Booster Box (English)",
@@ -3640,6 +3640,237 @@
    "price": 579.99,
    "available": true,
    "url": "https://lightofcards.com.au/products/one-piece-op-17-the-worlds-strongest-warriors-booster-box"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck": {
+   "name": "Bandai One Piece Card Game Animal Kingdom Pirates ST-04 Starter Deck",
+   "shop": "JB Hi-Fi",
+   "price": 166.45,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-big-mom-pirates-st-07-starter-deck": {
+   "name": "Bandai One Piece Card Game Big Mom Pirates ST-07 Starter Deck",
+   "shop": "JB Hi-Fi",
+   "price": 166.45,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-big-mom-pirates-st-07-starter-deck"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-2-dp-02": {
+   "name": "Bandai One Piece Card Game Double Pack Set Vol 2 DP-02",
+   "shop": "JB Hi-Fi",
+   "price": 721.45,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-2-dp-02"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red": {
+   "name": "Bandai One Piece Card Game Edward Newgate Starter Deck ST-15 Red",
+   "shop": "JB Hi-Fi",
+   "price": 266.35,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-english-2nd-anniversary-set": {
+   "name": "Bandai One Piece Card Game English 2nd Anniversary Set",
+   "shop": "JB Hi-Fi",
+   "price": 4106.94,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-english-2nd-anniversary-set"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-extra-booster-box-eb-02-anime-25th-collection": {
+   "name": "Bandai One Piece Card Game Extra Booster Box EB-02 Anime 25th Collection",
+   "shop": "JB Hi-Fi",
+   "price": 1997.94,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-extra-booster-box-eb-02-anime-25th-collection"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-monkey-d-luffy-starter-deck-st-18-purple": {
+   "name": "Bandai One Piece Card Game Monkey D. Luffy Starter Deck ST-18 Purple",
+   "shop": "JB Hi-Fi",
+   "price": 332.95,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-monkey-d-luffy-starter-deck-st-18-purple"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-prb-01-premium-booster-box": {
+   "name": "Bandai One Piece Card Game PRB-01 Premium Booster Box",
+   "shop": "JB Hi-Fi",
+   "price": 2219.94,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-prb-01-premium-booster-box"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-premium-card-collection-uta": {
+   "name": "Bandai One Piece Card Game: Premium Card Collection - Uta",
+   "shop": "JB Hi-Fi",
+   "price": 144.25,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-premium-card-collection-uta"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-romance-dawn-op-01-booster-box": {
+   "name": "Bandai One Piece Card Game Romance Dawn OP-01 Booster Box",
+   "shop": "JB Hi-Fi",
+   "price": 3551.94,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-romance-dawn-op-01-booster-box"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-set-sail-deck-set-sd-01-1pc": {
+   "name": "BANDAI One Piece Card Game Set Sail Deck Set [SD-01] 1pc",
+   "shop": "JB Hi-Fi",
+   "price": 42.95,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-set-sail-deck-set-sd-01-1pc"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-special-goods-set-ace-sabo-luffy": {
+   "name": "Bandai One Piece Card Game Special Goods Set Ace/Sabo/Luffy",
+   "shop": "JB Hi-Fi",
+   "price": 244.15,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-special-goods-set-ace-sabo-luffy"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-28": {
+   "name": "Bandai One Piece Card Game Starter Deck ST-28",
+   "shop": "JB Hi-Fi",
+   "price": 166.45,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-30": {
+   "name": "Bandai One Piece Card Game Starter Deck ST-30",
+   "shop": "JB Hi-Fi",
+   "price": 133.15,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-30"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-32": {
+   "name": "Bandai One Piece Card Game Starter Deck ST-32",
+   "shop": "JB Hi-Fi",
+   "price": 88.75,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-32"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-36": {
+   "name": "Bandai One Piece Card Game Starter Deck ST-36",
+   "shop": "JB Hi-Fi",
+   "price": 72.1,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-36"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck": {
+   "name": "Bandai One Piece Card Game The Seven Warlords of the Sea ST-03 Starter Deck",
+   "shop": "JB Hi-Fi",
+   "price": 166.45,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-worst-generation-st-02-starter-deck": {
+   "name": "Bandai One Piece Card Game Worst Generation ST-02 Starter Deck",
+   "shop": "JB Hi-Fi",
+   "price": 122.05,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-worst-generation-st-02-starter-deck"
+  },
+  "list|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": {
+   "name": "One Piece Card Game Extra Booster Display Heroines Edition Box 24 Pack EB-03",
+   "shop": "JB Hi-Fi",
+   "price": 214.0,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-3d2y-starter-deck-st-14": {
+   "name": "Bandai One Piece Card Game 3D2Y Starter Deck ST-14",
+   "shop": "JB Hi-Fi",
+   "price": 61.0,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-3d2y-starter-deck-st-14"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-500-years-in-the-future-op-07-booster-box": {
+   "name": "Bandai One Piece Card Game 500 Years in the Future OP-07 Booster Box",
+   "shop": "JB Hi-Fi",
+   "price": 699.25,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-500-years-in-the-future-op-07-booster-box"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-absolute-justice-st-06-starter-deck": {
+   "name": "Bandai One Piece Card Game Absolute Justice ST-06 Starter Deck",
+   "shop": "JB Hi-Fi",
+   "price": 188.65,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-absolute-justice-st-06-starter-deck"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-awakening-of-the-new-era-op-05-booster-box": {
+   "name": "Bandai One Piece Card Game Awakening of the New Era OP-05 Booster Box",
+   "shop": "JB Hi-Fi",
+   "price": 2219.94,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-awakening-of-the-new-era-op-05-booster-box"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-charlotte-katakuri-starter-deck-st-20-yellow": {
+   "name": "Bandai One Piece Card Game Charlotte Katakuri Starter Deck ST-20 Yellow",
+   "shop": "JB Hi-Fi",
+   "price": 166.45,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-charlotte-katakuri-starter-deck-st-20-yellow"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-devil-fruits-collection-vol-2-df-02": {
+   "name": "Bandai One Piece Card Game Devil Fruits Collection Vol 2 DF-02",
+   "shop": "JB Hi-Fi",
+   "price": 210.85,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-devil-fruits-collection-vol-2-df-02"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-devil-fruits-collection-vol-3-df-03": {
+   "name": "Bandai One Piece Card Game Devil Fruits Collection Vol 3 DF-03",
+   "shop": "JB Hi-Fi",
+   "price": 99.85,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-devil-fruits-collection-vol-3-df-03"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-dp-07": {
+   "name": "Bandai One Piece Card Game Double Pack DP-07",
+   "shop": "JB Hi-Fi",
+   "price": 221.95,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-dp-07"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-1-dp-01": {
+   "name": "Bandai One Piece Card Game Double Pack Set Vol 1 DP-01",
+   "shop": "JB Hi-Fi",
+   "price": 221.95,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-1-dp-01"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-3-dp-03": {
+   "name": "Bandai One Piece Card Game Double Pack Set Vol. 3 DP-03",
+   "shop": "JB Hi-Fi",
+   "price": 177.55,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-3-dp-03"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-5-dp-05": {
+   "name": "Bandai One Piece Card Game Double Pack Set Vol. 5 DP-05",
+   "shop": "JB Hi-Fi",
+   "price": 66.55,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-5-dp-05"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-6-dp-06": {
+   "name": "Bandai One Piece Card Game Double Pack Set Vol. 6 DP-06",
+   "shop": "JB Hi-Fi",
+   "price": 244.15,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-6-dp-06"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-dp-08-double-pack": {
+   "name": "Bandai One Piece Card Game DP-08 Double Pack",
+   "shop": "JB Hi-Fi",
+   "price": 94.3,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-dp-08-double-pack"
+  },
+  "list|JB Hi-Fi|bandai-one-piece-card-game-dp-09-double-pack": {
+   "name": "Bandai One Piece Card Game DP-09 Double Pack",
+   "shop": "JB Hi-Fi",
+   "price": 72.1,
+   "available": true,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-dp-09-double-pack"
   },
   "card|Elemental Arcade|OP05-015|belo-betty-op05015-awakening-of-the-new-era": {
    "name": "Belo Betty OP05-015",
@@ -3669,13 +3900,6 @@
    "available": true,
    "url": "https://www.mayhemcollectables.com.au/products/revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2"
   },
-  "card|Elemental Arcade|OP13-017|monkeyddragon-op13017-carrying-on-his-will": {
-   "name": "Monkey.D.Dragon OP13-017",
-   "shop": "Elemental Arcade",
-   "price": 1.0,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/monkeyddragon-op13017-carrying-on-his-will"
-  },
   "card|pick|https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will": {
    "name": "Sabo OP13-004 Regular",
    "shop": "Elemental Arcade",
@@ -3683,40 +3907,26 @@
    "available": true,
    "url": "https://elementalarcade.com.au/products/sabo-op13004-carrying-on-his-will"
   },
-  "card|pick|https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future": {
-   "name": "Monkey.D.Dragon OP07-015 Regular",
-   "shop": "Elemental Arcade",
-   "price": 2.0,
-   "available": true,
-   "url": "https://elementalarcade.com.au/products/monkeyddragon-op07015-500-years-in-the-future"
-  },
   "card|pick|https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island": {
    "name": "Brook OP15-022 Alternate Art",
    "shop": "Elemental Arcade",
-   "price": 76.6,
+   "price": 75.7,
    "available": true,
    "url": "https://elementalarcade.com.au/products/brook-op15022-alternate-art-adventure-on-kamis-island"
   },
   "card|pick|https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle": {
    "name": "Tashigi OP14-029 SP",
    "shop": "Elemental Arcade",
-   "price": 76.0,
+   "price": 75.1,
    "available": true,
    "url": "https://elementalarcade.com.au/products/tashigi-sp-op14029-the-time-of-battle"
   },
   "card|pick|https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle": {
    "name": "Moby Dick OP16-021 Alternate Art",
    "shop": "Elemental Arcade",
-   "price": 21.0,
+   "price": 20.1,
    "available": true,
    "url": "https://elementalarcade.com.au/products/moby-dick-alternate-art-op16021-the-time-of-battle"
-  },
-  "ebay|v1|366683562606|0": {
-   "name": "Gomu Gomu DON!! card (Japanese) + Mera Mera DON!! card (Japanese) + Ope Ope DON!! card (Japanese)",
-   "shop": "eBay (from Japan)",
-   "price": 86.31,
-   "available": true,
-   "url": "https://www.ebay.com.au/itm/366683562606"
   },
   "ebay|v1|820082175327|0": {
    "name": "Nike x One Piece Gomu Gomu DON!! card (Japanese)",
