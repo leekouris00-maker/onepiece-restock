@@ -7,14 +7,15 @@
  "drops_slot": "2026-11-11 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794341317,
+ "ebay_ts": 1794342340,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
  "offline_streak": 0,
  "page_hints": {
-  "https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250": 14
+  "https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250": 14,
+  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 4
  },
  "pages_seen": {
   "Alpha Gaming": 99,
@@ -53,7 +54,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794341697,
+ "pokemon_ts": 1794342536,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -2071,7 +2072,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794255363.9668746
+   "t": 1794342062.6245072
   },
   "morethanmeeples.com.au": {
    "rules": [
@@ -6145,7 +6146,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794341880,
+ "sealed_ts": 1794342536,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -6186,6 +6187,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794341317,
- "sweep_ts": 1794341317
+ "singles_ts": 1794342340,
+ "sweep_ts": 1794342340
 }
