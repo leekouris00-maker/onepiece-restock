@@ -34,6 +34,12 @@ container. Auto-buy still does, through the hand-over below.
 
 ## 2. VPN / proxy
 
+**VPN mode** is `VPN_MODE` in `.env`: `auto` (on when the two Mullvad WireGuard lines are filled in, off
+when they are empty), `on`, or `off`. `run_docker.bat` says which mode it started. With VPN mode off the
+container is just as isolated, but it connects directly, so shops see your normal address; the Security
+page shows "Direct". To change mode, edit `.env` and run `run_docker.bat` again. The rest of this section
+is VPN mode on.
+
 - The bot container sits on a private Docker network with no gateway. Its only way out is the VPN
   container's proxy (`http://vpn:8888`). If the VPN drops, Gluetun's kill switch closes and the bot is
   simply cut off. There is no fallback to your home connection, by design and by wiring.

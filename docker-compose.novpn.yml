@@ -1,0 +1,51 @@
+# The restock bot in an isolated container, WITHOUT a VPN (v2.15.1). run_docker.bat uses this file when
+# VPN mode is off. Everything else is the same as docker-compose.yml: read-only system, unprivileged
+# user, no capabilities, memory/CPU limits, only docker-data\ writable, allowed-sites list, CAPTCHA
+# pausing, file checks, security log, emergency stop. The difference: shops see your normal address.
+
+x-bot: &bot
+  build:
+    context: .
+    args:
+      BASE_IMAGE: ${BOT_BASE_IMAGE:-python:3.12-slim-bookworm}
+  image: onepiece-restock:local
+  restart: unless-stopped
+  networks: [outside]
+  volumes:
+    - ./docker-data:/data            # the only place the bot can write (config, memory files, logs)
+  read_only: true                    # the rest of the container's system can't be changed
+  tmpfs:
+    - /tmp:size=64m,mode=1777
+  user: "10001:10001"                # not root
+  cap_drop: [ALL]                    # no Linux capabilities at all
+  security_opt:
+    - no-new-privileges:true
+  pids_limit: 256
+  mem_limit: ${BOT_MEMORY:-768m}
+  cpus: ${BOT_CPUS:-1.5}
+  env_file: [.env]                   # webhooks and tokens: environment variables, never in the image
+  environment:
+    BOT_CONTAINER: "1"
+    BOT_SECURITY: "1"
+    BOT_DATA_DIR: /data
+    BOT_NET_MODE: direct
+    BOT_ENDPOINTS: ""                # no VPN endpoints in this mode, whatever .env says
+    BOT_ENDPOINT: ""
+    TZ: ${TZ:-Australia/Melbourne}
+  logging:
+    driver: json-file
+    options: {max-size: "5m", max-file: "3"}
+
+services:
+  bot:
+    <<: *bot
+    command: ["tcg_bot.py", "--loop", "${BOT_EVERY_MINUTES:-5}"]
+    ports:
+      - "127.0.0.1:8766:8766"        # the Security page, reachable from this PC only
+
+  commands:
+    <<: *bot
+    command: ["commands_bot.py"]
+
+networks:
+  outside: {}

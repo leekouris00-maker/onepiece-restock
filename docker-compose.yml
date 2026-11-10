@@ -1,5 +1,6 @@
-# The restock bot in an isolated container, behind a VPN container (v2.15).
-# Start it with run_docker.bat (Windows) - it creates docker-data\ and .env for you the first time.
+# The restock bot in an isolated container, behind a VPN container (v2.15) - "VPN mode on".
+# Start it with run_docker.bat (Windows) - it creates docker-data\ and .env for you the first time, and
+# uses this file when VPN mode is on, docker-compose.novpn.yml when it is off (VPN_MODE in .env).
 #
 #   vpn       Gluetun (open source VPN client) connected to Mullvad over WireGuard, with its kill switch.
 #             It is the ONLY container that can reach the internet. It offers an HTTP proxy on port 8888
