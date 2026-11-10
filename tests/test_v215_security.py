@@ -110,10 +110,39 @@ class Captcha(unittest.TestCase):
         self.assertIsNone(cw.detect(404, {}, b"<html>verify you are human</html>"))
         self.assertIsNone(cw.detect(200, {"Content-Type": "application/xml"}, b"<urlset><loc>x</loc></urlset>"))
 
+    def test_slow_down_challenge_is_a_temporary_pause(self):
+        # the real page Shopify shops behind Cloudflare sent on 10 Nov 2026: HTTP 429 + cf-mitigated: challenge
+        real = (b"<!DOCTYPE html><html><head><title>Verifying your connection...</title></head><body><noscript>Enable "
+                b"JavaScript and cookies to continue</noscript><script>(function(){window._cf_chl_opt = {cFPWv: 'b'};"
+                b"var a = document.createElement('script');a.src = '/cdn-cgi/challenge-platform/h/b/orchestrate/chl_page/v1';"
+                b"})();</script></body></html>")
+        self.assertEqual(cw.detect(429, {"cf-mitigated": "challenge", "content-type": "text/html"}, real), "Cloudflare challenge")
+        st, h, t = {}, "shop.test", 100000
+        self.assertFalse(cw.pause(st, h, "Cloudflare challenge", "u", now=t, status=429))          # not told
+        self.assertFalse(cw.pause(st, h, "Cloudflare challenge", "u", now=t + 2, status=429))      # same burst: counted once
+        e = st["captcha"][h]
+        self.assertEqual((e["count"], e["until"] - t, e.get("needs_you")), (1, 1800, None))
+        self.assertTrue(cw.is_paused(st, h, {}, now=t + 1799))
+        self.assertFalse(cw.is_paused(st, h, {}, now=t + 1801))                                    # one try after 30 min
+        waits = []
+        for i in range(4):                                                                         # still challenged each time
+            t = st["captcha"][h]["until"] + 1
+            told = cw.pause(st, h, "Cloudflare challenge", "u", now=t, status=429)
+            if st["captcha"][h].get("needs_you"):
+                break
+            waits.append(st["captcha"][h]["until"] - t)
+        self.assertEqual(waits, [3600, 7200, 14400])              # 1 h, 2 h, 4 h, then past 6 hours in all:
+        self.assertTrue(told and st["captcha"][h]["needs_you"])   # ...it waits for you, and you're told
+        self.assertTrue(cw.is_paused(st, h, {}, now=t + 10 ** 7))
+        self.assertIn("6 hours", cw.message("Shop", h, st["captcha"][h]))
+        self.assertFalse(cw.pause(st, h, "Cloudflare challenge", "u", now=t + 3600, status=429))   # stays waiting, no repeat notice
+        self.assertTrue(st["captcha"][h]["needs_you"])
+
     def test_pause_tells_you_once_a_day_and_resume_clears_it(self):
         st = {}
-        self.assertTrue(cw.pause(st, "shop.test", "hCaptcha", "https://shop.test/x", now=1000))
-        self.assertFalse(cw.pause(st, "shop.test", "hCaptcha", "https://shop.test/x", now=2000))
+        self.assertTrue(cw.pause(st, "shop.test", "hCaptcha", "https://shop.test/x", now=1000, status=403))
+        self.assertTrue(st["captcha"]["shop.test"]["needs_you"])                           # a real CAPTCHA waits for you at once
+        self.assertFalse(cw.pause(st, "shop.test", "hCaptcha", "https://shop.test/x", now=2000, status=403))
         self.assertTrue(cw.is_paused(st, "shop.test", {}, now=10 ** 9))                    # forever, by default
         every6 = {"security": {"captcha": {"recheck_hours": 1}}}                           # 1 is raised to 6
         self.assertTrue(cw.is_paused(st, "shop.test", every6, now=2000 + 5 * 3600))
@@ -181,6 +210,22 @@ class Guard(Base):
         with mock.patch.object(tb, "_fail") as fail:
             self.assertIsNone(tb.fetch_json("https://evil.example/products.json"))
             fail.assert_not_called()
+
+    def test_a_shops_own_redirect_is_allowed_but_shared_platforms_are_not(self):
+        c = cfg()
+        c["sealed"]["shopify_collections"] += [
+            {"name": "Good Games", "url": "https://shop.goodgames.com.au/collections/x/products.json"},
+            {"name": "Tiny", "url": "https://tiny-shop.myshopify.com/collections/x/products.json"}]
+        ng.apply(tb, c)
+        ng.gate("https://www.goodgames.com.au/collections/x")           # shop.goodgames.com.au redirects here
+        socket.getaddrinfo                                               # (the socket guard uses the same list)
+        self.assertTrue(ng.host_allowed("www.goodgames.com.au", ng.RT["allow"]))
+        ng.gate("https://tiny-shop.myshopify.com/x")
+        with self.assertRaises(ng.Blocked):
+            ng.gate("https://someone-else.myshopify.com/x")
+        with self.assertRaises(ng.Blocked):
+            ng.gate("https://goodgames.com.au.evil.example/x")
+        self.assertEqual(ng.site_of("www.jbhifi.com.au"), "jbhifi.com.au")
 
     def test_sockets_and_urllib_are_guarded_too(self):
         ng.apply(tb, cfg())

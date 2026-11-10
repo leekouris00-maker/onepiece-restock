@@ -67,6 +67,7 @@ STATE_NAME = "security_state.json"
 MIN_ROTATE_MINUTES = 60
 VERIFY_RETRY = 60                 # while disconnected, look again this often
 VIOLATION_WINDOW = 3600
+SHARED_PLATFORMS = ("myshopify.com", "bigcommerce.com", "wixsite.com", "squarespace.com")   # one shop there != all of them
 CORE_HOSTS = ("discord.com", "discordapp.com", "discord.gg", "discordapp.net", "ntfy.sh", "api.ebay.com",
               "tcgcsv.com", "raw.githubusercontent.com", "api.github.com")
 LOCAL_NAMES = ("localhost", "ip6-localhost", "host.docker.internal")
@@ -190,7 +191,8 @@ def _host_of(url):
 def build_allowlist(tb, cfg, s):
     hosts = set(CORE_HOSTS) | set(s["extra_hosts"])
     try:
-        hosts |= {h.lower() for h in tb.shop_names(cfg)}
+        shops = {h.lower() for h in tb.shop_names(cfg)}
+        hosts |= shops | {site_of(h) for h in shops if not h.endswith(SHARED_PLATFORMS)}
     except Exception:  # noqa: BLE001
         pass
     for name, path in (getattr(tb, "CATALOGS", {}) or {}).items():
@@ -212,8 +214,19 @@ def build_allowlist(tb, cfg, s):
     return hosts
 
 
+_SECOND_LEVEL = ("com.au", "net.au", "org.au", "co.nz", "co.uk", "com.sg")
+
+
+def site_of(host):
+    """The site a host belongs to: shop.goodgames.com.au -> goodgames.com.au, cdn.discordapp.com -> discordapp.com."""
+    parts = (host or "").lower().rstrip(".").split(".")
+    n = 3 if ".".join(parts[-2:]) in _SECOND_LEVEL else 2
+    return ".".join(parts[-n:]) if len(parts) >= n else ".".join(parts)
+
+
 def host_allowed(host, allow):
-    """Exactly listed, or a subdomain of a listed site (cdn.discordapp.com under discordapp.com)."""
+    """Listed, or on the same site as a listed shop (a shop's own redirects: shop.goodgames.com.au sends the bot
+    to www.goodgames.com.au)."""
     host = (host or "").lower().rstrip(".")
     if host in allow:
         return True
@@ -290,9 +303,11 @@ def on_response(url, status, headers, body):
             _log("captcha_resumed", host=host, how="the shop answered normally")
         return False
     with _lock:
-        tell = captcha_watch.pause(st, host, kind, url)
+        tell = captcha_watch.pause(st, host, kind, url, status=status)
+        e = st["captcha"][host]
         save_state(tb)
-    _log("captcha_detected", "warning", host=host, kind=kind, status=status)
+    _log("captcha_detected", "warning", host=host, kind=kind, status=status,
+         pause="until you press Resume" if e.get("needs_you") else f"{int((e['until'] - time.time()) // 60) + 1} min")
     if tell:
         try:
             name = tb.shop_names(cfg).get(host, host)
