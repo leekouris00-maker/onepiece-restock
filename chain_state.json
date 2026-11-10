@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794349230,
+  "bf_ts": 1794350012,
   "cache": {
    "finds": [],
    "listings": [
@@ -966,7 +966,7 @@
     }
    ]
   },
-  "cursor": 14,
+  "cursor": 16,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -2119,7 +2119,7 @@
     "ok": false
    },
    "one-piece-uncut-collection-80-2021-2-dvd": {
-    "q": 1
+    "ok": false
    },
    "one-piece-uncut-collection-81-2021-2-dvd": {
     "ok": false
@@ -2152,7 +2152,7 @@
     "ok": false
    },
    "one-piece-voyage-collection-16-2016-8-dvd-1": {
-    "q": 1
+    "ok": false
    },
    "one-piece-voyage-collection-2-1999-dvd": {
     "ok": false
@@ -2227,6 +2227,6 @@
     "ok": false
    }
   },
-  "ts": 1794343019
+  "ts": 1794350225
  }
 }
