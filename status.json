@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-11 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794351233,
+ "ebay_ts": 1794352268,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794351233,
+ "pokemon_ts": 1794351880,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -1294,7 +1294,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794265007.0570333
+   "t": 1794351866.4358847
   },
   "grailborne.com.au": {
    "rules": [
@@ -2664,7 +2664,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794265007.0471327
+   "t": 1794351866.9380305
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -3190,7 +3190,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794265007.0501144
+   "t": 1794351867.2876296
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -4254,7 +4254,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794265007.065053
+   "t": 1794351866.0851536
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -6151,10 +6151,9 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794351616,
+ "sealed_ts": 1794352464,
  "shop_down": [
-  "cardbot.com.au",
-  "www.jtoys.com.au"
+  "cardbot.com.au"
  ],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6181,7 +6180,7 @@
   "www.gumnut.com.au": 0,
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
-  "www.jtoys.com.au": 3,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -6191,9 +6190,8 @@
  },
  "shop_locked": [],
  "shop_retry": {
-  "cardbot.com.au": 1794329829,
-  "www.jtoys.com.au": 1794351924
+  "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794351233,
- "sweep_ts": 1794351233
+ "singles_ts": 1794352268,
+ "sweep_ts": 1794352268
 }
