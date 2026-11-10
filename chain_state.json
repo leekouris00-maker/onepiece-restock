@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794328141,
+  "bf_ts": 1794332711,
   "cache": {
    "finds": [],
    "listings": [
@@ -966,7 +966,7 @@
     }
    ]
   },
-  "cursor": 104,
+  "cursor": 106,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -2127,6 +2127,9 @@
    "one-piece-usopp-build-a-scene-pop-vinyl-pop-vinyl": {
     "q": 1
    },
+   "one-piece-voyage-collection-1-1999-dvd": {
+    "q": 1
+   },
    "one-piece-voyage-collection-11-2012-dvd": {
     "q": 1
    },
@@ -2140,6 +2143,12 @@
     "q": 1
    },
    "one-piece-voyage-collection-15-2015-dvd": {
+    "q": 1
+   },
+   "one-piece-voyage-collection-5-1999-8-dvd": {
+    "q": 1
+   },
+   "one-piece-voyage-collection-9-1999-dvd": {
     "q": 1
    },
    "one-piece-world-collectable-figure-log-stories-monkey-d-luffy-going-merry-figure-figure": {
