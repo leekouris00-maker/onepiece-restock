@@ -1,13 +1,13 @@
 {
  "captcha": {
   "alphagaming.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794308227,
    "kind": "Cloudflare challenge",
-   "since": 1794308227,
+   "since": 1794308997,
    "status": 429,
    "told": null,
-   "until": 1794308827,
+   "until": 1794310197,
    "url": "https://alphagaming.com.au/collections/one-piece-sealed-products/products.json?limit=250"
   },
   "cardbot.com.au": {
@@ -41,13 +41,13 @@
    "url": "https://elementalarcade.com.au/robots.txt"
   },
   "goldfieldsgames.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794308227,
    "kind": "Cloudflare challenge",
-   "since": 1794308227,
+   "since": 1794308996,
    "status": 429,
    "told": null,
-   "until": 1794308827,
+   "until": 1794310196,
    "url": "https://goldfieldsgames.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "grailborne.com.au": {
@@ -81,23 +81,23 @@
    "url": "https://lightofcards.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
   },
   "pocketgames.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794308227,
    "kind": "Cloudflare challenge",
-   "since": 1794308227,
+   "since": 1794308996,
    "status": 429,
    "told": null,
-   "until": 1794308827,
+   "until": 1794310196,
    "url": "https://pocketgames.com.au/collections/one-piece-tcg-cards/products.json?limit=250"
   },
   "rogueonline.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794308228,
    "kind": "Cloudflare challenge",
-   "since": 1794308228,
+   "since": 1794308996,
    "status": 429,
    "told": null,
-   "until": 1794308828,
+   "until": 1794310196,
    "url": "https://rogueonline.com.au/collections/one-piece-tcg/products.json?limit=250"
   },
   "shop.goodgames.com.au": {
@@ -181,13 +181,13 @@
    "url": "https://www.gdgames.com.au/collections/one-piece-tcg/products.json?limit=250"
   },
   "www.gumnut.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794308227,
    "kind": "Cloudflare challenge",
-   "since": 1794308227,
+   "since": 1794308996,
    "status": 429,
    "told": null,
-   "until": 1794308827,
+   "until": 1794310196,
    "url": "https://www.gumnut.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "www.irresistibleforce.com.au": {

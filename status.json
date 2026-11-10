@@ -8,34 +8,7 @@
  "ebay_fails": 0,
  "ebay_state": "ok",
  "ebay_ts": 1794308805,
- "held": {
-  "sealed|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards": {
-   "f": {
-    "cart": "",
-    "id": "sealed|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards",
-    "kind": "Sealed",
-    "name": "Trafalgar Law - ST03-008 - One Piece Gift Collection 2023 Promo",
-    "note": "Heroines Gift Collection",
-    "price": 24.99,
-    "shop": "Cherry Collectables",
-    "url": "https://www.cherrycollectables.com.au/products/trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards"
-   },
-   "t": 1794308814
-  },
-  "sealed|Cherry Collectables|yamato-gift-collection-2023-st09-012-one-piece-one-piece-promotion-cards": {
-   "f": {
-    "cart": "",
-    "id": "sealed|Cherry Collectables|yamato-gift-collection-2023-st09-012-one-piece-one-piece-promotion-cards",
-    "kind": "Sealed",
-    "name": "Yamato - ST09-012 - One Piece Gift Collection 2023 Promo",
-    "note": "Heroines Gift Collection",
-    "price": 26.99,
-    "shop": "Cherry Collectables",
-    "url": "https://www.cherrycollectables.com.au/products/yamato-gift-collection-2023-st09-012-one-piece-one-piece-promotion-cards"
-   },
-   "t": 1794308814
-  }
- },
+ "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -5632,7 +5605,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794308805,
+ "sealed_ts": 1794309368,
  "shop_down": [
   "cardbot.com.au"
  ],
