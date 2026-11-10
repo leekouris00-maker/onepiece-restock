@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794299820,
+  "bf_ts": 1794300489,
   "cache": {
    "finds": [
     {
@@ -785,7 +785,7 @@
     }
    ]
   },
-  "cursor": 80,
+  "cursor": 82,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1256,6 +1256,9 @@
    "eiichiro-oda-one-piece-omnibus-edition-vol-3-book": {
     "q": 1
    },
+   "eiichiro-oda-one-piece-vol-105-book": {
+    "q": 1
+   },
    "funko-one-piece-going-merry-bitty-pop-playset": {
     "ok": false
    },
@@ -1405,6 +1408,12 @@
     "q": 1
    },
    "one-piece-3d-pvc-bag-clip-series-5-blind-bag-collectible": {
+    "q": 1
+   },
+   "one-piece-aces-storythe-manga-vol-1-book": {
+    "q": 1
+   },
+   "one-piece-aces-storythe-manga-vol-2-book": {
     "q": 1
    },
    "one-piece-battle-record-collection-gol-d-roger-figure-figure": {
@@ -1761,6 +1770,9 @@
    "one-piece-tony-tony-chopper-build-a-scene-flocked-pop-vinyl-pop-vinyl": {
     "q": 1
    },
+   "one-piece-uncut-collection-67-2017-dvd": {
+    "q": 1
+   },
    "one-piece-uncut-collection-68-2018-dvd": {
     "q": 1
    },
@@ -1804,6 +1816,9 @@
     "ok": false
    },
    "one-piece-usopp-build-a-scene-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
+   "one-piece-voyage-collection-14-2014-dvd": {
     "q": 1
    },
    "one-piece-voyage-collection-15-2015-dvd": {
@@ -1852,6 +1867,9 @@
     "q": 1
    },
    "yahtzee-one-piece-board-game": {
+    "q": 1
+   },
+   "yuto-tsukuda-one-piece-shokugeki-no-sanji-book": {
     "q": 1
    }
   },
