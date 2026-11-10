@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794286461,
+  "bf_ts": 1794287694,
   "cache": {
    "finds": [
     {
@@ -785,7 +785,7 @@
     }
    ]
   },
-  "cursor": 46,
+  "cursor": 48,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1346,6 +1346,9 @@
    "one-piece-enel-pop-vinyl-pop-vinyl": {
     "q": 1
    },
+   "one-piece-fl-pirate-hunter-zoro-figure-figure": {
+    "q": 1
+   },
    "one-piece-franky-pop-vinyl-pop-vinyl": {
     "q": 1
    },
@@ -1365,6 +1368,9 @@
     "q": 1
    },
    "one-piece-grandista-monkey-d-luffy-gear-5-figure-figure": {
+    "q": 1
+   },
+   "one-piece-grandista-monkey-d-luffy-gear-5-ii-figure-figure": {
     "q": 1
    },
    "one-piece-grandista-shanks-figure-figure": {
