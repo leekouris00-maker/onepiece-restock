@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794276774,
+  "bf_ts": 1794277546,
   "cache": {
    "finds": [
     {
@@ -321,7 +321,7 @@
     }
    ]
   },
-  "cursor": 24,
+  "cursor": 26,
   "files": 110,
   "handles": {
    "abystyle-one-piece-flame-flame-fruit-replica": {
@@ -719,6 +719,9 @@
    },
    "controller-add-on-one-piece-luffy-wanted-poster-cable-guys-controller-and-phone-holder": {
     "ok": false
+   },
+   "controller-add-on-one-piece-tony-tony-chopper-cable-guys-controller-and-phone-holder": {
+    "q": 1
    },
    "funko-one-piece-going-merry-bitty-pop-playset": {
     "ok": false
