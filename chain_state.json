@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794270762,
+  "bf_ts": 1794271533,
   "cache": {
    "finds": [
     {
@@ -15,22 +15,6 @@
     }
    ],
    "listings": [
-    {
-     "available": true,
-     "box_id": "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03",
-     "cart": "https://www.jbhifi.com.au/cart/40427809177801:1",
-     "group": "box",
-     "id": "list|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03",
-     "kind": "New listing",
-     "max": 260.0,
-     "name": "One Piece Card Game Extra Booster Display Heroines Edition Box 24 Pack EB-03",
-     "note": "sold by SuperGamers on JB Marketplace",
-     "page": 1,
-     "price": 214.0,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03"
-    },
     {
      "available": true,
      "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-set-sail-deck-set-sd-01-1pc",
@@ -78,22 +62,154 @@
      "quiet": true,
      "shop": "JB Hi-Fi",
      "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-36"
+    },
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03",
+     "cart": "https://www.jbhifi.com.au/cart/40427809177801:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "One Piece Card Game Extra Booster Display Heroines Edition Box 24 Pack EB-03",
+     "note": "sold by SuperGamers on JB Marketplace",
+     "page": 1,
+     "price": 214.0,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-big-mom-pirates-st-07-starter-deck",
+     "cart": "https://www.jbhifi.com.au/cart/40429492895945:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-big-mom-pirates-st-07-starter-deck",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Big Mom Pirates ST-07 Starter Deck",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 166.45,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-big-mom-pirates-st-07-starter-deck"
+    },
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-romance-dawn-op-01-booster-box",
+     "cart": "https://www.jbhifi.com.au/cart/40429492928713:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-romance-dawn-op-01-booster-box",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "Bandai One Piece Card Game Romance Dawn OP-01 Booster Box",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 3551.94,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-romance-dawn-op-01-booster-box"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-english-2nd-anniversary-set",
+     "cart": "https://www.jbhifi.com.au/cart/40429492994249:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-english-2nd-anniversary-set",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game English 2nd Anniversary Set",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 4106.94,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-english-2nd-anniversary-set"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-special-goods-set-ace-sabo-luffy",
+     "cart": "https://www.jbhifi.com.au/cart/40429493256393:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-special-goods-set-ace-sabo-luffy",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Special Goods Set Ace/Sabo/Luffy",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 244.15,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-special-goods-set-ace-sabo-luffy"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-worst-generation-st-02-starter-deck",
+     "cart": "https://www.jbhifi.com.au/cart/40429493289161:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-worst-generation-st-02-starter-deck",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Worst Generation ST-02 Starter Deck",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 122.05,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-worst-generation-st-02-starter-deck"
     }
    ]
   },
-  "cursor": 10,
+  "cursor": 12,
   "files": 110,
   "handles": {
+   "bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck": {
+    "q": 1
+   },
+   "bandai-one-piece-card-game-big-mom-pirates-st-07-starter-deck": {
+    "ok": true
+   },
+   "bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red": {
+    "q": 1
+   },
+   "bandai-one-piece-card-game-english-2nd-anniversary-set": {
+    "ok": true
+   },
+   "bandai-one-piece-card-game-english-2nd-anniversary-set-japanese-version": {
+    "ok": false
+   },
+   "bandai-one-piece-card-game-japanese-3rd-anniversary-set-english-version": {
+    "q": 1
+   },
    "bandai-one-piece-card-game-op-17-the-worlds-strongest-warriors-booster-box-japanese": {
     "ok": false
    },
+   "bandai-one-piece-card-game-prb-01-premium-booster-box": {
+    "q": 1
+   },
+   "bandai-one-piece-card-game-romance-dawn-op-01-booster-box": {
+    "ok": true
+   },
    "bandai-one-piece-card-game-set-sail-deck-set-sd-01-1pc": {
     "ok": true
+   },
+   "bandai-one-piece-card-game-special-goods-set-ace-sabo-luffy": {
+    "ok": true
+   },
+   "bandai-one-piece-card-game-starter-deck-st-28": {
+    "q": 1
    },
    "bandai-one-piece-card-game-starter-deck-st-32": {
     "ok": true
    },
    "bandai-one-piece-card-game-starter-deck-st-36": {
+    "ok": true
+   },
+   "bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck": {
+    "q": 1
+   },
+   "bandai-one-piece-card-game-worst-generation-st-02-starter-deck": {
     "ok": true
    },
    "kotomi-one-piece-plush-keyring-blind-box-collectible": {
@@ -124,6 +240,6 @@
     "ok": false
    }
   },
-  "ts": 1794270762
+  "ts": 1794271533
  }
 }
