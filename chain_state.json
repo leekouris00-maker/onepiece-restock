@@ -17,6 +17,54 @@
    "listings": [
     {
      "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-3d2y-starter-deck-st-14",
+     "cart": "https://www.jbhifi.com.au/cart/40428874694857:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-3d2y-starter-deck-st-14",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game 3D2Y Starter Deck ST-14",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 61.0,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-3d2y-starter-deck-st-14"
+    },
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-500-years-in-the-future-op-07-booster-box",
+     "cart": "https://www.jbhifi.com.au/cart/40428871745737:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-500-years-in-the-future-op-07-booster-box",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "Bandai One Piece Card Game 500 Years in the Future OP-07 Booster Box",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 699.25,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-500-years-in-the-future-op-07-booster-box"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-absolute-justice-st-06-starter-deck",
+     "cart": "https://www.jbhifi.com.au/cart/40428864602313:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-absolute-justice-st-06-starter-deck",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Absolute Justice ST-06 Starter Deck",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 188.65,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-absolute-justice-st-06-starter-deck"
+    },
+    {
+     "available": true,
      "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck",
      "cart": "https://www.jbhifi.com.au/cart/40429493387465:1",
      "group": "new",
@@ -30,6 +78,22 @@
      "quiet": true,
      "shop": "JB Hi-Fi",
      "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck"
+    },
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-awakening-of-the-new-era-op-05-booster-box",
+     "cart": "https://www.jbhifi.com.au/cart/40428862669001:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-awakening-of-the-new-era-op-05-booster-box",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "Bandai One Piece Card Game Awakening of the New Era OP-05 Booster Box",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 2219.94,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-awakening-of-the-new-era-op-05-booster-box"
     },
     {
      "available": true,
@@ -49,6 +113,86 @@
     },
     {
      "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-charlotte-katakuri-starter-deck-st-20-yellow",
+     "cart": "https://www.jbhifi.com.au/cart/40428864405705:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-charlotte-katakuri-starter-deck-st-20-yellow",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Charlotte Katakuri Starter Deck ST-20 Yellow",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 166.45,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-charlotte-katakuri-starter-deck-st-20-yellow"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-devil-fruits-collection-vol-2-df-02",
+     "cart": "https://www.jbhifi.com.au/cart/40428873515209:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-devil-fruits-collection-vol-2-df-02",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Devil Fruits Collection Vol 2 DF-02",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 210.85,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-devil-fruits-collection-vol-2-df-02"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-devil-fruits-collection-vol-3-df-03",
+     "cart": "https://www.jbhifi.com.au/cart/40428872728777:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-devil-fruits-collection-vol-3-df-03",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Devil Fruits Collection Vol 3 DF-03",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 99.85,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-devil-fruits-collection-vol-3-df-03"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-dp-07",
+     "cart": "https://www.jbhifi.com.au/cart/40428874268873:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-dp-07",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Double Pack DP-07",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 221.95,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-dp-07"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-1-dp-01",
+     "cart": "https://www.jbhifi.com.au/cart/40428862537929:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-1-dp-01",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Double Pack Set Vol 1 DP-01",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 221.95,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-1-dp-01"
+    },
+    {
+     "available": true,
      "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-2-dp-02",
      "cart": "https://www.jbhifi.com.au/cart/40429320700105:1",
      "group": "new",
@@ -62,6 +206,86 @@
      "quiet": true,
      "shop": "JB Hi-Fi",
      "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-2-dp-02"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-3-dp-03",
+     "cart": "https://www.jbhifi.com.au/cart/40428871254217:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-3-dp-03",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Double Pack Set Vol. 3 DP-03",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 177.55,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-3-dp-03"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-5-dp-05",
+     "cart": "https://www.jbhifi.com.au/cart/40428873744585:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-5-dp-05",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Double Pack Set Vol. 5 DP-05",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 66.55,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-5-dp-05"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-6-dp-06",
+     "cart": "https://www.jbhifi.com.au/cart/40428870762697:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-6-dp-06",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Double Pack Set Vol. 6 DP-06",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 244.15,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-6-dp-06"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-dp-08-double-pack",
+     "cart": "https://www.jbhifi.com.au/cart/40428871549129:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-dp-08-double-pack",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game DP-08 Double Pack",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 94.3,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-dp-08-double-pack"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-dp-09-double-pack",
+     "cart": "https://www.jbhifi.com.au/cart/40428872597705:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-dp-09-double-pack",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game DP-09 Double Pack",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 72.1,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-dp-09-double-pack"
     },
     {
      "available": true,
@@ -321,227 +545,243 @@
     },
     {
      "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-3d2y-starter-deck-st-14",
-     "cart": "https://www.jbhifi.com.au/cart/40428874694857:1",
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-egghead-starter-deck-st-29",
+     "cart": "https://www.jbhifi.com.au/cart/40428869484745:1",
      "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-3d2y-starter-deck-st-14",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-egghead-starter-deck-st-29",
      "kind": "New listing",
      "max": 0.0,
-     "name": "Bandai One Piece Card Game 3D2Y Starter Deck ST-14",
+     "name": "Bandai One Piece Card Game Egghead Starter Deck ST-29",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
-     "price": 61.0,
+     "price": 105.4,
      "quiet": true,
      "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-3d2y-starter-deck-st-14"
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-egghead-starter-deck-st-29"
     },
     {
      "available": true,
-     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-500-years-in-the-future-op-07-booster-box",
-     "cart": "https://www.jbhifi.com.au/cart/40428871745737:1",
+     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-emperors-in-the-new-world-op-09-booster-box",
+     "cart": "https://www.jbhifi.com.au/cart/40428869648585:1",
      "group": "box",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-500-years-in-the-future-op-07-booster-box",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-emperors-in-the-new-world-op-09-booster-box",
      "kind": "New listing",
      "max": 260.0,
-     "name": "Bandai One Piece Card Game 500 Years in the Future OP-07 Booster Box",
+     "name": "Bandai One Piece Card Game Emperors in the New World OP-09 Booster Box",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
-     "price": 699.25,
+     "price": 1331.94,
      "quiet": true,
      "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-500-years-in-the-future-op-07-booster-box"
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-emperors-in-the-new-world-op-09-booster-box"
     },
     {
      "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-absolute-justice-st-06-starter-deck",
-     "cart": "https://www.jbhifi.com.au/cart/40428864602313:1",
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-english-1st-anniversary-set",
+     "cart": "https://www.jbhifi.com.au/cart/40428859949257:1",
      "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-absolute-justice-st-06-starter-deck",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-english-1st-anniversary-set",
      "kind": "New listing",
      "max": 0.0,
-     "name": "Bandai One Piece Card Game Absolute Justice ST-06 Starter Deck",
+     "name": "Bandai One Piece Card Game English 1st Anniversary Set",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
-     "price": 188.65,
+     "price": 10877.94,
      "quiet": true,
      "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-absolute-justice-st-06-starter-deck"
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-english-1st-anniversary-set"
     },
     {
      "available": true,
-     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-awakening-of-the-new-era-op-05-booster-box",
-     "cart": "https://www.jbhifi.com.au/cart/40428862669001:1",
-     "group": "box",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-awakening-of-the-new-era-op-05-booster-box",
-     "kind": "New listing",
-     "max": 260.0,
-     "name": "Bandai One Piece Card Game Awakening of the New Era OP-05 Booster Box",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 2219.94,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-awakening-of-the-new-era-op-05-booster-box"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-charlotte-katakuri-starter-deck-st-20-yellow",
-     "cart": "https://www.jbhifi.com.au/cart/40428864405705:1",
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-film-edition-st-05-starter-deck",
+     "cart": "https://www.jbhifi.com.au/cart/40428862832841:1",
      "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-charlotte-katakuri-starter-deck-st-20-yellow",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-film-edition-st-05-starter-deck",
      "kind": "New listing",
      "max": 0.0,
-     "name": "Bandai One Piece Card Game Charlotte Katakuri Starter Deck ST-20 Yellow",
+     "name": "Bandai One Piece Card Game Film Edition ST-05 Starter Deck",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
      "price": 166.45,
      "quiet": true,
      "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-charlotte-katakuri-starter-deck-st-20-yellow"
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-film-edition-st-05-starter-deck"
     },
     {
      "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-devil-fruits-collection-vol-2-df-02",
-     "cart": "https://www.jbhifi.com.au/cart/40428873515209:1",
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-gear-5-starter-deck-ex-st-21",
+     "cart": "https://www.jbhifi.com.au/cart/40428869386441:1",
      "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-devil-fruits-collection-vol-2-df-02",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-gear-5-starter-deck-ex-st-21",
      "kind": "New listing",
      "max": 0.0,
-     "name": "Bandai One Piece Card Game Devil Fruits Collection Vol 2 DF-02",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 210.85,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-devil-fruits-collection-vol-2-df-02"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-devil-fruits-collection-vol-3-df-03",
-     "cart": "https://www.jbhifi.com.au/cart/40428872728777:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-devil-fruits-collection-vol-3-df-03",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Devil Fruits Collection Vol 3 DF-03",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 99.85,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-devil-fruits-collection-vol-3-df-03"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-dp-07",
-     "cart": "https://www.jbhifi.com.au/cart/40428874268873:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-dp-07",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Double Pack DP-07",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 221.95,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-dp-07"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-1-dp-01",
-     "cart": "https://www.jbhifi.com.au/cart/40428862537929:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-1-dp-01",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Double Pack Set Vol 1 DP-01",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 221.95,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-1-dp-01"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-3-dp-03",
-     "cart": "https://www.jbhifi.com.au/cart/40428871254217:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-3-dp-03",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Double Pack Set Vol. 3 DP-03",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 177.55,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-3-dp-03"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-5-dp-05",
-     "cart": "https://www.jbhifi.com.au/cart/40428873744585:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-5-dp-05",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Double Pack Set Vol. 5 DP-05",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 66.55,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-5-dp-05"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-6-dp-06",
-     "cart": "https://www.jbhifi.com.au/cart/40428870762697:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-6-dp-06",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Double Pack Set Vol. 6 DP-06",
+     "name": "Bandai One Piece Card Game Gear 5 Starter Deck EX ST-21",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
      "price": 244.15,
      "quiet": true,
      "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-6-dp-06"
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-gear-5-starter-deck-ex-st-21"
     },
     {
      "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-dp-08-double-pack",
-     "cart": "https://www.jbhifi.com.au/cart/40428871549129:1",
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-gift-box-2023-gc-01",
+     "cart": "https://www.jbhifi.com.au/cart/40428863488201:1",
      "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-dp-08-double-pack",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-gift-box-2023-gc-01",
      "kind": "New listing",
      "max": 0.0,
-     "name": "Bandai One Piece Card Game DP-08 Double Pack",
+     "name": "Bandai One Piece Card Game Gift Box 2023 GC-01",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
-     "price": 94.3,
+     "price": 943.45,
      "quiet": true,
      "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-dp-08-double-pack"
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-gift-box-2023-gc-01"
     },
     {
      "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-dp-09-double-pack",
-     "cart": "https://www.jbhifi.com.au/cart/40428872597705:1",
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-illustration-box-ib-05",
+     "cart": "https://www.jbhifi.com.au/cart/40428874662089:1",
      "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-dp-09-double-pack",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-illustration-box-ib-05",
      "kind": "New listing",
      "max": 0.0,
-     "name": "Bandai One Piece Card Game DP-09 Double Pack",
+     "name": "Bandai One Piece Card Game Illustration Box IB-05",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
-     "price": 72.1,
+     "price": 288.55,
      "quiet": true,
      "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-dp-09-double-pack"
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-illustration-box-ib-05"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-illustration-box-ib-06",
+     "cart": "https://www.jbhifi.com.au/cart/40428873973961:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-illustration-box-ib-06",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Illustration Box IB-06",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 310.75,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-illustration-box-ib-06"
+    },
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-kingdoms-of-intrigue-op-04-booster-box",
+     "cart": "https://www.jbhifi.com.au/cart/40428863193289:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-kingdoms-of-intrigue-op-04-booster-box",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "Bandai One Piece Card Game Kingdoms of Intrigue OP-04 Booster Box",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 1076.64,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-kingdoms-of-intrigue-op-04-booster-box"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-learn-together-deck-set-ld-01",
+     "cart": "https://www.jbhifi.com.au/cart/40428870009033:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-learn-together-deck-set-ld-01",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Learn Together Deck Set LD-01",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 62.1,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-learn-together-deck-set-ld-01"
+    },
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-memorial-collection-extra-booster-box-eb-01",
+     "cart": "https://www.jbhifi.com.au/cart/40428861620425:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-memorial-collection-extra-booster-box-eb-01",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "Bandai One Piece Card Game Memorial Collection Extra Booster Box [EB-01]",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 1664.94,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-memorial-collection-extra-booster-box-eb-01"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-monkey-d-luffy-st-08-starter-deck",
+     "cart": "https://www.jbhifi.com.au/cart/40428905955529:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-monkey-d-luffy-st-08-starter-deck",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Monkey D Luffy ST-08 Starter Deck",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 66.55,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-monkey-d-luffy-st-08-starter-deck"
+    },
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-op-11-a-fist-of-divine-speed-booster-box",
+     "cart": "https://www.jbhifi.com.au/cart/40428906086601:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-op-11-a-fist-of-divine-speed-booster-box",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "Bandai One Piece Card Game OP-11 A Fist of Divine Speed Booster Box",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 1331.94,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-op-11-a-fist-of-divine-speed-booster-box"
+    },
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-op-13-carrying-on-his-will-booster-box",
+     "cart": "https://www.jbhifi.com.au/cart/40428910117065:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-op-13-carrying-on-his-will-booster-box",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "Bandai One Piece Card Game OP-13 Carrying On His Will Booster Box",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 1165.44,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-op-13-carrying-on-his-will-booster-box"
+    },
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-op-14-the-azure-seas-seven-booster-box",
+     "cart": "https://www.jbhifi.com.au/cart/40428905726153:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-op-14-the-azure-seas-seven-booster-box",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "Bandai One Piece Card Game OP-14 The Azure Sea's Seven Booster Box",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 643.75,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-op-14-the-azure-seas-seven-booster-box"
     }
    ]
   },
@@ -639,19 +879,19 @@
     "ok": true
    },
    "bandai-one-piece-card-game-eb-01-memorial-collection-extra-booster-box-japanese": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red": {
     "ok": true
    },
    "bandai-one-piece-card-game-egghead-starter-deck-st-29": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-emperors-in-the-new-world-op-09-booster-box": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-english-1st-anniversary-set": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-english-2nd-anniversary-set": {
     "ok": true
@@ -663,52 +903,52 @@
     "ok": true
    },
    "bandai-one-piece-card-game-film-edition-st-05-starter-deck": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-gear-5-starter-deck-ex-st-21": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-gift-box-2023-gc-01": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-heroines-edition-special-set-japanese-no-gold-don-checked": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-illustration-box-ib-05": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-illustration-box-ib-06": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-japanese-2nd-anniversary-set-english-cards": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-japanese-2nd-anniversary-set-japanese-ver": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-japanese-3rd-anniversary-set-english-version": {
     "ok": false
    },
    "bandai-one-piece-card-game-kingdoms-of-intrigue-op-04-booster-box": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-kingdoms-of-intrigue-op-04-booster-box-japanese": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-learn-together-deck-set-ld-01": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-legacy-of-the-master-op-12-booster-box-japanese": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-memorial-collection-extra-booster-box-eb-01": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-mighty-enemies-op-03-booster-box-japanese": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-monkey-d-luffy-st-08-starter-deck": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-monkey-d-luffy-starter-deck-st-18-purple": {
     "ok": true
@@ -732,22 +972,22 @@
     "ok": false
    },
    "bandai-one-piece-card-game-op-07-500-years-in-the-future-booster-box-japanese": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-op-11-a-fist-of-divine-speed-booster-box": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-op-13-carrying-on-his-will-booster-box": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-op-14-the-azure-seas-seven-booster-box": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-op-14-the-azure-seas-seven-booster-box-japanese": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-op-15-adventure-on-kamis-island-booster-box-japanese": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-op-16-the-time-of-battle-booster-box-japanese": {
     "q": 1
@@ -1173,6 +1413,6 @@
     "q": 1
    }
   },
-  "ts": 1794279415
+  "ts": 1794282425
  }
 }
