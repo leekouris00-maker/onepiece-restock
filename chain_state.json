@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794278943,
+  "bf_ts": 1794280386,
   "cache": {
    "finds": [
     {
@@ -545,7 +545,7 @@
     }
    ]
   },
-  "cursor": 30,
+  "cursor": 32,
   "files": 110,
   "handles": {
    "abystyle-one-piece-flame-flame-fruit-replica": {
@@ -1007,8 +1007,17 @@
    "megahouse-lookup-one-piece-donquixote-doflamingo": {
     "ok": false
    },
+   "megahouse-lookup-one-piece-monkey-d-luffy-ver-future-island-egghead": {
+    "q": 1
+   },
    "megahouse-tsumichen-stack-up-change-one-piece": {
     "ok": false
+   },
+   "minix-one-piece-buggy-152-anime-manga-action-figure-collectible-toy-12cm": {
+    "q": 1
+   },
+   "minix-one-piece-monkey-d-luffy": {
+    "q": 1
    },
    "monopoly-one-piece-refresh-board-game": {
     "ok": false
@@ -1018,6 +1027,15 @@
    },
    "one-piece-2027-calendar-calendar": {
     "ok": false
+   },
+   "one-piece-battle-record-collection-gol-d-roger-figure-figure": {
+    "q": 1
+   },
+   "one-piece-battle-record-collection-monkey-d-luffy-gear-5-figure-figure": {
+    "q": 1
+   },
+   "one-piece-battle-record-collection-monkey-d-luffy-gear-5-ii-figure-figure": {
+    "q": 1
    },
    "one-piece-blackbeard-black-hole-pop-vinyl-pop-vinyl": {
     "ok": false
@@ -1040,13 +1058,25 @@
    "one-piece-going-merry-rc-boat": {
     "ok": false
    },
+   "one-piece-grandista-monkey-d-luffy-gear-5-figure-figure": {
+    "q": 1
+   },
+   "one-piece-grandista-shanks-figure-figure": {
+    "q": 1
+   },
    "one-piece-live-action-chopper-poster-poster": {
     "ok": false
+   },
+   "one-piece-maximatic-plus-monkey-d-luffy-figure-figure": {
+    "q": 1
    },
    "one-piece-momonosuke-pop-vinyl-pop-vinyl": {
     "ok": false
    },
    "one-piece-monkey-d-garp-young-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
+   "one-piece-monkey-d-luffy-gear-5-gum-gum-dawn-gatling-figure-figure": {
     "q": 1
    },
    "one-piece-mystery-pop-vinyl-blind-box-collectible": {
@@ -1061,14 +1091,23 @@
    "one-piece-roronoa-zoro-dressrosa-glow-pop-vinyl-pop-vinyl": {
     "ok": false
    },
+   "one-piece-roronoa-zoro-the-anime-figure-figure": {
+    "q": 1
+   },
    "one-piece-roronoa-zoro-young-pop-vinyl-pop-vinyl": {
     "ok": false
+   },
+   "one-piece-sanji-build-a-scene-pop-vinyl-pop-vinyl": {
+    "q": 1
    },
    "one-piece-sanji-ifrit-jambe-glow-pop-vinyl-pop-vinyl": {
     "ok": false
    },
    "one-piece-saul-with-nico-robin-6-pop-vinyl-pop-vinyl": {
     "ok": false
+   },
+   "one-piece-theorama-soul-shanks-figure-figure": {
+    "q": 1
    },
    "one-piece-uncut-collection-78-2020-2-dvd": {
     "q": 1
@@ -1085,6 +1124,9 @@
    "one-piece-x-popsockets-popgrip-magsafe-phone-grip-stand-with-swappable-top-chopper": {
     "q": 1
    },
+   "one-piece-yamato-man-beast-form-pop-deluxe-action-figure-anime-manga-toy-15-7cm": {
+    "q": 1
+   },
    "one-piece-young-luffy-with-devil-fruit-pop-vinyl-pop-vinyl": {
     "ok": false
    },
@@ -1099,6 +1141,9 @@
    },
    "ultimate-guard-playmat-one-piece-devil-fruits": {
     "ok": false
+   },
+   "wn1-one-piece-playing-cards-card-game": {
+    "q": 1
    }
   },
   "ts": 1794279415
