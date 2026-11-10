@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-11 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794327454,
+ "ebay_ts": 1794328356,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -56,7 +56,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794327454,
+ "pokemon_ts": 1794328156,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -5891,10 +5891,9 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794327454,
+ "sealed_ts": 1794328356,
  "shop_down": [
-  "cardbot.com.au",
-  "www.jtoys.com.au"
+  "cardbot.com.au"
  ],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -5921,7 +5920,7 @@
   "www.gumnut.com.au": 0,
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
-  "www.jtoys.com.au": 3,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -5931,9 +5930,8 @@
  },
  "shop_locked": [],
  "shop_retry": {
-  "cardbot.com.au": 1794325484,
-  "www.jtoys.com.au": 1794327878
+  "cardbot.com.au": 1794328860
  },
- "singles_ts": 1794327454,
- "sweep_ts": 1794327454
+ "singles_ts": 1794328356,
+ "sweep_ts": 1794328356
 }

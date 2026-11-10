@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794326952,
+  "bf_ts": 1794328141,
   "cache": {
    "finds": [],
    "listings": [
@@ -966,7 +966,7 @@
     }
    ]
   },
-  "cursor": 102,
+  "cursor": 104,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1632,6 +1632,9 @@
    "one-piece-aces-storythe-manga-vol-2-book": {
     "q": 1
    },
+   "one-piece-adventure-of-nebulandia-2015-dvd": {
+    "q": 1
+   },
    "one-piece-battle-record-collection-gol-d-roger-figure-figure": {
     "q": 1
    },
@@ -1765,6 +1768,9 @@
     "q": 1
    },
    "one-piece-episode-of-east-blue-luffy-and-his-four-friends-great-adventure-2017-blu-ray": {
+    "q": 1
+   },
+   "one-piece-episode-of-sabo-2015-blu-ray": {
     "q": 1
    },
    "one-piece-episode-of-skypiea-2018-dvd-1": {
