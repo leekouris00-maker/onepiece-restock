@@ -45,7 +45,7 @@ import urllib.request
 
 import ebay_watch as ew
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.environ.get("BOT_DATA_DIR") or os.path.dirname(os.path.abspath(__file__))   # v2.15: data folder (container)
 STATE_PATH = os.path.join(HERE, "deal_finder.json")      # PC only (in .gitignore)
 
 DEFAULTS = {

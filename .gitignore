@@ -18,5 +18,13 @@ collection.json
 collection_photos/
 # v2.12 deal finder: which eBay deals it has already told you about (PC only)
 deal_finder.json
+# v2.15 security: secrets for the container, the container's data folder, and the PC's security files
+.env
+docker-data/
+security_state.json
+security_events.jsonl*
+security_panel_token.txt
+environment.txt
+autobuy_offers.jsonl*
 # v2.13: the cloud loop reads this between checks
 next_wait.txt

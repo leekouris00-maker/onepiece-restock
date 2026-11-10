@@ -172,12 +172,19 @@ try:
     import chain_shops         # v2.14: chain retailers (JB Hi-Fi); optional
 except ImportError:
     chain_shops = None
+try:
+    import netguard            # v2.15: security (network guard, CAPTCHA pause, file checks, log); off unless switched on
+except ImportError:
+    netguard = None
 
-VERSION = "2.14"
+VERSION = "2.15"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE_DIR = os.path.dirname(os.path.abspath(__file__))
+# v2.15: in the container the code is read-only and everything the bot writes goes in BOT_DATA_DIR
+HERE = os.environ.get("BOT_DATA_DIR") or CODE_DIR
+IN_CONTAINER = str(os.environ.get("BOT_CONTAINER", "")).strip().lower() in ("1", "true", "yes", "on")
 CONFIG_PATH = os.path.join(HERE, "config.json")
 SECRETS_PATH = os.path.join(HERE, "secrets.json")        # optional; same keys as "alerts"; never commit it
 STATE_PATH = os.path.join(HERE, "seen.json")
@@ -626,6 +633,8 @@ class _Http:
         scheme = (u.scheme or "https").lower()
         host = (u.hostname or "").lower()
         port = u.port or (443 if scheme == "https" else 80)
+        if netguard:
+            netguard.gate(url)              # raises netguard.Blocked (an OSError): callers treat it as "couldn't send"
         if self.classic and method == "GET" and body is None:
             return self._exchange_classic(url, host, headers)
         target = (u.path or "/") + (("?" + u.query) if u.query else "")
@@ -724,6 +733,11 @@ class _Http:
         host = (urllib.parse.urlsplit(url).hostname or "").lower()
         if host in self.skip_hosts:
             raise SkipHost(host)
+        if netguard:                    # v2.15: allowed sites, VPN state, CAPTCHA pauses, emergency stop
+            try:
+                netguard.gate(url)
+            except netguard.Blocked:
+                raise SkipHost(host) from None
         if robots and self.robots_on and not self.allowed(url):
             raise RobotsDisallowed(url, self.robots.get(host, {}).get("unreachable", False))
         if not memo:
@@ -781,6 +795,8 @@ class _Http:
                         hdrs["If-Modified-Since"] = cached[0]["last-modified"]
             try:
                 status, h, data = self._get_following(url, hdrs)
+                if netguard and netguard.on_response(url, status, h, data):
+                    raise SkipHost(host)            # a CAPTCHA page: the shop is paused until you say so
             except (OSError, http.client.HTTPException, ssl.SSLError) as e:
                 last = e
                 with self.lock:
@@ -972,6 +988,8 @@ def begin_check(cfg, status=None, drop=None, skip_down=True):
     hints = status.get("page_hints")
     if isinstance(hints, dict):
         PAGE_HINTS.update(hints)
+    if netguard:                        # v2.15: does nothing unless "security" is switched on
+        netguard.apply(_me(), cfg or {})
     _run_t0[0] = time.perf_counter()
     return status
 
@@ -1148,7 +1166,7 @@ KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "relea
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
                   "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
-                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy", "deal_finder", "chain_shops"}
+                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy", "deal_finder", "chain_shops", "security"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -4380,11 +4398,11 @@ def fetch_new_files():
     """v2.11: an update_bot.bat from before v2.11 doesn't know about auto_buy.py or setup_autobuy.bat, and never
     updates itself. Fetch those (and the newer update_bot.bat) once from the bot's GitHub repo. PC copy only."""
     global auto_buy, deal_finder, chain_shops
-    if IN_ACTIONS:
+    if IN_ACTIONS or IN_CONTAINER:      # the container's code is read-only: it's updated by rebuilding the image
         return
     for name in ("auto_buy.py", "auto_buy_web.py", "collection.py", "deal_finder.py", "chain_shops.py", "setup_autobuy.bat",
                  "open_autobuy.bat", "update_bot.bat"):
-        path = os.path.join(HERE, name)
+        path = os.path.join(CODE_DIR, name)
         try:
             if os.path.exists(path):
                 with open(path, "rb") as fh:
@@ -4496,15 +4514,24 @@ def main():
                      f"Checking every {every}.{poke}{nxt}", GREEN)
     good_cfg, was_dropping, problem, warned = cfg, None, None, ""
     fetch_new_files()
-    if auto_buy and not IN_ACTIONS and heartbeat_role(cfg) != "listen":
+    if auto_buy and not IN_ACTIONS and not IN_CONTAINER and heartbeat_role(cfg) != "listen":
         auto_buy.start(sys.modules[__name__])     # v2.11: picks up /autobuy try requests from Discord
         try:
             import auto_buy_web                   # v2.11.2: the auto-buy page on the PC (open_autobuy.bat)
             auto_buy_web.start(sys.modules[__name__], auto_buy, cfg)
         except Exception as e:  # noqa: BLE001
             print(f"   ! auto-buy page skipped ({redact(e)})")
+    if netguard and (IN_CONTAINER or netguard.settings(cfg)["enabled"]):
+        try:
+            import security_panel
+            security_panel.start(sys.modules[__name__], cfg)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! security page skipped ({redact(e)})")
     while True:
         try:
+            if netguard and netguard.stopped(sys.modules[__name__]):
+                time.sleep(15)                  # emergency stop: do nothing until Resume on the Security page
+                continue
             try:
                 cfg = load_config()  # pick up edits without restarting
             except json.JSONDecodeError as e:

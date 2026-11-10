@@ -58,8 +58,12 @@ import time
 import urllib.parse
 from datetime import datetime
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-PROFILE_DIR = os.path.join(HERE, "buyer_profile")
+CODE_DIR = os.path.dirname(os.path.abspath(__file__))
+HERE = os.environ.get("BOT_DATA_DIR") or os.path.dirname(os.path.abspath(__file__))   # v2.15: data folder (container)
+# the signed-in browser profile never goes in the shared data folder: it stays next to the code, on the PC
+PROFILE_DIR = os.path.join(CODE_DIR, "buyer_profile")
+OFFERS_PATH = os.path.join(HERE, "autobuy_offers.jsonl")   # v2.15: container -> PC hand-over (see auto_buy_host.py)
+OFFERS_MAX_BYTES = 512 * 1024
 LEDGER_PATH = os.path.join(HERE, "autobuy.json")
 LIST_PATH = os.path.join(HERE, "autobuy_list.json")
 SHOTS_DIR = os.path.join(HERE, "autobuy_shots")
@@ -487,6 +491,7 @@ def offer(tb, cfg, finds):
     if s["mode"] == "off":
         return []
     taken = []
+    handover = [] if getattr(tb, "IN_CONTAINER", False) else None     # v2.15: the PC does the buying, not the container
     items = load_items(tb) if "list" in s["what"] else None
     picked = set()                              # one of each list item per batch (the cheapest shop first)
     for f in sorted(finds, key=lambda f: (not f.get("link_watch"), f.get("kind") != "Booster box", f.get("price") or 0)):
@@ -496,22 +501,88 @@ def offer(tb, cfg, finds):
         it = item_for(f, items) if items is not None else None
         if it and it["id"] in picked:
             continue
-        with _lock:
-            if f["id"] in _busy:
-                continue
-            try:
-                _q.put_nowait({"f": dict(f), "t": time.time(), "mode": s["mode"], "item": it["id"] if it else None})
-            except queue.Full:
-                break
-            _busy.add(f["id"])
+        if handover is not None:
+            handover.append(dict(f))
+        else:
+            with _lock:
+                if f["id"] in _busy:
+                    continue
+                try:
+                    _q.put_nowait({"f": dict(f), "t": time.time(), "mode": s["mode"], "item": it["id"] if it else None})
+                except queue.Full:
+                    break
+                _busy.add(f["id"])
         if it:
             picked.add(it["id"])
         f["autobuy"] = True              # desk mode leaves it alone; the shared alert doesn't say (v2.11.3: private)
         taken.append(f)
-    if taken:
+    if handover:
+        write_offers(tb, handover)
+        print(f"   (auto-buy {s['mode']}: handed to the PC: {', '.join(f['name'][:40] for f in handover)})")
+    elif taken:
         start(tb)
         print(f"   (auto-buy {s['mode']}: queued {', '.join(f['name'][:40] for f in taken)})")
     return taken
+
+
+OFFER_KEYS = ("id", "kind", "name", "shop", "price", "url", "cart", "note", "link_watch", "game", "section")
+
+
+def write_offers(tb, finds):
+    """Container: leave finds for the PC's buyer (auto_buy_host.py) in the shared data folder."""
+    line = json.dumps({"t": round(time.time(), 1),
+                       "finds": [{k: f[k] for k in OFFER_KEYS if k in f} for f in finds]}, ensure_ascii=True)
+    try:
+        if os.path.exists(OFFERS_PATH) and os.path.getsize(OFFERS_PATH) > OFFERS_MAX_BYTES:
+            os.replace(OFFERS_PATH, OFFERS_PATH + ".1")
+        with open(OFFERS_PATH, "a", encoding="utf-8", newline="\n") as f:
+            f.write(line + "\n")
+    except OSError as e:
+        print(f"   ! auto-buy: couldn't hand over to the PC ({e})")
+
+
+def read_offers(pos, known_hosts, max_age=120, now=None, path=None):
+    """PC: finds left by the container since byte `pos` -> (finds, new pos). Old offers (the PC was off) and
+    anything whose links aren't https links to a shop the PC's own config knows are dropped: the container
+    is the less trusted side, so the PC checks what it's handed before it opens a checkout."""
+    path = path or OFFERS_PATH
+    now = now or time.time()
+    try:
+        size = os.path.getsize(path)
+    except OSError:
+        return [], 0
+    if pos > size:
+        pos = 0                                   # the file was cut over
+    try:
+        with open(path, "rb") as f:
+            f.seek(pos)
+            raw = f.read()
+    except OSError:
+        return [], pos
+    end = raw.rfind(b"\n") + 1
+    out = []
+    for line in raw[:end].splitlines():
+        try:
+            d = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(d, dict) or now - float(d.get("t") or 0) > max_age:
+            continue
+        for f in d.get("finds") or []:
+            if not isinstance(f, dict) or not isinstance(f.get("id"), str) or not isinstance(f.get("name"), str):
+                continue
+            ok = True
+            for k in ("url", "cart"):
+                u = urllib.parse.urlsplit(str(f.get(k) or ""))
+                if f.get(k) and (u.scheme != "https" or (u.hostname or "").lower() not in known_hosts):
+                    ok = False
+            try:
+                f["price"] = float(f.get("price"))
+            except (TypeError, ValueError):
+                ok = False
+            if ok and f.get("cart"):
+                out.append({k: f[k] for k in OFFER_KEYS if k in f})
+    return out, pos + end
 
 
 def start(tb):
@@ -1005,7 +1076,7 @@ if __name__ == "__main__":
             stream.reconfigure(encoding="utf-8", errors="replace")
         except Exception:  # noqa: BLE001
             pass
-    sys.path.insert(0, HERE)
+    sys.path.insert(0, CODE_DIR)
     import tcg_bot
     if "--setup" in sys.argv:
         sys.exit(setup(tcg_bot))

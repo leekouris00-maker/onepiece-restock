@@ -30,7 +30,7 @@ import threading
 import time
 from datetime import date, datetime, timedelta
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.environ.get("BOT_DATA_DIR") or os.path.dirname(os.path.abspath(__file__))   # v2.15: data folder (container)
 PATH = os.path.join(HERE, "collection.json")
 PHOTOS_DIR = os.path.join(HERE, "collection_photos")
 

@@ -35,7 +35,7 @@ import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.environ.get("BOT_DATA_DIR") or os.path.dirname(os.path.abspath(__file__))   # v2.15: data folder (container)
 WATCH_PATH = os.path.join(HERE, "watches.json")
 MAX_WATCHES = 25
 WORKERS = 6

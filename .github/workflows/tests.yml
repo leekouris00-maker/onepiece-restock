@@ -25,3 +25,4 @@ jobs:
       - run: env -u GITHUB_ACTIONS python -m unittest discover -s tests
         env:
           TZ: Australia/Melbourne
+          BOT_CHAIN_SHOPS: "off"      # tests never read the real JB Hi-Fi site (its own tests switch it back on, faked)

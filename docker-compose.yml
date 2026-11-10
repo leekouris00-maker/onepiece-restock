@@ -1,0 +1,98 @@
+# The restock bot in an isolated container, behind a VPN container (v2.15).
+# Start it with run_docker.bat (Windows) - it creates docker-data\ and .env for you the first time.
+#
+#   vpn       Gluetun (open source VPN client) connected to Mullvad over WireGuard, with its kill switch.
+#             It is the ONLY container that can reach the internet. It offers an HTTP proxy on port 8888
+#             to the private network below.
+#   bot       the restock checker + the Security page. On the private network only: it has no route to
+#             the internet or to your home network except through "vpn". If the VPN drops, it is cut off.
+#   commands  the Discord slash commands (same image), also only through "vpn".
+#
+# Auto-buy and desk mode are not in here: they need your signed-in Chrome, so they stay on the PC
+# (run_pc_side.bat) and use your normal connection.
+#
+# A second endpoint for IP rotation: copy the "vpn" service as "vpn2" with another SERVER_CITIES, and set
+# BOT_ENDPOINTS=melbourne=http://vpn:8888,sydney=http://vpn2:8888 in .env.
+
+x-bot: &bot
+  build:
+    context: .
+    args:
+      BASE_IMAGE: ${BOT_BASE_IMAGE:-python:3.12-slim-bookworm}
+  image: onepiece-restock:local
+  restart: unless-stopped
+  depends_on:
+    vpn:
+      condition: service_healthy
+  networks: [private]
+  volumes:
+    - ./docker-data:/data            # the only place the bot can write (config, memory files, logs)
+  read_only: true                    # the rest of the container's system can't be changed
+  tmpfs:
+    - /tmp:size=64m,mode=1777
+  user: "10001:10001"                # not root
+  cap_drop: [ALL]                    # no Linux capabilities at all
+  security_opt:
+    - no-new-privileges:true
+  pids_limit: 256
+  mem_limit: ${BOT_MEMORY:-768m}
+  cpus: ${BOT_CPUS:-1.5}
+  env_file: [.env]                   # webhooks and tokens: environment variables, never in the image
+  environment:
+    BOT_CONTAINER: "1"
+    BOT_SECURITY: "1"
+    BOT_DATA_DIR: /data
+    BOT_NET_MODE: proxy
+    BOT_ENDPOINTS: ${BOT_ENDPOINTS:-melbourne=http://vpn:8888}
+    BOT_ENDPOINT: ${BOT_ENDPOINT:-}
+    TZ: ${TZ:-Australia/Melbourne}
+  logging:
+    driver: json-file
+    options: {max-size: "5m", max-file: "3"}
+
+services:
+  vpn:
+    image: qmcgaw/gluetun:latest
+    restart: unless-stopped
+    cap_add: [NET_ADMIN]             # needed to create the VPN tunnel; only this container has it
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    networks: [private, outside]
+    environment:
+      VPN_SERVICE_PROVIDER: ${VPN_SERVICE_PROVIDER:-mullvad}
+      VPN_TYPE: wireguard
+      WIREGUARD_PRIVATE_KEY: ${WIREGUARD_PRIVATE_KEY:?put your Mullvad WireGuard private key in .env}
+      WIREGUARD_ADDRESSES: ${WIREGUARD_ADDRESSES:?put your Mullvad WireGuard address in .env}
+      SERVER_CITIES: ${VPN_CITY:-Melbourne}
+      HTTPPROXY: "on"                # the proxy the bot uses, on the private network only
+      HTTPPROXY_LOG: "off"
+      HTTPPROXY_STEALTH: "on"        # don't add proxy headers to requests
+      FIREWALL_INPUT_PORTS: "8888"
+      TZ: ${TZ:-Australia/Melbourne}
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "3"}
+
+  bot:
+    <<: *bot
+    command: ["tcg_bot.py", "--loop", "${BOT_EVERY_MINUTES:-5}"]
+    ports:
+      - "127.0.0.1:8766:8766"        # the Security page, reachable from this PC only
+
+  commands:
+    <<: *bot
+    command: ["commands_bot.py"]
+    environment:
+      BOT_CONTAINER: "1"
+      BOT_SECURITY: "1"
+      BOT_DATA_DIR: /data
+      BOT_NET_MODE: proxy
+      BOT_ENDPOINTS: ${BOT_ENDPOINTS:-melbourne=http://vpn:8888}
+      BOT_ENDPOINT: ${BOT_ENDPOINT:-}
+      HTTPS_PROXY: http://vpn:8888   # Discord's live connection is opened before the guard starts
+      TZ: ${TZ:-Australia/Melbourne}
+
+networks:
+  private:
+    internal: true                   # no gateway: containers here can only talk to each other
+  outside: {}

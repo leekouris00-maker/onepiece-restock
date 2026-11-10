@@ -322,7 +322,7 @@ def desk_until(tb):
 def desk_open(tb, finds, now=None, opener=None):
     """Desk mode: open checkout links for buyable targets (boxes, watched sealed, /watch links)."""
     now = now or time.time()
-    if tb.IN_ACTIONS or tb.DRY_RUN[0] or desk_until(tb) <= now:
+    if tb.IN_ACTIONS or getattr(tb, "IN_CONTAINER", False) or tb.DRY_RUN[0] or desk_until(tb) <= now:
         return []
     opener = opener or (lambda url: webbrowser.open(url, new=2))
     order = {True: 0}

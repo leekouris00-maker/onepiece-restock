@@ -1,0 +1,6 @@
+# Nothing personal goes into the image: only *.py and docker-requirements.txt are copied.
+*
+!*.py
+!docker-requirements.txt
+probe/
+tests/

@@ -133,8 +133,8 @@ def _fetch_missing(module):
     """v2.9: an update_bot.bat from before v2.9 doesn't know about new files, so it updates this file but not
     the module next to it. Get that one file from the bot's own GitHub repo (the same place update_bot.bat
     downloads from), once; if that doesn't work the command is just left out."""
-    path = os.path.join(tb.HERE, module + ".py")
-    if os.path.exists(path):
+    path = os.path.join(tb.CODE_DIR, module + ".py")
+    if os.path.exists(path) or tb.IN_CONTAINER:
         return
     try:
         body = tb.HTTP.fetch(f"{tb.REPO_RAW_URL}/{module}.py", tries=2, robots=False, memo=False)
@@ -694,7 +694,9 @@ def ebay_matches(raw, text):
 # ---------------------------------------------------------------- Discord wiring
 class Bot(discord.Client):
     def __init__(self):
-        super().__init__(intents=discord.Intents.default())
+        # v2.15: in the container the only way out is the VPN container's proxy
+        proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy") or None
+        super().__init__(intents=discord.Intents.default(), **({"proxy": proxy} if proxy else {}))
         self.tree = app_commands.CommandTree(self)
         self.synced = False
 
@@ -1348,7 +1350,7 @@ async def post_report(cfg, hook, user, store, what, price, photo, game="pokemon"
         fname = re.sub(r"[^\w.-]", "_", photo.filename or "photo.jpg")[:60]
         kwargs["file"] = discord.File(io.BytesIO(await photo.read()), filename=fname)
         e.set_image(url=f"attachment://{fname}")
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(trust_env=True) as session:
         wh = discord.Webhook.from_url(hook, session=session)
         await wh.send(content=role or None, embed=e, username=name, wait=True,
                       allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=bool(role)), **kwargs)
@@ -2534,6 +2536,13 @@ def main():
     if not token:
         sys.exit('No bot token. Add "discord_bot_token": "<token>" to the "alerts" section of config.json '
                  '(or to secrets.json).')
+    if getattr(tb, "netguard", None):       # v2.15: the same allowed-sites and file checks as the restock bot
+        try:
+            tb.netguard.apply(tb, cfg)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! security settings couldn't be applied ({tb.redact(e)})", flush=True)
+            if tb.netguard.settings(cfg)["enabled"]:
+                sys.exit("Security is switched on but couldn't start, so the commands bot won't run without it.")
     print(f"[{datetime.now():%H:%M:%S}] starting Discord commands (v{tb.VERSION})...", flush=True)
     bot.run(token.strip(), log_handler=None)
 

@@ -38,7 +38,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.environ.get("BOT_DATA_DIR") or os.path.dirname(os.path.abspath(__file__))   # v2.15: data folder (container)
 WATCH_PATH = os.path.join(HERE, "ebay_watch.json")
 SECRETS_PATH = os.path.join(HERE, "secrets.json")
 CONFIG_PATH = os.path.join(HERE, "config.json")

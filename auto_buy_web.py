@@ -29,7 +29,8 @@ import urllib.parse
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE_DIR = os.path.dirname(os.path.abspath(__file__))
+HERE = os.environ.get("BOT_DATA_DIR") or os.path.dirname(os.path.abspath(__file__))   # v2.15: data folder (container)
 TOKEN_PATH = os.path.join(HERE, "autobuy_web_token.txt")
 DEFAULT_PORT = 8765
 MAX_BODY = 16_000
@@ -727,7 +728,7 @@ if __name__ == "__main__":
             stream.reconfigure(encoding="utf-8", errors="replace")
         except Exception:  # noqa: BLE001
             pass
-    sys.path.insert(0, HERE)
+    sys.path.insert(0, CODE_DIR)
     import tcg_bot
     import auto_buy
     cfg = tcg_bot.load_config()

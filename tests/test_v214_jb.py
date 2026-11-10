@@ -71,7 +71,8 @@ class Jb(unittest.TestCase):
                 [("Default Title", 29900, True)]),
         }
         self.asked = []
-        for p in (mock.patch.object(tb, "HERE", self.dir.name), mock.patch.object(tb.HTTP, "fetch", side_effect=self.fetch)):
+        for p in (mock.patch.object(tb, "HERE", self.dir.name), mock.patch.object(tb.HTTP, "fetch", side_effect=self.fetch),
+                  mock.patch.dict(os.environ, {"BOT_CHAIN_SHOPS": "on"})):
             p.start()
             self.addCleanup(p.stop)
 

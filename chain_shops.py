@@ -24,7 +24,8 @@ How often: every 10 minutes, and every 2 minutes inside a drop window. Between t
 what it read last, so nothing alerts twice and nothing "sells out" just because it wasn't re-read.
 If JB can't be read, the last reading is kept for up to 3 hours.
 
-Settings (config.json, optional): "chain_shops": false switches this off. "pause_shops" works for
+Settings (config.json, optional): "chain_shops": false switches this off (so does the environment
+variable BOT_CHAIN_SHOPS=off). "pause_shops" works for
 "JB Hi-Fi" like any other shop. What it has found is kept in chain_state.json.
 
 Not here yet: Toymate (answered 429/403 to the bot from GitHub's computers on 10 Nov 2026), Kmart,
@@ -63,6 +64,8 @@ NO_SELLER = {"", "default title", "default", "jb hi-fi", "jb hifi"}
 def enabled(cfg, tb):
     if (cfg or {}).get("chain_shops", True) is False:
         return False
+    if os.environ.get("BOT_CHAIN_SHOPS", "").strip().lower() in ("0", "off", "false", "no"):
+        return False                    # used by the test run, so older tests never reach the real JB site
     return JB_NAME not in tb.paused_shops(cfg)
 
 
