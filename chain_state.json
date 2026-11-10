@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794322121,
+  "bf_ts": 1794322918,
   "cache": {
    "finds": [
     {
@@ -785,7 +785,7 @@
     }
    ]
   },
-  "cursor": 90,
+  "cursor": 92,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1237,6 +1237,9 @@
    },
    "clementoni-one-piece-1000pc-jigsaw-puzzle-set-design-3": {
     "ok": false
+   },
+   "cluedo-one-piece-board-game": {
+    "q": 1
    },
    "controller-add-on-one-piece-buggy-holdems-mini-cable-guys-phone-stand-and-device-holder": {
     "q": 1
@@ -1815,6 +1818,15 @@
    "one-piece-tony-tony-chopper-build-a-scene-flocked-pop-vinyl-pop-vinyl": {
     "q": 1
    },
+   "one-piece-uncut-collection-54-2014-dvd": {
+    "q": 1
+   },
+   "one-piece-uncut-collection-55-2015-dvd": {
+    "q": 1
+   },
+   "one-piece-uncut-collection-56-2015-dvd": {
+    "q": 1
+   },
    "one-piece-uncut-collection-57-2015-dvd": {
     "q": 1
    },
@@ -1891,6 +1903,9 @@
     "ok": false
    },
    "one-piece-usopp-build-a-scene-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
+   "one-piece-voyage-collection-12-2013-dvd": {
     "q": 1
    },
    "one-piece-voyage-collection-13-2013-dvd": {
