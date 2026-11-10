@@ -741,7 +741,11 @@
   "plist|delta-reign|JToys|89821",
   "plist|delta-reign|JToys|89824"
  ],
- "Kollecter (pokemon:30th-celebration)": [],
+ "Kollecter (pokemon:30th-celebration)": [
+  "plist|30th-celebration|Kollecter|pokemon-tcg-30th-celebration-5-booster-tin",
+  "plist|30th-celebration|Kollecter|pokemon-tcg-chn-30th-celebration-booster-box-30thc-s-chinese",
+  "plist|30th-celebration|Kollecter|pokemon-tcg-chn-30th-celebration-first-partner-illustration-collection-set-vol-3"
+ ],
  "Kollecter (pokemon:delta-reign)": [
   "plist|delta-reign|Kollecter|pokemon-tcg-mega-evolution-delta-reign-booster-bundle",
   "plist|delta-reign|Kollecter|pokemon-tcg-mega-evolution-delta-reign-build-battle-box",

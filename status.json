@@ -53,7 +53,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794273790,
+ "pokemon_ts": 1794274568,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -78,6 +78,10 @@
   "plist|30th-celebration|JToys|90008": [
    99.99,
    1794078356
+  ],
+  "plist|30th-celebration|Kollecter|pokemon-tcg-30th-celebration-5-booster-tin": [
+   0.0,
+   1794274569
   ],
   "plist|30th-celebration|Light of Cards|sealed-pokemon-tcg-30th-celebration-day-night-mini-tin": [
    49.99,
@@ -114,6 +118,14 @@
   "poke|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-sylveon-ex-box-greninja-ex-box-16th-september": [
    79.99,
    1794265016
+  ],
+  "poke|30th-celebration|Kollecter|pokemon-tcg-chn-30th-celebration-booster-box-30thc-s-chinese": [
+   149.0,
+   1794274569
+  ],
+  "poke|30th-celebration|Kollecter|pokemon-tcg-chn-30th-celebration-first-partner-illustration-collection-set-vol-3": [
+   25.0,
+   1794274569
   ],
   "poke|30th-celebration|Light of Cards|pre-order-pokemon-tcg-30th-celebration-knock-out-collection": [
    49.99,
@@ -4718,7 +4730,7 @@
    "t": 1794218109.0752587
   }
  },
- "sealed_ts": 1794273987,
+ "sealed_ts": 1794274754,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
