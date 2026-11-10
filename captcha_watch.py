@@ -8,6 +8,8 @@ When a shop answers with a "prove you're human" page instead of its normal reply
      /challenge page, or a "verify you are human" page),
   2. pauses that shop - no more requests to it,
   3. tells you once (Discord #bot-status, and the Security page), and
+     (unless it's a "slow down" challenge - HTTP 429 - which is temporary: the shop is paused for 10 min,
+     doubling up to 4 hours, with one try after each, and you're only told if it's still going after 6 hours),
   4. waits for you. Open the shop in your own browser, do the check if you want to, then press Resume on
      the Security page. The bot then tries the shop again; if the shop still challenges it, the shop is
      paused again.
@@ -24,6 +26,10 @@ Settings (config.json "security" > "captcha"):
 import time
 
 MIN_RECHECK_HOURS = 6
+BACKOFF_FIRST = 10 * 60           # a "slow down" challenge: first pause
+BACKOFF_MAX = 4 * 3600            # ...doubling up to this
+SAME_BURST = 60                   # challenges this close together count once
+STUCK_AFTER = 6 * 3600            # still challenged after this long: wait for you, and tell you
 NOTIFY_GAP = 24 * 3600
 BODY_LOOK = 60_000
 
@@ -93,31 +99,59 @@ def detect(status, headers, body, location=""):
 
 
 def paused(state):
-    """{host: entry} for shops waiting on you."""
+    """{host: entry} for paused shops (waiting for you, or a temporary "slow down" pause with "until")."""
     c = state.get("captcha")
     return c if isinstance(c, dict) else {}
 
 
 def is_paused(state, host, cfg=None, now=None):
-    """True while the shop is paused. With "recheck_hours" set, False once that long has passed (one try)."""
+    """True while the shop is paused. A temporary pause (a "slow down" challenge) ends at its "until" time
+    (one try). With "recheck_hours" set, a pause waiting for you also gets one try after that long."""
     e = paused(state).get(host)
     if not e:
         return False
+    if e.get("until"):
+        return (now or time.time()) < float(e["until"])
     hours = settings(cfg)["recheck_hours"]
     if hours and (now or time.time()) - float(e.get("since") or 0) >= hours * 3600:
         return False
     return True
 
 
-def pause(state, host, kind, url, now=None):
-    """Record the challenge. Returns True if you should be told (first time, or a day since the last notice)."""
+def pause(state, host, kind, url, now=None, status=None):
+    """Record the challenge. Returns True if you should be told.
+
+    A challenge sent with HTTP 429 is the shop's way of saying "slow down" (Shopify shops behind Cloudflare
+    send "Verifying your connection..." with a 429 when a lot of requests arrive at once; seen 10 Nov 2026).
+    It clears by itself, so it's a TEMPORARY pause: 10 min, doubling up to 4 h, with one try after each.
+    Only if the shop is still challenging after STUCK_AFTER does it wait for you, and you're told.
+    Any other challenge waits for you straight away. Either way nothing tries to get past it."""
     now = now or time.time()
     c = state.setdefault("captcha", {})
     e = c.get(host) or {}
+    if e and now - float(e.get("since") or 0) < SAME_BURST:
+        return False                    # several replies from the same moment (the bot reads pages in parallel): one pause
+    first = float(e.get("first") or now)
+    count = int(e.get("count") or 0) + 1
+    temporary = int(status or 0) == 429 and not e.get("needs_you") and now - first < STUCK_AFTER
+    entry = {"kind": kind, "since": round(now), "first": round(first), "url": str(url)[:300], "count": count,
+             "status": int(status or 0), "told": e.get("told")}
+    if temporary:
+        entry["until"] = round(now + min(BACKOFF_MAX, BACKOFF_FIRST * 2 ** (count - 1)))
+        c[host] = entry
+        return False
+    entry["needs_you"] = True
     tell = not e.get("told") or now - float(e["told"]) >= NOTIFY_GAP
-    c[host] = {"kind": kind, "since": round(now), "first": e.get("first") or round(now), "url": str(url)[:300],
-               "count": int(e.get("count") or 0) + 1, "told": round(now) if tell else e.get("told")}
+    if tell:
+        entry["told"] = round(now)
+    c[host] = entry
     return tell
+
+
+def same_burst(state, host, now=None):
+    """True if this shop was paused moments ago (parallel replies from the same check)."""
+    e = paused(state).get(host)
+    return bool(e) and (now or time.time()) - float(e.get("since") or 0) < SAME_BURST
 
 
 def resume(state, host):
@@ -126,6 +160,10 @@ def resume(state, host):
 
 
 def message(name, host, e):
+    if int(e.get("status") or 0) == 429:
+        return (f"🧩 **{name} has been asking the bot to verify it's human for {STUCK_AFTER // 3600} hours** "
+                f"({e.get('kind')}). The bot has stopped checking it and won't try to get round it. If the shop opens "
+                f"normally in your own browser, press **Resume** for it on the bot's Security page to try again.")
     return (f"🧩 **{name} is asking for human verification** ({e.get('kind')}). The bot has stopped checking it and "
             f"won't try to get round it. To carry on: open https://{host} in your own browser, and if it lets you in, "
             f"press **Resume** for it on the bot's Security page. If the shop challenges the bot again it'll be paused again.")

@@ -63,6 +63,14 @@ on the Security page, and waits. Press **Resume** there to let it try again; if 
 it pauses again. The bot never solves, skips or works around a challenge and never copies cookies from
 your browser. `recheck_hours` (0 = wait for you; otherwise at least 6) lets it try once by itself.
 
+One kind is treated differently: a challenge sent with HTTP 429 is a shop saying "slow down" (Shopify
+shops behind Cloudflare do this when many requests arrive at once, and it clears by itself). That pauses
+the shop for 10 minutes, doubling up to 4 hours, with one try after each pause. You are only told, and
+asked to press Resume, if it is still happening after 6 hours.
+
+The allowed-sites list also covers a listed shop's own site, so a shop redirecting between its own
+addresses (shop.goodgames.com.au to www.goodgames.com.au) isn't blocked.
+
 ## 4. Monitoring
 
 - **Security log:** `security_events.jsonl` in the data folder, also on the Security page. Secrets,

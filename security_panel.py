@@ -268,8 +268,9 @@ function render(){if(!S)return;const n=S.network,b=$('#banner');
  $('#rotd').textContent=(n.rotate_minutes>0?'Every '+n.rotate_minutes+' minutes':'Off')+(n.endpoints.length<2?' · needs two or more endpoints':'')+' · last change '+ago(n.last_rotation)+' · shortest allowed '+n.min_rotate_minutes+' min';
  if(!typing)$('#rotm').value=n.rotate_minutes;
  const c=S.captcha;$('#cap').innerHTML=(c.enabled&&S.enabled?pill('ok','Watching'):pill('warn','Off'))+
-  (c.paused.length?'<table style="margin-top:8px">'+c.paused.map(p=>`<tr><td><b>${esc(p.host)}</b><div class="mute">${esc(p.kind)} · ${ago(p.since)}</div></td><td style="text-align:right"><button data-host="${esc(p.host)}">Resume</button></td></tr>`).join('')+'</table>'
+  (c.paused.length?'<table style="margin-top:8px">'+c.paused.map(p=>`<tr><td><b>${esc(p.host)}</b><div class="mute">${esc(p.kind)} · ${ago(p.since)} · ${p.needs_you?'waiting for you':'slow-down pause, retries by itself in '+Math.max(1,Math.round((p.until-Date.now()/1000)/60))+' min'}</div></td><td style="text-align:right"><button data-host="${esc(p.host)}">Resume</button></td></tr>`).join('')+'</table>'
   :'<div class="mute" style="margin-top:8px">No shop is asking for human verification.</div>');
+ if(c.paused.some(p=>p.needs_you)&&!S.stopped&&!$('#banner').className){const b2=$('#banner');b2.className='warn';b2.textContent=c.paused.filter(p=>p.needs_you).length+' shop(s) need human verification - see CAPTCHA detection below.'}
  const m=S.monitoring;$('#mon').innerHTML=`<div>${pill(m.allowlist&&S.active?'ok':'warn',m.allowlist&&S.active?'Allowed sites only':'Not restricted')} <span class="mute">${m.allowed_sites} sites</span></div>
   <div style="margin-top:6px">${pill(m.files&&S.active?'ok':'warn',m.files&&S.active?'File checks on':'File checks off')} <span class="mute">${m.blocked_files} blocked</span></div>
   <div class="mute" style="margin-top:6px">Unexpected sites this hour: ${m.violations_this_hour} of ${m.max_violations} before an automatic stop</div>`;
