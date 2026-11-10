@@ -106,6 +106,7 @@
   "list|Cherry Collectables|one-piece-card-game-eb-01-memorial-collection-extra-booster-booster-box",
   "list|Cherry Collectables|one-piece-card-game-eb-02-extra-booster-booster-box",
   "list|Cherry Collectables|one-piece-card-game-eb-03-extra-booster-box",
+  "list|Cherry Collectables|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box",
   "list|Cherry Collectables|one-piece-card-game-op-02-paramount-war-booster-box",
   "list|Cherry Collectables|one-piece-card-game-op-03-pillars-of-strength-booster-box",
   "list|Cherry Collectables|one-piece-card-game-op-04-kingdoms-of-intrigue-booster-box",
@@ -702,16 +703,21 @@
  "Gumnut (pokemon:30th-celebration)": [],
  "Gumnut (pokemon:delta-reign)": [],
  "JB Hi-Fi": [
+  "list|JB Hi-Fi|bandai-one-piece-card-game-prb-01-premium-booster-box",
   "list|JB Hi-Fi|bandai-one-piece-card-game-romance-dawn-op-01-booster-box",
   "list|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03"
  ],
  "JB Hi-Fi (all sealed)": [
+  "list|JB Hi-Fi|bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck",
   "list|JB Hi-Fi|bandai-one-piece-card-game-big-mom-pirates-st-07-starter-deck",
+  "list|JB Hi-Fi|bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red",
   "list|JB Hi-Fi|bandai-one-piece-card-game-english-2nd-anniversary-set",
   "list|JB Hi-Fi|bandai-one-piece-card-game-set-sail-deck-set-sd-01-1pc",
   "list|JB Hi-Fi|bandai-one-piece-card-game-special-goods-set-ace-sabo-luffy",
+  "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-28",
   "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-32",
   "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-36",
+  "list|JB Hi-Fi|bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck",
   "list|JB Hi-Fi|bandai-one-piece-card-game-worst-generation-st-02-starter-deck"
  ],
  "JToys": [
@@ -751,9 +757,15 @@
  ],
  "Light of Cards (pokemon:30th-celebration)": [
   "plist|30th-celebration|Light of Cards|pokemon-tcg-30th-celebration-elite-trainer-box",
-  "plist|30th-celebration|Light of Cards|pre-order-pokemon-tcg-30th-celebration-ex-box"
+  "plist|30th-celebration|Light of Cards|pre-order-pokemon-tcg-30th-celebration-ex-box",
+  "plist|30th-celebration|Light of Cards|pre-order-pokemon-tcg-30th-celebration-knock-out-collection",
+  "plist|30th-celebration|Light of Cards|sealed-pokemon-tcg-30th-celebration-day-night-mini-tin"
  ],
- "Light of Cards (pokemon:delta-reign)": [],
+ "Light of Cards (pokemon:delta-reign)": [
+  "plist|delta-reign|Light of Cards|pokemon-tcg-mega-evolution-pitch-black-three-booster-blister",
+  "plist|delta-reign|Light of Cards|sealed-pokemon-tcg-mega-evolution-me06-delta-reign-booster-box",
+  "plist|delta-reign|Light of Cards|sealed-pokemon-tcg-mega-evolution-me06-delta-reign-elite-trainer-box"
+ ],
  "M-G": [],
  "M-G (all sealed)": [],
  "M-G (pokemon:30th-celebration)": [
@@ -1047,6 +1059,7 @@
  "The Wandering Collector (pokemon:delta-reign)": [
   "plist|delta-reign|The Wandering Collector|in-hand-pokemon-tcg-mega-evolution-6-delta-reign-3-pack-blister",
   "plist|delta-reign|The Wandering Collector|in-hand-pokemon-tcg-mega-evolution-6-delta-reign-booster-bundle",
+  "plist|delta-reign|The Wandering Collector|in-hand-pokemon-tcg-mega-evolution-6-delta-reign-elite-trainer-box",
   "plist|delta-reign|The Wandering Collector|pokemon-tcg-mega-evolution-6-delta-reign-booster-box"
  ]
 }
