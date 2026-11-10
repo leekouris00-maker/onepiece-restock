@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794297478,
+  "bf_ts": 1794298277,
   "cache": {
    "finds": [
     {
@@ -785,7 +785,7 @@
     }
    ]
   },
-  "cursor": 74,
+  "cursor": 76,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1575,6 +1575,9 @@
    "one-piece-jewelry-bonney-pop-vinyl-pop-vinyl": {
     "q": 1
    },
+   "one-piece-killer-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
    "one-piece-king-of-artist-monkey-d-luffy-land-of-wano-ii-figure-figure": {
     "q": 1
    },
@@ -1698,6 +1701,9 @@
    "one-piece-roronoa-zoro-young-pop-vinyl-pop-vinyl": {
     "ok": false
    },
+   "one-piece-sakazuki-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
    "one-piece-sanji-build-a-scene-pop-vinyl-pop-vinyl": {
     "q": 1
    },
@@ -1738,6 +1744,9 @@
     "q": 1
    },
    "one-piece-tony-tony-chopper-build-a-scene-flocked-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
+   "one-piece-uncut-collection-69-2018-dvd": {
     "q": 1
    },
    "one-piece-uncut-collection-70-2018-dvd": {
