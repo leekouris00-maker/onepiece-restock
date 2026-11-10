@@ -18,7 +18,7 @@ for v in c.values():
     v["ts"] = 1; v["bf_ts"] = 0
 json.dump(c, open("chain_state.json", "w"))
 P
-timeout 600 python tcg_bot.py --pace 3 > out.txt 2>&1; echo "exit $?"
+timeout 600 python probe/dump.py > out.txt 2>&1; echo "exit $?"; sed -n "/########/,/title:/p" out.txt | head -120
 echo "== check summary"; grep -iE "checked|shops? (down|ok)|^Restock check|took" out.txt | tail -6
 echo "== security events"
 python - <<'P'
