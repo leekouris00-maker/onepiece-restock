@@ -63,6 +63,16 @@ on the Security page, and waits. Press **Resume** there to let it try again; if 
 it pauses again. The bot never solves, skips or works around a challenge and never copies cookies from
 your browser. `recheck_hours` (0 = wait for you; otherwise at least 6) lets it try once by itself.
 
+**Since v2.16 this part runs by itself**, on the PC copy and the cloud copy, whether or not the rest of
+security is switched on. With security off:
+
+- Paused shops are kept in `captcha_state.json` (the cloud copy saves it to GitHub with its other memory).
+- Shops that start challenging during one check get **one** #bot-status notice between them, and a shop
+  that is still challenging is mentioned again weekly, not daily.
+- Resume is `/captcha resume:<shop>` (or `resume:all`) in Discord; `/captcha` by itself lists paused shops.
+- The cloud copy has nobody to press Resume, so it tries a paused shop once a day by itself.
+- To switch it off: `"security": {"captcha": {"enabled": false}}` in `config.json`.
+
 One kind is treated differently: a challenge sent with HTTP 429 is a shop saying "slow down" (Shopify
 shops behind Cloudflare do this when many requests arrive at once, and it clears by itself). That pauses
 the shop for 10 minutes, doubling up to 4 hours, with one try after each pause. You are only told, and

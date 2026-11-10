@@ -177,7 +177,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.15"
+VERSION = "2.16"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -988,8 +988,13 @@ def begin_check(cfg, status=None, drop=None, skip_down=True):
     hints = status.get("page_hints")
     if isinstance(hints, dict):
         PAGE_HINTS.update(hints)
-    if netguard:                        # v2.15: does nothing unless "security" is switched on
+    if netguard:                        # v2.15: security, off unless switched on. v2.16: CAPTCHA detection runs regardless
         netguard.apply(_me(), cfg or {})
+        if not DRY_RUN[0]:
+            waiting = [r["name"] for r in netguard.watch_list(_me(), cfg or {})]
+            if waiting:
+                print(f"   ~ paused, asked for human verification: {', '.join(waiting[:25])}"
+                      f"{' ...' if len(waiting) > 25 else ''}  (/captcha in Discord)")
     _run_t0[0] = time.perf_counter()
     return status
 
@@ -4143,6 +4148,8 @@ def run_once(cfg, args, drop=None):
         print(f"   ! {len(undelivered)} alert(s) didn't reach Discord - they'll go out next check")
 
     metrics = run_metrics()
+    if netguard:
+        netguard.flush_notices(_me(), cfg)      # v2.16: one #bot-status notice for shops that asked for human verification
     if not DRY_RUN[0]:
         discord_health(cfg, status)
         save_state(kept)

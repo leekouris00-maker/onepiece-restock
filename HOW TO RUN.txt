@@ -77,6 +77,14 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.16: CAPTCHA DETECTION IS ALWAYS ON (PC copy and cloud copy, no Docker or VPN needed).
+  - When a shop answers with a "prove you're human" page, the bot stops checking that shop, tells you once in
+    #bot-status, and waits. It never solves or gets round the check.
+  - /captcha in Discord lists the paused shops. Open the shop in your own browser; if it lets you in,
+    /captcha resume:<shop> (or resume:all) and the bot tries it on the next check.
+  - A "slow down" challenge clears by itself: the bot waits 10 minutes, doubling up to 4 hours, and only tells
+    you if it's still going after 6 hours. The cloud copy tries a paused shop once a day by itself.
+  - To switch it off: "security": {"captcha": {"enabled": false}} in config.json.
 New in v2.15: SECURITY (all off until you switch it on - nothing changes for the way you run the bot today).
   - run_docker.bat runs the bot in an isolated container behind a VPN container (Docker Desktop + a Mullvad account).
     The bot can then only write inside docker-data\, can't touch Windows, and has no internet except through the VPN.

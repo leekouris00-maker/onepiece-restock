@@ -52,6 +52,7 @@ Type these in your Discord server:
     /want list | add | remove | enable   change the singles want list without editing config.json
     /boxmax <price>                      change the booster box max price
     /mute <hours>, /unmute               no @pings or phone pushes for a while (finds still post)
+    /captcha [resume:<shop>]             shops asking the bot for human verification; resume one after you've looked
     /pokemon max <type> <price>          the most you'd pay for a Pokémon product type
     /pokemon setup                       make the Pokémon role and channels (safe to run again)
 
@@ -601,7 +602,7 @@ HELP = (
     "🃏 DON!! cards have no number: `/want add num:Gomu Gomu DON max:<price>`\n"
     "🖥️ `/desk on` the PC opens the checkout tab itself when a target comes in stock (`/desk off`)\n"
     "⚡ In drop windows the bot also checks that release's listings and your /watch links every 15 seconds.\n\n"
-    "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/pokemon max`, `/pokemon setup`, "
+    "Admins: `/want list|add|remove|enable`, `/boxmax`, `/mute`, `/unmute`, `/captcha`, `/pokemon max`, `/pokemon setup`, "
     "`/onepiece setup`, "
     "and the /watch, /ebay and /bought commands."
 )
@@ -1214,6 +1215,55 @@ async def unmute_cmd(inter: discord.Interaction):
     controls.pop("mute_until", None)
     tb.atomic_write_json(tb.CONTROLS_PATH, controls)
     await inter.response.send_message("🔔 Pings are back on.", ephemeral=True)
+
+
+# ---------------------------------------------------------------- v2.16: shops asking for human verification
+def build_captcha(cfg, resume=""):
+    """/captcha: the shops paused because they asked the bot for human verification; resume:<shop> tries one again.
+    The bot never solves or gets round a challenge - Resume only means "I've looked, try the shop again"."""
+    ng = getattr(tb, "netguard", None)
+    if ng is None:
+        return "CAPTCHA detection isn't installed on this copy (netguard.py is missing)."
+    if ng.settings(cfg)["enabled"]:
+        return "Security is switched on here, so paused shops and their Resume buttons are on the Security page (open_security.bat)."
+    if not ng.captcha_watch.settings(cfg)["enabled"]:
+        return 'CAPTCHA detection is switched off in config.json ("security" > "captcha" > "enabled").'
+    out = []
+    if str(resume or "").strip():
+        done = ng.resume_matching(tb, resume, cfg)
+        out.append(f"▶️ Trying again on the next check: **{', '.join(done)}**. If a shop challenges the bot again it'll be "
+                   f"paused again." if done else f"No paused shop matches “{str(resume)[:60]}”.")
+    rows = ng.watch_list(tb, cfg)
+    if not rows:
+        out.append("🧩 No shop is asking the bot for human verification right now.")
+        return "\n".join(out)
+    out.append(f"🧩 **{len(rows)} shop(s) paused** (the bot isn't checking them and won't try to get round it):")
+    for r in rows[:30]:
+        since = f"<t:{int(r['since'])}:R>" if r.get("since") else "recently"
+        if r["needs_you"]:
+            what = f"waiting for you - open https://{r['host']} in your browser, then `/captcha resume:{r['name']}`"
+        else:
+            what = f"asked to slow down; the bot tries again by itself <t:{int(r['until'])}:R>"
+        out.append(f"• **{r['name']}** ({r['kind']}, since {since}): {what}")
+    if len(rows) > 30:
+        out.append(f"…and {len(rows) - 30} more")
+    return "\n".join(out)[:1900]
+
+
+@bot.tree.command(name="captcha", description="Shops asking the bot for human verification; resume one after you've checked it")
+@app_commands.default_permissions(manage_guild=True)
+@app_commands.describe(resume="A paused shop to try again (its name or web address), or 'all'")
+async def captcha_cmd(inter: discord.Interaction, resume: str = ""):
+    cfg = await admin_only(inter)
+    if cfg is None:
+        return
+    try:
+        text = build_captcha(cfg, resume)
+        if str(resume or "").strip():
+            tb.append_text(AUDIT_PATH, f"{datetime.now():%Y-%m-%d %H:%M:%S}  {inter.user} ({inter.user.id})  captcha resume {resume[:80]}\n", 500_000)
+        await inter.response.send_message(text, ephemeral=True)
+    except Exception as e:  # noqa: BLE001
+        await fail(inter, e)
 
 
 # ---------------------------------------------------------------- Pokémon

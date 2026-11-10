@@ -3,6 +3,8 @@
 Network guard for the restock bot (v2.15)
 =========================================
 Off unless config.json has  "security": {"enabled": true}  (or the container sets BOT_SECURITY=1).
+v2.16: CAPTCHA detection is the exception - it runs by itself even with security off (see captcha_watch.py),
+keeping its pauses in captcha_state.json. "security": {"captcha": {"enabled": false}} switches it off.
 With it on, every request the bot makes passes through here first.
 
 WHAT IT DOES
@@ -64,6 +66,9 @@ import fileguard
 import security_log
 
 STATE_NAME = "security_state.json"
+WATCH_STATE_NAME = "captcha_state.json"   # v2.16: CAPTCHA pauses while the rest of security is off (the cloud copy saves it to GitHub)
+CLOUD_RECHECK_HOURS = 24.0        # the cloud copy has nobody to press Resume: one try a day
+WATCH_REMIND = 7 * 86400          # a shop that's still challenging: say so again this often, not daily
 MIN_ROTATE_MINUTES = 60
 VERIFY_RETRY = 60                 # while disconnected, look again this often
 VIOLATION_WINDOW = 3600
@@ -77,7 +82,8 @@ IP_RE = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b|\b(?:[0-9a-f]{1,4}:){2,7}[0-9a-
 _lock = threading.RLock()
 _tls = threading.local()
 RT = {"on": False, "tb": None, "cfg": None, "s": None, "allow": set(), "proxy_hosts": set(), "applied": None,
-      "orig_getaddrinfo": None, "opener": False, "saved_env": None, "violations": [], "state": None}
+      "orig_getaddrinfo": None, "opener": False, "saved_env": None, "violations": [], "state": None,
+      "watch": False, "wstate": None, "wsig": None, "notices": []}
 
 
 class Blocked(OSError):
@@ -175,6 +181,58 @@ def save_state(tb):
             print(f"   ! couldn't save {STATE_NAME} ({e})")
 
 
+# ---------------------------------------------------------------- CAPTCHA pauses while security is off (v2.16)
+def _watch_path(tb):
+    return os.path.join(tb.HERE, WATCH_STATE_NAME)
+
+
+def _watch_sig(tb):
+    path = _watch_path(tb)
+    try:
+        return path, os.stat(path).st_mtime_ns
+    except OSError:
+        return path, None
+
+
+def _watch_state(tb):
+    """The pauses kept while security is off. Read again whenever the file changed, because the restock bot
+    and the commands bot (/captcha resume) are separate programs sharing it."""
+    sig = _watch_sig(tb)
+    with _lock:
+        if RT["wstate"] is None or sig != RT["wsig"]:
+            st = tb.read_json(sig[0], {}) if sig[1] is not None else {}
+            RT["wstate"], RT["wsig"] = (st if isinstance(st, dict) else {}), sig
+        return RT["wstate"]
+
+
+def _save_watch(tb):
+    with _lock:
+        try:
+            tb.atomic_write_json(_watch_path(tb), RT["wstate"] or {}, sort_keys=True)
+            RT["wsig"] = _watch_sig(tb)
+        except OSError as e:
+            print(f"   ! couldn't save {WATCH_STATE_NAME} ({e})")
+
+
+def _cap_state(tb):
+    """Where CAPTCHA pauses live: the security state when security is on, else the stand-alone file."""
+    return load_state(tb) if RT["on"] else _watch_state(tb)
+
+
+def _cap_save(tb):
+    save_state(tb) if RT["on"] else _save_watch(tb)
+
+
+def _carry(src, dst):
+    """Switching security on or off mustn't forget a pause. True if anything was copied."""
+    moved = False
+    for host, e in captcha_watch.paused(src).items():
+        if host not in captcha_watch.paused(dst):
+            dst.setdefault("captcha", {})[host] = e
+            moved = True
+    return moved
+
+
 def _log(event, level="info", **fields):
     if RT["tb"] is not None:
         security_log.log(RT["tb"], event, level, **fields)
@@ -270,7 +328,13 @@ def _violation(kind, host, detail=""):
 
 def gate(url):
     """Called by the bot before every request. Raises Blocked if the request may not go out."""
-    if not RT["on"] or getattr(_tls, "internal", False):
+    if getattr(_tls, "internal", False):
+        return
+    if not RT["on"]:
+        if RT["watch"]:                 # v2.16: security is off, but a shop that asked for human verification stays paused
+            host = _host_of(url)
+            if host and captcha_watch.is_paused(_watch_state(RT["tb"]), host, hours=RT["s"]["captcha"]["recheck_hours"]):
+                raise Blocked(f"{host} asked for human verification: paused until Resume")
         return
     host = _host_of(url)
     st = load_state(RT["tb"])
@@ -290,24 +354,28 @@ def gate(url):
 
 def on_response(url, status, headers, body):
     """Called with each reply. True if it was a CAPTCHA challenge (the shop is now paused)."""
-    if not RT["on"] or getattr(_tls, "internal", False) or not RT["s"]["captcha"]["enabled"]:
+    if getattr(_tls, "internal", False) or not (RT["on"] or RT["watch"]) or not RT["s"]["captcha"]["enabled"]:
         return False
+    alone = not RT["on"]                    # v2.16: detection by itself, security off
     kind = captcha_watch.detect(status, headers, body)
     host = _host_of(url)
     tb, cfg = RT["tb"], RT["cfg"]
-    st = load_state(tb)
+    st = _cap_state(tb)
     if not kind:
         if host in captcha_watch.paused(st) and 200 <= int(status or 0) < 300:     # a recheck that went through
             captcha_watch.resume(st, host)
-            save_state(tb)
+            _cap_save(tb)
             _log("captcha_resumed", host=host, how="the shop answered normally")
         return False
     with _lock:
         if captcha_watch.same_burst(st, host):
             return True                             # already paused by another reply from this same check
-        tell = captcha_watch.pause(st, host, kind, url, status=status)
+        tell = captcha_watch.pause(st, host, kind, url, status=status, notify_gap=WATCH_REMIND if alone else None)
         e = st["captcha"][host]
-        save_state(tb)
+        _cap_save(tb)
+        if tell and alone:
+            RT["notices"].append(host)              # one notice for the whole check: flush_notices()
+            tell = False
     _log("captcha_detected", "warning", host=host, kind=kind, status=status,
          pause="until you press Resume" if e.get("needs_you") else f"{int((e['until'] - time.time()) // 60) + 1} min")
     if tell:
@@ -317,6 +385,63 @@ def on_response(url, status, headers, body):
         except Exception:  # noqa: BLE001
             pass
     return True
+
+
+def flush_notices(tb=None, cfg=None):
+    """v2.16: called at the end of a check. Shops that started asking for human verification during it get
+    ONE #bot-status notice between them (the cloud copy can meet twenty at once). Returns how many shops."""
+    tb, cfg = tb or RT["tb"], cfg if cfg is not None else RT["cfg"]
+    with _lock:
+        hosts, RT["notices"] = list(dict.fromkeys(RT["notices"])), []
+    if tb is None or not hosts:
+        return 0
+    cloud = bool(getattr(tb, "IN_ACTIONS", False))
+    try:
+        names = tb.shop_names(cfg or {})
+    except Exception:  # noqa: BLE001
+        names = {}
+    live = captcha_watch.paused(_cap_state(tb))
+    items = sorted(((names.get(h, h), h, live[h]) for h in hosts if h in live), key=lambda i: str(i[0]).lower())
+    if not items:
+        return 0
+    if len(items) == 1:
+        text = captcha_watch.message(*items[0], how=captcha_watch.HOW_DISCORD, cloud=cloud)
+    else:
+        text = captcha_watch.digest(items, how=captcha_watch.HOW_DISCORD, cloud=cloud)
+    try:
+        _internal(lambda: tb.post_status(cfg, text, tb.AMBER))
+    except Exception:  # noqa: BLE001
+        pass
+    return len(items)
+
+
+def watch_list(tb, cfg=None):
+    """v2.16 (/captcha): the paused shops, [{name, host, kind, since, needs_you, until}], longest wait first."""
+    try:
+        names = tb.shop_names(cfg or RT["cfg"] or {})
+    except Exception:  # noqa: BLE001
+        names = {}
+    out = [{"name": names.get(h, h), "host": h, "kind": e.get("kind"), "since": e.get("first") or e.get("since"),
+            "needs_you": bool(e.get("needs_you")), "until": e.get("until")}
+           for h, e in captcha_watch.paused(_cap_state(tb)).items()]
+    return sorted(out, key=lambda r: (not r["needs_you"], r["since"] or 0))
+
+
+def resume_matching(tb, query, cfg=None):
+    """v2.16 (/captcha resume:<shop>): Resume by shop name, web address, or "all". Returns the names resumed."""
+    q = str(query or "").strip().lower()
+    if not q:
+        return []
+    rows = watch_list(tb, cfg)
+    hit = rows if q == "all" else [r for r in rows if q == r["host"] or q == str(r["name"]).lower()] \
+        or [r for r in rows if q in r["host"] or q in str(r["name"]).lower()]
+    st = _cap_state(tb)
+    done = [r["name"] for r in hit if captcha_watch.resume(st, r["host"])]
+    if done:
+        _cap_save(tb)
+        for r in hit:
+            _log("captcha_resumed", host=r["host"], how="you said Resume in Discord")
+    return done
 
 
 def _internal(fn):
@@ -493,14 +618,18 @@ def _use_endpoint(tb, s, st, name, why, now):
 
 
 def apply(tb, cfg, now=None):
-    """Called at the start of every check: switch the guard on or off and keep the connection verified."""
+    """Called at the start of every check: switch the guard on or off and keep the connection verified.
+    v2.16: with security off, CAPTCHA detection still runs by itself (unless "captcha": {"enabled": false})."""
     now = now or time.time()
     problems = []
     s = settings(cfg, problems)
     s["captcha"] = captcha_watch.settings(cfg)
+    if not s["enabled"] and getattr(tb, "IN_ACTIONS", False) and not s["captcha"]["recheck_hours"]:
+        s["captcha"]["recheck_hours"] = CLOUD_RECHECK_HOURS
     with _lock:
         if RT["tb"] is not tb:
             RT["state"] = None
+            RT["wstate"] = None
         was_on = RT["on"]
         RT.update(tb=tb, cfg=cfg, s=s)
         if not s["enabled"]:
@@ -510,8 +639,14 @@ def apply(tb, cfg, now=None):
                 _restore_proxy()
                 fileguard.disable()
                 _log("security_off")
+                if s["captcha"]["enabled"] and _carry(load_state(tb), _watch_state(tb)):
+                    _save_watch(tb)
+            RT["watch"] = s["captcha"]["enabled"]
             return s
+        RT["watch"] = False
         st = load_state(tb)
+        if not was_on and _carry(_watch_state(tb), st):
+            pass                        # saved with the rest below
         RT["allow"] = build_allowlist(tb, cfg, s)
         RT["proxy_hosts"] = {_host_of(u) for u in s["endpoints"].values()}
         RT["on"] = True
@@ -584,10 +719,10 @@ def set_rotation(tb, minutes):
 
 
 def resume_captcha(tb, host):
-    st = load_state(tb)
+    st = _cap_state(tb)
     if not captcha_watch.resume(st, host):
         raise ValueError("that shop isn't paused")
-    save_state(tb)
+    _cap_save(tb)
     _log("captcha_resumed", host=host, how="you pressed Resume")
 
 
@@ -646,7 +781,8 @@ def snapshot(tb, cfg=None):
                     "vpn_flag": st.get("vpn_flag"), "rotate_minutes": rotate, "min_rotate_minutes": MIN_ROTATE_MINUTES,
                     "last_rotation": st.get("rotated_ts") or 0},
         "captcha": {"enabled": s["captcha"]["enabled"], "recheck_hours": s["captcha"]["recheck_hours"],
-                    "paused": [dict(e, host=h) for h, e in sorted(captcha_watch.paused(st).items())]},
+                    "alone": bool(RT["watch"] and not RT["on"]),
+                    "paused": [dict(e, host=h) for h, e in sorted(captcha_watch.paused(_cap_state(tb)).items())]},
         "monitoring": {"allowlist": s["enforce"], "allowed_sites": len(RT["allow"]) if RT["on"] else 0,
                        "violations_this_hour": len({h for _, h in RT["violations"]}),
                        "max_violations": s["max_violations"], "files": s["files"],

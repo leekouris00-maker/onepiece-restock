@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-CAPTCHA detection for the restock bot (v2.15)
-=============================================
+CAPTCHA detection for the restock bot (v2.15; on by itself since v2.16)
+=======================================================================
+Since v2.16 this runs whether or not the rest of "security" is switched on (PC copy and cloud copy).
 When a shop answers with a "prove you're human" page instead of its normal reply, the bot:
 
   1. notices (Cloudflare challenge / Turnstile, hCaptcha, reCAPTCHA, PerimeterX, DataDome, Shopify's
@@ -10,9 +11,10 @@ When a shop answers with a "prove you're human" page instead of its normal reply
   3. tells you once (Discord #bot-status, and the Security page), and
      (unless it's a "slow down" challenge - HTTP 429 - which is temporary: the shop is paused for 10 min,
      doubling up to 4 hours, with one try after each, and you're only told if it's still going after 6 hours),
-  4. waits for you. Open the shop in your own browser, do the check if you want to, then press Resume on
-     the Security page. The bot then tries the shop again; if the shop still challenges it, the shop is
-     paused again.
+  4. waits for you. Open the shop in your own browser, do the check if you want to, then say Resume:
+     /captcha resume:<shop> in Discord, or the Resume button on the Security page when security is on.
+     The bot then tries the shop again; if the shop still challenges it, the shop is paused again.
+     (The cloud copy has nobody to press Resume, so it tries a paused shop once a day by itself.)
 
 The bot never tries to solve, skip or get round a challenge, never copies cookies from your browser and
 never switches address to dodge one: a pause stays in place whichever endpoint is in use. A shop that
@@ -104,21 +106,22 @@ def paused(state):
     return c if isinstance(c, dict) else {}
 
 
-def is_paused(state, host, cfg=None, now=None):
+def is_paused(state, host, cfg=None, now=None, hours=None):
     """True while the shop is paused. A temporary pause (a "slow down" challenge) ends at its "until" time
-    (one try). With "recheck_hours" set, a pause waiting for you also gets one try after that long."""
+    (one try). With "recheck_hours" set, a pause waiting for you also gets one try after that long.
+    "hours" overrides the setting (the cloud copy's once-a-day try)."""
     e = paused(state).get(host)
     if not e:
         return False
     if e.get("until"):
         return (now or time.time()) < float(e["until"])
-    hours = settings(cfg)["recheck_hours"]
+    hours = settings(cfg)["recheck_hours"] if hours is None else hours
     if hours and (now or time.time()) - float(e.get("since") or 0) >= hours * 3600:
         return False
     return True
 
 
-def pause(state, host, kind, url, now=None, status=None):
+def pause(state, host, kind, url, now=None, status=None, notify_gap=None):
     """Record the challenge. Returns True if you should be told.
 
     A challenge sent with HTTP 429 is the shop's way of saying "slow down" (Shopify shops behind Cloudflare
@@ -141,7 +144,7 @@ def pause(state, host, kind, url, now=None, status=None):
         c[host] = entry
         return False
     entry["needs_you"] = True
-    tell = not e.get("told") or now - float(e["told"]) >= NOTIFY_GAP
+    tell = not e.get("told") or now - float(e["told"]) >= (notify_gap or NOTIFY_GAP)
     if tell:
         entry["told"] = round(now)
     c[host] = entry
@@ -159,11 +162,34 @@ def resume(state, host):
     return paused(state).pop(host, None) is not None
 
 
-def message(name, host, e):
+HOW_PAGE = "press **Resume** for it on the bot's Security page"
+HOW_DISCORD = "use `/captcha resume:{name}` in Discord"
+HOW_CLOUD = ("This is the cloud copy, which shops often refuse because it runs from GitHub's addresses; the PC copy on "
+             "your home connection may still read them fine. The cloud copy tries each one again once a day by itself.")
+
+
+def message(name, host, e, how=HOW_PAGE, cloud=False):
+    """The notice for one shop. "how" is what Resume looks like where this copy runs."""
+    how = how.replace("{name}", str(name))
+    if cloud:
+        return (f"🧩 **{name} is asking the bot for human verification** ({e.get('kind')}). The bot has stopped checking "
+                f"it and won't try to get round it. {HOW_CLOUD}")
     if int(e.get("status") or 0) == 429:
         return (f"🧩 **{name} has been asking the bot to verify it's human for {STUCK_AFTER // 3600} hours** "
                 f"({e.get('kind')}). The bot has stopped checking it and won't try to get round it. If the shop opens "
-                f"normally in your own browser, press **Resume** for it on the bot's Security page to try again.")
+                f"normally in your own browser, {how} to try again.")
     return (f"🧩 **{name} is asking for human verification** ({e.get('kind')}). The bot has stopped checking it and "
             f"won't try to get round it. To carry on: open https://{host} in your own browser, and if it lets you in, "
-            f"press **Resume** for it on the bot's Security page. If the shop challenges the bot again it'll be paused again.")
+            f"{how}. If the shop challenges the bot again it'll be paused again.")
+
+
+def digest(items, how=HOW_DISCORD, cloud=False):
+    """One notice for several shops from the same check. items: [(name, host, entry), ...]"""
+    lines = "\n".join(f"• **{name}** ({e.get('kind')})" for name, host, e in items[:40])
+    more = f"\n…and {len(items) - 40} more" if len(items) > 40 else ""
+    head = (f"🧩 **{len(items)} shops are asking the bot for human verification.** The bot has stopped checking them "
+            f"and won't try to get round it.\n{lines}{more}\n")
+    if cloud:
+        return head + HOW_CLOUD
+    return head + (f"To carry on: open a shop in your own browser, and if it lets you in, "
+                   f"{how.replace('{name}', '<shop>')} (or `resume:all`). A shop that challenges the bot again is paused again.")
