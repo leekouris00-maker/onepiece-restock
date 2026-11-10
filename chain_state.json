@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794281178,
+  "bf_ts": 1794281944,
   "cache": {
    "finds": [
     {
@@ -545,7 +545,7 @@
     }
    ]
   },
-  "cursor": 34,
+  "cursor": 36,
   "files": 110,
   "handles": {
    "abystyle-one-piece-flame-flame-fruit-replica": {
@@ -977,6 +977,9 @@
    "kotomi-one-piece-plush-keyring-blind-box-collectible": {
     "ok": false
    },
+   "lego-75639-the-going-merry-pirate-ship-netflix-one-piece": {
+    "q": 1
+   },
    "lego-75641-dr-hiriluks-hideout-one-piece": {
     "q": 1
    },
@@ -1043,7 +1046,13 @@
    "one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": {
     "ok": true
    },
+   "one-piece-card-game-playmat-storage-box-set-eustass-captain-kid": {
+    "q": 1
+   },
    "one-piece-card-game-premium-card-collection-bandai-card-games-fest-23-24-edition": {
+    "q": 1
+   },
+   "one-piece-card-game-special-goods-set-former-four-emperors": {
     "q": 1
    },
    "one-piece-chopper-plush-pencil-case-pencil-case": {
