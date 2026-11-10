@@ -594,6 +594,31 @@ def start(tb):
     t.start()
 
 
+def launch_chrome(pw, kw):
+    """v2.19: start the buyer Chrome WITH its sandbox. Playwright turns Chrome's sandbox off unless asked
+    (that's the "unsupported command-line flag: --no-sandbox" banner), and this window is signed in to
+    Shop Pay and opens shop pages, so the sandbox stays on. Only if Chrome won't start that way does it
+    fall back, and says so loudly. Real Chrome first, Playwright's own Chromium if Chrome isn't installed."""
+    want_chrome = str(kw.pop("browser", "chrome")).lower() == "chrome"
+    for sandbox in (True, False):
+        last = None
+        for channel in (("chrome", None) if want_chrome else (None,)):
+            try:
+                extra = {"channel": channel} if channel else {}
+                ctx = pw.chromium.launch_persistent_context(chromium_sandbox=sandbox, **extra, **kw)
+                if not sandbox:
+                    print("   !!! The auto-buy browser could only start WITHOUT Chrome's sandbox (" + str(last)[:200]
+                          + "). It still works, but a bad page has less in its way. Tell Claude if you see this.",
+                          flush=True)
+                return ctx
+            except Exception as e:  # noqa: BLE001
+                last = e
+        msg = str(last).lower()
+        if "in use" in msg or "already running" in msg:
+            raise last                       # the profile is open elsewhere: not a sandbox problem, don't drop it
+    raise last
+
+
 def _run_worker(tb):
     buyer = Buyer(tb)
     try:
@@ -729,14 +754,9 @@ class Buyer:
                                "then setup_autobuy.bat") from None
         self.pw = sync_playwright().start()
         kw = {"user_data_dir": PROFILE_DIR, "headless": bool(s.get("headless")),
-              "viewport": {"width": 1280, "height": 1000}, "locale": "en-AU", "timezone_id": "Australia/Melbourne"}
-        try:
-            if str(s.get("browser", "chrome")).lower() == "chrome":
-                self.ctx = self.pw.chromium.launch_persistent_context(channel="chrome", **kw)
-            else:
-                raise RuntimeError("bundled Chromium asked for")
-        except Exception:  # noqa: BLE001  (no Chrome installed: Playwright's own Chromium)
-            self.ctx = self.pw.chromium.launch_persistent_context(**kw)
+              "viewport": {"width": 1280, "height": 1000}, "locale": "en-AU", "timezone_id": "Australia/Melbourne",
+              "browser": s.get("browser", "chrome")}
+        self.ctx = launch_chrome(self.pw, kw)
         return self.ctx
 
     def close(self):
@@ -1031,10 +1051,7 @@ def setup(tb):
     with sync_playwright() as pw:
         kw = {"user_data_dir": PROFILE_DIR, "headless": False, "viewport": None, "locale": "en-AU",
               "args": ["--start-maximized"]}
-        try:
-            ctx = pw.chromium.launch_persistent_context(channel="chrome", **kw)
-        except Exception:  # noqa: BLE001
-            ctx = pw.chromium.launch_persistent_context(**kw)
+        ctx = launch_chrome(pw, kw)
         first = ctx.pages[0] if ctx.pages else ctx.new_page()
         first.goto("https://shop.app/account")
         for b in bases:

@@ -32,7 +32,7 @@ import urllib.parse
 from collections import Counter
 from datetime import datetime
 
-KEEP = 500                      # misses.json keeps the latest 500 reports
+KEEP = 3000                     # misses.json keeps the latest 3000 reports (v2.19: the scorecard feed adds more)
 REMOTE_MAX_AGE = 300            # the cloud copy's files on GitHub are re-read after 5 minutes
 
 ICON = {"first": "✅", "late": "🐢", "seen": "👀", "not_found": "🙈", "filtered": "🧹", "not_watched": "🔭"}
@@ -194,9 +194,19 @@ def live_look(tb, host, handle):
 
 
 # ---------------------------------------------------------------- the lookup
-def explain(tb, cfg, link, reported=None, remote=True, live=True, mem=None):
+def _guarded(tb):
+    """v2.19: True when the security layer only lets the bot reach its allowed sites. Looking up a shop the
+    bot doesn't read would count as a violation (and five different ones in an hour stop the bot)."""
+    ng = getattr(tb, "netguard", None)
+    rt = getattr(ng, "RT", None) or {}
+    return bool(rt.get("on") and (rt.get("s") or {}).get("enforce"))
+
+
+def explain(tb, cfg, link, reported=None, remote=True, live=True, mem=None, match_hours=None):
     """What the bot knew about a product someone else posted first. -> dict with "kind" (see ICON),
-    "headline", "lines" (extra detail) and the facts behind them."""
+    "headline", "lines" (extra detail) and the facts behind them.
+    match_hours (v2.19, the scorecard): only bot alerts within this many hours before the report count as
+    the same drop, so an alert from last week's restock isn't scored as "first" for today's."""
     reported = float(reported or time.time())
     host, path = clean_link(link)
     if not host:
@@ -217,6 +227,8 @@ def explain(tb, cfg, link, reported=None, remote=True, live=True, mem=None):
     firsts = sorted(f for f in firsts if f[0])
     alerts = sorted({e["t"] for e in mem["events"] if e.get("event") == "alert" and e.get("t")
                      and same_product(e.get("url", ""), host, path)})
+    if match_hours:
+        alerts = [a for a in alerts if a >= reported - match_hours * 3600]
     stocked = sorted({e["t"] for e in mem["events"] if e.get("event") == "in_stock" and e.get("id") in ids})
     known = bool(shop and handle and any(i.endswith("|" + handle) for kn in mem["known"] for key, lst in kn.items()
                                          if key.split(" (")[0] == shop for i in lst))
@@ -234,7 +246,7 @@ def explain(tb, cfg, link, reported=None, remote=True, live=True, mem=None):
     if alerts:
         before = [a for a in alerts if a <= reported]
         if before:
-            res.update(kind="first", headline=f"The bot alerted at {when(before[-1])}, {gap(before[-1])} before you "
+            res.update(kind="first", lead_min=round((reported - before[-1]) / 60), headline=f"The bot alerted at {when(before[-1])}, {gap(before[-1])} before you "
                                               f"saw it elsewhere.")
             res["lines"].append("If you didn't get it: check the channel's notification settings, /mute and quiet hours.")
         else:
@@ -259,7 +271,7 @@ def explain(tb, cfg, link, reported=None, remote=True, live=True, mem=None):
             res["lines"].append("Came into stock: " + ", ".join(when(t) for t in stocked[-3:]))
         return res
 
-    look = live_look(tb, host, handle) if live else None
+    look = live_look(tb, host, handle) if live and (shop or not _guarded(tb)) else None
     if look:
         res.update(title=look["title"], available=look["available"], price=look["price"])
     if not shop:
@@ -267,6 +279,8 @@ def explain(tb, cfg, link, reported=None, remote=True, live=True, mem=None):
         res["headline"] = f"{host} isn't one of the bot's shops."
         if look:
             res["lines"].append("It's a Shopify shop, so it's quick to add: say the word and it goes in the list.")
+        elif live and _guarded(tb):
+            res["lines"].append("Security is on, so the bot didn't look the shop up (it isn't on the allowed list).")
         elif live:
             res["lines"].append("It isn't a standard Shopify shop (or blocks bots), so it'd need its own code.")
         return res
@@ -296,8 +310,8 @@ def record(tb, res, who="", note=""):
     log = tb.read_json(misses_path(tb), []) or []
     if not isinstance(log, list):
         log = []
-    keep = {k: res.get(k) for k in ("link", "host", "shop", "kind", "headline", "first_seen", "late_min", "title",
-                                     "reason", "reported") if res.get(k) is not None}
+    keep = {k: res.get(k) for k in ("link", "host", "shop", "kind", "headline", "first_seen", "late_min", "lead_min",
+                                     "title", "reason", "reported", "source") if res.get(k) is not None}
     keep.update(t=round(time.time()), who=str(who)[:60], note=str(note)[:200])
     log.append(keep)
     tb.atomic_write_json(misses_path(tb), log[-KEEP:], indent=1, ensure_ascii=False)

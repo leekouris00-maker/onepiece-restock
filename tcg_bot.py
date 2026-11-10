@@ -177,7 +177,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.18.0"
+VERSION = "2.19.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -195,6 +195,7 @@ PICKS_PATH = os.path.join(HERE, "market_picks.json")   # optional: value picks f
 SNAPSHOT_PATH = os.path.join(HERE, "latest.json")      # last check's results, so Discord commands answer instantly
 HISTORY_PATH = os.path.join(HERE, "price_history.json")  # one price per listing per day ("lowest seen", /history)
 EVENTS_PATH = os.path.join(HERE, "events.jsonl")       # restocks, sell-outs and new listings, for /stats
+UPTIME_PATH = os.path.join(HERE, "uptime.json")        # v2.19: which hours each copy finished a check in, for /scorecard
 CONTROLS_PATH = os.path.join(HERE, "controls.json")    # switches set from Discord (e.g. /mute)
 # The ledger saves its picks (and the cloud copy its recap snapshot) to the GitHub repo; the PC copy
 # reads them from there. Override with "repo_raw_url" in config.json.
@@ -1179,7 +1180,7 @@ KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "relea
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
                   "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
-                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy", "deal_finder", "chain_shops", "security"}
+                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy", "deal_finder", "chain_shops", "security", "scorecard"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -3672,6 +3673,41 @@ def log_events(events):
         append_text(EVENTS_PATH, "".join(json.dumps(e, ensure_ascii=False) + "\n" for e in events), 2_000_000)
 
 
+UPTIME_KEEP_DAYS = 120
+
+
+def mark_uptime(now=None, copy=None):
+    """v2.19: note that this copy finished a check in this hour (UTC). uptime.json holds one 24-character
+    line per day per copy ("1" = at least one check that hour), so it changes at most once an hour and the
+    cloud copy's commits stay quiet. /scorecard turns it into "checking X% of hours" and the longest gap."""
+    if DRY_RUN[0]:
+        return False
+    now = time.time() if now is None else now
+    copy = copy or ("cloud" if IN_ACTIONS else "pc")
+    day = time.strftime("%Y-%m-%d", time.gmtime(now))
+    hour = int(now // 3600) % 24
+    data = read_json(UPTIME_PATH, {}) or {}
+    if not isinstance(data, dict):
+        data = {}
+    days = data.get(copy)
+    if not isinstance(days, dict):
+        days = {}
+    line = str(days.get(day) or "").ljust(24, "0")[:24]
+    if line[hour] == "1":
+        return False
+    days[day] = line[:hour] + "1" + line[hour + 1:]
+    for old in sorted(days)[:-UPTIME_KEEP_DAYS]:
+        days.pop(old, None)
+    data[copy] = days
+    data["v"] = 1
+    try:
+        atomic_write_json(UPTIME_PATH, data, indent=1, sort_keys=True)
+    except OSError as e:
+        print(f"   ! couldn't save uptime.json ({redact(e)})")
+        return False
+    return True
+
+
 def read_events(days=30):
     cutoff = time.time() - days * 86400
     out = []
@@ -4027,6 +4063,7 @@ def run_once(cfg, args, drop=None):
         status["last_found"] = len(finds)
         if fast_lane:
             status["fast_lane"] = dict(fast_lane.STATUS)
+    mark_uptime()
     posts = shop_health(cfg, status)
     for name, saved in RESTORED:
         posts.append((f"🩹 **{name} was damaged**, so the bot loaded its last good copy (saved {saved:%d %b %I:%M %p}) "
