@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794296818,
+  "bf_ts": 1794297478,
   "cache": {
    "finds": [
     {
@@ -785,7 +785,7 @@
     }
    ]
   },
-  "cursor": 72,
+  "cursor": 74,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1467,6 +1467,12 @@
    "one-piece-chopper-2023-pop-vinyl-keychain-pop-keychain": {
     "q": 1
    },
+   "one-piece-chopper-arabasta-version-figure-figure": {
+    "q": 1
+   },
+   "one-piece-chopper-dressrosa-version-figure-figure": {
+    "q": 1
+   },
    "one-piece-chopper-egghead-pop-vinyl-pop-vinyl": {
     "q": 1
    },
@@ -1482,6 +1488,9 @@
    "one-piece-crew-wiro-notebook-notebook": {
     "q": 1
    },
+   "one-piece-crocodile-figure-figure": {
+    "q": 1
+   },
    "one-piece-demonio-fleur-pop-vinyl-pop-vinyl": {
     "ok": false
    },
@@ -1492,6 +1501,9 @@
     "q": 1
    },
    "one-piece-dr-vegapunk-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
+   "one-piece-dracule-mihawk-figure-figure": {
     "q": 1
    },
    "one-piece-dxf-grandline-series-extra-bartholomew-kuma-figure-figure": {
@@ -1603,6 +1615,12 @@
     "q": 1
    },
    "one-piece-monkey-d-luffy-build-a-scene-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
+   "one-piece-monkey-d-luffy-egghead-version-figure-figure": {
+    "q": 1
+   },
+   "one-piece-monkey-d-luffy-gear-5-figure-figure": {
     "q": 1
    },
    "one-piece-monkey-d-luffy-gear-5-gum-gum-dawn-gatling-figure-figure": {
@@ -1722,6 +1740,9 @@
    "one-piece-tony-tony-chopper-build-a-scene-flocked-pop-vinyl-pop-vinyl": {
     "q": 1
    },
+   "one-piece-uncut-collection-70-2018-dvd": {
+    "q": 1
+   },
    "one-piece-uncut-collection-71-2019-dvd": {
     "q": 1
    },
@@ -1786,6 +1807,9 @@
     "ok": false
    },
    "tamashii-nations-going-merry-chogokin-one-piece-25th": {
+    "q": 1
+   },
+   "top-trumps-one-piece-quiz-card-game": {
     "q": 1
    },
    "ultimate-guard-playmat-one-piece-devil-fruits": {
