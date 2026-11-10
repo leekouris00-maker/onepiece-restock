@@ -7,8 +7,35 @@
  "drops_slot": "2026-11-10 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794307847,
- "held": {},
+ "ebay_ts": 1794308805,
+ "held": {
+  "sealed|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards": {
+   "f": {
+    "cart": "",
+    "id": "sealed|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards",
+    "kind": "Sealed",
+    "name": "Trafalgar Law - ST03-008 - One Piece Gift Collection 2023 Promo",
+    "note": "Heroines Gift Collection",
+    "price": 24.99,
+    "shop": "Cherry Collectables",
+    "url": "https://www.cherrycollectables.com.au/products/trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards"
+   },
+   "t": 1794308814
+  },
+  "sealed|Cherry Collectables|yamato-gift-collection-2023-st09-012-one-piece-one-piece-promotion-cards": {
+   "f": {
+    "cart": "",
+    "id": "sealed|Cherry Collectables|yamato-gift-collection-2023-st09-012-one-piece-one-piece-promotion-cards",
+    "kind": "Sealed",
+    "name": "Yamato - ST09-012 - One Piece Gift Collection 2023 Promo",
+    "note": "Heroines Gift Collection",
+    "price": 26.99,
+    "shop": "Cherry Collectables",
+    "url": "https://www.cherrycollectables.com.au/products/yamato-gift-collection-2023-st09-012-one-piece-one-piece-promotion-cards"
+   },
+   "t": 1794308814
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -25,6 +52,7 @@
   "CardPlus TCG": 99,
   "Cherry Collectables": 99,
   "Collectible Madness": 99,
+  "GUF": 99,
   "Gameology": 99,
   "Gametraders Modbury Heights": 99,
   "Goldfields Games": 99,
@@ -54,7 +82,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794308045,
+ "pokemon_ts": 1794308805,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -5604,7 +5632,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794308045,
+ "sealed_ts": 1794308805,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -5645,6 +5673,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794301428
  },
- "singles_ts": 1794307847,
- "sweep_ts": 1794307847
+ "singles_ts": 1794308805,
+ "sweep_ts": 1794308805
 }
