@@ -131,6 +131,14 @@ class ClassicGzip(unittest.TestCase):
     """Classic (v1-style) requests unpack a gzip reply - they only ask for one for the big singles lists."""
 
     def test_unpacks_gzip(self):
+        # v2.18: the cloud copy now commits captcha_state.json, which can hold a real pause for this shop;
+        # read the bot's memory files from an empty folder so that can't make this test skip the host
+        from unittest import mock
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        p = mock.patch.object(tb, "HERE", tmp.name)
+        p.start()
+        self.addCleanup(p.stop)
         body = json.dumps({"products": [{"handle": "a"}]}).encode()
 
         class Resp:

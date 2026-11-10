@@ -164,6 +164,14 @@ except ImportError:
         import deck_price as dk
     except ImportError:
         dk = None
+try:
+    import restock_trend as rt  # v2.18: /restocks
+except ImportError:
+    _fetch_missing("restock_trend")
+    try:
+        import restock_trend as rt
+    except ImportError:
+        rt = None
 if oi is None and "onepiece_instore" in _fetch_missing_later:
     _fetch_missing("onepiece_instore")
     try:
@@ -582,6 +590,8 @@ HELP = (
     "`/pricecheck deck <deck>` what a whole deck costs at the shops now and at TCGplayer: a saved deck, a want-list "
     "deck, or paste a list (`1xOP12-001 4xOP12-016 ...`). `/pricecheck save` keeps one · `/pricecheck list`\n"
     "`/stats` restock patterns over the last 30 days\n"
+    "`/restocks` each shop's restock trend: how often, up or down, how long stock lasts · `/restocks shop:<name>` "
+    "for one shop's weekly chart, busiest day and hour and recent restocks\n"
     "`/pricedrops` singles that got the most cheaper in the last 6 hours (`hours:` to change)\n"
     "`/drops` releases and drop windows coming up\n"
     "`/recap` the daily recap, right now\n"
@@ -977,6 +987,62 @@ async def stats_cmd(inter: discord.Interaction):
         await inter.response.send_message(embed=build_stats(cfg_now()))
     except Exception as e:  # noqa: BLE001
         await fail(inter, e)
+
+
+if rt:
+    def build_restocks(cfg, shop="", days=30, game="all", now=None):
+        """/restocks: every shop's restock trend, or one shop in detail (restock_trend.py)."""
+        now = now or time.time()
+        ev = tb.read_events(days * 2 + 1)
+        g = rt.GAMES.get(game)
+        stats = rt.shop_stats(rt.restocks(ev, g), days, now, rt.data_since(ev))
+        what = {"onepiece": "One Piece", "pokemon": "Pokémon"}.get(game, "One Piece and Pokémon")
+        foot = ("One restock = a shop putting stock up (products within an hour count once) · "
+                "from this copy's own log, booster boxes, watched sealed and Pokémon")
+        if shop.strip():
+            s = rt.find_shop(stats, shop)
+            if not s:
+                return embed(f"📦 Restocks: {shop.strip()}"[:256], [], GREY,
+                             f"No {what} restocks logged for a shop matching **{shop.strip()[:60]}** in the last "
+                             f"{days * 2} days. `/restocks` lists the shops that have restocked.", footer=foot)
+            return embed(f"📦 Restock trend: {s['shop']}"[:256],
+                         [{"name": n, "value": v} for n, v in rt.detail_fields(s, days, now)], PURPLE,
+                         f"{what}, last {days} days against the {days} before.", footer=foot)
+        since = rt.data_since(ev)
+        note = ""
+        if since and now - since < days * 2 * 86400:
+            note = (f"\nThe log starts {datetime.fromtimestamp(since):%d %b}, so the up/down comparison shows "
+                    f"\"building history\" until it covers {days * 2} days.")
+        lines = rt.overview_text(stats, days, now)
+        return embed(f"📦 Restock trends by shop, last {days} days",
+                     [lines_field(f"Shops ({len(stats)})", lines,
+                                  "No restocks logged yet. Give it a few days.", limit=12)],
+                     PURPLE, f"{what}. Busiest first; the bars are restocks per week.{note}\n"
+                             "`/restocks shop:<name>` for one shop in detail.", footer=foot)
+
+    async def restock_shop_autocomplete(inter: discord.Interaction, current: str):
+        try:
+            names = await asyncio.to_thread(lambda: rt.shop_names(tb.read_events(180)))
+        except Exception:  # noqa: BLE001
+            return []
+        cur = current.lower()
+        return [app_commands.Choice(name=n[:100], value=n[:100]) for n in names if cur in n.lower()][:25]
+
+    @bot.tree.command(name="restocks", description="How often each shop restocks, whether it's going up or down, and how long stock lasts")
+    @app_commands.describe(shop="One shop in detail (leave empty for every shop)",
+                           days="Period to look at, 7 to 90 days (default 30), compared with the one before",
+                           game="One Piece, Pokémon or both (default both)")
+    @app_commands.choices(game=[app_commands.Choice(name="Both", value="all"),
+                                app_commands.Choice(name="One Piece", value="onepiece"),
+                                app_commands.Choice(name="Pokémon", value="pokemon")])
+    @app_commands.autocomplete(shop=restock_shop_autocomplete)
+    async def restocks_cmd(inter: discord.Interaction, shop: str = "", days: app_commands.Range[int, 7, 90] = 30,
+                           game: Optional[app_commands.Choice[str]] = None):
+        try:
+            e = await asyncio.to_thread(build_restocks, cfg_now(), shop[:60], days, game.value if game else "all")
+            await inter.response.send_message(embed=e)
+        except Exception as e:  # noqa: BLE001
+            await fail(inter, e)
 
 
 @bot.tree.command(name="pricedrops", description="Singles that got the most cheaper in the last few hours")

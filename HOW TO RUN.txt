@@ -77,6 +77,13 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.18: RESTOCK TRENDS PER SHOP. /restocks in Discord shows every shop busiest first: how many restocks in
+  the last 30 days, up or down against the 30 before, a bar per week, how often it restocks and how long the stock
+  lasts. /restocks shop:<name> shows one shop: weekly chart, busiest day and hour, a rough guess at the next
+  restock and its last few restocks. days: changes the period (7 to 90), game: picks One Piece or Pokemon.
+  Products that come in at one shop within an hour count as one restock. Read from events.jsonl (the bot's own
+  log of in-stock / sold-out changes), so it needs nothing switched on, and the up/down comparison fills in once
+  the log covers twice the period. Try it without Discord: py -3 restock_trend.py   or   py -3 restock_trend.py Pokebox
 New in v2.16: CAPTCHA DETECTION IS ALWAYS ON (PC copy and cloud copy, no Docker or VPN needed).
   - When a shop answers with a "prove you're human" page, the bot stops checking that shop, tells you once in
     #bot-status, and waits. It never solves or gets round the check.
