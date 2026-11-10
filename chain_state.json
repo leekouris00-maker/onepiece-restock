@@ -17,6 +17,22 @@
    "listings": [
     {
      "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck",
+     "cart": "https://www.jbhifi.com.au/cart/40429493387465:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Animal Kingdom Pirates ST-04 Starter Deck",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 166.45,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck"
+    },
+    {
+     "available": true,
      "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-big-mom-pirates-st-07-starter-deck",
      "cart": "https://www.jbhifi.com.au/cart/40429492895945:1",
      "group": "new",
@@ -33,6 +49,22 @@
     },
     {
      "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red",
+     "cart": "https://www.jbhifi.com.au/cart/40429493518537:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Edward Newgate Starter Deck ST-15 Red",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 266.35,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red"
+    },
+    {
+     "available": true,
      "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-english-2nd-anniversary-set",
      "cart": "https://www.jbhifi.com.au/cart/40429492994249:1",
      "group": "new",
@@ -46,6 +78,22 @@
      "quiet": true,
      "shop": "JB Hi-Fi",
      "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-english-2nd-anniversary-set"
+    },
+    {
+     "available": true,
+     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-prb-01-premium-booster-box",
+     "cart": "https://www.jbhifi.com.au/cart/40429493715145:1",
+     "group": "box",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-prb-01-premium-booster-box",
+     "kind": "New listing",
+     "max": 260.0,
+     "name": "Bandai One Piece Card Game PRB-01 Premium Booster Box",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 2219.94,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-prb-01-premium-booster-box"
     },
     {
      "available": true,
@@ -97,6 +145,22 @@
     },
     {
      "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-28",
+     "cart": "https://www.jbhifi.com.au/cart/40429493321929:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-28",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game Starter Deck ST-28",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 166.45,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28"
+    },
+    {
+     "available": true,
      "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-32",
      "cart": "https://www.jbhifi.com.au/cart/40429729480905:1",
      "group": "new",
@@ -126,6 +190,22 @@
      "quiet": true,
      "shop": "JB Hi-Fi",
      "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-36"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck",
+     "cart": "https://www.jbhifi.com.au/cart/40429493682377:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game The Seven Warlords of the Sea ST-03 Starter Deck",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 166.45,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck"
     },
     {
      "available": true,
@@ -161,83 +241,19 @@
     },
     {
      "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck",
-     "cart": "https://www.jbhifi.com.au/cart/40429493387465:1",
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-2-dp-02",
+     "cart": "https://www.jbhifi.com.au/cart/40429320700105:1",
      "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-double-pack-set-vol-2-dp-02",
      "kind": "New listing",
      "max": 0.0,
-     "name": "Bandai One Piece Card Game Animal Kingdom Pirates ST-04 Starter Deck",
+     "name": "Bandai One Piece Card Game Double Pack Set Vol 2 DP-02",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
-     "price": 166.45,
+     "price": 721.45,
      "quiet": true,
      "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red",
-     "cart": "https://www.jbhifi.com.au/cart/40429493518537:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Edward Newgate Starter Deck ST-15 Red",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 266.35,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red"
-    },
-    {
-     "available": true,
-     "box_id": "box|JB Hi-Fi|bandai-one-piece-card-game-prb-01-premium-booster-box",
-     "cart": "https://www.jbhifi.com.au/cart/40429493715145:1",
-     "group": "box",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-prb-01-premium-booster-box",
-     "kind": "New listing",
-     "max": 260.0,
-     "name": "Bandai One Piece Card Game PRB-01 Premium Booster Box",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 2219.94,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-prb-01-premium-booster-box"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-28",
-     "cart": "https://www.jbhifi.com.au/cart/40429493321929:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-28",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Starter Deck ST-28",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 166.45,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck",
-     "cart": "https://www.jbhifi.com.au/cart/40429493682377:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game The Seven Warlords of the Sea ST-03 Starter Deck",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 166.45,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-the-seven-warlords-of-the-sea-st-03-starter-deck"
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-2-dp-02"
     }
    ]
   },
@@ -248,7 +264,7 @@
     "ok": false
    },
    "bandai-grand-ship-collection-going-merry-a-netflix-series-one-piece": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-animal-kingdom-pirates-st-04-starter-deck": {
     "ok": true
@@ -257,7 +273,7 @@
     "ok": true
    },
    "bandai-one-piece-card-game-double-pack-set-vol-2-dp-02": {
-    "q": 1
+    "ok": true
    },
    "bandai-one-piece-card-game-edward-newgate-starter-deck-st-15-red": {
     "ok": true
@@ -278,7 +294,7 @@
     "ok": false
    },
    "bandai-one-piece-card-game-playmat-and-storage-box-set-yamato": {
-    "q": 1
+    "ok": false
    },
    "bandai-one-piece-card-game-prb-01-premium-booster-box": {
     "ok": true
@@ -308,34 +324,34 @@
     "ok": true
    },
    "funko-one-piece-going-merry-bitty-pop-playset": {
-    "q": 1
+    "ok": false
    },
    "funko-one-piece-kuro-pop-vinyl": {
-    "q": 1
+    "ok": false
    },
    "funko-one-piece-luffy-bitty-pop-4-pack": {
-    "q": 1
+    "ok": false
    },
    "funko-one-piece-luffy-w-going-merry-bitty-pop-ride": {
-    "q": 1
+    "ok": false
    },
    "funko-one-piece-mini-vinyl-figure-random-select": {
-    "q": 1
+    "ok": false
    },
    "funko-one-piece-tony-tony-chopper-flocked-pop-vinyl": {
-    "q": 1
+    "ok": false
    },
    "funko-one-piece-zoro-king-of-hell-pop-premium": {
-    "q": 1
+    "ok": false
    },
    "kotomi-one-piece-plush-keyring-blind-box-collectible": {
     "ok": false
    },
    "lookup-one-piece-corazon": {
-    "q": 1
+    "ok": false
    },
    "megahouse-lookup-one-piece-donquixote-doflamingo": {
-    "q": 1
+    "ok": false
    },
    "megahouse-tsumichen-stack-up-change-one-piece": {
     "ok": false
@@ -344,7 +360,7 @@
     "ok": false
    },
    "one-piece-blackbeard-black-hole-pop-vinyl-pop-vinyl": {
-    "q": 1
+    "ok": false
    },
    "one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": {
     "ok": true
@@ -353,19 +369,19 @@
     "ok": false
    },
    "one-piece-live-action-chopper-poster-poster": {
-    "q": 1
+    "ok": false
    },
    "one-piece-mystery-pop-vinyl-blind-box-collectible": {
     "ok": false
    },
    "one-piece-roronoa-zoro-dressrosa-glow-pop-vinyl-pop-vinyl": {
-    "q": 1
+    "ok": false
    },
    "one-piece-roronoa-zoro-young-pop-vinyl-pop-vinyl": {
-    "q": 1
+    "ok": false
    },
    "one-piece-sanji-ifrit-jambe-glow-pop-vinyl-pop-vinyl": {
-    "q": 1
+    "ok": false
    },
    "one-piece-uncut-collection-81-2021-2-dvd": {
     "ok": false
@@ -374,21 +390,21 @@
     "ok": false
    },
    "one-piece-young-luffy-with-devil-fruit-pop-vinyl-pop-vinyl": {
-    "q": 1
+    "ok": false
    },
    "one-piece-zoro-sleeping-pop-premium-pop-vinyl": {
-    "q": 1
+    "ok": false
    },
    "s-h-figuarts-chopper-a-netflix-series-one-piece": {
     "ok": false
    },
    "tamashii-nations-figuarts-zero-one-piece-monkey-d-luffy-gear-4-three-captains-battle-of-monsters-on-onigashima": {
-    "q": 1
+    "ok": false
    },
    "ultimate-guard-playmat-one-piece-devil-fruits": {
-    "q": 1
+    "ok": false
    }
   },
-  "ts": 1794272304
+  "ts": 1794273398
  }
 }
