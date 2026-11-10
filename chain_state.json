@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794288446,
+  "bf_ts": 1794289243,
   "cache": {
    "finds": [
     {
@@ -785,10 +785,13 @@
     }
    ]
   },
-  "cursor": 50,
+  "cursor": 52,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
+    "q": 1
+   },
+   "500pc-hqc-anime-cube-one-piece-puzzle-1": {
     "q": 1
    },
    "abystyle-one-piece-flame-flame-fruit-replica": {
@@ -1157,6 +1160,48 @@
    "bandai-one-piece-egghead-crisis-eb-04-booster-box-japanese": {
     "q": 1
    },
+   "bandai-one-piece-going-merry-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-ark-maxim-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-baratie-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-dragons-ship-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-garps-ship-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-going-merry-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-kuja-pirates-ship-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-marine-ship-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-marshall-d-teachs-ship-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-moby-dick-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-oro-jackson-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-red-force-scaled-replica-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-spade-pirates-ship-model-kit": {
+    "q": 1
+   },
+   "bandai-one-piece-grand-ship-collection-trafalgar-laws-submarine-model-kit": {
+    "q": 1
+   },
    "bandai-one-piece-japanese-1st-anniversary-release-celebration-set-english-cards": {
     "q": 1
    },
@@ -1217,6 +1262,12 @@
    "funko-one-piece-zoro-king-of-hell-pop-premium": {
     "ok": false
    },
+   "g-e-m-series-one-piece-nami-runrunrun": {
+    "q": 1
+   },
+   "g-e-m-series-one-piece-sabo-runrunrun": {
+    "q": 1
+   },
    "g-e-m-series-one-piece-uta-run-run-run": {
     "q": 1
    },
@@ -1253,8 +1304,23 @@
    "lookup-one-piece-corazon": {
     "ok": false
    },
+   "lookup-one-piece-kaido-the-beast": {
+    "q": 1
+   },
+   "lookup-one-piece-monkey-d-luffy-gear-5-repeat": {
+    "q": 1
+   },
+   "lookup-one-piece-sabo-repeat": {
+    "q": 1
+   },
+   "lookup-one-piece-sanji-ver-future-island-egghead": {
+    "q": 1
+   },
    "lookup-one-piece-tony-tony-chopper": {
     "ok": false
+   },
+   "lookup-one-piece-trafalgar-law": {
+    "q": 1
    },
    "megahouse-lookup-one-piece-boa-hancock": {
     "ok": false
@@ -1316,8 +1382,14 @@
    "one-piece-brook-pop-vinyl-pop-vinyl-1": {
     "q": 1
    },
+   "one-piece-card-game-9-pocket-binder-set-seven-warlords-of-the-sea": {
+    "q": 1
+   },
    "one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": {
     "ok": true
+   },
+   "one-piece-card-game-legacy-of-the-master-op-12-1pc": {
+    "q": 1
    },
    "one-piece-card-game-official-playmat-limited-edition-vol-2": {
     "q": 1
@@ -1326,6 +1398,9 @@
     "q": 1
    },
    "one-piece-card-game-premium-card-collection-bandai-card-games-fest-23-24-edition": {
+    "q": 1
+   },
+   "one-piece-card-game-premium-card-collection-best-selection-vol-4": {
     "q": 1
    },
    "one-piece-card-game-special-goods-set-former-four-emperors": {
@@ -1375,6 +1450,12 @@
    },
    "one-piece-going-merry-rc-boat": {
     "ok": false
+   },
+   "one-piece-grand-ship-collection-queen-mama-chanter": {
+    "q": 1
+   },
+   "one-piece-grand-ship-collection-thousand-sunny-flying-model": {
+    "q": 1
    },
    "one-piece-grandista-edward-newgate-figure-figure": {
     "q": 1
