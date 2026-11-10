@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794299051,
+  "bf_ts": 1794299820,
   "cache": {
    "finds": [
     {
@@ -785,7 +785,7 @@
     }
    ]
   },
-  "cursor": 78,
+  "cursor": 80,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1247,6 +1247,15 @@
    "controller-add-on-one-piece-tony-tony-chopper-cable-guys-controller-and-phone-holder": {
     "q": 1
    },
+   "eiichiro-oda-one-piece-omnibus-edition-vol-1-book": {
+    "q": 1
+   },
+   "eiichiro-oda-one-piece-omnibus-edition-vol-2-book": {
+    "q": 1
+   },
+   "eiichiro-oda-one-piece-omnibus-edition-vol-3-book": {
+    "q": 1
+   },
    "funko-one-piece-going-merry-bitty-pop-playset": {
     "ok": false
    },
@@ -1435,6 +1444,9 @@
     "q": 1
    },
    "one-piece-buggy-plush-plush": {
+    "q": 1
+   },
+   "one-piece-buggy-the-clown-on-throne-nycc-2024-pop-deluxe-pop-vinyl": {
     "q": 1
    },
    "one-piece-card-game-9-pocket-binder-set-seven-warlords-of-the-sea": {
