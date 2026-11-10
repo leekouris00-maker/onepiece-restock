@@ -1784,6 +1784,67 @@
    ],
    "t": 1794255363.9668746
   },
+  "morethanmeeples.com.au": {
+   "rules": [
+    [
+     0,
+     "/wp-admin/"
+    ],
+    [
+     0,
+     "/my-account/*"
+    ],
+    [
+     0,
+     "/wishlist/*"
+    ],
+    [
+     0,
+     "/checkout/*"
+    ],
+    [
+     0,
+     "/cart/*"
+    ],
+    [
+     0,
+     "/*?remove_from_wishlist=*"
+    ],
+    [
+     0,
+     "/*?add_to_wishlist=*"
+    ],
+    [
+     0,
+     "/*?remove_item=*"
+    ],
+    [
+     0,
+     "/*?add-to-cart=*"
+    ],
+    [
+     0,
+     "/*?sf_paged=*"
+    ],
+    [
+     0,
+     "/author/*"
+    ],
+    [
+     0,
+     "/category/*"
+    ],
+    [
+     0,
+     "/players/*"
+    ],
+    [
+     1,
+     "/wp-admin/admin-ajax.php"
+    ]
+   ],
+   "t": 1794300430.1823714
+  },
   "overhauledgames.com.au": {
    "rules": [],
    "t": 1794265007.3181655
@@ -4730,7 +4791,7 @@
    "t": 1794218109.0752587
   }
  },
- "sealed_ts": 1794300248,
+ "sealed_ts": 1794300433,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -4743,6 +4804,7 @@
   "goldfieldsgames.com.au": 0,
   "grailborne.com.au": 0,
   "lightofcards.com.au": 0,
+  "morethanmeeples.com.au": 0,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
