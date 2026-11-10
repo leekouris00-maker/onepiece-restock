@@ -177,7 +177,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.16"
+VERSION = "2.16.1"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -303,18 +303,25 @@ EXTRA_SHOPIFY_COLLECTIONS = [
     {"name": "Rogue Online", "url": "https://rogueonline.com.au/collections/one-piece-tcg/products.json?limit=250"},
     {"name": "The Wandering Collector",
      "url": "https://thewanderingcollector.com.au/collections/one-piece-tcg-english-sealed-products/products.json?limit=250"},
+    # v2.16.1 (10 Nov 2026): from the shop audit. GUF (Geelong, Werribee, Ballarat, Bendigo) prices at retail
+    # (EB-05 display A$216); its options are its four stores, so "in stock" can mean one store only.
+    {"name": "GUF", "url": "https://guf.com.au/collections/one-piece-card-game/products.json?limit=250"},
 ]
 # Single products to check directly (Shopify .js), for ones a shop hasn't put in its One Piece section yet.
 EXTRA_SHOPIFY_PRODUCTS = [
     # Goldfields lists OP-18 at A$180 but outside its One Piece section, and its search doesn't find it.
     {"name": "Goldfields Games",
      "url": "https://goldfieldsgames.com.au/products/one-piece-card-game-the-dominance-of-god-op-18-booster-box.js"},
+    # v2.16.1: a drone shop that lists OP-18 at retail (A$214.99). Its robots.txt closes search, so just this product.
+    {"name": "FPV Faster", "url": "https://www.fpvfaster.com.au/products/one-piece-card-game-op-18-booster-box.js"},
 ]
 # WooCommerce shops (their public Store API, the same one their own shop pages use).
 EXTRA_WOOCOMMERCE = [
     {"name": "Overhauled Games TCG",
      "url": "https://overhauledgames.com.au/wp-json/wc/store/v1/products?search=one%20piece%20tcg&per_page=100"},
     {"name": "CardPlus TCG", "url": "https://cardplustcg.com.au/wp-json/wc/store/v1/products?search=one%20piece&per_page=100"},
+    # v2.16.1: Brisbane shop at retail prices, A$10 flat shipping (some listings are "Pickup Only" and say so in the name).
+    {"name": "More Than Meeples", "url": "https://morethanmeeples.com.au/wp-json/wc/store/v1/products?search=one%20piece&per_page=100"},
 ]
 BOX_MIN_PRICE = 80      # a "booster box" listed under this is a pre-order deposit (CardPlus: $35), not the box's price
 DEPOSIT_RE = re.compile(r"\bdeposit\b", re.I)
@@ -324,6 +331,7 @@ EXTRA_SHOPIFY_SEARCH = [
     # Friendly Collectibles was removed in Oct 2026: its search refused the bot (HTTP 401) on every check.
     {"name": "Light of Cards", "base": "https://lightofcards.com.au"},     # v2.4; mostly Japanese, English kept (paused: see SHOP_PAUSES)
     {"name": "Card Bot", "base": "https://cardbot.com.au"},                # v2.4; mostly Japanese, English kept
+    {"name": "Irresistible Force", "base": "https://www.irresistibleforce.com.au"},   # v2.16.1; Brisbane, retail prices
 ]
 SEARCH_QUERIES = ["one piece booster box", "one piece booster display", "one piece card game"]
 # v2.10.1: shops left alone until a date (YYYY-MM-DD; the shop is back on watch from that day). Lee paused Light of
