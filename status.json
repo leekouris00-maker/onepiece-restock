@@ -2,12 +2,12 @@
  "discord_health": {},
  "drops_scan": {
   "Elemental Arcade": 1793451591,
-  "Good Games": 1794337041
+  "Good Games": 1794338140
  },
- "drops_slot": "2026-11-11 00",
+ "drops_slot": "2026-11-11 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794337028,
+ "ebay_ts": 1794338127,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794336827,
+ "pokemon_ts": 1794338127,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -88,10 +88,6 @@
   "open|item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-36|498393": [
    40.0,
    1794218144
-  ],
-  "plist|30th-celebration|JToys|90008": [
-   99.99,
-   1794078356
   ],
   "plist|30th-celebration|Kollecter|pokemon-tcg-30th-celebration-5-booster-tin": [
    0.0,
@@ -195,11 +191,11 @@
   ],
   "sealed|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards": [
    24.99,
-   1794326397
+   1794338142
   ],
   "sealed|Cherry Collectables|yamato-gift-collection-2023-st09-012-one-piece-one-piece-promotion-cards": [
    26.99,
-   1794326397
+   1794338142
   ],
   "sealed|GUF|boa-hancock-gift-collection-2023-one-piece-promotion-cards": [
    74.6,
@@ -207,7 +203,7 @@
   ],
   "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
    99.0,
-   1794324336
+   1794338142
   ]
  },
  "robots": {
@@ -6147,7 +6143,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794337269,
+ "sealed_ts": 1794338127,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -6188,6 +6184,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794337028,
- "sweep_ts": 1794337028
+ "singles_ts": 1794338127,
+ "sweep_ts": 1794338127
 }
