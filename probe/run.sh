@@ -6,6 +6,18 @@ c["security"] = {"enabled": True, "files": {"enforce": True}, "allowlist": {"enf
 json.dump(c, open("config.json", "w"), indent=2)
 P
 rm -f security_events.jsonl
+python - <<'P'
+import json
+s = json.load(open("status.json"))
+for k in list(s):
+    if k.endswith("_ts") or k in ("last_sweep", "sweep_ts", "singles_at", "pokemon_at"):
+        s.pop(k)
+json.dump(s, open("status.json", "w"))
+c = json.load(open("chain_state.json"))
+for v in c.values():
+    v["ts"] = 1; v["bf_ts"] = 0
+json.dump(c, open("chain_state.json", "w"))
+P
 timeout 600 python tcg_bot.py --pace 3 > out.txt 2>&1; echo "exit $?"
 echo "== check summary"; grep -iE "checked|shops? (down|ok)|^Restock check|took" out.txt | tail -6
 echo "== security events"
