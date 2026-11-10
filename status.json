@@ -2,12 +2,12 @@
  "discord_health": {},
  "drops_scan": {
   "Elemental Arcade": 1793451591,
-  "Good Games": 1792843525
+  "Good Games": 1794337041
  },
  "drops_slot": "2026-11-11 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794336095,
+ "ebay_ts": 1794337028,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -16,7 +16,6 @@
  "page_hints": {
   "https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250": 14,
   "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 4,
-  "https://tcg.goodgames.com.au/collections/one-piece-card-game-singles-in-stock/products.json?limit=250": 6,
   "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250": 2
  },
  "pages_seen": {
@@ -56,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794336095,
+ "pokemon_ts": 1794336827,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -2926,7 +2925,7 @@
   },
   "tcg.goodgames.com.au": {
    "rules": [],
-   "t": 1794218116.0762067
+   "t": 1794337010.3576107
   },
   "thewanderingcollector.com.au": {
    "rules": [
@@ -5461,8 +5460,265 @@
    "t": 1794304636.8652844
   },
   "www.mayhemcollectables.com.au": {
-   "rules": [],
-   "t": 1794218115.6559496
+   "rules": [
+    [
+     1,
+     "/"
+    ],
+    [
+     1,
+     "/products/account"
+    ],
+    [
+     1,
+     "/products/orders"
+    ],
+    [
+     1,
+     "/products/checkout"
+    ],
+    [
+     1,
+     "/*/products/account"
+    ],
+    [
+     1,
+     "/*/products/orders"
+    ],
+    [
+     1,
+     "/*/products/checkout"
+    ],
+    [
+     1,
+     "/collections/account"
+    ],
+    [
+     1,
+     "/collections/orders"
+    ],
+    [
+     1,
+     "/collections/checkout"
+    ],
+    [
+     1,
+     "/*/collections/account"
+    ],
+    [
+     1,
+     "/*/collections/orders"
+    ],
+    [
+     1,
+     "/*/collections/checkout"
+    ],
+    [
+     1,
+     "/pages/checkout"
+    ],
+    [
+     1,
+     "/*/pages/checkout"
+    ],
+    [
+     1,
+     "/blogs/*account"
+    ],
+    [
+     1,
+     "/blogs/*orders"
+    ],
+    [
+     1,
+     "/blogs/*checkout"
+    ],
+    [
+     1,
+     "/*/blogs/*account"
+    ],
+    [
+     1,
+     "/*/blogs/*orders"
+    ],
+    [
+     1,
+     "/*/blogs/*checkout"
+    ],
+    [
+     0,
+     "/admin"
+    ],
+    [
+     0,
+     "/cart/"
+    ],
+    [
+     0,
+     "/*/cart/"
+    ],
+    [
+     0,
+     "/checkout"
+    ],
+    [
+     0,
+     "/*/checkout"
+    ],
+    [
+     0,
+     "/checkouts/"
+    ],
+    [
+     0,
+     "/*/checkouts/"
+    ],
+    [
+     0,
+     "/orders"
+    ],
+    [
+     0,
+     "/*/orders"
+    ],
+    [
+     1,
+     "/account/login"
+    ],
+    [
+     1,
+     "/*/account/login"
+    ],
+    [
+     0,
+     "/account"
+    ],
+    [
+     0,
+     "/*/account"
+    ],
+    [
+     0,
+     "/64522092784"
+    ],
+    [
+     0,
+     "/cdn/wpm/*.js"
+    ],
+    [
+     0,
+     "/services"
+    ],
+    [
+     0,
+     "/sf_*"
+    ],
+    [
+     0,
+     "/.well-known/shopify/monorail"
+    ],
+    [
+     0,
+     "/cart.js"
+    ],
+    [
+     0,
+     "/*/cart.js"
+    ],
+    [
+     0,
+     "/recommendations/products"
+    ],
+    [
+     0,
+     "/*/recommendations/products"
+    ],
+    [
+     0,
+     "/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/*/collections/*sort_by*"
+    ],
+    [
+     0,
+     "/collections/*+*"
+    ],
+    [
+     0,
+     "/collections/*%2B*"
+    ],
+    [
+     0,
+     "/collections/*%2b*"
+    ],
+    [
+     0,
+     "/*/collections/*+*"
+    ],
+    [
+     0,
+     "/*/collections/*%2B*"
+    ],
+    [
+     0,
+     "/*/collections/*%2b*"
+    ],
+    [
+     0,
+     "/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/*/collections/*filter*&*filter*"
+    ],
+    [
+     0,
+     "/blogs/*+*"
+    ],
+    [
+     0,
+     "/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*/blogs/*+*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2B*"
+    ],
+    [
+     0,
+     "/*/blogs/*%2b*"
+    ],
+    [
+     0,
+     "/*?*ls=*&ls=*"
+    ],
+    [
+     0,
+     "/*?*ls%3*ls%3*"
+    ],
+    [
+     0,
+     "/*?*oseid=*"
+    ],
+    [
+     0,
+     "/*?*preview_theme_id=*"
+    ],
+    [
+     0,
+     "/*?*preview_script_id=*"
+    ]
+   ],
+   "t": 1794337009.5985594
   },
   "www.monstermart.com.au": {
    "rules": [],
@@ -5891,7 +6147,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794336473,
+ "sealed_ts": 1794337269,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -5932,6 +6188,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794336095,
- "sweep_ts": 1794336095
+ "singles_ts": 1794337028,
+ "sweep_ts": 1794337028
 }

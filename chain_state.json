@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794332711,
+  "bf_ts": 1794337225,
   "cache": {
    "finds": [],
    "listings": [
@@ -966,7 +966,7 @@
     }
    ]
   },
-  "cursor": 106,
+  "cursor": 108,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1564,7 +1564,7 @@
     "ok": false
    },
    "lookup-one-piece-trafalgar-law": {
-    "q": 1
+    "ok": false
    },
    "megahouse-lookup-one-piece-boa-hancock": {
     "ok": false
@@ -1573,85 +1573,85 @@
     "ok": false
    },
    "megahouse-lookup-one-piece-monkey-d-luffy-ver-future-island-egghead": {
-    "q": 1
+    "ok": false
    },
    "megahouse-lookup-one-piece-roronoa-zoro-ver-future-island-egghead": {
-    "q": 1
+    "ok": false
    },
    "megahouse-lookup-one-piece-trafalgar-law-childhood-ver": {
-    "q": 1
+    "ok": false
    },
    "megahouse-mega-cat-project-one-piece-good-night-nyanpiecenyan": {
-    "q": 1
+    "ok": false
    },
    "megahouse-tsumichen-stack-up-change-one-piece": {
     "ok": false
    },
    "megahouse-yuracolle-series-one-piece-grand-line-collection": {
-    "q": 1
+    "ok": false
    },
    "minix-one-piece-buggy-152-anime-manga-action-figure-collectible-toy-12cm": {
-    "q": 1
+    "ok": false
    },
    "minix-one-piece-monkey-d-luffy": {
-    "q": 1
+    "ok": false
    },
    "monopoly-one-piece-board-game": {
-    "q": 1
+    "ok": false
    },
    "monopoly-one-piece-refresh-board-game": {
     "ok": false
    },
    "nemesis-now-one-piece-devil-fruit-box-12-8cm": {
-    "q": 1
+    "ok": false
    },
    "nemesis-now-one-piece-straw-hat-crew-lamp-21cm": {
-    "q": 1
+    "ok": false
    },
    "one-piece-2027-calendar-calendar": {
     "ok": false
    },
    "one-piece-3d-pvc-bag-clip-series-1-blind-bag-collectible": {
-    "q": 1
+    "ok": false
    },
    "one-piece-3d-pvc-bag-clip-series-2-blind-bag-collectible": {
-    "q": 1
+    "ok": false
    },
    "one-piece-3d-pvc-bag-clip-series-3-blind-bag-collectible": {
-    "q": 1
+    "ok": false
    },
    "one-piece-3d-pvc-bag-clip-series-4-blind-bag-collectible": {
-    "q": 1
+    "ok": false
    },
    "one-piece-3d-pvc-bag-clip-series-5-blind-bag-collectible": {
-    "q": 1
+    "ok": false
    },
    "one-piece-aces-storythe-manga-vol-1-book": {
-    "q": 1
+    "ok": false
    },
    "one-piece-aces-storythe-manga-vol-2-book": {
-    "q": 1
+    "ok": false
    },
    "one-piece-adventure-of-nebulandia-2015-dvd": {
-    "q": 1
+    "ok": false
    },
    "one-piece-battle-record-collection-gol-d-roger-figure-figure": {
-    "q": 1
+    "ok": false
    },
    "one-piece-battle-record-collection-marshall-d-teach-figure-figure": {
-    "q": 1
+    "ok": false
    },
    "one-piece-battle-record-collection-monkey-d-luffy-gear-5-figure-figure": {
-    "q": 1
+    "ok": false
    },
    "one-piece-battle-record-collection-monkey-d-luffy-gear-5-ii-figure-figure": {
-    "q": 1
+    "ok": false
    },
    "one-piece-battle-record-collection-shanks-figure-figure": {
-    "q": 1
+    "ok": false
    },
    "one-piece-big-sofvimates-laboon-figure-figure": {
-    "q": 1
+    "ok": false
    },
    "one-piece-bitty-pop-blind-bag-collectible": {
     "q": 1
@@ -2130,6 +2130,9 @@
    "one-piece-voyage-collection-1-1999-dvd": {
     "q": 1
    },
+   "one-piece-voyage-collection-10-2018-dvd": {
+    "q": 1
+   },
    "one-piece-voyage-collection-11-2012-dvd": {
     "q": 1
    },
@@ -2145,7 +2148,19 @@
    "one-piece-voyage-collection-15-2015-dvd": {
     "q": 1
    },
+   "one-piece-voyage-collection-3-1999-dvd": {
+    "q": 1
+   },
+   "one-piece-voyage-collection-4-2017-dvd": {
+    "q": 1
+   },
    "one-piece-voyage-collection-5-1999-8-dvd": {
+    "q": 1
+   },
+   "one-piece-voyage-collection-6-1999-dvd": {
+    "q": 1
+   },
+   "one-piece-voyage-collection-7-2006-dvd": {
     "q": 1
    },
    "one-piece-voyage-collection-9-1999-dvd": {
@@ -2200,6 +2215,6 @@
     "q": 1
    }
   },
-  "ts": 1794327382
+  "ts": 1794337225
  }
 }
