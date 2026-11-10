@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794348392,
+  "bf_ts": 1794349230,
   "cache": {
    "finds": [],
    "listings": [
@@ -966,7 +966,7 @@
     }
    ]
   },
-  "cursor": 12,
+  "cursor": 14,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -2117,6 +2117,9 @@
    },
    "one-piece-uncut-collection-79-2021-2-dvd": {
     "ok": false
+   },
+   "one-piece-uncut-collection-80-2021-2-dvd": {
+    "q": 1
    },
    "one-piece-uncut-collection-81-2021-2-dvd": {
     "ok": false
