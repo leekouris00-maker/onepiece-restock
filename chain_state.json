@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794276105,
+  "bf_ts": 1794276774,
   "cache": {
    "finds": [
     {
@@ -321,7 +321,7 @@
     }
    ]
   },
-  "cursor": 22,
+  "cursor": 24,
   "files": 110,
   "handles": {
    "abystyle-one-piece-flame-flame-fruit-replica": {
@@ -741,6 +741,9 @@
    "funko-one-piece-zoro-king-of-hell-pop-premium": {
     "ok": false
    },
+   "g-e-m-series-one-piece-uta-run-run-run": {
+    "q": 1
+   },
    "jada-one-piece-luffy-zoro-nami-chopper-metalfigs-2-5-diecast-figure-4-pack": {
     "ok": false
    },
@@ -783,6 +786,9 @@
    "monopoly-one-piece-refresh-board-game": {
     "ok": false
    },
+   "nemesis-now-one-piece-devil-fruit-box-12-8cm": {
+    "q": 1
+   },
    "one-piece-2027-calendar-calendar": {
     "ok": false
    },
@@ -810,6 +816,9 @@
    "one-piece-momonosuke-pop-vinyl-pop-vinyl": {
     "ok": false
    },
+   "one-piece-monkey-d-garp-young-pop-vinyl-pop-vinyl": {
+    "q": 1
+   },
    "one-piece-mystery-pop-vinyl-blind-box-collectible": {
     "ok": false
    },
@@ -831,11 +840,17 @@
    "one-piece-saul-with-nico-robin-6-pop-vinyl-pop-vinyl": {
     "ok": false
    },
+   "one-piece-uncut-collection-79-2021-2-dvd": {
+    "q": 1
+   },
    "one-piece-uncut-collection-81-2021-2-dvd": {
     "ok": false
    },
    "one-piece-usopp-angry-pop-vinyl-pop-vinyl": {
     "ok": false
+   },
+   "one-piece-x-popsockets-popgrip-magsafe-phone-grip-stand-with-swappable-top-chopper": {
+    "q": 1
    },
    "one-piece-young-luffy-with-devil-fruit-pop-vinyl-pop-vinyl": {
     "ok": false
