@@ -2,12 +2,12 @@
  "discord_health": {},
  "drops_scan": {
   "Elemental Arcade": 1793451591,
-  "Good Games": 1794346274
+  "Good Games": 1794354282
  },
  "drops_slot": "2026-11-11 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794353302,
+ "ebay_ts": 1794354270,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -15,7 +15,7 @@
  "offline_streak": 0,
  "page_hints": {
   "https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250": 14,
-  "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250": 2
+  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 3
  },
  "pages_seen": {
   "Alpha Gaming": 99,
@@ -54,7 +54,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794354058,
+ "pokemon_ts": 1794354652,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -184,25 +184,17 @@
    69.95,
    1794218144
   ],
-  "poke|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-3-booster-blister": [
-   27.99,
-   1794091232
-  ],
   "poke|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-booster-box": [
    349.99,
    1794218144
   ],
-  "poke|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-elite-trainer-box-etb": [
-   149.99,
-   1794091232
-  ],
   "sealed|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards": [
    24.99,
-   1794346276
+   1794354283
   ],
   "sealed|Cherry Collectables|yamato-gift-collection-2023-st09-012-one-piece-one-piece-promotion-cards": [
    26.99,
-   1794346276
+   1794354283
   ],
   "sealed|GUF|boa-hancock-gift-collection-2023-one-piece-promotion-cards": [
    74.6,
@@ -210,7 +202,7 @@
   ],
   "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
    99.0,
-   1794346276
+   1794354283
   ]
  },
  "robots": {
@@ -6150,7 +6142,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794354058,
+ "sealed_ts": 1794354652,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -6191,6 +6183,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794353302,
- "sweep_ts": 1794353302
+ "singles_ts": 1794354270,
+ "sweep_ts": 1794354270
 }
