@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794277546,
+  "bf_ts": 1794278189,
   "cache": {
    "finds": [
     {
@@ -321,7 +321,7 @@
     }
    ]
   },
-  "cursor": 26,
+  "cursor": 28,
   "files": 110,
   "handles": {
    "abystyle-one-piece-flame-flame-fruit-replica": {
@@ -802,6 +802,9 @@
     "ok": true
    },
    "one-piece-card-game-premium-card-collection-bandai-card-games-fest-23-24-edition": {
+    "q": 1
+   },
+   "one-piece-chopper-plush-pencil-case-pencil-case": {
     "q": 1
    },
    "one-piece-demonio-fleur-pop-vinyl-pop-vinyl": {
