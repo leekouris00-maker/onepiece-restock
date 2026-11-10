@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794296049,
+  "bf_ts": 1794296818,
   "cache": {
    "finds": [
     {
@@ -785,7 +785,7 @@
     }
    ]
   },
-  "cursor": 70,
+  "cursor": 72,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1421,6 +1421,9 @@
    },
    "one-piece-blackbeard-black-hole-pop-vinyl-pop-vinyl": {
     "ok": false
+   },
+   "one-piece-boat-poster-poster": {
+    "q": 1
    },
    "one-piece-boat-pvc-keyring-keyring": {
     "q": 1
