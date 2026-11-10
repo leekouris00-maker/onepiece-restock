@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-10 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794270228,
+ "ebay_ts": 1794271154,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -53,7 +53,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794270032,
+ "pokemon_ts": 1794270771,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -107,9 +107,17 @@
    34.99,
    1794265016
   ],
+  "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-box": [
+   344.0,
+   1794270772
+  ],
   "poke|delta-reign|Gametraders Modbury Heights|pre-order-pokemon-tcg-mega-evolution-delta-reign-booster-box-6th-november": [
    339.99,
    1794265016
+  ],
+  "poke|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-checklane-blister-releases-6-nov-2026": [
+   22.9,
+   1794270772
   ],
   "poke|delta-reign|Overhauled Games TCG|21238": [
    34.95,
@@ -4682,7 +4690,7 @@
    "t": 1794218109.0752587
   }
  },
- "sealed_ts": 1794270228,
+ "sealed_ts": 1794271154,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -4715,6 +4723,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794270228,
- "sweep_ts": 1794270228
+ "singles_ts": 1794271154,
+ "sweep_ts": 1794271154
 }

@@ -704,7 +704,11 @@
  "JB Hi-Fi": [
   "list|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03"
  ],
- "JB Hi-Fi (all sealed)": [],
+ "JB Hi-Fi (all sealed)": [
+  "list|JB Hi-Fi|bandai-one-piece-card-game-set-sail-deck-set-sd-01-1pc",
+  "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-32",
+  "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-36"
+ ],
  "JToys": [
   "list|JToys|78683",
   "list|JToys|83985",
