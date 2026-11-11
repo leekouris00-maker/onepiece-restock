@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1794367001
  },
- "drops_slot": "2026-11-12 00",
+ "drops_slot": "2026-11-12 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794422847,
+ "ebay_ts": 1794423793,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -6159,7 +6159,7 @@
    "t": 1794392733.8639977
   }
  },
- "sealed_ts": 1794423229,
+ "sealed_ts": 1794423793,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -6200,6 +6200,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794422847,
- "sweep_ts": 1794422847
+ "singles_ts": 1794423793,
+ "sweep_ts": 1794423793
 }
