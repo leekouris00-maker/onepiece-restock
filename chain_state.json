@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794364684,
+  "bf_ts": 1794366742,
   "cache": {
    "finds": [],
    "listings": [
@@ -966,7 +966,7 @@
     }
    ]
   },
-  "cursor": 35,
+  "cursor": 37,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1687,7 +1687,7 @@
     "ok": false
    },
    "one-piece-card-game-adventure-kamis-island-double-pack-boosters-dp-10-box": {
-    "q": 1
+    "ok": true
    },
    "one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": {
     "ok": true
@@ -2230,6 +2230,6 @@
     "ok": false
    }
   },
-  "ts": 1794363315
+  "ts": 1794366955
  }
 }
