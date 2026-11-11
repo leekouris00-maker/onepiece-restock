@@ -43,7 +43,7 @@
   "TCGroup": 99,
   "The Wandering Collector": 99
  },
- "pc_on": false,
+ "pc_on": true,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794389715,
+ "pokemon_ts": 1794390479,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -6151,7 +6151,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794390096,
+ "sealed_ts": 1794390665,
  "shop_down": [
   "cardbot.com.au"
  ],
