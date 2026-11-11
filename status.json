@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-12 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794413119,
+ "ebay_ts": 1794414121,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -84,6 +84,10 @@
   "list|GUF|one-piece-card-game-set-sail-deck-set-sd-01": [
    36.0,
    1794324336
+  ],
+  "list|Good Games (sealed)|one-piece-card-game-booster-box-tba-op-15": [
+   339.0,
+   1794414132
   ],
   "list|Light of Cards|one-piece-card-game-ts-03-tin-pack-vol-3": [
    35.0,
@@ -6155,7 +6159,7 @@
    "t": 1794392733.8639977
   }
  },
- "sealed_ts": 1794413499,
+ "sealed_ts": 1794414121,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -6196,6 +6200,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794413119,
- "sweep_ts": 1794413119
+ "singles_ts": 1794414121,
+ "sweep_ts": 1794414121
 }
