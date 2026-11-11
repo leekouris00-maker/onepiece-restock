@@ -316,6 +316,8 @@ def make_handler(tb, ab, lan=False):
                         note = f"Added {len(added)}." + (f" {len(skipped)} already there." if skipped else "") + (
                             f" {len(problems)} couldn't be added: " + "; ".join(problems[:3]) if problems else "")
                         d = {"items": f"({len(added)} added, {len(skipped)} skipped, {len(problems)} problems)"}
+                    elif path == "/api/collection/check":     # v2.19.2: re-price one item now
+                        _, _, note = col.check_price(tb, str(d.get("id") or ""), tb.load_config())
                     elif path == "/api/collection/remove":
                         col.remove(tb, str(d.get("id") or ""))
                         note = "Removed."
@@ -651,7 +653,7 @@ function renderCol(){
     ${w?`<dt>A week ago</dt><dd>${money(w.from)}</dd>`:''}
     ${gain!=null?`<dt>Up / down</dt><dd class="${cls(gain)}">${gain<0?'−':'+'}${money(Math.abs(gain))}${i.paid?' ('+pct((i.now-i.paid)/i.paid*100)+')':''}</dd>`:''}
     ${i.notes?`<dt>Notes</dt><dd>${esc(i.notes)}</dd>`:''}</dl>
-   <div class="actions"><button class="btn small" data-c="edit">Edit</button><button class="btn small" data-c="photo">📷 Photo</button>${i.status==='coming'?'<button class="btn small" data-c="arrived">Arrived</button>':''}<button class="btn small danger" data-c="remove">Remove</button></div>
+   <div class="actions">${i.source==='your estimate'?'':'<button class="btn small" data-c="check">🔄 Check price</button>'}<button class="btn small" data-c="edit">Edit</button><button class="btn small" data-c="photo">📷 Photo</button>${i.status==='coming'?'<button class="btn small" data-c="arrived">Arrived</button>':''}<button class="btn small danger" data-c="remove">Remove</button></div>
   </div></article>`}).join(''):`<div class="empty card" style="grid-column:1/-1"><b>Nothing here yet</b>Add your tins, sealed product and special cards below.</div>`;
 }
 async function loadCol(){try{C=await api('/api/collection');renderCol()}catch(e){$('#citems').innerHTML='<div class="empty err" style="grid-column:1/-1">'+esc(e.message)+'</div>'}}
@@ -674,6 +676,7 @@ $('#cimportbtn').addEventListener('click',async()=>{let items;const t=$('#cimpor
  if(await cact('/api/collection/import',{items})){$('#cimporttext').value='';$('#cimport').open=false}});
 $('#citems').addEventListener('click',e=>{const a=e.target.dataset.c;if(!a)return;const id=e.target.closest('.citem').dataset.id,i=C.items.find(x=>x.id===id);
  if(a==='edit')editItem(i);
+ if(a==='check'){const b=e.target;b.disabled=true;b.textContent='Checking…';cact('/api/collection/check',{id}).finally(()=>{b.disabled=false;b.textContent='🔄 Check price'})}
  if(a==='arrived')cact('/api/collection/item',{id,status:'have'});
  if(a==='remove'&&confirm('Remove '+i.name+' from your collection?'))cact('/api/collection/remove',{id});
  if(a==='photo'){photoFor=id;$('#cphoto').click()}});

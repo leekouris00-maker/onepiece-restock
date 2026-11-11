@@ -181,6 +181,7 @@ def upsert(tb, d, cfg=None):
         price_changed = not old or any(old.get(k) != it.get(k) for k in ("card", "match", "lang", "value"))
         if price_changed:
             _cache["t"] = 0
+            it.pop("checked", None)       # v2.19.2: a "Check price" result was for what it was before
             if old and any(old.get(k) != it.get(k) for k in ("card", "match", "lang")):
                 it["hist"] = {}           # a different thing is being priced: start its record again
                 it["start"] = None
@@ -412,6 +413,118 @@ def quote(tb, it, cfg=None):
         return None
 
 
+# ---------------------------------------------------------------- v2.19.2: "Check price" on one item
+# The hourly update prices items from the bot's own records. "Check price" asks the shops right now:
+#   a card   - searches Elemental Arcade and Good Games for its number, opens each listing and takes the
+#              cheapest near-mint copy in stock of the right version (same rules as the records);
+#   sealed   - the bot reads every sealed shop every few minutes anyway, so it re-reads that latest check
+#              (and says how long ago it was) instead of asking 20+ shops again;
+#   estimate - nothing to check: your own number wins.
+# A live price is kept for the rest of the day, so the hourly update doesn't put the older record back.
+LIVE_SHOPS = ("Elemental Arcade", "Good Games")
+LIVE_KEEP_SECONDS = 6 * 3600
+
+
+def _live_card(tb, it, cfg):
+    """The cheapest in-stock copy of this card at the singles shops, read now. None if none is in stock."""
+    num = it.get("card")
+    shops = ((cfg or {}).get("singles") or {}).get("shops") or {}
+    if not num:
+        return None
+    want = {"num": num, "name": num, "search": num, "max": 1e9, "qty": 1, "exclude": []}
+    jobs = []
+    for name in LIVE_SHOPS:
+        base = shops.get(name)
+        if base:
+            jobs.append((tb.elemental_card, want, base) if name == "Elemental Arcade"
+                        else (tb.handle_shop_card, want, name, base))
+    if not jobs:
+        return None
+    finds = [f for r in tb.pmap(lambda j: j[0](*j[1:]), jobs, leaf=False) for f in (r or [])]
+    ok = []
+    for f in finds:
+        title = str(f.get("note") or "")
+        if it.get("match") and not _words_ok(title, it["match"]):
+            continue
+        if not it.get("match") and _version(title):
+            continue                      # no version words: only the regular print
+        if not _lang_ok(title, it.get("lang")) or re.search(r"damaged|proxy", title, re.I):
+            continue
+        ok.append(f)
+    if not ok:
+        return None
+    best = min(ok, key=lambda f: f["price"])
+    cond = f" ({best['cond']})" if best.get("cond") and best["cond"] != "NM" else ""
+    return {"price": round(float(best["price"]), 2), "where": best["shop"], "url": best["url"], "in_stock": True,
+            "series": {}, "source": f"checked just now · cheapest in stock{cond}", "live": True}
+
+
+def _ago(seconds):
+    m = int(max(0, seconds) // 60)
+    return "just now" if m < 1 else f"{m} min ago" if m < 60 else f"{m // 60} h {m % 60} min ago"
+
+
+def check_price(tb, iid, cfg=None):
+    """Re-price one item now. -> (item, quote or None, a sentence for the page)."""
+    with _lock:
+        it = next((x for x in load(tb) if x["id"] == str(iid or "")), None)
+    if not it:
+        raise ValueError("that item isn't in the collection any more")
+    if it.get("value") is not None:
+        return it, quote(tb, it, cfg), f"{it['name']} uses your own estimate ({_money(it['value'])}). Edit it to change it."
+    h = it.get("hist") or {}
+    before = h[max(h)] if h else None
+    q, how = None, ""
+    if it.get("card"):
+        try:
+            q = _live_card(tb, it, cfg)
+        except Exception:  # noqa: BLE001
+            q = None
+        if not q:
+            how = "none in stock at Elemental or Good Games right now, so "
+    if not q:
+        q = quote(tb, it, cfg)
+        if q and not it.get("card"):
+            st = tb.read_json(os.path.join(HERE, "status.json"), {}) or {}
+            ts = float(st.get("sealed_ts") or 0)
+            if ts:
+                q = dict(q, source=f"{q.get('source', '')} · shops checked {_ago(time.time() - ts)}")
+    with _lock:                           # the shops took a moment: read the list again before saving
+        items = load(tb)
+        cur = next((x for x in items if x["id"] == it["id"]), None)
+        if not cur:
+            raise ValueError("that item was removed while its price was being checked")
+        if q:
+            record(cur, q, backfill=not cur.get("hist"))
+            cur["checked"] = {k: q.get(k) for k in ("price", "source", "where", "url", "in_stock")}
+            cur["checked"].update(t=round(time.time()), day=today())
+        save(tb, items)
+        _cache["t"] = 0
+    if not q:
+        return cur, None, f"No price found for {it['name']}: no shop has it and TCGplayer doesn't list it. Give it your own estimate with Edit."
+    where = f" at {q['where']}" if q.get("where") and q["where"] != "TCGplayer" else (" on TCGplayer" if q.get("where") else "")
+    change = ""
+    if before is not None and before != q["price"]:
+        change = f" (was {_money(before)})"
+    elif before is not None:
+        change = " (no change)"
+    lead = how[0].upper() + how[1:] if how else ""
+    return cur, q, f"{lead}{it['name']}: {_money(q['price'])}{where}{change}."
+
+
+def _money(v):
+    return f"A${v:,.2f}"
+
+
+def _fresh_check(it):
+    """Today's "Check price" result, if it's recent enough to beat the records."""
+    c = it.get("checked")
+    if (isinstance(c, dict) and c.get("price") is not None and c.get("day") == today()
+            and time.time() - float(c.get("t") or 0) < LIVE_KEEP_SECONDS and it.get("value") is None):
+        return dict(c, series={})
+    return None
+
+
 def record(it, q, backfill=False):
     """Put today's price in the item's daily record (and, for a new item, the days before from the series)."""
     if not q or q.get("price") is None:
@@ -459,7 +572,7 @@ def refresh(tb, cfg=None, force=False):
         items = load(tb)
         prices, changed = {}, False
         for it in items:
-            q = quote(tb, it, cfg)
+            q = _fresh_check(it) or quote(tb, it, cfg)     # v2.19.2: a live check from today wins
             prices[it["id"]] = q
             changed |= record(it, q, backfill=not it.get("hist"))
         if changed:

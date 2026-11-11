@@ -77,6 +77,9 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.19.2: CHECK PRICE. Each item in My collection has a 🔄 Check price button. A card is looked up at
+  Elemental Arcade and Good Games right then (cheapest near-mint copy in stock of that version); sealed items
+  re-read the bot's latest shop check (every few minutes). The new price is kept for the rest of the day.
 New in v2.19: THE SCORECARD - is the bot good enough to charge for? /scorecard show grades the bot against another
 group's alerts (Fellowship), checks it was running every hour, and says ready / not ready against targets
 (28 days of data, 30 drops compared, first or within 1 minute on 8 in 10, checking 99% of hours). Set it up once:
