@@ -141,8 +141,8 @@ def skip_reason(tb, cfg, title, variants=None):
     word = next((w.strip() for w in tb.NOT_SEALED if w in t), None)
     if word:
         return f"its title has \"{word}\", which the bot treats as an accessory or graded card, not sealed product"
-    if tb.SINGLE_NUM_RE.search(title) or tb.SINGLE_HINT_RE.search(title):
-        return "it looks like a single card (card number or rarity in the title)"
+    if tb.SINGLE_NUM_RE.search(title) or tb.SINGLE_HINT_RE.search(title) or tb.PROMO_RE.search(title):
+        return "it looks like a single card (card number, rarity or promo in the title)"
     if not tb.TCG_RE.search(title):
         return "its title doesn't say it's the card game (no \"card game\", \"TCG\" or set code like OP-18)"
     if any(tb.condition(v.get("title")) for v in variants or [] if isinstance(v, dict)):

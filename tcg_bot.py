@@ -177,7 +177,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.19.0"
+VERSION = "2.19.1"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -268,7 +268,8 @@ DEFAULT_SEALED_WATCH = [
     # v2.10.2: not plain "Illustration Box" - that matched the older IB-07 too
     {"name": "Illustration Box IB-09 / IB-10", "match": ["IB-09", "IB-10", "Illustration Box Vol.9", "Illustration Box Vol 9",
                                                          "Illustration Box Vol.10", "Illustration Box Vol 10"], "max": 130},
-    {"name": "Heroines Gift Collection", "match": ["Gift Collection"], "max": 120},
+    # v2.19.1: "not" - the older 2023 Gift Collection (and its promo singles) isn't this product
+    {"name": "Heroines Gift Collection", "match": ["Gift Collection"], "not": ["2023", "2024", "2025"], "max": 120},
     {"name": "Ace, Sabo & Luffy Premium Card Collection", "match": ["Ace, Sabo", "Sabo & Luffy", "Sabo and Luffy"], "max": 150},
     {"name": "29th Anniversary Premium Card Collection", "match": ["29th Anniversary"], "max": 150},
 ]
@@ -373,6 +374,13 @@ TCG_RE = re.compile(r"card game|\btcg\b|card collection|\b(?:OP|EB|ST|DP|PRB|PEB
                     r"booster|starter deck|double pack|ultra deck|tin pack", re.I)
 SINGLE_HINT_RE = re.compile(r"^\s*don(?:!!|\s+card)|\s-\s*(?:non[\s-]?)?foil\s*$|alternate art|alt art|\((?:common|uncommon|rare|super rare|secret rare|leader|sec|sr)\b|"
                             r"manga rare|#\d{3}\b|\bpsa\b|\bcgc\b|\bbgs\b|graded", re.I)
+# v2.19.1: promo singles ("Trafalgar Law - ST03-008 - One Piece Gift Collection 2023 Promo",
+# "Boa Hancock (Gift Collection 2023) [One Piece Promotion Cards]") matched the sealed_watch "Gift Collection"
+# entry, because the watch list never checked for singles. A promo is a single unless the title says it holds
+# several cards ("8 Cards", "Card Collection"); a promo pack or box is still sealed.
+PROMO_RE = re.compile(r"\bpromo(?:tion(?:al)?)?(?:\s+cards?)?\b(?!\s*(?:packs?|box(?:es)?|bundles?))", re.I)
+MULTI_CARD_RE = re.compile(r"\b\d+\s*cards\b|card collection", re.I)
+BRACKETS_RE = re.compile(r"[\(\[][^)\]]*[\)\]]")
 SEALED_OPTS = {"new": True, "packs": False}      # set from config.json in begin_check()
 
 # ---- v2.4: release-code sweep
@@ -1437,16 +1445,41 @@ def is_preorder(title, tags=""):
     return bool(PREORDER_RE.search(blob))
 
 
-def watch_item(title, watch):
-    """The sealed_watch entry this product title matches, or None (box titles are left to the box check)."""
+def looks_like_single(title, variants=None):
+    """v2.19.1: a single card rather than a sealed product: a card number (unless the title says it holds
+    several cards, like "(P-159 Monkey D. Luffy, 8 Cards)"), a rarity/foil/graded hint, a promo, or sold by
+    condition (Near Mint, Lightly Played...)."""
+    title = title or ""
+    if any(condition(v.get("title")) for v in variants or [] if isinstance(v, dict)):
+        return True
+    if SINGLE_HINT_RE.search(title):
+        return True
+    multi = MULTI_CARD_RE.search(title)
+    return bool((SINGLE_NUM_RE.search(title) or PROMO_RE.search(title)) and not multi)
+
+
+def _has_match(text, m):
+    t, m = text.lower(), m.lower()
+    return m in t or re.sub(r"[\s\-]", "", m) in re.sub(r"[\s\-]", "", t)
+
+
+def watch_item(title, watch, variants=None):
+    """The sealed_watch entry this product title matches, or None (box titles are left to the box check).
+    v2.19.1: never a single, never a title with one of the entry's "not" words, and a match only inside
+    brackets counts only if the rest of the title is sealed product ("Boa Hancock (Gift Collection 2023)"
+    is a single whose set name is in brackets; "Double Pack Set Vol.13 (DP-13)" is sealed)."""
     if not title or is_box_title(title) or is_excluded(title, WATCH_EXCLUDE) or is_other_game(title):
         return None
-    t = title.lower()
-    squashed = re.sub(r"[\s\-]", "", t)
+    if looks_like_single(title, variants):
+        return None
+    outside = BRACKETS_RE.sub(" ", title)
     for w in watch:
+        if any(_has_match(title, n) for n in w.get("not", []) or []):
+            continue
         for m in w.get("match", []):
-            m = m.lower()
-            if m in t or re.sub(r"[\s\-]", "", m) in squashed:
+            if not _has_match(title, m):
+                continue
+            if _has_match(outside, m) or SEALED_WORD_RE.search(outside):
                 return w
     return None
 
@@ -1459,7 +1492,8 @@ def is_sealed_listing(title, variants=None):
     t = norm(title)
     if is_excluded(title, WATCH_EXCLUDE) or any(w in t for w in NOT_SEALED) or is_other_game(title):
         return False
-    if SINGLE_NUM_RE.search(title) or SINGLE_HINT_RE.search(title) or not TCG_RE.search(title):
+    promo = PROMO_RE.search(title) and not MULTI_CARD_RE.search(title)        # v2.19.1
+    if SINGLE_NUM_RE.search(title) or SINGLE_HINT_RE.search(title) or promo or not TCG_RE.search(title):
         return False                 # a single or graded card, or One Piece merch rather than the card game
     if any(condition(v.get("title")) for v in variants or [] if isinstance(v, dict)):
         return False                 # sold by condition (Near Mint, Lightly Played...): a single
@@ -1476,7 +1510,7 @@ def classify(title, watch, max_price, variants=None):
     alerting only as a new listing and when it becomes buyable)."""
     if is_box_title(title):
         return "Booster box", "box", "box", max_price, None
-    w = watch_item(title, watch)
+    w = watch_item(title, watch, variants)
     if w:
         return "Sealed", "sealed", "watch", w["max"], w
     if is_sealed_listing(title, variants):
