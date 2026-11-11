@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794382166,
+ "pokemon_ts": 1794382929,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -166,8 +166,8 @@
    1794265016
   ],
   "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-box": [
-   344.0,
-   1794270772
+   334.0,
+   1794382929
   ],
   "poke|delta-reign|Gametraders Modbury Heights|pre-order-pokemon-tcg-mega-evolution-delta-reign-booster-box-6th-november": [
    339.99,
@@ -6147,7 +6147,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794382545,
+ "sealed_ts": 1794383295,
  "shop_down": [
   "cardbot.com.au"
  ],
