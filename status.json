@@ -7,27 +7,8 @@
  "drops_slot": "2026-11-12 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794402534,
- "held": {
-  "list|GUF|nico-robin-sp-extra-booster-one-piece-heroines-edition-vol-2": {
-   "f": {
-    "available": false,
-    "box_id": "item|GUF|nico-robin-sp-extra-booster-one-piece-heroines-edition-vol-2",
-    "cart": "",
-    "group": "new",
-    "id": "list|GUF|nico-robin-sp-extra-booster-one-piece-heroines-edition-vol-2",
-    "kind": "New listing",
-    "max": 0.0,
-    "name": "Nico Robin (SP) [Extra Booster: One Piece Heroines Edition Vol. 2]",
-    "note": "listed, not buyable yet",
-    "page": 99,
-    "price": 624.5,
-    "shop": "GUF",
-    "url": "https://guf.com.au/products/nico-robin-sp-extra-booster-one-piece-heroines-edition-vol-2"
-   },
-   "t": 1794402545
-  }
- },
+ "ebay_ts": 1794403453,
+ "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -62,7 +43,7 @@
   "TCGroup": 99,
   "The Wandering Collector": 99
  },
- "pc_on": true,
+ "pc_on": false,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -74,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794402534,
+ "pokemon_ts": 1794403251,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -95,6 +76,10 @@
   "list|GUF|jewelry-bonney-extra-booster-one-piece-heroines-edition-vol-2": [
    17.9,
    1794324336
+  ],
+  "list|GUF|nico-robin-sp-extra-booster-one-piece-heroines-edition-vol-2": [
+   624.5,
+   1794403251
   ],
   "list|GUF|one-piece-card-game-set-sail-deck-set-sd-01": [
    36.0,
@@ -6170,7 +6155,7 @@
    "t": 1794392733.8639977
   }
  },
- "sealed_ts": 1794402729,
+ "sealed_ts": 1794403646,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -6211,6 +6196,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794402534,
- "sweep_ts": 1794402534
+ "singles_ts": 1794403453,
+ "sweep_ts": 1794403453
 }
