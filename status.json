@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-11 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794391033,
+ "ebay_ts": 1794391993,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794391230,
+ "pokemon_ts": 1794391993,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -1029,7 +1029,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794305004.5405266
+   "t": 1794391967.1480975
   },
   "elementalarcade.com.au": {
    "rules": [],
@@ -1555,7 +1555,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794305004.519776
+   "t": 1794391966.9843106
   },
   "guf.com.au": {
    "rules": [
@@ -2403,7 +2403,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794305003.8068762
+   "t": 1794391966.6466951
   },
   "rogueonline.com.au": {
    "rules": [
@@ -2925,7 +2925,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794305003.8835366
+   "t": 1794391966.641516
   },
   "tcg.goodgames.com.au": {
    "rules": [],
@@ -3455,7 +3455,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1794305005.0070097
+   "t": 1794391966.6523216
   },
   "www.fpvfaster.com.au": {
    "rules": [
@@ -3993,7 +3993,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794305003.8058908
+   "t": 1794391966.6291018
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -4415,7 +4415,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1794305003.8196242
+   "t": 1794391966.6525743
   },
   "www.gumnut.com.au": {
    "rules": [
@@ -4676,7 +4676,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794305003.805035
+   "t": 1794391966.6278775
   },
   "www.irresistibleforce.com.au": {
    "rules": [
@@ -5887,7 +5887,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1794305003.8067355
+   "t": 1794391966.6329331
   },
   "www.tcgroupau.com.au": {
    "rules": [
@@ -6151,7 +6151,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794391597,
+ "sealed_ts": 1794392368,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -6192,6 +6192,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794391033,
- "sweep_ts": 1794391033
+ "singles_ts": 1794391993,
+ "sweep_ts": 1794391993
 }
