@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794379187,
+ "pokemon_ts": 1794379959,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -96,6 +96,10 @@
   "open|item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-36|498393": [
    40.0,
    1794218144
+  ],
+  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-battle-deck-espeon-ex": [
+   50.0,
+   1794379959
   ],
   "plist|30th-celebration|Kollecter|pokemon-tcg-30th-celebration-5-booster-tin": [
    0.0,
@@ -6143,7 +6147,7 @@
    "t": 1794305771.5095885
   }
  },
- "sealed_ts": 1794379572,
+ "sealed_ts": 1794380326,
  "shop_down": [
   "cardbot.com.au"
  ],
