@@ -249,3 +249,4 @@
 {"t": 1794392742, "event": "in_stock", "id": "poke|delta-reign|M-G|133259", "name": "Pokemon – Delta Reign – Elite Trainer Box", "shop": "M-G", "price": 149.0, "was": 1973455}
 {"t": 1794392742, "event": "in_stock", "id": "poke|delta-reign|M-G|133260", "name": "Pokemon – Delta Reign – Three Booster Blister", "shop": "M-G", "price": 38.0, "was": 1973455}
 {"t": 1794403251, "event": "alert", "id": "list|GUF|nico-robin-sp-extra-booster-one-piece-heroines-edition-vol-2", "kind": "New listing", "name": "Nico Robin (SP) [Extra Booster: One Piece Heroines Edition Vol. 2]", "shop": "GUF", "url": "https://guf.com.au/products/nico-robin-sp-extra-booster-one-piece-heroines-edition-vol-2", "price": 624.5, "copy": "cloud"}
+{"t": 1794404783, "event": "in_stock", "id": "poke|30th-celebration|JToys|89316", "name": "Pokemon TCG 30th Celebration Battle Deck – Espeon ex", "shop": "JToys", "price": 89.99, "was": 532220}
