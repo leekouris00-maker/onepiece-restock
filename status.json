@@ -7,8 +7,27 @@
  "drops_slot": "2026-11-11 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794391993,
- "held": {},
+ "ebay_ts": 1794392941,
+ "held": {
+  "poke|delta-reign|M-G|133259": {
+   "f": {
+    "cart": "https://www.m-g.com.au/checkout/?add-to-cart=133259&quantity=1",
+    "game": "pokemon",
+    "id": "poke|delta-reign|M-G|133259",
+    "kind": "Sealed",
+    "name": "Pokemon \u2013 Delta Reign \u2013 Elite Trainer Box",
+    "note": "Elite Trainer Box",
+    "preorder": false,
+    "price": 149.0,
+    "ptype": "Elite Trainer Box",
+    "section": "delta-reign",
+    "section_name": "Delta Reign",
+    "shop": "M-G",
+    "url": "https://www.m-g.com.au/product/pokemon-delta-reign-elite-trainer-box/"
+   },
+   "t": 1794392741
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -55,7 +74,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794391993,
+ "pokemon_ts": 1794392741,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -474,7 +493,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794305003.813971
+   "t": 1794392733.8708606
   },
   "cardbot.com.au": {
    "rules": [
@@ -6148,10 +6167,10 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794305771.5095885
+   "t": 1794392733.8639977
   }
  },
- "sealed_ts": 1794392368,
+ "sealed_ts": 1794393132,
  "shop_down": [
   "cardbot.com.au"
  ],
@@ -6192,6 +6211,6 @@
  "shop_retry": {
   "cardbot.com.au": 1794329829
  },
- "singles_ts": 1794391993,
- "sweep_ts": 1794391993
+ "singles_ts": 1794392941,
+ "sweep_ts": 1794392940
 }
