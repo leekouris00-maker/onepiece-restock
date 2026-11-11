@@ -20,16 +20,6 @@
    "told": 1794337010,
    "url": "https://elementalarcade.com.au/robots.txt"
   },
-  "tcg.goodgames.com.au": {
-   "count": 2,
-   "first": 1794359057,
-   "kind": "Cloudflare challenge",
-   "since": 1794360003,
-   "status": 429,
-   "told": null,
-   "until": 1794361203,
-   "url": "https://tcg.goodgames.com.au/search/suggest.json?q=Belo%20Betty&resources[type]=product&resources[limit]=10"
-  },
   "www.irresistibleforce.com.au": {
    "count": 3,
    "first": 1794358303,
