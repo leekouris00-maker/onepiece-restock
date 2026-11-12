@@ -1,5 +1,15 @@
 {
  "captcha": {
+  "alphagaming.com.au": {
+   "count": 1,
+   "first": 1794496678,
+   "kind": "Cloudflare challenge",
+   "since": 1794496678,
+   "status": 429,
+   "told": null,
+   "until": 1794497278,
+   "url": "https://alphagaming.com.au/search/suggest.json?q=IB-10&resources[type]=product&resources[limit]=10"
+  },
   "cardbot.com.au": {
    "count": 7,
    "first": 1794443555,
@@ -11,13 +21,13 @@
    "url": "https://cardbot.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
   },
   "collectiblemadness.com.au": {
-   "count": 2,
+   "count": 3,
    "first": 1794494762,
    "kind": "Cloudflare challenge",
-   "since": 1794495530,
+   "since": 1794496891,
    "status": 429,
    "told": null,
-   "until": 1794496730,
+   "until": 1794499291,
    "url": "https://collectiblemadness.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
   },
   "elementalarcade.com.au": {
@@ -30,15 +40,35 @@
    "told": 1794337010,
    "url": "https://elementalarcade.com.au/robots.txt"
   },
-  "grailborne.com.au": {
-   "count": 2,
-   "first": 1794494762,
+  "goldfieldsgames.com.au": {
+   "count": 1,
+   "first": 1794496678,
    "kind": "Cloudflare challenge",
-   "since": 1794495530,
+   "since": 1794496678,
    "status": 429,
    "told": null,
-   "until": 1794496730,
+   "until": 1794497278,
+   "url": "https://goldfieldsgames.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
+  "grailborne.com.au": {
+   "count": 3,
+   "first": 1794494762,
+   "kind": "Cloudflare challenge",
+   "since": 1794496891,
+   "status": 429,
+   "told": null,
+   "until": 1794499291,
    "url": "https://grailborne.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
+  },
+  "guf.com.au": {
+   "count": 1,
+   "first": 1794496679,
+   "kind": "Cloudflare challenge",
+   "since": 1794496679,
+   "status": 429,
+   "told": null,
+   "until": 1794497279,
+   "url": "https://guf.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
   },
   "lightofcards.com.au": {
    "count": 7,
@@ -50,6 +80,36 @@
    "told": 1794477266,
    "url": "https://lightofcards.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
   },
+  "pocketgames.com.au": {
+   "count": 1,
+   "first": 1794496678,
+   "kind": "Cloudflare challenge",
+   "since": 1794496678,
+   "status": 429,
+   "told": null,
+   "until": 1794497278,
+   "url": "https://pocketgames.com.au/search/suggest.json?q=ST-38&resources[type]=product&resources[limit]=10"
+  },
+  "rogueonline.com.au": {
+   "count": 1,
+   "first": 1794496678,
+   "kind": "Cloudflare challenge",
+   "since": 1794496678,
+   "status": 429,
+   "told": null,
+   "until": 1794497278,
+   "url": "https://rogueonline.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
+  "shop.goodgames.com.au": {
+   "count": 1,
+   "first": 1794496891,
+   "kind": "Cloudflare challenge",
+   "since": 1794496891,
+   "status": 429,
+   "told": null,
+   "until": 1794497491,
+   "url": "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250"
+  },
   "tcg.goodgames.com.au": {
    "count": 8,
    "first": 1794367929,
@@ -60,15 +120,65 @@
    "told": 1794403433,
    "url": "https://tcg.goodgames.com.au/robots.txt"
   },
-  "www.gdgames.com.au": {
-   "count": 2,
-   "first": 1794494972,
+  "thewanderingcollector.com.au": {
+   "count": 1,
+   "first": 1794496678,
    "kind": "Cloudflare challenge",
-   "since": 1794495715,
+   "since": 1794496678,
    "status": 429,
    "told": null,
-   "until": 1794496915,
+   "until": 1794497278,
+   "url": "https://thewanderingcollector.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
+  "www.cherrycollectables.com.au": {
+   "count": 1,
+   "first": 1794496678,
+   "kind": "Cloudflare challenge",
+   "since": 1794496678,
+   "status": 429,
+   "told": null,
+   "until": 1794497278,
+   "url": "https://www.cherrycollectables.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
+  "www.gameology.com.au": {
+   "count": 1,
+   "first": 1794496891,
+   "kind": "Cloudflare challenge",
+   "since": 1794496891,
+   "status": 429,
+   "told": null,
+   "until": 1794497491,
+   "url": "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
+  },
+  "www.gametradersinglefarm.com.au": {
+   "count": 1,
+   "first": 1794496678,
+   "kind": "Cloudflare challenge",
+   "since": 1794496678,
+   "status": 429,
+   "told": null,
+   "until": 1794497278,
+   "url": "https://www.gametradersinglefarm.com.au/search/suggest.json?q=IB-09&resources[type]=product&resources[limit]=10"
+  },
+  "www.gdgames.com.au": {
+   "count": 3,
+   "first": 1794494972,
+   "kind": "Cloudflare challenge",
+   "since": 1794497077,
+   "status": 429,
+   "told": null,
+   "until": 1794499477,
    "url": "https://www.gdgames.com.au/collections/one-piece-tcg/products.json?limit=250"
+  },
+  "www.gumnut.com.au": {
+   "count": 1,
+   "first": 1794496891,
+   "kind": "Cloudflare challenge",
+   "since": 1794496891,
+   "status": 429,
+   "told": null,
+   "until": 1794497491,
+   "url": "https://www.gumnut.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "www.irresistibleforce.com.au": {
    "count": 7,
@@ -121,14 +231,24 @@
    "url": "https://www.monstermart.com.au/robots.txt"
   },
   "www.pokebox.com.au": {
-   "count": 2,
+   "count": 3,
    "first": 1794494972,
    "kind": "Cloudflare challenge",
-   "since": 1794495714,
+   "since": 1794497078,
    "status": 429,
    "told": null,
-   "until": 1794496914,
+   "until": 1794499478,
    "url": "https://www.pokebox.com.au/collections/one-piece-card-game-booster-boxes-english/products.json?limit=250"
+  },
+  "www.tcgroupau.com.au": {
+   "count": 1,
+   "first": 1794496678,
+   "kind": "Cloudflare challenge",
+   "since": 1794496678,
+   "status": 429,
+   "told": null,
+   "until": 1794497278,
+   "url": "https://www.tcgroupau.com.au/search/suggest.json?q=IB-09&resources[type]=product&resources[limit]=10"
   }
  }
 }
