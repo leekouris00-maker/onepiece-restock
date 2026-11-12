@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794495534,
+ "pokemon_ts": 1794496120,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -89,6 +89,10 @@
    339.0,
    1794414132
   ],
+  "list|JToys|90304": [
+   499.99,
+   1794495934
+  ],
   "list|Light of Cards|one-piece-card-game-ts-03-tin-pack-vol-3": [
    35.0,
    1794324336
@@ -96,18 +100,6 @@
   "list|TCGroup|one-piece-card-game-the-dominance-of-god-double-pack-display-dp-13-english": [
    24.99,
    1794468638
-  ],
-  "open|item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-34|498393": [
-   40.0,
-   1794218144
-  ],
-  "open|item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-35|498393": [
-   40.0,
-   1794218144
-  ],
-  "open|item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-36|498393": [
-   40.0,
-   1794218144
   ],
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-battle-deck-espeon-ex": [
    50.0,
@@ -208,18 +200,6 @@
   "poke|delta-reign|Light of Cards|sealed-pokemon-tcg-mega-evolution-me06-delta-reign-elite-trainer-box": [
    159.99,
    1794272320
-  ],
-  "poke|delta-reign|Overhauled Games TCG|21238": [
-   34.95,
-   1794218144
-  ],
-  "poke|delta-reign|Overhauled Games TCG|21242": [
-   69.95,
-   1794218144
-  ],
-  "poke|delta-reign|Pokebox|pokemon-tcg-mega-evolution-me06-delta-reign-booster-box": [
-   349.99,
-   1794218144
   ],
   "sealed|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards": [
    24.99,
@@ -6175,7 +6155,7 @@
    "t": 1794481441.2562501
   }
  },
- "sealed_ts": 1794495733,
+ "sealed_ts": 1794496487,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
