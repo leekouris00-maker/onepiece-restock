@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-12 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794467672,
+ "ebay_ts": 1794468628,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794467463,
+ "pokemon_ts": 1794468053,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -92,6 +92,10 @@
   "list|Light of Cards|one-piece-card-game-ts-03-tin-pack-vol-3": [
    35.0,
    1794324336
+  ],
+  "list|TCGroup|one-piece-card-game-the-dominance-of-god-double-pack-display-dp-13-english": [
+   24.99,
+   1794468638
   ],
   "open|item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-34|498393": [
    40.0,
@@ -6171,7 +6175,7 @@
    "t": 1794392733.8639977
   }
  },
- "sealed_ts": 1794467866,
+ "sealed_ts": 1794468628,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6208,6 +6212,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794467672,
- "sweep_ts": 1794467672
+ "singles_ts": 1794468628,
+ "sweep_ts": 1794468628
 }
