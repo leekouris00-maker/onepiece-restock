@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-12 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794448697,
+ "ebay_ts": 1794449599,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794448697,
+ "pokemon_ts": 1794449402,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -120,6 +120,10 @@
   "plist|30th-celebration|Light of Cards|sealed-pokemon-tcg-30th-celebration-day-night-mini-tin": [
    49.99,
    1794272320
+  ],
+  "plist|30th-celebration|Rogue Online|pre-order-pokemon-tcg-30th-celebration-ultra-premium-collection-day-night-random-box": [
+   899.99,
+   1794449402
   ],
   "plist|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-pokemon-center-elite-trainer-box-etb": [
    349.0,
@@ -6163,7 +6167,7 @@
    "t": 1794392733.8639977
   }
  },
- "sealed_ts": 1794448892,
+ "sealed_ts": 1794449794,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6200,6 +6204,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794448697,
- "sweep_ts": 1794448697
+ "singles_ts": 1794449599,
+ "sweep_ts": 1794449599
 }
