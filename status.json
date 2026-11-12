@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794521210,
+ "pokemon_ts": 1794521904,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -188,6 +188,10 @@
   "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-box": [
    334.0,
    1794382929
+  ],
+  "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-elite-trainer-box": [
+   130.0,
+   1794521905
   ],
   "poke|delta-reign|Gameology|pokemon-tcg-mega-evolution-delta-reign-booster-box": [
    359.95,
@@ -6159,10 +6163,8 @@
    "t": 1794481441.2562501
   }
  },
- "sealed_ts": 1794521210,
- "shop_down": [
-  "www.jtoys.com.au"
- ],
+ "sealed_ts": 1794522088,
+ "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -6188,7 +6190,7 @@
   "www.gumnut.com.au": 0,
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
-  "www.jtoys.com.au": 3,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -6197,9 +6199,7 @@
   "www.tcgroupau.com.au": 0
  },
  "shop_locked": [],
- "shop_retry": {
-  "www.jtoys.com.au": 1794521537
- },
+ "shop_retry": {},
  "singles_ts": 1794521210,
  "sweep_ts": 1794521210
 }
