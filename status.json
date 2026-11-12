@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-13 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794514613,
+ "ebay_ts": 1794515519,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794515208,
+ "pokemon_ts": 1794515903,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -64,6 +64,10 @@
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
    1794339194
+  ],
+  "ebay|v1|178490730493|0": [
+   273.91,
+   1794515532
   ],
   "list|Cherry Collectables|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box": [
    499.99,
@@ -6155,7 +6159,7 @@
    "t": 1794481441.2562501
   }
  },
- "sealed_ts": 1794515208,
+ "sealed_ts": 1794516086,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6192,6 +6196,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794514613,
- "sweep_ts": 1794514613
+ "singles_ts": 1794515519,
+ "sweep_ts": 1794515519
 }
