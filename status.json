@@ -15,7 +15,7 @@
  "offline_streak": 0,
  "page_hints": {
   "https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250": 14,
-  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 4,
+  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 3,
   "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250": 2
  },
  "pages_seen": {
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794545998,
+ "pokemon_ts": 1794546763,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -6091,7 +6091,7 @@
    "t": 1794481441.2562501
   }
  },
- "sealed_ts": 1794546197,
+ "sealed_ts": 1794546947,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
