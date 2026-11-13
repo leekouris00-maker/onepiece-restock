@@ -733,6 +733,7 @@ class Bot(discord.Client):
             asyncio.create_task(watch_discord_health())
             if sc:
                 asyncio.create_task(scorecard_loop())
+            asyncio.create_task(ensure_deals_channel())
         if not self.synced:
             for g in self.guilds:                  # per-server commands appear instantly
                 self.tree.copy_global_to(guild=g)
@@ -751,6 +752,26 @@ def feed_channel():
 
 bot = Bot()
 _dm_sent = set()
+
+
+async def ensure_deals_channel():
+    """v2.19.3: the eBay deal finder's singles used to post in 🔒・auto-buy when there was no deals channel,
+    so singles looked like auto-buy items. Make 🔒・deals (owner + "autobuy_user_ids" only) once, if missing."""
+    await bot.wait_until_ready()
+    try:
+        cfg = cfg_now()
+        alerts = cfg.get("alerts") or {}
+        if (alerts.get("discord_webhook_deals") or tb.IN_ACTIONS or ac is None or not hasattr(ac, "DEALS_KEY")
+                or not (cfg.get("deal_finder") or {}).get("enabled", True) or not bot.guilds):
+            return
+        token = os.environ.get("DISCORD_BOT_TOKEN") or alerts.get("discord_bot_token")
+        g = bot.guilds[0]
+        people = {str(x) for x in (alerts.get("autobuy_user_ids") or [])} | ({str(g.owner_id)} if g.owner_id else set())
+        res = await asyncio.to_thread(ac.make_private, token, g.id, sorted(people), ac.DEALS_NAME, ac.DEALS_KEY)
+        await asyncio.to_thread(ac.save, res["hooks"])
+        print(f"   made the private {ac.DEALS_NAME} channel: eBay deals post there now, not in 🔒・auto-buy", flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"   ! couldn't make the private 🔒・deals channel ({tb.redact(e)}); deals stay in bot_output.log", flush=True)
 
 
 async def watch_discord_health():

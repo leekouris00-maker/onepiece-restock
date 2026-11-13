@@ -170,7 +170,7 @@ def settings(cfg):
 
 def private_hook(cfg):
     a = (cfg or {}).get("alerts") or {}
-    return a.get("discord_webhook_deals") or a.get("discord_webhook_autobuy")
+    return a.get("discord_webhook_deals")     # v2.19.3: its own 🔒・deals, never 🔒・auto-buy (that's for buying)
 
 
 def load_state(tb):
@@ -368,7 +368,7 @@ def post(tb, tp, cfg, store, deals, s):
     elif time.time() - _no_channel_said[0] > NO_CHANNEL_EVERY:
         _no_channel_said[0] = time.time()
         tb.post_status(cfg, "💰 The deal finder found something, but your private channel isn't set up yet, so "
-                            "it's only in bot_output.log on the PC. Open `/autobuy panel` once to make it.", tb.AMBER)
+                            "it's only in bot_output.log on the PC. Restart the bot (restart_bot.bat) and it makes 🔒・deals.", tb.AMBER)
     big = [d for d in deals if d["profit"] >= float(s["push_min_profit"])]
     if ok and big:
         b = big[0]

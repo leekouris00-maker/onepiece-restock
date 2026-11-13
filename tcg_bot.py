@@ -177,7 +177,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.19.2"
+VERSION = "2.19.3"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -1434,10 +1434,12 @@ def is_other_game(title):
     return "one piece" not in t and any(g in t for g in OTHER_GAMES)
 
 
-def is_box_title(title):
+def is_box_title(title, variants=None):
+    """v2.19.3: not a single whose set name says "Booster Box" ("Franky OP18-021 [The Dominance of God Booster
+    Box]"): those were kind "Booster box", so they matched the OP-18 auto-buy item."""
     t = (title or "").lower()
     return (("booster box" in t or "booster display" in t) and not is_excluded(title, BOX_EXCLUDE)
-            and not is_other_game(title))
+            and not is_other_game(title) and not looks_like_single(title, variants))
 
 
 def is_preorder(title, tags=""):
@@ -1516,7 +1518,7 @@ def classify(title, watch, max_price, variants=None):
     or None if it isn't watched. Groups: "box" (booster boxes, alert at or under your max), "watch"
     (sealed_watch items, alert at or under their max) and "new" (v2.4: any other English sealed product,
     alerting only as a new listing and when it becomes buyable)."""
-    if is_box_title(title):
+    if is_box_title(title, variants):
         return "Booster box", "box", "box", max_price, None
     w = watch_item(title, watch, variants)
     if w:
