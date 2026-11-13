@@ -153,6 +153,8 @@ def skip_reason(tb, cfg, title, variants=None):
         return "it's a single booster pack, and packs are off (\"new_sealed_packs\": true turns them on)"
     if not tb.SEALED_WORD_RE.search(title):
         return "its title has no sealed-product word (booster, deck, box, collection, tin, set...)"
+    if not tb.is_sealed_listing(title, variants):          # v2.19.2: "Card Name [Set Name]"
+        return "its sealed-product word is only in the set name in brackets, so the bot takes it for a single"
     return None
 
 

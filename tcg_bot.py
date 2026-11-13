@@ -381,6 +381,7 @@ SINGLE_HINT_RE = re.compile(r"^\s*don(?:!!|\s+card)|\s-\s*(?:non[\s-]?)?foil\s*$
 PROMO_RE = re.compile(r"\bpromo(?:tion(?:al)?)?(?:\s+cards?)?\b(?!\s*(?:packs?|box(?:es)?|bundles?))", re.I)
 MULTI_CARD_RE = re.compile(r"\b\d+\s*cards\b|card collection", re.I)
 BRACKETS_RE = re.compile(r"[\(\[][^)\]]*[\)\]]")
+PRODUCT_LINE_RE = re.compile(r"one piece|card game|\btcg\b", re.I)   # v2.19.2: see is_sealed_listing
 SEALED_OPTS = {"new": True, "packs": False}      # set from config.json in begin_check()
 
 # ---- v2.4: release-code sweep
@@ -1500,7 +1501,14 @@ def is_sealed_listing(title, variants=None):
     if not SEALED_OPTS.get("packs") and any(w in t for w in PACK_WORDS):
         return False
     # v2.10.4: a sealed word only inside a single's set name doesn't count ("Buggy (Premium Booster -The Best-)")
-    return bool(SEALED_WORD_RE.search(re.sub(r"\([^)]*\)", " ", title)))
+    # v2.19.2: square brackets too. Singles are often listed "Card Name [Set Name]" (GUF, 13 Nov 2026:
+    # "My name is Shirahoshi!! [Extra Booster: One Piece Heroines Edition Vol. 2]" alerted at $1 because
+    # "Booster" sat inside the [...]). A sealed word only in brackets still counts when the rest of the title
+    # names the product line ("One Piece Card Game - [EB-05] ... Booster Box", "One Piece TCG [ST-30 Deck]").
+    outside = BRACKETS_RE.sub(" ", title)
+    if SEALED_WORD_RE.search(outside):
+        return True
+    return bool(PRODUCT_LINE_RE.search(outside) and SEALED_WORD_RE.search(title))
 
 
 def classify(title, watch, max_price, variants=None):
