@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-14 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794609703,
+ "ebay_ts": 1794610962,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794610268,
+ "pokemon_ts": 1794611163,
  "recent_alerts": {
   "ebay|v1|178490730493|0": [
    273.91,
@@ -2074,7 +2074,7 @@
   },
   "overhauledgames.com.au": {
    "rules": [],
-   "t": 1794524538.0658274
+   "t": 1794611153.193871
   },
   "pocketgames.com.au": {
    "rules": [
@@ -6083,8 +6083,10 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794610479,
- "shop_down": [],
+ "sealed_ts": 1794611163,
+ "shop_down": [
+  "morethanmeeples.com.au"
+ ],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -6095,7 +6097,7 @@
   "grailborne.com.au": 0,
   "guf.com.au": 0,
   "lightofcards.com.au": 0,
-  "morethanmeeples.com.au": 1,
+  "morethanmeeples.com.au": 3,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
@@ -6119,7 +6121,9 @@
   "www.tcgroupau.com.au": 0
  },
  "shop_locked": [],
- "shop_retry": {},
- "singles_ts": 1794609703,
- "sweep_ts": 1794609703
+ "shop_retry": {
+  "morethanmeeples.com.au": 1794611873
+ },
+ "singles_ts": 1794610962,
+ "sweep_ts": 1794610962
 }
