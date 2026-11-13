@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-13 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794544155,
+ "ebay_ts": 1794545117,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794544539,
+ "pokemon_ts": 1794545319,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -76,6 +76,10 @@
   "list|GUF|jewelry-bonney-extra-booster-one-piece-heroines-edition-vol-2": [
    17.9,
    1794324336
+  ],
+  "list|GUF|my-name-is-shirahoshi-extra-booster-one-piece-heroines-edition-vol-2": [
+   1.0,
+   1794545128
   ],
   "list|GUF|nico-robin-sp-extra-booster-one-piece-heroines-edition-vol-2": [
    624.5,
@@ -147,7 +151,7 @@
   ],
   "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
    99.0,
-   1794466768
+   1794545128
   ]
  },
  "robots": {
@@ -6087,7 +6091,7 @@
    "t": 1794481441.2562501
   }
  },
- "sealed_ts": 1794544722,
+ "sealed_ts": 1794545319,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6124,6 +6128,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794544155,
- "sweep_ts": 1794544155
+ "singles_ts": 1794545117,
+ "sweep_ts": 1794545117
 }
