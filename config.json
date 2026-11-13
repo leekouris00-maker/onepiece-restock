@@ -55,7 +55,7 @@
         "_help": "CLOUD COPY: Discord webhooks and heartbeat topic are stored in GitHub Actions Secrets, not this public file."
     },
     "sealed": {
-        "max_price": 260,
+        "max_price": 300,
         "shopify_collections": [
             {
                 "name": "Gumnut",
