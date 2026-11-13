@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-13 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794550923,
+ "ebay_ts": 1794551851,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794551302,
+ "pokemon_ts": 1794552051,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -140,6 +140,10 @@
   "poke|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": [
    159.0,
    1794543770
+  ],
+  "poke|delta-reign|M-G|137861": [
+   10.0,
+   1794552051
   ],
   "sealed|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards": [
    24.99,
@@ -6095,7 +6099,7 @@
    "t": 1794481441.2562501
   }
  },
- "sealed_ts": 1794551302,
+ "sealed_ts": 1794552235,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6132,6 +6136,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794550923,
- "sweep_ts": 1794550923
+ "singles_ts": 1794551851,
+ "sweep_ts": 1794551851
 }
