@@ -274,3 +274,4 @@
 {"t": 1794537765, "event": "in_stock", "id": "poke|30th-celebration|M-G|127826", "name": "Pokemon – 30th Celebration – Ultra Premium Day/Night Collection", "shop": "M-G", "price": 699.0, "was": 1512}
 {"t": 1794539974, "event": "sold_out", "id": "poke|delta-reign|Cherry Collectables|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box", "name": "Pokemon TCG ME06 Mega Evolution Delta Reign Elite Trainer Box", "shop": "Cherry Collectables", "price": 159.99, "was": 274958}
 {"t": 1794540743, "event": "sold_out", "id": "poke|30th-celebration|M-G|127830", "name": "Pokemon – 30th Celebration – 5-Booster Tin", "shop": "M-G", "price": 119.0, "was": 174314}
+{"t": 1794542296, "event": "sold_out", "id": "item|Good Games (sealed)|one-piece-card-game-starter-deck-tba-st-34", "name": "One Piece Card Game Starter Deck – Charlotte Katakuri (Purple) - ST-34", "shop": "Good Games (sealed)", "price": 40.0, "was": 324152}
