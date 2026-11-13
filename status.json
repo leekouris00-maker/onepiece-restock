@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-14 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794584366,
+ "ebay_ts": 1794585407,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -43,7 +43,7 @@
   "TCGroup": 99,
   "The Wandering Collector": 99
  },
- "pc_on": true,
+ "pc_on": false,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794584146,
+ "pokemon_ts": 1794584790,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -6107,10 +6107,8 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794584561,
- "shop_down": [
-  "www.jtoys.com.au"
- ],
+ "sealed_ts": 1794585407,
+ "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -6136,7 +6134,7 @@
   "www.gumnut.com.au": 0,
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
-  "www.jtoys.com.au": 3,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -6145,9 +6143,7 @@
   "www.tcgroupau.com.au": 0
  },
  "shop_locked": [],
- "shop_retry": {
-  "www.jtoys.com.au": 1794584853
- },
- "singles_ts": 1794584366,
- "sweep_ts": 1794584366
+ "shop_retry": {},
+ "singles_ts": 1794585407,
+ "sweep_ts": 1794585407
 }
