@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794542999,
+ "pokemon_ts": 1794543770,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -68,10 +68,6 @@
   "ebay|v1|178490730493|0": [
    273.91,
    1794515532
-  ],
-  "list|Cherry Collectables|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box": [
-   499.99,
-   1794272320
   ],
   "list|GUF|alvida-extra-booster-one-piece-heroines-edition-vol-2": [
    10.3,
@@ -113,14 +109,6 @@
    149.95,
    1794437067
   ],
-  "plist|30th-celebration|Kollecter|pokemon-tcg-30th-celebration-5-booster-tin": [
-   0.0,
-   1794274569
-  ],
-  "plist|30th-celebration|Light of Cards|sealed-pokemon-tcg-30th-celebration-day-night-mini-tin": [
-   49.99,
-   1794272320
-  ],
   "plist|30th-celebration|Rogue Online|pre-order-pokemon-tcg-30th-celebration-ultra-premium-collection-day-night-random-box": [
    899.99,
    1794449402
@@ -128,62 +116,6 @@
   "plist|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-pokemon-center-elite-trainer-box-etb": [
    349.0,
    1794388952
-  ],
-  "plist|delta-reign|Light of Cards|pokemon-tcg-mega-evolution-pitch-black-three-booster-blister": [
-   44.99,
-   1794272320
-  ],
-  "plist|delta-reign|Light of Cards|sealed-pokemon-tcg-mega-evolution-me06-delta-reign-booster-box": [
-   319.99,
-   1794272320
-  ],
-  "plist|delta-reign|Rogue Online|pre-order-pokemon-tcg-mega-evolution-delta-reign-booster-bundle-box": [
-   49.99,
-   1794265016
-  ],
-  "plist|delta-reign|The Wandering Collector|in-hand-pokemon-tcg-mega-evolution-6-delta-reign-3-pack-blister": [
-   39.95,
-   1794267756
-  ],
-  "plist|delta-reign|The Wandering Collector|in-hand-pokemon-tcg-mega-evolution-6-delta-reign-booster-bundle": [
-   79.95,
-   1794267756
-  ],
-  "plist|delta-reign|The Wandering Collector|in-hand-pokemon-tcg-mega-evolution-6-delta-reign-elite-trainer-box": [
-   169.95,
-   1794272320
-  ],
-  "plist|delta-reign|The Wandering Collector|pokemon-tcg-mega-evolution-6-delta-reign-booster-box": [
-   389.95,
-   1794267756
-  ],
-  "poke|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-sylveon-ex-box-greninja-ex-box-16th-september": [
-   79.99,
-   1794265016
-  ],
-  "poke|30th-celebration|Kollecter|pokemon-tcg-chn-30th-celebration-booster-box-30thc-s-chinese": [
-   149.0,
-   1794274569
-  ],
-  "poke|30th-celebration|Kollecter|pokemon-tcg-chn-30th-celebration-first-partner-illustration-collection-set-vol-3": [
-   25.0,
-   1794274569
-  ],
-  "poke|30th-celebration|Light of Cards|pre-order-pokemon-tcg-30th-celebration-knock-out-collection": [
-   49.99,
-   1794272320
-  ],
-  "poke|delta-reign|Cherry Collectables|pokemon-tcg-mega-evolution-delta-reign-booster-box": [
-   349.99,
-   1794265016
-  ],
-  "poke|delta-reign|Cherry Collectables|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": [
-   159.99,
-   1794265016
-  ],
-  "poke|delta-reign|Cherry Collectables|pokemon-tcg-mega-evolution-delta-reign-three-booster-blister": [
-   34.99,
-   1794265016
   ],
   "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-box": [
    334.0,
@@ -197,17 +129,9 @@
    359.95,
    1794464454
   ],
-  "poke|delta-reign|Gametraders Modbury Heights|pre-order-pokemon-tcg-mega-evolution-delta-reign-booster-box-6th-november": [
-   339.99,
-   1794265016
-  ],
-  "poke|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-checklane-blister-releases-6-nov-2026": [
-   22.9,
-   1794270772
-  ],
-  "poke|delta-reign|Light of Cards|sealed-pokemon-tcg-mega-evolution-me06-delta-reign-elite-trainer-box": [
-   159.99,
-   1794272320
+  "poke|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": [
+   159.0,
+   1794543770
   ],
   "sealed|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards": [
    24.99,
@@ -6163,7 +6087,7 @@
    "t": 1794481441.2562501
   }
  },
- "sealed_ts": 1794543197,
+ "sealed_ts": 1794543954,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
