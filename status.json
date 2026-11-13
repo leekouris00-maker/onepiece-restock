@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-13 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794565404,
+ "ebay_ts": 1794566349,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794565203,
+ "pokemon_ts": 1794565970,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -985,7 +985,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794478998.5977235
+   "t": 1794565962.7088578
   },
   "elementalarcade.com.au": {
    "rules": [],
@@ -1511,7 +1511,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794478998.4621923
+   "t": 1794565962.7077532
   },
   "guf.com.au": {
    "rules": [
@@ -2881,7 +2881,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794479129.4507039
+   "t": 1794565961.9241645
   },
   "tcg.goodgames.com.au": {
    "rules": [],
@@ -3411,7 +3411,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1794478998.4334328
+   "t": 1794565961.9294908
   },
   "www.fpvfaster.com.au": {
    "rules": [
@@ -3949,7 +3949,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794479129.7137647
+   "t": 1794565961.9281814
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -6107,7 +6107,7 @@
    "t": 1794481441.2562501
   }
  },
- "sealed_ts": 1794565780,
+ "sealed_ts": 1794566349,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6144,6 +6144,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794565404,
- "sweep_ts": 1794565404
+ "singles_ts": 1794566349,
+ "sweep_ts": 1794566349
 }
