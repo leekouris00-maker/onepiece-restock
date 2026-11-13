@@ -288,3 +288,4 @@
 {"t": 1794551302, "event": "sold_out", "id": "box|Pokebox|one-piece-card-game-romance-dawn-op-01-booster-box-english", "name": "One Piece Card Game - Romance Dawn OP-01 Booster Box", "shop": "Pokebox", "price": 1999.99, "was": 1190818}
 {"t": 1794552051, "event": "alert", "id": "poke|delta-reign|M-G|137861", "kind": "Sealed", "name": "Pokemon – Delta Reign – Blister (Single) – Limit 6", "shop": "M-G", "url": "https://www.m-g.com.au/product/pokemon-delta-reign-blister-single-limit-6/", "price": 10.0, "copy": "cloud"}
 {"t": 1794553008, "event": "sold_out", "id": "box|JToys|89681", "name": "One Piece Card Game OP18 The Dominance of God Booster Box", "shop": "JToys", "price": 399.99, "was": 173240}
+{"t": 1794554333, "event": "sold_out", "id": "poke|30th-celebration|More Than Meeples|186470", "name": "Pokemon TCG 30th Celebration Battle Deck", "shop": "More Than Meeples", "price": 59.95, "was": 253805}
