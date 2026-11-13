@@ -77,6 +77,10 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.19.3: SINGLES OUT OF AUTO-BUY. eBay deals (singles under TCGplayer market) now post in their own private
+  🔒・deals channel, made when the bot starts; 🔒・auto-buy is only auto-buy again. Deals were always alerts only,
+  never bought. Also: a single whose set name says "Booster Box" ("Franky OP18-021 [The Dominance of God Booster
+  Box]") is no longer counted as a booster box, and auto-buy refuses anything with a card number.
 New in v2.19.2: CHECK PRICE. Each item in My collection has a 🔄 Check price button. A card is looked up at
   Elemental Arcade and Good Games right then (cheapest near-mint copy in stock of that version); sealed items
   re-read the bot's latest shop check (every few minutes). The new price is kept for the rest of the day.
@@ -138,4 +142,4 @@ New in v2.12: DEAL FINDER (PC copy, private). Every 15 minutes it reads the newe
   Always check the photos before buying.   Try it:  py -3 deal_finder.py   (prints today's deals, posts nothing)
   Settings, all optional, in config.json:  "deal_finder": {"min_pct": 25, "min_profit": 10, "min_market": 30,
   "sell_fee_pct": 13, "push_min_profit": 25, "every_minutes": 15, "searches_per_hour": 40}
-  Its own channel instead of 🔒・auto-buy (optional): "discord_webhook_deals" under "alerts".
+  Posts in 🔒・deals ("discord_webhook_deals" under "alerts"), never in 🔒・auto-buy (v2.19.3).

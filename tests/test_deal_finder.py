@@ -98,7 +98,7 @@ class FakeEbay:
 
 
 CFG = {"alerts": {"ebay_client_id": "id", "ebay_client_secret": "secret",
-                  "discord_webhook_autobuy": "https://discord.com/api/webhooks/1/private"}}
+                  "discord_webhook_deals": "https://discord.com/api/webhooks/1/private"}}
 
 
 class Base(unittest.TestCase):
@@ -213,7 +213,7 @@ class TestRun(Base):
         self.assertEqual(len(deals), 1)
         self.assertEqual(len(tb.sent), 1)
         hook, payload = tb.sent[0]
-        self.assertEqual(hook, CFG["alerts"]["discord_webhook_autobuy"])
+        self.assertEqual(hook, CFG["alerts"]["discord_webhook_deals"])
         self.assertIn("% under", payload["embeds"][0]["title"])
         self.assertEqual(payload["allowed_mentions"], {"parse": []})
         q = fake.queries[0]
@@ -258,6 +258,16 @@ class TestRun(Base):
         self.assertEqual(tb.sent, [])
         self.assertEqual(len(tb.status), 1)
         self.assertNotIn("Sabo", tb.status[0])
+
+    def test_v2193_never_posts_in_the_auto_buy_channel(self):
+        tb = FakeTb()
+        cfg = {"alerts": {"ebay_client_id": "id", "ebay_client_secret": "secret",
+                          "discord_webhook_autobuy": "https://discord.com/api/webhooks/3/autobuy"}}
+        df._no_channel_said[0] = 0.0
+        self.run_bot(tb, [item(1, "Sabo OP13-120 Parallel", 30)], cfg=cfg)
+        self.assertEqual(tb.sent, [])
+        self.assertEqual(len(tb.status), 1)
+        self.assertIn("🔒・deals", tb.status[0])
 
     def test_cloud_copy_and_no_key_do_nothing(self):
         tb = FakeTb()

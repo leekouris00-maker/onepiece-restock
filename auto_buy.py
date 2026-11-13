@@ -254,6 +254,18 @@ def save_items(tb, items):
                                      "items": items})
 
 
+CARD_NUM_RE = re.compile(r"\b(?:OP|EB|ST|PRB)\d{2}-\d{3}\b|\bP-\d{3}\b", re.I)   # same as tcg_bot's SINGLE_NUM_RE
+
+
+def _looks_single(name):
+    """tcg_bot.looks_like_single when it's loaded (run as a script it's __main__), else just the card number."""
+    for mod in (sys.modules.get("tcg_bot"), sys.modules.get("__main__")):
+        fn = getattr(mod, "looks_like_single", None)
+        if fn:
+            return fn(name)
+    return bool(CARD_NUM_RE.search(name or ""))
+
+
 def item_matches(it, f):
     text = f"{f.get('name', '')} {f.get('url', '')}"
     if it["code"]:
@@ -261,6 +273,8 @@ def item_matches(it, f):
             return False
         if not it["match"] and f.get("kind") != "Booster box":
             return False                       # a code item means the booster box, not a sleeve or deck
+    if f.get("kind") == "Single" or _looks_single(f.get("name", "")):
+        return False                           # v2.19.3: never a single card, whatever list item it matches
     t = text.lower()
     return all(any(alt.strip() in t for alt in w.split("|")) for w in it["match"])
 

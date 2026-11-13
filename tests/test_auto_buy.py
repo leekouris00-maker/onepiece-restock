@@ -476,5 +476,60 @@ class Private(unittest.TestCase):
         self.assertEqual(body["parent_id"], "50")
 
 
+import add_channels as ac  # noqa: E402
+
+
+class TestV2193Singles(unittest.TestCase):
+    """Singles whose set name says "Booster Box" were kind "Booster box", so they matched the OP-18 item."""
+
+    def test_single_with_box_set_name_is_not_a_box(self):
+        import tcg_bot as tb
+        for t in ("Franky (Leader) OP18-021 [The Dominance of God Booster Box]",
+                  "Nico Robin - OP18-031 - Manga Rare [OP-18 Booster Box]"):
+            self.assertFalse(tb.is_box_title(t), t)
+            self.assertNotEqual((tb.classify(t, [], 260) or ("",))[0], "Booster box", t)
+        for t in ("One Piece Card Game OP-18 Booster Box",
+                  "One Piece Card Game - The Dominance of God [OP-18] Booster Box (24 Packs) Pre-Order",
+                  "ONE PIECE CARD GAME EB-05 Booster Box"):
+            self.assertTrue(tb.is_box_title(t), t)
+
+    def test_list_item_never_matches_a_single(self):
+        it = ab.make_item(code="OP-18", max=260)
+        single = {"name": "Nico Robin OP18-031 [OP-18 Booster Box]", "kind": "Booster box", "price": 120}
+        box = {"name": "One Piece Card Game OP-18 Booster Box", "kind": "Booster box", "price": 230}
+        self.assertFalse(ab.item_matches(it, single))
+        self.assertTrue(ab.item_matches(it, box))
+        words = ab.make_item(match="op-18|op18", max=260)
+        self.assertFalse(ab.item_matches(words, {"name": "Loki OP18-119 SEC", "kind": "Single"}))
+
+    def test_deals_channel_is_its_own_private_channel(self):
+        calls = []
+
+        def api(token, method, path, body=None, auth=True, url=None):
+            calls.append((method, path, body))
+            if path == "/users/@me":
+                return {"id": "999"}
+            if path.endswith("/channels") and method == "GET":
+                return [{"id": "60", "type": 0, "name": ac.PRIVATE_NAME}]
+            if method == "POST" and path.endswith("/channels"):
+                return {"id": "78", **body}
+            if path.endswith("/webhooks") and method == "GET":
+                return []
+            if path.endswith("/webhooks"):
+                return {"id": "2", "token": "def"}
+            return {}
+        old = ac.api
+        ac.api = api
+        try:
+            res = ac.make_private("tok", 123, ["555"], ac.DEALS_NAME, ac.DEALS_KEY)
+        finally:
+            ac.api = old
+        self.assertIn("discord_webhook_deals", res["hooks"])
+        self.assertNotIn("discord_webhook_autobuy", res["hooks"])
+        body = next(b for m, p, b in calls if m == "POST" and p == "/guilds/123/channels")
+        self.assertEqual(body["name"], "🔒・deals")
+        self.assertEqual({o["id"]: o for o in body["permission_overwrites"]}["123"]["deny"], str(ac.VIEW))
+
+
 if __name__ == "__main__":
     unittest.main()
