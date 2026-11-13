@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-13 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794546197,
+ "ebay_ts": 1794547146,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794546763,
+ "pokemon_ts": 1794547526,
  "recent_alerts": {
   "box|JB Hi-Fi|one-piece-card-game-extra-booster-display-heroines-edition-box-24-pack-eb-03": [
    214.0,
@@ -104,6 +104,10 @@
   "list|TCGroup|one-piece-card-game-the-dominance-of-god-double-pack-display-dp-13-english": [
    24.99,
    1794468638
+  ],
+  "open|item|Gameology|one-piece-card-game-mini-case-set-vol-3-ts-03-random-select|498485": [
+   44.95,
+   1794547528
   ],
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-battle-deck-espeon-ex": [
    50.0,
@@ -6091,7 +6095,7 @@
    "t": 1794481441.2562501
   }
  },
- "sealed_ts": 1794546947,
+ "sealed_ts": 1794547712,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6128,6 +6132,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794546197,
- "sweep_ts": 1794546197
+ "singles_ts": 1794547146,
+ "sweep_ts": 1794547146
 }
