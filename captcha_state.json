@@ -82,13 +82,13 @@
   },
   "www.jbhifi.com.au": {
    "count": 1,
-   "first": 1794661181,
+   "first": 1794661960,
    "kind": "Cloudflare challenge",
-   "since": 1794661181,
+   "since": 1794661960,
    "status": 429,
    "told": null,
-   "until": 1794661781,
-   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-6-dp-06.js"
+   "until": 1794662560,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28.js"
   },
   "www.kollecter.com.au": {
    "count": 7,

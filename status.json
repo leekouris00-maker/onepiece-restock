@@ -8,21 +8,7 @@
  "ebay_fails": 0,
  "ebay_state": "ok",
  "ebay_ts": 1794661789,
- "held": {
-  "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": {
-   "f": {
-    "cart": "https://grailborne.com.au/cart/46863319072941:1",
-    "id": "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition",
-    "kind": "Sealed",
-    "name": "One Piece Card Game: Premium Card Collection - 29th Anniversary Edition (P-159 Monkey D. Luffy, 8 Cards) (Ships March 2027)",
-    "note": "29th Anniversary Premium Card Collection, pre-order",
-    "price": 99.0,
-    "shop": "Grailborne",
-    "url": "https://grailborne.com.au/products/one-piece-card-game-premium-card-collection-29th-anniversary-edition"
-   },
-   "t": 1794661799
-  }
- },
+ "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -69,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794661571,
+ "pokemon_ts": 1794662350,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -6113,7 +6099,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794661789,
+ "sealed_ts": 1794662534,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
