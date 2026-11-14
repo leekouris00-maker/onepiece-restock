@@ -177,7 +177,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.19.3"
+VERSION = "2.19.5"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -429,6 +429,18 @@ ROBOT_TOKEN = "onepiecerestockbot"
 # welcomes bots: tell them honestly what we are. Add more in config.json "user_agent_by_shop".
 BOT_UA = f"Mozilla/5.0 (compatible; {ROBOT_TOKEN}/2.0; personal stock checker, a few requests every 5 min)"
 UA_BY_HOST = {"www.jtoys.com.au": BOT_UA}
+# ---- v2.19.4: one pace for every Shopify shop. Shopify counts requests per internet address across every
+# store it hosts, so ~20 Shopify shops paced one by one still add up to a burst Shopify answers with 429.
+SHOPIFY_PER_SEC = 8             # front lane (boxes, sealed, sweep, Pokémon, links, fast lane): across all Shopify shops
+SHOPIFY_BG_PER_SEC = 4          # background lane (singles, price-drop lists): only when nothing in front is waiting
+BG_MAX_WAIT = 90                # a background request never waits longer than this for a gap
+SHOPIFY_SLOW_MAX = 4            # after 429s the pace halves, down to a quarter
+SHOPIFY_STRIKE_GAP = 30         # 429s within this many seconds count as one
+SHOPIFY_BG_HOLD = 5 * 60        # after a 429, background requests give up at once for this long
+SHOPIFY_RECOVER = 10 * 60       # the pace steps back up after this long without a 429
+SHOPIFY_PATH_RE = re.compile(r"(?:^|/)(?:products\.json|search/suggest\.json|products/[^/?#]+\.js(?:on)?"
+                             r"|collections/[^/?#]+/products\.json)(?:$|[?#])", re.I)
+SHOPIFY_HEADERS = ("x-shopid", "x-sorting-hat-shopid")
 JOB_WORKERS = 16                # shop-level jobs in parallel
 LEAF_WORKERS = 24               # individual requests inside a job (product pages, search queries)
 
@@ -535,6 +547,37 @@ def tls_context(cafile=None):
     return ctx
 
 
+_lane = threading.local()
+
+
+def in_background():
+    """True on a thread doing background-lane work (singles, price-drop lists)."""
+    return bool(getattr(_lane, "bg", False))
+
+
+class background:
+    """with background(): ... - requests made inside go in the Shopify background lane."""
+
+    def __enter__(self):
+        self.old = in_background()
+        _lane.bg = True
+        return self
+
+    def __exit__(self, *exc):
+        _lane.bg = self.old
+        return False
+
+
+def _in_lane(bg, fn, *a, **kw):
+    """fn(*a, **kw) in the given lane (True = background), on whatever thread runs it."""
+    old = in_background()
+    _lane.bg = bool(bg)
+    try:
+        return fn(*a, **kw)
+    finally:
+        _lane.bg = old
+
+
 class _Http:
     def __init__(self):
         self.lock = threading.Lock()
@@ -555,12 +598,24 @@ class _Http:
         self.ua_by_host = dict(UA_BY_HOST)
         self.timeout = HTTP_TIMEOUT
         self._ctx = None
+        self.shopify_hosts = set()          # v2.19.4: shops recognised as Shopify from their answers
+        self.sp_on = True
+        self.sp_rate = SHOPIFY_PER_SEC
+        self.sp_bg_rate = SHOPIFY_BG_PER_SEC
+        self.sp_slow = 1                    # 1, 2 or 4: how much the pace is cut after 429s
+        self.sp_next = 0.0                  # earliest time for the next Shopify request (any lane)
+        self.sp_bg_next = 0.0               # ...and for the next background one
+        self.sp_front_waiting = 0
+        self.sp_strike = 0.0                # last 429 from a Shopify shop
+        self.sp_step = 0.0                  # last time the pace changed
+        self.sp_hold = 0.0                  # background requests give up until then
         self.reset_metrics()
 
     # ------------------------------------------------------------ bookkeeping
     def reset_metrics(self):
         with self.lock:
             self.m = Counter()
+            self.sm = Counter()             # v2.19.4: Shopify pace (front, background, waited, held, slowed)
             self.lat = defaultdict(lambda: deque(maxlen=500))   # bounded: the commands bot never resets
             self.refused.clear()
 
@@ -660,6 +715,8 @@ class _Http:
              "Accept": "application/json, text/plain, */*"}
         h.update(headers or {})
         key = (scheme, host, port)
+        if method == "GET":
+            self._group_gate(host, u.path)
         with self._sem(host):
             if method == "GET":
                 self._pace(host)
@@ -682,6 +739,7 @@ class _Http:
                     raise
                 ms = (time.perf_counter() - t0) * 1000
                 hdrs = {k.lower(): v for k, v in resp.getheaders()}
+                self._learn_platform(host, hdrs)
                 if resp.will_close:
                     conn.close()
                 else:
@@ -711,6 +769,7 @@ class _Http:
         ua = self.ua_by_host.get(host) or self.ua_by_host.get(host.removeprefix("www.")) or self.user_agent
         h = {"User-Agent": ua, "Accept": "application/json"}
         h.update(headers or {})
+        self._group_gate(host, urllib.parse.urlsplit(url).path)
         with self._sem(host):
             self._pace(host)
             t0 = time.perf_counter()
@@ -728,6 +787,7 @@ class _Http:
                 reason = e.reason
                 raise reason if isinstance(reason, OSError) else OSError(str(reason))
             ms = (time.perf_counter() - t0) * 1000
+            self._learn_platform(host, hdrs)
             data = raw
             enc = hdrs.get("content-encoding", "").lower()
             if raw and enc == "gzip":         # only when asked for (see gzip_urls); urllib doesn't unpack it itself
@@ -813,6 +873,8 @@ class _Http:
                         hdrs["If-Modified-Since"] = cached[0]["last-modified"]
             try:
                 status, h, data = self._get_following(url, hdrs)
+                if status == 429 and self.is_shopify(host, u.path):
+                    self._shopify_strike()      # v2.19.4: one shop's 429 slows every Shopify shop
                 if netguard and netguard.on_response(url, status, h, data):
                     raise SkipHost(host)            # a CAPTCHA page: the shop is paused until you say so
             except (OSError, http.client.HTTPException, ssl.SSLError) as e:
@@ -871,6 +933,86 @@ class _Http:
         now = time.time()
         with self.lock:
             return {h: c[0] - now for h, c in self.cool.items() if c[0] > now}
+
+    # ------------------------------------------------------------ v2.19.4: one pace for all Shopify shops
+    def is_shopify(self, host, path=""):
+        return host in self.shopify_hosts or bool(SHOPIFY_PATH_RE.search(path or ""))
+
+    def _learn_platform(self, host, headers):
+        """A shop that answers with Shopify's headers is Shopify, whatever address was asked."""
+        if not host or host in self.shopify_hosts or not headers:
+            return
+        h = headers
+        if (any(k in h for k in SHOPIFY_HEADERS) or any(k.startswith("x-shopify-") for k in h)
+                or "shopify" in str(h.get("powered-by", "")).lower()):
+            with self.lock:
+                self.shopify_hosts.add(host)
+
+    def _sp_recover(self, now):
+        if self.sp_slow > 1 and now - self.sp_strike >= SHOPIFY_RECOVER and now - self.sp_step >= SHOPIFY_RECOVER:
+            self.sp_slow = max(1, self.sp_slow // 2)
+            self.sp_step = now
+
+    def _shopify_strike(self):
+        """A Shopify shop said 429: slow every Shopify shop down, and hold the background lane."""
+        now = time.time()
+        with self.lock:
+            if now - self.sp_strike < SHOPIFY_STRIKE_GAP:
+                return False                # same burst
+            self.sp_strike = self.sp_step = now
+            self.sp_slow = min(SHOPIFY_SLOW_MAX, self.sp_slow * 2)
+            self.sp_hold = now + SHOPIFY_BG_HOLD
+            self.sm["slowed"] += 1
+        return True
+
+    def _group_gate(self, host, path):
+        """Wait for this request's turn in the shared Shopify pace (before the shop's own slot)."""
+        if not self.sp_on or not self.is_shopify(host, path):
+            return
+        if in_background():
+            return self._bg_gate()
+        with self.lock:
+            now = time.time()
+            self._sp_recover(now)
+            at = max(now, self.sp_next)
+            self.sp_next = at + self.sp_slow / max(0.1, self.sp_rate)
+            self.sm["front"] += 1
+            self.sm["waited"] += at - now
+            self.sp_front_waiting += 1
+        try:
+            if at > now:
+                time.sleep(at - now)
+        finally:
+            with self.lock:
+                self.sp_front_waiting -= 1
+
+    def _bg_gate(self):
+        t0 = time.time()
+        while True:
+            with self.lock:
+                now = time.time()
+                if self.sp_hold > now:
+                    self.sm["held"] += 1
+                    raise HttpError(429, f"Too Many Requests - singles wait: Shopify asked the bot to slow down, "
+                                         f"trying again in {int(self.sp_hold - now) // 60 + 1} min", self.sp_hold - now)
+                self._sp_recover(now)
+                overdue = now - t0 >= BG_MAX_WAIT
+                ready = max(self.sp_next, self.sp_bg_next)
+                if (overdue or self.sp_front_waiting == 0) and now >= ready:
+                    self.sp_next = now + self.sp_slow / max(0.1, self.sp_rate)
+                    self.sp_bg_next = now + self.sp_slow / max(0.1, self.sp_bg_rate)
+                    self.sm["background"] += 1
+                    self.sm["waited"] += now - t0
+                    return
+                nap = min(0.25, max(0.01, ready - now))
+            time.sleep(nap)
+
+    def shopify_metrics(self):
+        with self.lock:
+            m = self.sm
+            return {"on": self.sp_on, "front": m["front"], "background": m["background"],
+                    "waited_s": round(m["waited"], 1), "held": m["held"], "slowed": m["slowed"],
+                    "pace": round(self.sp_rate / self.sp_slow, 2)}
 
     def _pace(self, host):
         """Space requests to one shop at least HOST_GAP seconds apart (call while holding its slot)."""
@@ -978,7 +1120,11 @@ def pmap(fn, items, leaf=True):
     items = list(items)
     if len(items) <= 1:
         return [fn(x) for x in items]
-    return list(_pool("leaf" if leaf else "jobs", LEAF_WORKERS if leaf else JOB_WORKERS).map(fn, items))
+    if in_background():                 # v2.19.4: background work has its own threads and keeps its lane
+        pool = _pool("bg-leaf" if leaf else "bg-jobs", 8 if leaf else 6)
+        return list(pool.map(lambda x: _in_lane(True, fn, x), items))
+    return list(_pool("leaf" if leaf else "jobs", LEAF_WORKERS if leaf else JOB_WORKERS).map(
+        lambda x: _in_lane(False, fn, x), items))
 
 
 def begin_check(cfg, status=None, drop=None, skip_down=True):
@@ -996,6 +1142,11 @@ def begin_check(cfg, status=None, drop=None, skip_down=True):
     HTTP.ua_by_host = {**UA_BY_HOST, **{str(k).lower(): v for k, v in
                                         ((cfg or {}).get("user_agent_by_shop") or {}).items() if v}}
     HTTP.robots_on = bool((cfg or {}).get("respect_robots", True))
+    sp = (cfg or {}).get("shopify_pace", True)
+    HTTP.sp_on = sp is not False
+    sp = sp if isinstance(sp, dict) else {}
+    HTTP.sp_rate = max(0.5, float(_num(sp.get("per_second")) or SHOPIFY_PER_SEC))
+    HTTP.sp_bg_rate = max(0.25, float(_num(sp.get("background_per_second")) or SHOPIFY_BG_PER_SEC))
     status = load_status() if status is None else status
     for host, e in (status.get("robots") or {}).items():
         if isinstance(e, dict) and e.get("t", 0) > HTTP.robots.get(host, {}).get("t", 0):
@@ -1027,7 +1178,7 @@ def run_metrics():
     return {"secs": round(time.perf_counter() - _run_t0[0], 2), "requests": m["requests"], "shared": m["shared"],
             "new_connections": m["connections"], "reused": m["reused"], "kb_wire": round(m["bytes_wire"] / 1024),
             "kb": round(m["bytes"] / 1024), "not_modified": m["not_modified"], "retries": m["retries"],
-            "skipped_hosts": sorted(HTTP.skip_hosts), "hosts": hosts}
+            "skipped_hosts": sorted(HTTP.skip_hosts), "hosts": hosts, "shopify": HTTP.shopify_metrics()}
 
 
 # ---------------------------------------------------------------- helpers
@@ -1189,7 +1340,8 @@ KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "relea
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
                   "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
-                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy", "deal_finder", "chain_shops", "security", "scorecard"}
+                  "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy", "deal_finder", "chain_shops", "security", "scorecard",
+                  "shopify_pace"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
 CONFIG_WARNINGS = []
 
@@ -2655,7 +2807,9 @@ def run_price_drops(cfg, status, show_all=False, role=None, pc_on=False, now=Non
     if due:
         store = load_drops_store()
         read = False
-        for sh, (products, complete) in pmap(lambda sh: (sh, read_catalog(sh["url"])), due, leaf=False):
+        with background():           # v2.19.4: price-drop lists wait behind the box check at Shopify shops
+            got = pmap(lambda sh: (sh, read_catalog(sh["url"])), due, leaf=False)
+        for sh, (products, complete) in got:
             if products is None:
                 print(f"   ! price drops: couldn't read {sh['name']}'s singles list; trying again next check")
                 continue
@@ -2718,7 +2872,7 @@ def run_checks_all(cfg, sealed=True, singles=True, pokemon=True, poke_only=None,
     -> ((finds, by_shop) | None, singles | None, pokemon_watch.Result | None)"""
     ex = _pool("phases", 4)
     fs = (ex.submit(check_sealed, cfg, True) if sweep else ex.submit(check_sealed, cfg)) if sealed else None
-    fg = ex.submit(check_singles, cfg) if singles else None
+    fg = ex.submit(_in_lane, True, check_singles, cfg) if singles else None      # v2.19.4: background lane
     fp = ex.submit(pokemon_watch.check, cfg, _me(), poke_only) if (pokemon and pokemon_watch) else None
     return (fs.result() if fs else None), (fg.result() if fg else None), (fp.result() if fp else None)
 
@@ -4260,6 +4414,11 @@ def run_once(cfg, args, drop=None):
     print(f"   (checked in {metrics['secs']:.1f}s · {metrics['requests']} requests, "
           f"{metrics['new_connections']} new connections, {metrics['kb_wire']} KB"
           + (f", skipped {len(metrics['skipped_hosts'])} down shop(s)" if metrics["skipped_hosts"] else "") + ")")
+    sp = metrics.get("shopify") or {}
+    if sp.get("on") and (sp.get("front") or sp.get("background")):
+        print(f"   Shopify shops: {sp['front']} front + {sp['background']} background requests, waited "
+              f"{sp['waited_s']:.0f}s in all, {sp['held']} singles held, slowed {sp['slowed']}x "
+              f"(pace now {sp['pace']}/s)")
 
 
 def finds_title(finds):

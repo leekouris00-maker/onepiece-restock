@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.19.0)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.19.5)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -77,6 +77,14 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.19.5: SHOP LINKS IN CAPTCHA NOTICES. When shops ask the bot for human verification, each shop's name in
+  the #bot-status notice (and in /captcha) is a link to that shop, so you can tap through and check it yourself.
+New in v2.19.4: ONE PACE FOR ALL SHOPIFY SHOPS. Shopify counts requests from your internet address across every
+  shop it hosts, so the bot now spaces its Shopify requests as one group: boxes and sealed first (8 a second),
+  singles and price-drop lists only in the gaps (4 a second). If any Shopify shop says "slow down", every
+  Shopify shop is slowed (down to a quarter) and singles wait 5 minutes; it speeds back up after 10 quiet minutes.
+  Change with "shopify_pace": {"per_second": 8, "background_per_second": 4} in config.json, or false to turn off.
+  bot_output.log shows a "Shopify shops:" line each check.
 New in v2.19.3: SINGLES OUT OF AUTO-BUY. eBay deals (singles under TCGplayer market) now post in their own private
   🔒・deals channel, made when the bot starts; 🔒・auto-buy is only auto-buy again. Deals were always alerts only,
   never bought. Also: a single whose set name says "Booster Box" ("Franky OP18-021 [The Dominance of God Booster
