@@ -40,16 +40,6 @@
    "told": 1794632618,
    "url": "https://rogueonline.com.au/robots.txt"
   },
-  "tcg.goodgames.com.au": {
-   "count": 9,
-   "first": 1794367929,
-   "kind": "Cloudflare challenge",
-   "needs_you": true,
-   "since": 1794576690,
-   "status": 429,
-   "told": 1794403433,
-   "url": "https://tcg.goodgames.com.au/robots.txt"
-  },
   "www.gdgames.com.au": {
    "count": 6,
    "first": 1794585794,

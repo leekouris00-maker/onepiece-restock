@@ -2,12 +2,12 @@
  "discord_health": {},
  "drops_scan": {
   "Elemental Arcade": 1793451591,
-  "Good Games": 1794367001
+  "Good Games": 1794664048
  },
  "drops_slot": "2026-11-15 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794662946,
+ "ebay_ts": 1794664038,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794663773,
+ "pokemon_ts": 1794664441,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -2877,7 +2877,7 @@
   },
   "tcg.goodgames.com.au": {
    "rules": [],
-   "t": 1794337010.3576107
+   "t": 1794663954.3553293
   },
   "thewanderingcollector.com.au": {
    "rules": [
@@ -6099,7 +6099,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794663773,
+ "sealed_ts": 1794664441,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6136,6 +6136,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794662946,
- "sweep_ts": 1794662946
+ "singles_ts": 1794664038,
+ "sweep_ts": 1794664038
 }
