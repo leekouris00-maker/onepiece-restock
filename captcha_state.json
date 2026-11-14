@@ -10,36 +10,6 @@
    "until": 1794700601,
    "url": "https://alphagaming.com.au/collections/one-piece-sealed-products/products.json?limit=250"
   },
-  "cardbot.com.au": {
-   "count": 1,
-   "first": 1794691355,
-   "kind": "Cloudflare challenge",
-   "since": 1794691355,
-   "status": 429,
-   "told": null,
-   "until": 1794691955,
-   "url": "https://cardbot.com.au/search/suggest.json?q=30th%20Celebration&resources[type]=product&resources[limit]=10"
-  },
-  "cardplustcg.com.au": {
-   "count": 1,
-   "first": 1794606082,
-   "kind": "reCAPTCHA",
-   "needs_you": true,
-   "since": 1794606082,
-   "status": 403,
-   "told": 1794606082,
-   "url": "https://cardplustcg.com.au/wp-json/wc/store/v1/products?search=one%20piece&per_page=100"
-  },
-  "collectiblemadness.com.au": {
-   "count": 1,
-   "first": 1794691358,
-   "kind": "Cloudflare challenge",
-   "since": 1794691358,
-   "status": 429,
-   "told": null,
-   "until": 1794691958,
-   "url": "https://collectiblemadness.com.au/search/suggest.json?q=Delta%20Reign%20box&resources[type]=product&resources[limit]=10"
-  },
   "elementalarcade.com.au": {
    "count": 11,
    "first": 1794301076,
@@ -61,35 +31,15 @@
    "until": 1794700601,
    "url": "https://goldfieldsgames.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
-  "grailborne.com.au": {
-   "count": 1,
-   "first": 1794691356,
-   "kind": "Cloudflare challenge",
-   "since": 1794691356,
-   "status": 429,
-   "told": null,
-   "until": 1794691956,
-   "url": "https://grailborne.com.au/search/suggest.json?q=Delta%20Reign%20box&resources[type]=product&resources[limit]=10"
-  },
   "guf.com.au": {
    "count": 1,
-   "first": 1794691355,
+   "first": 1794692225,
    "kind": "Cloudflare challenge",
-   "since": 1794691355,
+   "since": 1794692225,
    "status": 429,
    "told": null,
-   "until": 1794691955,
-   "url": "https://guf.com.au/search/suggest.json?q=Delta%20Reign%20tin&resources[type]=product&resources[limit]=10"
-  },
-  "lightofcards.com.au": {
-   "count": 1,
-   "first": 1794691361,
-   "kind": "Cloudflare challenge",
-   "since": 1794691361,
-   "status": 429,
-   "told": null,
-   "until": 1794691961,
-   "url": "https://lightofcards.com.au/search/suggest.json?q=Delta%20Reign%20box&resources[type]=product&resources[limit]=10"
+   "until": 1794692825,
+   "url": "https://guf.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "pocketgames.com.au": {
    "count": 7,
@@ -112,73 +62,63 @@
    "url": "https://rogueonline.com.au/robots.txt"
   },
   "shop.goodgames.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794691549,
    "kind": "Cloudflare challenge",
-   "since": 1794691549,
+   "since": 1794692226,
    "status": 429,
    "told": null,
-   "until": 1794692149,
+   "until": 1794693426,
    "url": "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "tcg.goodgames.com.au": {
-   "count": 5,
+   "count": 6,
    "first": 1794667899,
    "kind": "Cloudflare challenge",
-   "since": 1794679893,
+   "needs_you": true,
+   "since": 1794692595,
    "status": 429,
-   "told": null,
-   "until": 1794689493,
-   "url": "https://tcg.goodgames.com.au/search/suggest.json?q=Belo%20Betty&resources[type]=product&resources[limit]=10"
+   "told": 1794692595,
+   "url": "https://tcg.goodgames.com.au/search/suggest.json?q=Revolutionary%20Army%20HQ&resources[type]=product&resources[limit]=10"
   },
   "thewanderingcollector.com.au": {
    "count": 1,
-   "first": 1794691355,
+   "first": 1794692225,
    "kind": "Cloudflare challenge",
-   "since": 1794691355,
+   "since": 1794692225,
    "status": 429,
    "told": null,
-   "until": 1794691955,
-   "url": "https://thewanderingcollector.com.au/search/suggest.json?q=30th%20Celebration%20collection&resources[type]=product&resources[limit]=10"
-  },
-  "www.cherrycollectables.com.au": {
-   "count": 1,
-   "first": 1794691355,
-   "kind": "Cloudflare challenge",
-   "since": 1794691355,
-   "status": 429,
-   "told": null,
-   "until": 1794691955,
-   "url": "https://www.cherrycollectables.com.au/search/suggest.json?q=30th%20Celebration%20collection&resources[type]=product&resources[limit]=10"
+   "until": 1794692825,
+   "url": "https://thewanderingcollector.com.au/collections/one-piece-tcg-english-sealed-products/products.json?limit=250"
   },
   "www.fpvfaster.com.au": {
-   "count": 3,
+   "count": 4,
    "first": 1794687722,
    "kind": "Cloudflare challenge",
-   "since": 1794689793,
+   "since": 1794692226,
    "status": 429,
    "told": null,
-   "until": 1794692193,
+   "until": 1794697026,
    "url": "https://www.fpvfaster.com.au/products/one-piece-card-game-op-18-booster-box.js"
   },
   "www.gameology.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794691549,
    "kind": "Cloudflare challenge",
-   "since": 1794691549,
+   "since": 1794692225,
    "status": 429,
    "told": null,
-   "until": 1794692149,
+   "until": 1794693425,
    "url": "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "www.gametradersinglefarm.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794691549,
    "kind": "Cloudflare challenge",
-   "since": 1794691549,
+   "since": 1794692226,
    "status": 429,
    "told": null,
-   "until": 1794692149,
+   "until": 1794693426,
    "url": "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250"
   },
   "www.gdgames.com.au": {
@@ -232,13 +172,13 @@
    "url": "https://www.kollecter.com.au/search/suggest.json?q=Delta%20Reign&resources[type]=product&resources[limit]=10"
   },
   "www.mayhemcollectables.com.au": {
-   "count": 2,
+   "count": 3,
    "first": 1794685725,
    "kind": "Cloudflare challenge",
-   "since": 1794688663,
+   "since": 1794692594,
    "status": 429,
    "told": null,
-   "until": 1794689863,
+   "until": 1794694994,
    "url": "https://www.mayhemcollectables.com.au/search/suggest.json?q=Belo%20Betty&resources[type]=product&resources[limit]=10"
   },
   "www.monstermart.com.au": {
@@ -252,23 +192,23 @@
    "url": "https://www.monstermart.com.au/robots.txt"
   },
   "www.pokebox.com.au": {
-   "count": 3,
+   "count": 4,
    "first": 1794687721,
    "kind": "Cloudflare challenge",
-   "since": 1794689793,
+   "since": 1794692225,
    "status": 429,
    "told": null,
-   "until": 1794692193,
-   "url": "https://www.pokebox.com.au/collections/english-pokemon-tcg-booster-boxes/products.json?limit=250"
+   "until": 1794697025,
+   "url": "https://www.pokebox.com.au/collections/one-piece-card-game-booster-boxes-english/products.json?limit=250"
   },
   "www.tcgroupau.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794691549,
    "kind": "Cloudflare challenge",
-   "since": 1794691549,
+   "since": 1794692225,
    "status": 429,
    "told": null,
-   "until": 1794692149,
+   "until": 1794693425,
    "url": "https://www.tcgroupau.com.au/collections/one-piece-booster-box/products.json?limit=250"
   }
  }
