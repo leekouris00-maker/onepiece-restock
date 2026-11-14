@@ -60,16 +60,6 @@
    "told": 1794403433,
    "url": "https://tcg.goodgames.com.au/robots.txt"
   },
-  "www.fpvfaster.com.au": {
-   "count": 3,
-   "first": 1794656675,
-   "kind": "Cloudflare challenge",
-   "since": 1794658866,
-   "status": 429,
-   "told": null,
-   "until": 1794661266,
-   "url": "https://www.fpvfaster.com.au/products/one-piece-card-game-op-18-booster-box.js"
-  },
   "www.gdgames.com.au": {
    "count": 6,
    "first": 1794585794,
@@ -79,16 +69,6 @@
    "status": 429,
    "told": 1794613092,
    "url": "https://www.gdgames.com.au/collections/one-piece-tcg/products.json?limit=250"
-  },
-  "www.gumnut.com.au": {
-   "count": 3,
-   "first": 1794656674,
-   "kind": "Cloudflare challenge",
-   "since": 1794658866,
-   "status": 429,
-   "told": null,
-   "until": 1794661266,
-   "url": "https://www.gumnut.com.au/robots.txt"
   },
   "www.irresistibleforce.com.au": {
    "count": 5,
@@ -102,13 +82,13 @@
   },
   "www.jbhifi.com.au": {
    "count": 1,
-   "first": 1794660536,
+   "first": 1794661181,
    "kind": "Cloudflare challenge",
-   "since": 1794660536,
+   "since": 1794661181,
    "status": 429,
    "told": null,
-   "until": 1794661136,
-   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28.js"
+   "until": 1794661781,
+   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-double-pack-set-vol-6-dp-06.js"
   },
   "www.kollecter.com.au": {
    "count": 7,
@@ -139,16 +119,6 @@
    "status": 429,
    "told": 1794359815,
    "url": "https://www.monstermart.com.au/robots.txt"
-  },
-  "www.pokebox.com.au": {
-   "count": 3,
-   "first": 1794656674,
-   "kind": "Cloudflare challenge",
-   "since": 1794658866,
-   "status": 429,
-   "told": null,
-   "until": 1794661266,
-   "url": "https://www.pokebox.com.au/collections/english-pokemon-tcg-booster-boxes/products.json?limit=250"
   }
  }
 }
