@@ -51,16 +51,6 @@
    "told": 1794632618,
    "url": "https://rogueonline.com.au/robots.txt"
   },
-  "shop.goodgames.com.au": {
-   "count": 2,
-   "first": 1794694565,
-   "kind": "Cloudflare challenge",
-   "since": 1794695235,
-   "status": 429,
-   "told": null,
-   "until": 1794696435,
-   "url": "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250"
-  },
   "tcg.goodgames.com.au": {
    "count": 6,
    "first": 1794667899,
@@ -80,26 +70,6 @@
    "told": null,
    "until": 1794697026,
    "url": "https://www.fpvfaster.com.au/products/one-piece-card-game-op-18-booster-box.js"
-  },
-  "www.gameology.com.au": {
-   "count": 2,
-   "first": 1794694565,
-   "kind": "Cloudflare challenge",
-   "since": 1794695235,
-   "status": 429,
-   "told": null,
-   "until": 1794696435,
-   "url": "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
-  },
-  "www.gametradersinglefarm.com.au": {
-   "count": 2,
-   "first": 1794694565,
-   "kind": "Cloudflare challenge",
-   "since": 1794695236,
-   "status": 429,
-   "told": null,
-   "until": 1794696436,
-   "url": "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250"
   },
   "www.gdgames.com.au": {
    "count": 6,
@@ -180,16 +150,6 @@
    "told": null,
    "until": 1794697025,
    "url": "https://www.pokebox.com.au/collections/one-piece-card-game-booster-boxes-english/products.json?limit=250"
-  },
-  "www.tcgroupau.com.au": {
-   "count": 2,
-   "first": 1794694565,
-   "kind": "Cloudflare challenge",
-   "since": 1794695235,
-   "status": 429,
-   "told": null,
-   "until": 1794696435,
-   "url": "https://www.tcgroupau.com.au/collections/one-piece-booster-box/products.json?limit=250"
   }
  }
 }
