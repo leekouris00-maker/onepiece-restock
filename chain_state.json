@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794614229,
+  "bf_ts": 1794615000,
   "cache": {
    "finds": [],
    "listings": [
@@ -966,7 +966,7 @@
     }
    ]
   },
-  "cursor": 0,
+  "cursor": 2,
   "files": 111,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -1065,6 +1065,9 @@
    "bandai-one-piece-card-game-dp-09-double-pack": {
     "ok": true
    },
+   "bandai-one-piece-card-game-dp-12-double-pack": {
+    "q": 1
+   },
    "bandai-one-piece-card-game-eb-01-memorial-collection-extra-booster-box-japanese": {
     "ok": false
    },
@@ -1115,6 +1118,9 @@
    },
    "bandai-one-piece-card-game-japanese-3rd-anniversary-set-english-version": {
     "ok": false
+   },
+   "bandai-one-piece-card-game-japanese-3rd-anniversary-set-simplified-chinese-version": {
+    "q": 1
    },
    "bandai-one-piece-card-game-kingdoms-of-intrigue-op-04-booster-box": {
     "ok": true
