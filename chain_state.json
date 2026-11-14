@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794633851,
+  "bf_ts": 1794655228,
   "cache": {
    "finds": [],
    "listings": [
@@ -275,6 +275,22 @@
      "quiet": true,
      "shop": "JB Hi-Fi",
      "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-dp-09-double-pack"
+    },
+    {
+     "available": true,
+     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-dp-12-double-pack",
+     "cart": "https://www.jbhifi.com.au/cart/40430208319689:1",
+     "group": "new",
+     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-dp-12-double-pack",
+     "kind": "New listing",
+     "max": 0.0,
+     "name": "Bandai One Piece Card Game DP-12 Double Pack",
+     "note": "sold by Gameology on JB Marketplace",
+     "page": 1,
+     "price": 77.65,
+     "quiet": true,
+     "shop": "JB Hi-Fi",
+     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-dp-12-double-pack"
     },
     {
      "available": true,
@@ -895,7 +911,7 @@
      "name": "Bandai One Piece Card Game Starter Deck ST-25",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
-     "price": 122.05,
+     "price": 133.15,
      "quiet": true,
      "shop": "JB Hi-Fi",
      "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-25"
@@ -947,42 +963,10 @@
      "quiet": true,
      "shop": "JB Hi-Fi",
      "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-30",
-     "cart": "https://www.jbhifi.com.au/cart/40429217611977:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-starter-deck-st-30",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game Starter Deck ST-30",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 133.15,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-30"
-    },
-    {
-     "available": true,
-     "box_id": "item|JB Hi-Fi|bandai-one-piece-card-game-dp-12-double-pack",
-     "cart": "https://www.jbhifi.com.au/cart/40430208319689:1",
-     "group": "new",
-     "id": "list|JB Hi-Fi|bandai-one-piece-card-game-dp-12-double-pack",
-     "kind": "New listing",
-     "max": 0.0,
-     "name": "Bandai One Piece Card Game DP-12 Double Pack",
-     "note": "sold by Gameology on JB Marketplace",
-     "page": 1,
-     "price": 77.65,
-     "quiet": true,
-     "shop": "JB Hi-Fi",
-     "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-dp-12-double-pack"
     }
    ]
   },
-  "cursor": 36,
+  "cursor": 38,
   "files": 111,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -2252,6 +2236,6 @@
     "ok": false
    }
   },
-  "ts": 1794618168
+  "ts": 1794655228
  }
 }

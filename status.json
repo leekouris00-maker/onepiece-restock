@@ -7,8 +7,22 @@
  "drops_slot": "2026-11-14 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794654640,
- "held": {},
+ "ebay_ts": 1794655674,
+ "held": {
+  "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": {
+   "f": {
+    "cart": "https://grailborne.com.au/cart/46863319072941:1",
+    "id": "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition",
+    "kind": "Sealed",
+    "name": "One Piece Card Game: Premium Card Collection - 29th Anniversary Edition (P-159 Monkey D. Luffy, 8 Cards) (Ships March 2027)",
+    "note": "29th Anniversary Premium Card Collection, pre-order",
+    "price": 99.0,
+    "shop": "Grailborne",
+    "url": "https://grailborne.com.au/products/one-piece-card-game-premium-card-collection-29th-anniversary-edition"
+   },
+   "t": 1794655685
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -55,7 +69,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794654640,
+ "pokemon_ts": 1794655261,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -97,10 +111,6 @@
    44.95,
    1794547528
   ],
-  "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-battle-deck-espeon-ex": [
-   50.0,
-   1794379959
-  ],
   "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-binder-collection": [
    149.95,
    1794437067
@@ -112,6 +122,10 @@
   "plist|30th-celebration|Light of Cards|pre-order-pokemon-tcg-30th-celebration-tech-sticker-collection-assorted": [
    69.99,
    1794624726
+  ],
+  "plist|30th-celebration|Light of Cards|sealed-pokemon-tcg-30th-celebration-booster-bundle": [
+   134.99,
+   1794655262
   ],
   "plist|30th-celebration|Pokebox|usa-import-pokemon-tcg-30th-celebration-ultra-premium-collection-day-espeon": [
    749.99,
@@ -128,14 +142,6 @@
   "plist|delta-reign|Cherry Collectables|kyogre-117-pokemon-me-mega-evolution-promo": [
    8.39,
    1794560184
-  ],
-  "plist|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-pokemon-center-elite-trainer-box-etb": [
-   349.0,
-   1794388952
-  ],
-  "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-box": [
-   334.0,
-   1794382929
   ],
   "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-elite-trainer-box": [
    130.0,
@@ -6099,7 +6105,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794655046,
+ "sealed_ts": 1794655674,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6111,7 +6117,7 @@
   "grailborne.com.au": 0,
   "guf.com.au": 0,
   "lightofcards.com.au": 0,
-  "morethanmeeples.com.au": 1,
+  "morethanmeeples.com.au": 0,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
@@ -6136,6 +6142,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794654640,
- "sweep_ts": 1794654640
+ "singles_ts": 1794655674,
+ "sweep_ts": 1794655674
 }
