@@ -1,15 +1,5 @@
 {
  "captcha": {
-  "alphagaming.com.au": {
-   "count": 1,
-   "first": 1794639832,
-   "kind": "Cloudflare challenge",
-   "since": 1794639832,
-   "status": 429,
-   "told": null,
-   "until": 1794640432,
-   "url": "https://alphagaming.com.au/search/suggest.json?q=OP-19&resources[type]=product&resources[limit]=10"
-  },
   "cardbot.com.au": {
    "count": 6,
    "first": 1794607958,
@@ -50,16 +40,6 @@
    "told": 1794337010,
    "url": "https://elementalarcade.com.au/robots.txt"
   },
-  "goldfieldsgames.com.au": {
-   "count": 1,
-   "first": 1794639831,
-   "kind": "Cloudflare challenge",
-   "since": 1794639831,
-   "status": 429,
-   "told": null,
-   "until": 1794640431,
-   "url": "https://goldfieldsgames.com.au/search/suggest.json?q=IB-09&resources[type]=product&resources[limit]=10"
-  },
   "grailborne.com.au": {
    "count": 3,
    "first": 1794636262,
@@ -69,16 +49,6 @@
    "told": null,
    "until": 1794640813,
    "url": "https://grailborne.com.au/search/suggest.json?q=one%20piece%20booster%20display&resources[type]=product&resources[limit]=10"
-  },
-  "guf.com.au": {
-   "count": 1,
-   "first": 1794639831,
-   "kind": "Cloudflare challenge",
-   "since": 1794639831,
-   "status": 429,
-   "told": null,
-   "until": 1794640431,
-   "url": "https://guf.com.au/search/suggest.json?q=TS-03&resources[type]=product&resources[limit]=10"
   },
   "lightofcards.com.au": {
    "count": 3,
@@ -110,6 +80,16 @@
    "told": 1794632618,
    "url": "https://rogueonline.com.au/robots.txt"
   },
+  "shop.goodgames.com.au": {
+   "count": 1,
+   "first": 1794640038,
+   "kind": "Cloudflare challenge",
+   "since": 1794640038,
+   "status": 429,
+   "told": null,
+   "until": 1794640638,
+   "url": "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250"
+  },
   "tcg.goodgames.com.au": {
    "count": 9,
    "first": 1794367929,
@@ -130,15 +110,35 @@
    "until": 1794641670,
    "url": "https://thewanderingcollector.com.au/collections/one-piece-tcg-english-sealed-products/products.json?limit=250"
   },
-  "www.cherrycollectables.com.au": {
+  "www.fpvfaster.com.au": {
    "count": 1,
-   "first": 1794639831,
+   "first": 1794640038,
    "kind": "Cloudflare challenge",
-   "since": 1794639831,
+   "since": 1794640038,
    "status": 429,
    "told": null,
-   "until": 1794640431,
-   "url": "https://www.cherrycollectables.com.au/search/suggest.json?q=ST-37&resources[type]=product&resources[limit]=10"
+   "until": 1794640638,
+   "url": "https://www.fpvfaster.com.au/products/one-piece-card-game-op-18-booster-box.js"
+  },
+  "www.gameology.com.au": {
+   "count": 1,
+   "first": 1794640038,
+   "kind": "Cloudflare challenge",
+   "since": 1794640038,
+   "status": 429,
+   "told": null,
+   "until": 1794640638,
+   "url": "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
+  },
+  "www.gametradersinglefarm.com.au": {
+   "count": 1,
+   "first": 1794640038,
+   "kind": "Cloudflare challenge",
+   "since": 1794640038,
+   "status": 429,
+   "told": null,
+   "until": 1794640638,
+   "url": "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250"
   },
   "www.gdgames.com.au": {
    "count": 6,
@@ -149,6 +149,16 @@
    "status": 429,
    "told": 1794613092,
    "url": "https://www.gdgames.com.au/collections/one-piece-tcg/products.json?limit=250"
+  },
+  "www.gumnut.com.au": {
+   "count": 1,
+   "first": 1794640038,
+   "kind": "Cloudflare challenge",
+   "since": 1794640038,
+   "status": 429,
+   "told": null,
+   "until": 1794640638,
+   "url": "https://www.gumnut.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "www.irresistibleforce.com.au": {
    "count": 8,
@@ -199,6 +209,16 @@
    "status": 429,
    "told": 1794359815,
    "url": "https://www.monstermart.com.au/robots.txt"
+  },
+  "www.pokebox.com.au": {
+   "count": 1,
+   "first": 1794640038,
+   "kind": "Cloudflare challenge",
+   "since": 1794640038,
+   "status": 429,
+   "told": null,
+   "until": 1794640638,
+   "url": "https://www.pokebox.com.au/collections/english-pokemon-tcg-booster-boxes/products.json?limit=250"
   },
   "www.tcgroupau.com.au": {
    "count": 3,
