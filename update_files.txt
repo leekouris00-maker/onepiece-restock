@@ -1,0 +1,51 @@
+# The bot's own files, one per line. update_bot.bat (through updater.py) downloads exactly these from GitHub.
+# Your settings and the bot's memory (config.json, secrets.json and every other .json) are never listed here
+# and are never touched by an update.
+updater.py
+tcg_bot.py
+commands_bot.py
+settings_check.py
+rehearsal.py
+value.py
+tcgplayer.py
+deck_price.py
+link_watch.py
+ebay_watch.py
+pokemon_watch.py
+fast_lane.py
+misses.py
+onepiece_instore.py
+auto_buy.py
+auto_buy_web.py
+auto_buy_host.py
+collection.py
+deal_finder.py
+chain_shops.py
+restock_trend.py
+scorecard.py
+netguard.py
+captcha_watch.py
+fileguard.py
+security_log.py
+security_panel.py
+add_channels.py
+add_pokemon_channels.py
+Dockerfile
+docker-compose.yml
+docker-compose.novpn.yml
+docker-requirements.txt
+.dockerignore
+.env.example
+run_docker.bat
+stop_docker.bat
+run_pc_side.bat
+open_security.bat
+setup_autobuy.bat
+open_autobuy.bat
+add_channels.bat
+add_pokemon_channels.bat
+restart_bot.bat
+update_bot.bat
+update_files.txt
+HOW TO RUN.txt
+SECURITY.md

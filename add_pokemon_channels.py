@@ -50,12 +50,26 @@ class SetupError(Exception):
     """Something Discord refused, in words that say what to do about it."""
 
 
+class SettingsTypo(ValueError):
+    """v2.21: config.json or secrets.json has a typo. The message says which file and line, in plain words,
+    and never shows a value from secrets.json."""
+
+
 def read_json(path):
     try:
         with open(path, encoding="utf-8-sig") as f:
             return json.load(f)
     except FileNotFoundError:
         return None
+    except (json.JSONDecodeError, UnicodeError) as e:
+        name = os.path.basename(path)
+        try:
+            import settings_check
+            text = settings_check.explain(path, e)["text"]
+        except Exception:  # noqa: BLE001  (settings_check.py not next to this script: say the bare minimum)
+            line = getattr(e, "lineno", None)
+            text = f"{name} has a typo" + (f" on line {line}" if line else "") + "."
+        raise SettingsTypo(f"{text}\nOpen {name} in Notepad, fix that line, save, and run this again.") from None
 
 
 def api(token, method, path, body=None, url=None, auth=True):
@@ -259,5 +273,8 @@ def main():
 if __name__ == "__main__":
     try:
         sys.exit(main())
+    except SettingsTypo as e:
+        print(f"\n{e}")
+        sys.exit(1)
     except KeyboardInterrupt:
         print("\nStopped.")

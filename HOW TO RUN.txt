@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.20.0)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.21.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -77,6 +77,20 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.21: THREE THINGS BEFORE A DROP.
+  - DROP REHEARSAL. About 3 hours before a drop window (3pm for a 6pm eve window) the bot posts one readiness
+    card in #bot-status: which shops already list the release, which are ready, which it can't read right now
+    and why, and whether the fast lane, desk mode, auto-buy and phone alerts are on. It makes no extra requests
+    and sends no alerts. By hand: py -3 tcg_bot.py --rehearse   Off: "drop_rehearsal": false in config.json.
+  - A SETTINGS FILE WITH A TYPO IS SAID OUT LOUD. If secrets.json won't load (a missing comma is enough), the
+    bot carries on with the last copy that worked (kept in secrets.json.lastgood) and tells you the file, the
+    line and what's probably wrong in #bot-status and on your phone. It never shows a value from that file.
+    config.json typos get the same plain message, and so do add_channels.bat / add_pokemon_channels.bat.
+  - THE UPDATER KEEPS ITSELF CURRENT. update_bot.bat is now a short file that runs updater.py. The list of
+    files comes from GitHub (update_files.txt), so a new file is never missed, and update_bot.bat replaces
+    itself when it changes. If any file fails to download, nothing is changed. Your config.json, secrets.json
+    and the bot's memory files are never touched by an update. It no longer asks about adding channels each
+    time: run add_channels.bat yourself if a channel is missing.
 New in v2.20: CAPTCHA HAND-OFF. The bot still never solves or gets round a human-verification check. What's new:
   - PC: when a shop starts waiting for you and desk mode is on (/desk on), the bot opens that shop in your own
     browser so you can look. It also tries the shop twice by itself (after 15 minutes, then 2 hours later) and

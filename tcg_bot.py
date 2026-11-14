@@ -149,6 +149,14 @@ try:
 except ImportError:
     link_watch = None
 try:
+    import rehearsal           # v2.21: readiness card in #bot-status a few hours before a drop window; optional
+except ImportError:
+    rehearsal = None
+try:
+    import settings_check      # v2.21: plain-English messages for a settings file with a typo; optional
+except ImportError:
+    settings_check = None
+try:
     import fast_lane           # v2.6: drop-window fast lane, desk mode, quantity links; optional
 except ImportError:
     fast_lane = None
@@ -177,7 +185,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.20.0"
+VERSION = "2.21.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -1335,7 +1343,7 @@ def _num(x):
         return None
 
 
-KNOWN_SETTINGS = {"_help", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
+KNOWN_SETTINGS = {"_help", "drop_rehearsal", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
                   "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
@@ -1489,12 +1497,75 @@ def check_config(cfg):
     return w
 
 
+SECRETS_PROBLEM = [None]        # v2.21: what's wrong with secrets.json, in words, or None
+_secrets_good = [None]          # the last secrets.json that loaded, while the bot has been running
+
+
+def typo_text(path, err):
+    """v2.21: 'secrets.json has a typo on line 13. Line 12 is probably missing a comma...' Never shows a secret."""
+    if settings_check:
+        try:
+            return settings_check.explain(path, err)["text"]
+        except Exception:  # noqa: BLE001
+            pass
+    line = getattr(err, "lineno", None)
+    return f"{os.path.basename(path)} has a typo" + (f" on line {line}" if line else "") + "."
+
+
+def load_secrets():
+    """v2.21: secrets.json as a dict. Before this a secrets.json with a typo was ignored without a word, so
+    the webhooks and bot token kept in it just stopped. Now the bot carries on with the last copy that
+    loaded (kept in memory, and in secrets.json.lastgood on the PC so it survives a restart) and
+    SECRETS_PROBLEM says what to fix; the main loop posts that to #bot-status and your phone."""
+    good_path = SECRETS_PATH + ".lastgood"
+    try:
+        data = _parse_json_file(SECRETS_PATH)
+        if not isinstance(data, dict):
+            raise ValueError("not an object")
+    except FileNotFoundError:
+        SECRETS_PROBLEM[0] = None
+        return {}
+    except (ValueError, OSError) as e:
+        text = (typo_text(SECRETS_PATH, e) if isinstance(e, (json.JSONDecodeError, OSError, UnicodeError))
+                else "secrets.json should start with { and end with }.")
+        fallback = _secrets_good[0]
+        if fallback is None:
+            try:
+                fallback = _parse_json_file(good_path)
+            except (ValueError, OSError):
+                fallback = None
+        usable = isinstance(fallback, dict)
+        text += (" Until it's fixed the bot is using the last copy that worked." if usable else
+                 " Until it's fixed, everything kept in it (webhooks, bot token, phone topic) is off.")
+        if text != SECRETS_PROBLEM[0]:
+            print(f"   !!! {text}")
+        SECRETS_PROBLEM[0] = text
+        return fallback if usable else {}
+    SECRETS_PROBLEM[0] = None
+    if data != _secrets_good[0]:
+        _secrets_good[0] = data
+        if not DRY_RUN[0] and not IN_ACTIONS and not IN_CONTAINER:
+            try:
+                with open(SECRETS_PATH, "rb") as src:
+                    raw = src.read()
+                try:
+                    with open(good_path, "rb") as old:
+                        same = old.read() == raw
+                except OSError:
+                    same = False
+                if not same:
+                    atomic_write_bytes(good_path, raw)
+            except OSError:
+                pass
+    return data
+
+
 def load_config():
     """Read config.json (+ secrets.json), then let environment variables override the alert settings."""
     with open(CONFIG_PATH, encoding="utf-8-sig") as f:
         cfg = json.load(f)
     alerts = cfg.setdefault("alerts", {})
-    secrets = read_json(SECRETS_PATH, {}) or {}
+    secrets = load_secrets()
     for k, v in (secrets.get("alerts", secrets) if isinstance(secrets, dict) else {}).items():
         if v and not str(k).startswith("_"):
             alerts[k] = v
@@ -4393,6 +4464,11 @@ def run_once(cfg, args, drop=None):
     metrics = run_metrics()
     if netguard:
         netguard.flush_notices(_me(), cfg)      # v2.16: one #bot-status notice for shops that asked for human verification
+    if rehearsal and do_sealed and by_shop and not drop and not DRY_RUN[0]:
+        try:                                    # v2.21: readiness card a few hours before a drop window
+            rehearsal.maybe_post(_me(), cfg, status, by_shop)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! drop rehearsal skipped ({redact(e)})")
     if not DRY_RUN[0]:
         discord_health(cfg, status)
         save_state(kept)
@@ -4608,6 +4684,11 @@ def self_test(cfg):
     print("config.json:", "OK" if not CONFIG_WARNINGS else "")
     for w in CONFIG_WARNINGS:
         print("   !", w)
+    if SECRETS_PROBLEM[0]:
+        ok = False
+        print("secrets.json: WON'T LOAD -", SECRETS_PROBLEM[0])
+    elif os.path.exists(SECRETS_PATH):
+        print("secrets.json: OK")
     try:
         probe = os.path.join(HERE, ".write-test.json")
         atomic_write_json(probe, {"ok": True})
@@ -4652,20 +4733,26 @@ def self_test(cfg):
 def fetch_new_files():
     """v2.11: an update_bot.bat from before v2.11 doesn't know about auto_buy.py or setup_autobuy.bat, and never
     updates itself. Fetch those (and the newer update_bot.bat) once from the bot's GitHub repo. PC copy only."""
-    global auto_buy, deal_finder, chain_shops
+    global auto_buy, deal_finder, chain_shops, settings_check, rehearsal
     if IN_ACTIONS or IN_CONTAINER:      # the container's code is read-only: it's updated by rebuilding the image
         return
+    # v2.21: update_bot.bat is now a short file that runs updater.py (which reads the file list from GitHub and
+    # keeps update_bot.bat itself current). An older update_bot.bat is swapped for it here, once. The new one is
+    # much shorter than the old, so an old copy that's still on screen just ends.
     for name in ("auto_buy.py", "auto_buy_web.py", "collection.py", "deal_finder.py", "chain_shops.py", "setup_autobuy.bat",
-                 "open_autobuy.bat", "update_bot.bat"):
+                 "open_autobuy.bat", "settings_check.py", "rehearsal.py", "restock_trend.py", "scorecard.py", "updater.py",
+                 "update_files.txt", "update_bot.bat"):
         path = os.path.join(CODE_DIR, name)
         try:
             if os.path.exists(path):
                 with open(path, "rb") as fh:
-                    if name != "update_bot.bat" or b"deal_finder.py" in fh.read():
+                    if name != "update_bot.bat" or b"updater.py" in fh.read():
                         continue
             body = HTTP.fetch(f"{REPO_RAW_URL}/{name}", tries=2, robots=False, memo=False)
             if name.endswith(".py"):
                 compile(body.decode("utf-8"), path, "exec")      # only keep it if it's real Python
+            if name.endswith(".bat"):                            # Windows line endings, whatever was downloaded
+                body = body.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
             atomic_write_bytes(path, body)
             print(f"   fetched {name} from GitHub (your update_bot.bat is older than it)")
         except Exception as e:  # noqa: BLE001
@@ -4674,6 +4761,18 @@ def fetch_new_files():
         try:
             import auto_buy as _ab
             auto_buy = _ab
+        except ImportError:
+            pass
+    if rehearsal is None:
+        try:
+            import rehearsal as _rh
+            rehearsal = _rh
+        except ImportError:
+            pass
+    if settings_check is None:
+        try:
+            import settings_check as _sc
+            settings_check = _sc
         except ImportError:
             pass
     if deal_finder is None:
@@ -4707,6 +4806,9 @@ def main():
     ap.add_argument("--recap", action="store_true", help="post the daily recap to Discord and stop")
     ap.add_argument("--dry-run", action="store_true", help="check and print, but post and save nothing")
     ap.add_argument("--self-test", action="store_true", help="check config, files and one shop, then stop")
+    ap.add_argument("--rehearse", nargs="?", const="", metavar="WINDOW",
+                    help="read the shops once and post the readiness card for the next drop window (or the next "
+                         "one whose name contains WINDOW) to #bot-status; with --dry-run it's only printed")
     ap.add_argument("--pace", type=float, metavar="MINUTES",
                     help="one check, paced as if looping every N minutes (singles and Pokémon only when due, drop "
                          "windows on); writes the seconds to wait before the next one to next_wait.txt")
@@ -4718,7 +4820,7 @@ def main():
     except FileNotFoundError:
         sys.exit(f"config.json not found next to {os.path.basename(__file__)}")
     except json.JSONDecodeError as e:
-        sys.exit(f"config.json has a typo: {e}")
+        sys.exit(f"{typo_text(CONFIG_PATH, e)}\nOpen config.json in Notepad, fix that line and save.")
 
     if args.self_test:
         sys.exit(0 if self_test(cfg) else 1)
@@ -4735,6 +4837,22 @@ def main():
     if args.recap:
         begin_check(cfg)
         run_recap(cfg)
+        return
+
+    if args.rehearse is not None:
+        if not rehearsal:
+            sys.exit("rehearsal.py isn't next to the bot. Run update_bot.bat.")
+        w = rehearsal.next_window(_me(), cfg, name=args.rehearse)
+        if not w:
+            sys.exit("No One Piece drop window coming up" + (f" with “{args.rehearse}” in its name." if args.rehearse else "."))
+        begin_check(cfg, load_status())
+        print(f"Reading the shops once for {w['name']} (no alerts are sent)...")
+        _, by_shop = check_sealed(cfg)
+        text, colour = rehearsal.build(_me(), cfg, w, by_shop)
+        if DRY_RUN[0]:
+            print("\n" + text)
+        else:
+            post_status(cfg, text, colour)
         return
 
     if args.pace and not args.loop:
@@ -4767,7 +4885,7 @@ def main():
         poke = f" Pokémon every {pokemon_watch.every_minutes(cfg):g} minutes."
     post_status(cfg, f"🟢 **Bot online** ({'PC' if heartbeat_role(cfg) != 'listen' else 'cloud'}, v{VERSION}). "
                      f"Checking every {every}.{poke}{nxt}", GREEN)
-    good_cfg, was_dropping, problem, warned = cfg, None, None, ""
+    good_cfg, was_dropping, problem, warned, secrets_warned = cfg, None, None, "", None
     fetch_new_files()
     if auto_buy and not IN_ACTIONS and not IN_CONTAINER and heartbeat_role(cfg) != "listen":
         auto_buy.start(sys.modules[__name__])     # v2.11: picks up /autobuy try requests from Discord
@@ -4790,15 +4908,25 @@ def main():
             try:
                 cfg = load_config()  # pick up edits without restarting
             except json.JSONDecodeError as e:
+                text = typo_text(CONFIG_PATH, e)
                 if problem != "config":
                     post_status(good_cfg, f"⚠️ **config.json has a typo**, so the bot is paused until it's fixed "
-                                          f"and saved.\n`{e}`", RED)
+                                          f"and saved.\n{text}", RED)
+                    push_phone(good_cfg, "Restock bot paused: config.json has a typo", text)
                 problem = "config"
-                print(f"   ! config.json has a typo, fix and save it: {e}")
+                print(f"   ! {text} Fix and save it.")
                 time.sleep(60)
                 continue
             if problem == "config":
                 post_status(cfg, "✅ config.json is fixed. Checking again.", GREEN)
+            sp = SECRETS_PROBLEM[0]
+            if sp != secrets_warned:        # v2.21: a secrets.json that won't load is said out loud, once
+                if sp:
+                    post_status(cfg, f"⚠️ **secrets.json won't load.** {sp}", RED)
+                    push_phone(cfg, "Restock bot: secrets.json won't load", sp)
+                elif secrets_warned:
+                    post_status(cfg, "✅ secrets.json is fixed.", GREEN)
+                secrets_warned = sp
             sig = "; ".join(CONFIG_WARNINGS)
             if sig != warned:
                 if sig:
