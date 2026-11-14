@@ -20,6 +20,16 @@
    "told": 1794606082,
    "url": "https://cardplustcg.com.au/wp-json/wc/store/v1/products?search=one%20piece&per_page=100"
   },
+  "collectiblemadness.com.au": {
+   "count": 1,
+   "first": 1794655874,
+   "kind": "Cloudflare challenge",
+   "since": 1794655874,
+   "status": 429,
+   "told": null,
+   "until": 1794656474,
+   "url": "https://collectiblemadness.com.au/search/suggest.json?q=Delta%20Reign%20blister&resources[type]=product&resources[limit]=10"
+  },
   "elementalarcade.com.au": {
    "count": 10,
    "first": 1794301076,
@@ -29,6 +39,36 @@
    "status": 429,
    "told": 1794337010,
    "url": "https://elementalarcade.com.au/robots.txt"
+  },
+  "grailborne.com.au": {
+   "count": 1,
+   "first": 1794655874,
+   "kind": "Cloudflare challenge",
+   "since": 1794655874,
+   "status": 429,
+   "told": null,
+   "until": 1794656474,
+   "url": "https://grailborne.com.au/search/suggest.json?q=Delta%20Reign%20box&resources[type]=product&resources[limit]=10"
+  },
+  "guf.com.au": {
+   "count": 1,
+   "first": 1794655874,
+   "kind": "Cloudflare challenge",
+   "since": 1794655874,
+   "status": 429,
+   "told": null,
+   "until": 1794656474,
+   "url": "https://guf.com.au/search/suggest.json?q=Delta%20Reign%20deck&resources[type]=product&resources[limit]=10"
+  },
+  "lightofcards.com.au": {
+   "count": 1,
+   "first": 1794655874,
+   "kind": "Cloudflare challenge",
+   "since": 1794655874,
+   "status": 429,
+   "told": null,
+   "until": 1794656474,
+   "url": "https://lightofcards.com.au/search/suggest.json?q=Delta%20Reign%20box&resources[type]=product&resources[limit]=10"
   },
   "pocketgames.com.au": {
    "count": 7,
@@ -50,6 +90,16 @@
    "told": 1794632618,
    "url": "https://rogueonline.com.au/robots.txt"
   },
+  "shop.goodgames.com.au": {
+   "count": 1,
+   "first": 1794655874,
+   "kind": "Cloudflare challenge",
+   "since": 1794655874,
+   "status": 429,
+   "told": null,
+   "until": 1794656474,
+   "url": "https://shop.goodgames.com.au/search/suggest.json?q=Delta%20Reign%20deck&resources[type]=product&resources[limit]=10"
+  },
   "tcg.goodgames.com.au": {
    "count": 9,
    "first": 1794367929,
@@ -70,6 +120,36 @@
    "until": 1794656277,
    "url": "https://thewanderingcollector.com.au/collections/one-piece-tcg-english-sealed-products/products.json?limit=250"
   },
+  "www.cherrycollectables.com.au": {
+   "count": 1,
+   "first": 1794655874,
+   "kind": "Cloudflare challenge",
+   "since": 1794655874,
+   "status": 429,
+   "told": null,
+   "until": 1794656474,
+   "url": "https://www.cherrycollectables.com.au/search/suggest.json?q=Delta%20Reign%20deck&resources[type]=product&resources[limit]=10"
+  },
+  "www.gameology.com.au": {
+   "count": 1,
+   "first": 1794655874,
+   "kind": "Cloudflare challenge",
+   "since": 1794655874,
+   "status": 429,
+   "told": null,
+   "until": 1794656474,
+   "url": "https://www.gameology.com.au/search/suggest.json?q=30th%20Celebration%20bundle&resources[type]=product&resources[limit]=10"
+  },
+  "www.gametradersinglefarm.com.au": {
+   "count": 1,
+   "first": 1794655874,
+   "kind": "Cloudflare challenge",
+   "since": 1794655874,
+   "status": 429,
+   "told": null,
+   "until": 1794656474,
+   "url": "https://www.gametradersinglefarm.com.au/search/suggest.json?q=30th%20Celebration%20collection&resources[type]=product&resources[limit]=10"
+  },
   "www.gdgames.com.au": {
    "count": 6,
    "first": 1794585794,
@@ -79,16 +159,6 @@
    "status": 429,
    "told": 1794613092,
    "url": "https://www.gdgames.com.au/collections/one-piece-tcg/products.json?limit=250"
-  },
-  "www.gumnut.com.au": {
-   "count": 4,
-   "first": 1794646310,
-   "kind": "Cloudflare challenge",
-   "since": 1794650827,
-   "status": 429,
-   "told": null,
-   "until": 1794655627,
-   "url": "https://www.gumnut.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "www.irresistibleforce.com.au": {
    "count": 4,
@@ -111,13 +181,13 @@
    "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28.js"
   },
   "www.kollecter.com.au": {
-   "count": 6,
+   "count": 7,
    "first": 1794620344,
    "kind": "Cloudflare challenge",
-   "since": 1794640862,
+   "needs_you": true,
+   "since": 1794655874,
    "status": 429,
-   "told": null,
-   "until": 1794655262,
+   "told": 1794655874,
    "url": "https://www.kollecter.com.au/search/suggest.json?q=Delta%20Reign&resources[type]=product&resources[limit]=10"
   },
   "www.mayhemcollectables.com.au": {
