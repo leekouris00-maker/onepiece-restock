@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794658870,
+ "pokemon_ts": 1794659545,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -128,6 +128,14 @@
   "plist|delta-reign|Cherry Collectables|kyogre-117-pokemon-me-mega-evolution-promo": [
    8.39,
    1794560184
+  ],
+  "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-box": [
+   334.0,
+   1794659546
+  ],
+  "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-bundle": [
+   70.0,
+   1794659546
   ],
   "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-elite-trainer-box": [
    130.0,
@@ -6091,7 +6099,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794658870,
+ "sealed_ts": 1794659545,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
