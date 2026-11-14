@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794615000,
+  "bf_ts": 1794615785,
   "cache": {
    "finds": [],
    "listings": [
@@ -966,7 +966,7 @@
     }
    ]
   },
-  "cursor": 2,
+  "cursor": 4,
   "files": 111,
   "handles": {
    "5-minute-one-piece-board-game": {
