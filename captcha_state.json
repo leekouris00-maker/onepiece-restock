@@ -161,13 +161,13 @@
    "url": "https://www.fpvfaster.com.au/products/one-piece-card-game-op-18-booster-box.js"
   },
   "www.gameology.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794671937,
    "kind": "Cloudflare challenge",
-   "since": 1794671937,
+   "since": 1794672710,
    "status": 429,
    "told": null,
-   "until": 1794672537,
+   "until": 1794673910,
    "url": "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "www.gametradersinglefarm.com.au": {
