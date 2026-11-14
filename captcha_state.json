@@ -1,5 +1,25 @@
 {
  "captcha": {
+  "alphagaming.com.au": {
+   "count": 1,
+   "first": 1794664949,
+   "kind": "Cloudflare challenge",
+   "since": 1794664949,
+   "status": 429,
+   "told": null,
+   "until": 1794665549,
+   "url": "https://alphagaming.com.au/search/suggest.json?q=DP-13&resources[type]=product&resources[limit]=10"
+  },
+  "cardbot.com.au": {
+   "count": 1,
+   "first": 1794664968,
+   "kind": "Cloudflare challenge",
+   "since": 1794664968,
+   "status": 429,
+   "told": null,
+   "until": 1794665568,
+   "url": "https://cardbot.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
   "cardplustcg.com.au": {
    "count": 1,
    "first": 1794606082,
@@ -10,6 +30,16 @@
    "told": 1794606082,
    "url": "https://cardplustcg.com.au/wp-json/wc/store/v1/products?search=one%20piece&per_page=100"
   },
+  "collectiblemadness.com.au": {
+   "count": 1,
+   "first": 1794664962,
+   "kind": "Cloudflare challenge",
+   "since": 1794664962,
+   "status": 429,
+   "told": null,
+   "until": 1794665562,
+   "url": "https://collectiblemadness.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
   "elementalarcade.com.au": {
    "count": 10,
    "first": 1794301076,
@@ -19,6 +49,46 @@
    "status": 429,
    "told": 1794337010,
    "url": "https://elementalarcade.com.au/robots.txt"
+  },
+  "goldfieldsgames.com.au": {
+   "count": 1,
+   "first": 1794664950,
+   "kind": "Cloudflare challenge",
+   "since": 1794664950,
+   "status": 429,
+   "told": null,
+   "until": 1794665550,
+   "url": "https://goldfieldsgames.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
+  "grailborne.com.au": {
+   "count": 1,
+   "first": 1794664959,
+   "kind": "Cloudflare challenge",
+   "since": 1794664959,
+   "status": 429,
+   "told": null,
+   "until": 1794665559,
+   "url": "https://grailborne.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
+  "guf.com.au": {
+   "count": 1,
+   "first": 1794664956,
+   "kind": "Cloudflare challenge",
+   "since": 1794664956,
+   "status": 429,
+   "told": null,
+   "until": 1794665556,
+   "url": "https://guf.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
+  "lightofcards.com.au": {
+   "count": 1,
+   "first": 1794664965,
+   "kind": "Cloudflare challenge",
+   "since": 1794664965,
+   "status": 429,
+   "told": null,
+   "until": 1794665565,
+   "url": "https://lightofcards.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
   },
   "pocketgames.com.au": {
    "count": 7,
@@ -40,6 +110,66 @@
    "told": 1794632618,
    "url": "https://rogueonline.com.au/robots.txt"
   },
+  "shop.goodgames.com.au": {
+   "count": 1,
+   "first": 1794665172,
+   "kind": "Cloudflare challenge",
+   "since": 1794665172,
+   "status": 429,
+   "told": null,
+   "until": 1794665772,
+   "url": "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250"
+  },
+  "thewanderingcollector.com.au": {
+   "count": 1,
+   "first": 1794664953,
+   "kind": "Cloudflare challenge",
+   "since": 1794664953,
+   "status": 429,
+   "told": null,
+   "until": 1794665553,
+   "url": "https://thewanderingcollector.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
+  "www.cherrycollectables.com.au": {
+   "count": 1,
+   "first": 1794664949,
+   "kind": "Cloudflare challenge",
+   "since": 1794664949,
+   "status": 429,
+   "told": null,
+   "until": 1794665549,
+   "url": "https://www.cherrycollectables.com.au/search/suggest.json?q=EB-05&resources[type]=product&resources[limit]=10"
+  },
+  "www.fpvfaster.com.au": {
+   "count": 1,
+   "first": 1794665172,
+   "kind": "Cloudflare challenge",
+   "since": 1794665172,
+   "status": 429,
+   "told": null,
+   "until": 1794665772,
+   "url": "https://www.fpvfaster.com.au/products/one-piece-card-game-op-18-booster-box.js"
+  },
+  "www.gameology.com.au": {
+   "count": 1,
+   "first": 1794665172,
+   "kind": "Cloudflare challenge",
+   "since": 1794665172,
+   "status": 429,
+   "told": null,
+   "until": 1794665772,
+   "url": "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
+  },
+  "www.gametradersinglefarm.com.au": {
+   "count": 1,
+   "first": 1794664949,
+   "kind": "Cloudflare challenge",
+   "since": 1794664949,
+   "status": 429,
+   "told": null,
+   "until": 1794665549,
+   "url": "https://www.gametradersinglefarm.com.au/search/suggest.json?q=ST-37&resources[type]=product&resources[limit]=10"
+  },
   "www.gdgames.com.au": {
    "count": 6,
    "first": 1794585794,
@@ -49,6 +179,16 @@
    "status": 429,
    "told": 1794613092,
    "url": "https://www.gdgames.com.au/collections/one-piece-tcg/products.json?limit=250"
+  },
+  "www.gumnut.com.au": {
+   "count": 1,
+   "first": 1794665171,
+   "kind": "Cloudflare challenge",
+   "since": 1794665171,
+   "status": 429,
+   "told": null,
+   "until": 1794665771,
+   "url": "https://www.gumnut.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "www.irresistibleforce.com.au": {
    "count": 5,
@@ -61,14 +201,14 @@
    "url": "https://www.irresistibleforce.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
   },
   "www.jbhifi.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794664658,
    "kind": "Cloudflare challenge",
-   "since": 1794664658,
+   "since": 1794665357,
    "status": 429,
    "told": null,
-   "until": 1794665258,
-   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28.js"
+   "until": 1794666557,
+   "url": "https://www.jbhifi.com.au/products.json?limit=250"
   },
   "www.kollecter.com.au": {
    "count": 7,
@@ -99,6 +239,26 @@
    "status": 429,
    "told": 1794359815,
    "url": "https://www.monstermart.com.au/robots.txt"
+  },
+  "www.pokebox.com.au": {
+   "count": 1,
+   "first": 1794665171,
+   "kind": "Cloudflare challenge",
+   "since": 1794665171,
+   "status": 429,
+   "told": null,
+   "until": 1794665771,
+   "url": "https://www.pokebox.com.au/collections/english-pokemon-tcg-booster-boxes/products.json?limit=250"
+  },
+  "www.tcgroupau.com.au": {
+   "count": 1,
+   "first": 1794664949,
+   "kind": "Cloudflare challenge",
+   "since": 1794664949,
+   "status": 429,
+   "told": null,
+   "until": 1794665549,
+   "url": "https://www.tcgroupau.com.au/search/suggest.json?q=OP-19&resources[type]=product&resources[limit]=10"
   }
  }
 }
