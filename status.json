@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-15 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794666951,
+ "ebay_ts": 1794667912,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -6099,7 +6099,7 @@
    "t": 1794666738.346302
   }
  },
- "sealed_ts": 1794667716,
+ "sealed_ts": 1794667912,
  "shop_down": [
   "www.jtoys.com.au"
  ],
@@ -6140,6 +6140,6 @@
  "shop_retry": {
   "www.jtoys.com.au": 1794668231
  },
- "singles_ts": 1794666951,
- "sweep_ts": 1794666951
+ "singles_ts": 1794667912,
+ "sweep_ts": 1794667912
 }
