@@ -81,14 +81,14 @@
    "url": "https://guf.com.au/search/suggest.json?q=30th%20Celebration&resources[type]=product&resources[limit]=10"
   },
   "lightofcards.com.au": {
-   "count": 2,
+   "count": 3,
    "first": 1794680739,
    "kind": "Cloudflare challenge",
-   "since": 1794681517,
+   "since": 1794682844,
    "status": 429,
    "told": null,
-   "until": 1794682717,
-   "url": "https://lightofcards.com.au/search/suggest.json?q=Delta%20Reign&resources[type]=product&resources[limit]=10"
+   "until": 1794685244,
+   "url": "https://lightofcards.com.au/search/suggest.json?q=one%20piece%20booster%20display&resources[type]=product&resources[limit]=10"
   },
   "pocketgames.com.au": {
    "count": 7,
