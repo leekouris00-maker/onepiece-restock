@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.19.5)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.20.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -77,6 +77,14 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.20: CAPTCHA HAND-OFF. The bot still never solves or gets round a human-verification check. What's new:
+  - PC: when a shop starts waiting for you and desk mode is on (/desk on), the bot opens that shop in your own
+    browser so you can look. It also tries the shop twice by itself (after 15 minutes, then 2 hours later) and
+    carries on if the shop answers normally; after that it waits for /captcha resume as before.
+    Doing the check in your browser doesn't let the bot in - it only shows you the shop is open to people.
+    To open the tab even with desk mode off: "security": {"captcha": {"open_tab": true}} (false = never).
+  - Cloud copy: a shop that has refused it for 3 days running is left to the PC copy - one last notice, no more
+    reminders, one try a week. Fewer #bot-status notices about shops only your home connection can read.
 New in v2.19.5: SHOP LINKS IN CAPTCHA NOTICES. When shops ask the bot for human verification, each shop's name in
   the #bot-status notice (and in /captcha) is a link to that shop, so you can tap through and check it yourself.
 New in v2.19.4: ONE PACE FOR ALL SHOPIFY SHOPS. Shopify counts requests from your internet address across every

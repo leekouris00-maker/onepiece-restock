@@ -16,6 +16,15 @@ When a shop answers with a "prove you're human" page instead of its normal reply
      The bot then tries the shop again; if the shop still challenges it, the shop is paused again.
      (The cloud copy has nobody to press Resume, so it tries a paused shop once a day by itself.)
 
+v2.20 - the hand-off, so a pause costs you less attention (still nothing is solved or got round):
+  * PC copy: when a shop starts waiting for you and desk mode is on (/desk on), the bot opens the shop's
+    front page in YOUR browser so you can see for yourself. It also makes two tries of its own, one after
+    15 minutes and one 2 hours after that, and carries on by itself if the shop answers normally; after
+    those it waits for Resume as before. Passing the check in your browser doesn't pass the bot - the bot
+    never uses your browser's cookies - it only shows you whether the shop is open to people.
+  * Cloud copy: a shop that has refused it for 3 days running is LEFT TO THE PC COPY: one last notice,
+    then no more reminders, and one try a week instead of one a day.
+
 The bot never tries to solve, skip or get round a challenge, never copies cookies from your browser and
 never switches address to dodge one: a pause stays in place whichever endpoint is in use. A shop that
 keeps challenging the bot doesn't want it there, and stays paused.
@@ -24,6 +33,8 @@ Settings (config.json "security" > "captcha"):
   "enabled": true        detection on (when security is on)
   "recheck_hours": 0     0 = wait for you to press Resume. A number = try the shop once after that many
                          hours by itself (at least 6).
+  "open_tab": "desk"     v2.20: open a newly paused shop in your browser - "desk" = only while desk mode is on,
+                         true = always, false = never. PC copy only.
 """
 import re
 import time
@@ -35,6 +46,9 @@ SAME_BURST = 60                   # challenges this close together count once
 STUCK_AFTER = 6 * 3600            # still challenged after this long: wait for you, and tell you
 NOTIFY_GAP = 24 * 3600
 BODY_LOOK = 60_000
+AUTO_TRIES = (15 * 60, 2 * 3600)  # v2.20, PC copy: the bot's own tries at a shop that's waiting for you, then no more
+LEAVE_AFTER = 3 * 86400           # v2.20, cloud copy: refused this long without a break = left to the PC copy
+LEFT_RECHECK_HOURS = 7 * 24.0     # ...and tried this often from then on
 
 # (name, header test, body markers) - body markers are only looked for in HTML replies
 _HEADER_SIGNS = [
@@ -63,8 +77,10 @@ def settings(cfg):
         hours = float(raw.get("recheck_hours") or 0)
     except (TypeError, ValueError):
         hours = 0.0
+    tab = raw.get("open_tab", "desk")
     return {"enabled": raw.get("enabled", True) is not False,
-            "recheck_hours": 0.0 if hours <= 0 else max(MIN_RECHECK_HOURS, hours)}
+            "recheck_hours": 0.0 if hours <= 0 else max(MIN_RECHECK_HOURS, hours),
+            "open_tab": "always" if tab is True else "never" if tab is False else "desk"}
 
 
 def detect(status, headers, body, location=""):
@@ -114,22 +130,31 @@ def is_paused(state, host, cfg=None, now=None, hours=None):
     e = paused(state).get(host)
     if not e:
         return False
+    now = now or time.time()
     if e.get("until"):
-        return (now or time.time()) < float(e["until"])
+        return now < float(e["until"])
+    if e.get("try_at") and now >= float(e["try_at"]):
+        return False                    # v2.20: one of the bot's own tries is due
     hours = settings(cfg)["recheck_hours"] if hours is None else hours
-    if hours and (now or time.time()) - float(e.get("since") or 0) >= hours * 3600:
+    if e.get("left"):
+        hours = max(hours or 0, LEFT_RECHECK_HOURS)     # v2.20: left to the PC copy - once a week
+    if hours and now - float(e.get("since") or 0) >= hours * 3600:
         return False
     return True
 
 
-def pause(state, host, kind, url, now=None, status=None, notify_gap=None):
+def pause(state, host, kind, url, now=None, status=None, notify_gap=None, auto_tries=(), leave_after=None):
     """Record the challenge. Returns True if you should be told.
 
     A challenge sent with HTTP 429 is the shop's way of saying "slow down" (Shopify shops behind Cloudflare
     send "Verifying your connection..." with a 429 when a lot of requests arrive at once; seen 10 Nov 2026).
     It clears by itself, so it's a TEMPORARY pause: 10 min, doubling up to 4 h, with one try after each.
     Only if the shop is still challenging after STUCK_AFTER does it wait for you, and you're told.
-    Any other challenge waits for you straight away. Either way nothing tries to get past it."""
+    Any other challenge waits for you straight away. Either way nothing tries to get past it.
+
+    v2.20: "auto_tries" (PC copy) = seconds until each of the bot's own tries at a shop that's waiting for
+    you; when they're used up it just waits. "leave_after" (cloud copy) = a shop challenged this long
+    without a break is marked "left" (to the PC copy): told once more, then never again."""
     now = now or time.time()
     c = state.setdefault("captcha", {})
     e = c.get(host) or {}
@@ -145,6 +170,19 @@ def pause(state, host, kind, url, now=None, status=None, notify_gap=None):
         c[host] = entry
         return False
     entry["needs_you"] = True
+    if e.get("tab"):
+        entry["tab"] = e["tab"]
+    if leave_after and (e.get("left") or now - first >= leave_after):
+        entry["left"] = True
+        if not e.get("left"):
+            entry["told"] = round(now)
+        c[host] = entry
+        return not e.get("left")
+    if auto_tries:
+        tried = int(e.get("tried") or 0) + 1 if e.get("needs_you") else 0
+        entry["tried"] = tried
+        if tried < len(auto_tries):
+            entry["try_at"] = round(now + auto_tries[tried])
     tell = not e.get("told") or now - float(e["told"]) >= (notify_gap or NOTIFY_GAP)
     if tell:
         entry["told"] = round(now)
@@ -169,6 +207,22 @@ HOW_CLOUD = ("This is the cloud copy, which shops often refuse because it runs f
              "your home connection may still read them fine. The cloud copy tries each one again once a day by itself.")
 
 
+HOW_LEFT = ("It has refused the cloud copy for {days} days running, so the cloud copy is leaving it to the PC copy on your "
+            "home connection: no more reminders about it, and one try a week in case that changes.")
+NOT_A_PASS = "Doing the check in your browser doesn't let the bot in; it only shows you the shop is open to people."
+
+
+def _auto_try(e, now=None):
+    """v2.20: ' The bot tries once more by itself in about N min.' while one of its own tries is still to come."""
+    at = float(e.get("try_at") or 0)
+    left = at - (now or time.time())
+    if left <= 0:
+        return ""
+    return (f" The bot tries once more by itself in about {int(left // 60) + 1} min" if left < 5400
+            else f" The bot tries once more by itself in about {round(left / 3600)} h") + \
+        " and carries on if the shop answers normally."
+
+
 def shop_link(name, host):
     """v2.19.5: the shop's name as a Discord link to its front page, so a notice can be tapped straight
     through to the shop. (The address the bot was refused on is usually a products.json feed, which is no
@@ -182,25 +236,32 @@ def message(name, host, e, how=HOW_PAGE, cloud=False):
     """The notice for one shop. "how" is what Resume looks like where this copy runs."""
     how = how.replace("{name}", str(name))
     shop = shop_link(name, host)
+    if cloud and e.get("left"):
+        return (f"🧩 **{shop} keeps asking the cloud copy for human verification** ({e.get('kind')}). "
+                + HOW_LEFT.format(days=LEAVE_AFTER // 86400))
     if cloud:
         return (f"🧩 **{shop} is asking the bot for human verification** ({e.get('kind')}). The bot has stopped checking "
                 f"it and won't try to get round it. {HOW_CLOUD}")
     if int(e.get("status") or 0) == 429:
         return (f"🧩 **{shop} has been asking the bot to verify it's human for {STUCK_AFTER // 3600} hours** "
-                f"({e.get('kind')}). The bot has stopped checking it and won't try to get round it. If the shop opens "
-                f"normally in your own browser, {how} to try again.")
+                f"({e.get('kind')}). The bot has stopped checking it and won't try to get round it.{_auto_try(e)} If the "
+                f"shop opens normally in your own browser, {how} to try again sooner.")
     return (f"🧩 **{shop} is asking for human verification** ({e.get('kind')}). The bot has stopped checking it and "
             f"won't try to get round it. To carry on: open https://{host} in your own browser, and if it lets you in, "
-            f"{how}. If the shop challenges the bot again it'll be paused again.")
+            f"{how}.{_auto_try(e)} If the shop challenges the bot again it'll be paused again. {NOT_A_PASS}")
 
 
 def digest(items, how=HOW_DISCORD, cloud=False):
     """One notice for several shops from the same check. items: [(name, host, entry), ...]"""
-    lines = "\n".join(f"• **{shop_link(name, host)}** ({e.get('kind')})" for name, host, e in items[:40])
+    lines = "\n".join(f"• **{shop_link(name, host)}** ({e.get('kind')})"
+                      + (" - now left to the PC copy, one try a week" if cloud and e.get("left") else "")
+                      for name, host, e in items[:40])
     more = f"\n…and {len(items) - 40} more" if len(items) > 40 else ""
     head = (f"🧩 **{len(items)} shops are asking the bot for human verification.** The bot has stopped checking them "
             f"and won't try to get round it.\n{lines}{more}\n")
     if cloud:
         return head + HOW_CLOUD
+    tries = (" The bot also makes two tries of its own at each (after 15 min, then 2 h later)."
+             if any(e.get("try_at") for _, _, e in items) else "")
     return head + (f"To carry on: open a shop in your own browser, and if it lets you in, "
-                   f"{how.replace('{name}', '<shop>')} (or `resume:all`). A shop that challenges the bot again is paused again.")
+                   f"{how.replace('{name}', '<shop>')} (or `resume:all`).{tries} A shop that challenges the bot again is paused again.")
