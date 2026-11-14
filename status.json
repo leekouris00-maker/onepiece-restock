@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1794367001
  },
- "drops_slot": "2026-11-14 06",
+ "drops_slot": "2026-11-14 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794617976,
+ "ebay_ts": 1794619040,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794618201,
+ "pokemon_ts": 1794618840,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    289.66,
@@ -6087,7 +6087,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794618622,
+ "sealed_ts": 1794619234,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6099,7 +6099,7 @@
   "grailborne.com.au": 0,
   "guf.com.au": 0,
   "lightofcards.com.au": 0,
-  "morethanmeeples.com.au": 2,
+  "morethanmeeples.com.au": 0,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
@@ -6124,6 +6124,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794617976,
- "sweep_ts": 1794617976
+ "singles_ts": 1794619040,
+ "sweep_ts": 1794619040
 }
