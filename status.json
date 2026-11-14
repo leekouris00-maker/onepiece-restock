@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794621935,
+ "pokemon_ts": 1794622569,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -6079,7 +6079,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794622339,
+ "sealed_ts": 1794622569,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6091,7 +6091,7 @@
   "grailborne.com.au": 0,
   "guf.com.au": 0,
   "lightofcards.com.au": 0,
-  "morethanmeeples.com.au": 1,
+  "morethanmeeples.com.au": 2,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
