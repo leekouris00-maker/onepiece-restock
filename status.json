@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-15 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794664981,
+ "ebay_ts": 1794665986,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794665177,
+ "pokemon_ts": 1794665986,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -6099,7 +6099,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794665571,
+ "sealed_ts": 1794666181,
  "shop_down": [
   "www.jtoys.com.au"
  ],
@@ -6113,7 +6113,7 @@
   "grailborne.com.au": 0,
   "guf.com.au": 0,
   "lightofcards.com.au": 0,
-  "morethanmeeples.com.au": 1,
+  "morethanmeeples.com.au": 0,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
@@ -6140,6 +6140,6 @@
  "shop_retry": {
   "www.jtoys.com.au": 1794666260
  },
- "singles_ts": 1794664981,
- "sweep_ts": 1794664981
+ "singles_ts": 1794665986,
+ "sweep_ts": 1794665986
 }
