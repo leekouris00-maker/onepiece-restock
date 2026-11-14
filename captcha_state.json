@@ -80,16 +80,6 @@
    "told": 1794632618,
    "url": "https://rogueonline.com.au/robots.txt"
   },
-  "shop.goodgames.com.au": {
-   "count": 1,
-   "first": 1794640038,
-   "kind": "Cloudflare challenge",
-   "since": 1794640038,
-   "status": 429,
-   "told": null,
-   "until": 1794640638,
-   "url": "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250"
-  },
   "tcg.goodgames.com.au": {
    "count": 9,
    "first": 1794367929,
@@ -110,36 +100,6 @@
    "until": 1794641670,
    "url": "https://thewanderingcollector.com.au/collections/one-piece-tcg-english-sealed-products/products.json?limit=250"
   },
-  "www.fpvfaster.com.au": {
-   "count": 1,
-   "first": 1794640038,
-   "kind": "Cloudflare challenge",
-   "since": 1794640038,
-   "status": 429,
-   "told": null,
-   "until": 1794640638,
-   "url": "https://www.fpvfaster.com.au/products/one-piece-card-game-op-18-booster-box.js"
-  },
-  "www.gameology.com.au": {
-   "count": 1,
-   "first": 1794640038,
-   "kind": "Cloudflare challenge",
-   "since": 1794640038,
-   "status": 429,
-   "told": null,
-   "until": 1794640638,
-   "url": "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
-  },
-  "www.gametradersinglefarm.com.au": {
-   "count": 1,
-   "first": 1794640038,
-   "kind": "Cloudflare challenge",
-   "since": 1794640038,
-   "status": 429,
-   "told": null,
-   "until": 1794640638,
-   "url": "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250"
-  },
   "www.gdgames.com.au": {
    "count": 6,
    "first": 1794585794,
@@ -149,16 +109,6 @@
    "status": 429,
    "told": 1794613092,
    "url": "https://www.gdgames.com.au/collections/one-piece-tcg/products.json?limit=250"
-  },
-  "www.gumnut.com.au": {
-   "count": 1,
-   "first": 1794640038,
-   "kind": "Cloudflare challenge",
-   "since": 1794640038,
-   "status": 429,
-   "told": null,
-   "until": 1794640638,
-   "url": "https://www.gumnut.com.au/collections/one-piece-card-game/products.json?limit=250"
   },
   "www.irresistibleforce.com.au": {
    "count": 8,
@@ -209,16 +159,6 @@
    "status": 429,
    "told": 1794359815,
    "url": "https://www.monstermart.com.au/robots.txt"
-  },
-  "www.pokebox.com.au": {
-   "count": 1,
-   "first": 1794640038,
-   "kind": "Cloudflare challenge",
-   "since": 1794640038,
-   "status": 429,
-   "told": null,
-   "until": 1794640638,
-   "url": "https://www.pokebox.com.au/collections/english-pokemon-tcg-booster-boxes/products.json?limit=250"
   },
   "www.tcgroupau.com.au": {
    "count": 3,
