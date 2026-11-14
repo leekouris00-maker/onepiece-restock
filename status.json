@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794623974,
+ "pokemon_ts": 1794624726,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -104,6 +104,14 @@
   "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-binder-collection": [
    149.95,
    1794437067
+  ],
+  "plist|30th-celebration|Light of Cards|pokemon-tcg-30th-celebration-poster-collection": [
+   84.99,
+   1794624726
+  ],
+  "plist|30th-celebration|Light of Cards|pre-order-pokemon-tcg-30th-celebration-tech-sticker-collection-assorted": [
+   69.99,
+   1794624726
   ],
   "plist|30th-celebration|Rogue Online|pre-order-pokemon-tcg-30th-celebration-ultra-premium-collection-day-night-random-box": [
    899.99,
@@ -6079,7 +6087,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794623974,
+ "sealed_ts": 1794624726,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
