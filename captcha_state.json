@@ -152,13 +152,13 @@
    "url": "https://www.cherrycollectables.com.au/collections/one-piece/products.json?limit=250"
   },
   "www.fpvfaster.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794687722,
    "kind": "Cloudflare challenge",
-   "since": 1794687722,
+   "since": 1794688479,
    "status": 429,
    "told": null,
-   "until": 1794688322,
+   "until": 1794689679,
    "url": "https://www.fpvfaster.com.au/products/one-piece-card-game-op-18-booster-box.js"
   },
   "www.gameology.com.au": {
@@ -232,13 +232,13 @@
    "url": "https://www.kollecter.com.au/search/suggest.json?q=Delta%20Reign&resources[type]=product&resources[limit]=10"
   },
   "www.mayhemcollectables.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794685725,
    "kind": "Cloudflare challenge",
-   "since": 1794685725,
+   "since": 1794688663,
    "status": 429,
    "told": null,
-   "until": 1794686325,
+   "until": 1794689863,
    "url": "https://www.mayhemcollectables.com.au/search/suggest.json?q=Belo%20Betty&resources[type]=product&resources[limit]=10"
   },
   "www.monstermart.com.au": {
@@ -252,13 +252,13 @@
    "url": "https://www.monstermart.com.au/robots.txt"
   },
   "www.pokebox.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794687721,
    "kind": "Cloudflare challenge",
-   "since": 1794687721,
+   "since": 1794688479,
    "status": 429,
    "told": null,
-   "until": 1794688321,
+   "until": 1794689679,
    "url": "https://www.pokebox.com.au/collections/one-piece-card-game-booster-boxes-english/products.json?limit=250"
   },
   "www.tcgroupau.com.au": {
