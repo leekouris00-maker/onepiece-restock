@@ -1,6 +1,6 @@
 @echo off
-rem Updates the bot to the newest version on GitHub, then restarts it.
-rem Put this file in the bot folder (next to tcg_bot.py) and double-click it. Safe to run any time.
+rem Updates the bot to the newest version on GitHub, then restarts it. Double-click it. Safe to run any time.
+rem The work is done by updater.py, which is downloaded fresh each time. Keep this file short.
 cd /d "%~dp0"
 chcp 65001 >nul
 if not exist tcg_bot.py (
@@ -8,35 +8,23 @@ if not exist tcg_bot.py (
   pause
   exit /b 1
 )
+set PY=python
+where py >nul 2>&1 && set PY=py -3
 echo Downloading the newest bot files from GitHub...
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$ErrorActionPreference='Stop';" ^
-  "$base='https://raw.githubusercontent.com/leekouris00-maker/onepiece-restock/master/';" ^
-  "$files='tcg_bot.py','commands_bot.py','value.py','tcgplayer.py','deck_price.py','link_watch.py','ebay_watch.py','pokemon_watch.py','fast_lane.py','misses.py','onepiece_instore.py','auto_buy.py','auto_buy_web.py','collection.py','deal_finder.py','chain_shops.py','restock_trend.py','scorecard.py','netguard.py','captcha_watch.py','fileguard.py','security_log.py','security_panel.py','auto_buy_host.py','Dockerfile','docker-compose.yml','docker-compose.novpn.yml','docker-requirements.txt','.dockerignore','.env.example','run_docker.bat','stop_docker.bat','run_pc_side.bat','open_security.bat','setup_autobuy.bat','open_autobuy.bat','add_channels.py','add_channels.bat','add_pokemon_channels.py','HOW TO RUN.txt';" ^
-  "New-Item -ItemType Directory -Force -Path 'backup-before-update' | Out-Null;" ^
-  "foreach($f in $files){" ^
-  "  $tmp=$f+'.download';" ^
-  "  try { Invoke-WebRequest -UseBasicParsing -Uri ($base+[uri]::EscapeDataString($f)) -OutFile $tmp }" ^
-  "  catch { Write-Host ('  could not download '+$f+' - kept the old one'); continue }" ^
-  "  if(Test-Path $f){ Copy-Item $f ('backup-before-update\'+$f) -Force }" ^
-  "  Move-Item $tmp $f -Force; Write-Host ('  updated '+$f) }"
-if errorlevel 1 (
-  echo.
-  echo Something went wrong downloading. Nothing was changed. Check the internet and try again.
-  pause
-  exit /b 1
-)
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/leekouris00-maker/onepiece-restock/master/updater.py' -OutFile 'updater.py.download' -ErrorAction Stop; Move-Item 'updater.py.download' 'updater.py' -Force } catch { Write-Host '  could not download the updater' }"
+if not exist updater.py goto failed
+%PY% updater.py
+if errorlevel 1 goto failed
 echo.
 echo Restarting the bot...
 if exist restart_bot.bat call restart_bot.bat
 echo.
 echo Done. Your old files are in the backup-before-update folder.
-echo Within a minute or two Discord's #bot-status should say "Bot online (PC, v2.20.0)".
-echo.
-choice /m "Add the #onepiece-in-store (and #tcgplayer-prices) channels to Discord now"
-if errorlevel 2 goto end
-call add_channels.bat
-exit /b 0
-:end
-echo.
 pause
+if exist update_bot.bat.new (move /y update_bot.bat.new update_bot.bat >nul & exit /b 0)
+exit /b 0
+:failed
+echo.
+echo The update did not finish. Nothing was changed. Check the internet and try again.
+pause
+exit /b 1

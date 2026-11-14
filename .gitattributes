@@ -1,0 +1,2 @@
+# Windows batch files keep their CRLF line endings exactly as saved, so a raw download from GitHub runs as is
+*.bat -text
