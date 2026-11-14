@@ -73,6 +73,15 @@ security is switched on. With security off:
 - The cloud copy has nobody to press Resume, so it tries a paused shop once a day by itself.
 - To switch it off: `"security": {"captcha": {"enabled": false}}` in `config.json`.
 
+**v2.20 hand-off** (nothing is solved or bypassed, and the bot never uses your browser's cookies):
+
+- PC copy: a shop that starts waiting for you is opened in your own browser while desk mode is on
+  (`"open_tab": true` = always, `false` = never; at most 3 per check, once per pause). The bot makes two
+  tries of its own, 15 minutes after the pause and 2 hours after that, and resumes by itself if the shop
+  answers normally; then it waits for Resume.
+- Cloud copy: a shop that has challenged it for 3 days without a break is marked as left to the PC copy:
+  one last notice, no further reminders, one try a week.
+
 One kind is treated differently: a challenge sent with HTTP 429 is a shop saying "slow down" (Shopify
 shops behind Cloudflare do this when many requests arrive at once, and it clears by itself). That pauses
 the shop for 10 minutes, doubling up to 4 hours, with one try after each pause. You are only told, and

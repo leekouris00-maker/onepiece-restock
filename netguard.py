@@ -42,7 +42,7 @@ SETTINGS (config.json, all optional; defaults shown)
       "require_vpn_flag": false          true = the check page must say it's a Mullvad exit
     },
     "allowlist": {"enforce": true, "extra_hosts": [], "max_violations": 5},
-    "captcha": {"enabled": true, "recheck_hours": 0},
+    "captcha": {"enabled": true, "recheck_hours": 0, "open_tab": "desk"},
     "files": {"enforce": true, "extra_write_dirs": []}
   }
 Environment variables (used by the container): BOT_SECURITY=1, BOT_NET_MODE=proxy,
@@ -69,6 +69,7 @@ STATE_NAME = "security_state.json"
 WATCH_STATE_NAME = "captcha_state.json"   # v2.16: CAPTCHA pauses while the rest of security is off (the cloud copy saves it to GitHub)
 CLOUD_RECHECK_HOURS = 24.0        # the cloud copy has nobody to press Resume: one try a day
 WATCH_REMIND = 7 * 86400          # a shop that's still challenging: say so again this often, not daily
+TABS_PER_CHECK = 3                # v2.20: at most this many shops opened in your browser from one check
 MIN_ROTATE_MINUTES = 60
 VERIFY_RETRY = 60                 # while disconnected, look again this often
 VIOLATION_WINDOW = 3600
@@ -83,7 +84,7 @@ _lock = threading.RLock()
 _tls = threading.local()
 RT = {"on": False, "tb": None, "cfg": None, "s": None, "allow": set(), "proxy_hosts": set(), "applied": None,
       "orig_getaddrinfo": None, "opener": False, "saved_env": None, "violations": [], "state": None,
-      "watch": False, "wstate": None, "wsig": None, "notices": []}
+      "watch": False, "wstate": None, "wsig": None, "notices": [], "tabs": []}
 
 
 class Blocked(OSError):
@@ -370,8 +371,14 @@ def on_response(url, status, headers, body):
     with _lock:
         if captcha_watch.same_burst(st, host):
             return True                             # already paused by another reply from this same check
-        tell = captcha_watch.pause(st, host, kind, url, status=status, notify_gap=WATCH_REMIND if alone else None)
+        cloud = bool(getattr(tb, "IN_ACTIONS", False))
+        was_waiting = bool((captcha_watch.paused(st).get(host) or {}).get("needs_you"))
+        tell = captcha_watch.pause(st, host, kind, url, status=status, notify_gap=WATCH_REMIND if alone else None,
+                                   auto_tries=() if cloud else captcha_watch.AUTO_TRIES,       # v2.20
+                                   leave_after=captcha_watch.LEAVE_AFTER if cloud and alone else None)
         e = st["captcha"][host]
+        if e.get("needs_you") and not was_waiting and not cloud:
+            RT["tabs"].append(host)                 # v2.20: shown to you in your own browser (open_tabs)
         _cap_save(tb)
         if tell and alone:
             RT["notices"].append(host)              # one notice for the whole check: flush_notices()
@@ -391,6 +398,7 @@ def flush_notices(tb=None, cfg=None):
     """v2.16: called at the end of a check. Shops that started asking for human verification during it get
     ONE #bot-status notice between them (the cloud copy can meet twenty at once). Returns how many shops."""
     tb, cfg = tb or RT["tb"], cfg if cfg is not None else RT["cfg"]
+    open_tabs(tb, cfg)
     with _lock:
         hosts, RT["notices"] = list(dict.fromkeys(RT["notices"])), []
     if tb is None or not hosts:
@@ -415,6 +423,52 @@ def flush_notices(tb=None, cfg=None):
     return len(items)
 
 
+def open_tabs(tb=None, cfg=None, now=None, opener=None):
+    """v2.20: shops that started waiting for you during this check are opened in YOUR browser (front page), so
+    you can see whether the shop is open to people - the bot doesn't read, drive or borrow anything from that
+    tab. PC copy only, once per pause, a few per check, and only while desk mode is on unless
+    "security": {"captcha": {"open_tab": true}}. Returns the hosts opened."""
+    tb, cfg = tb or RT["tb"], cfg if cfg is not None else RT["cfg"]
+    with _lock:
+        hosts, RT["tabs"] = list(dict.fromkeys(RT["tabs"])), []
+    if tb is None or not hosts:
+        return []
+    if getattr(tb, "IN_ACTIONS", False) or getattr(tb, "IN_CONTAINER", False) or tb.DRY_RUN[0]:
+        return []
+    now = now or time.time()
+    mode = captcha_watch.settings(cfg)["open_tab"]
+    if mode == "desk":
+        try:
+            desk = float(tb.read_controls().get("desk_until", 0) or 0)
+        except Exception:  # noqa: BLE001
+            desk = 0.0
+        if desk <= now:
+            return []
+    elif mode != "always":
+        return []
+    if opener is None:
+        import webbrowser
+        opener = lambda url: webbrowser.open(url, new=2)  # noqa: E731
+    st = _cap_state(tb)
+    opened = []
+    for host in hosts:
+        e = captcha_watch.paused(st).get(host)
+        if len(opened) >= TABS_PER_CHECK or not e or not e.get("needs_you") or e.get("tab"):
+            continue
+        try:
+            opener(f"https://{host}/")
+        except Exception as err:  # noqa: BLE001
+            print(f"   ! couldn't open {host} in your browser ({err})")
+            break
+        e["tab"] = round(now)
+        opened.append(host)
+    if opened:
+        _cap_save(tb)
+        _log("captcha_tab_opened", hosts=opened)
+        print(f"   (asked for human verification: opened {', '.join(opened)} in your browser to look at)")
+    return opened
+
+
 def watch_list(tb, cfg=None):
     """v2.16 (/captcha): the paused shops, [{name, host, kind, since, needs_you, until}], longest wait first."""
     try:
@@ -422,7 +476,8 @@ def watch_list(tb, cfg=None):
     except Exception:  # noqa: BLE001
         names = {}
     out = [{"name": names.get(h, h), "host": h, "kind": e.get("kind"), "since": e.get("first") or e.get("since"),
-            "needs_you": bool(e.get("needs_you")), "until": e.get("until")}
+            "needs_you": bool(e.get("needs_you")), "until": e.get("until"), "try_at": e.get("try_at"),
+            "left": bool(e.get("left"))}
            for h, e in captcha_watch.paused(_cap_state(tb)).items()]
     return sorted(out, key=lambda r: (not r["needs_you"], r["since"] or 0))
 

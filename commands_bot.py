@@ -1486,6 +1486,8 @@ def build_captcha(cfg, resume=""):
         since = f"<t:{int(r['since'])}:R>" if r.get("since") else "recently"
         if r["needs_you"]:
             what = f"waiting for you - open https://{r['host']} in your browser, then `/captcha resume:{r['name']}`"
+            if r.get("try_at") and float(r["try_at"]) > time.time():      # v2.20
+                what += f" (the bot also tries once by itself <t:{int(r['try_at'])}:R>)"
         else:
             what = f"asked to slow down; the bot tries again by itself <t:{int(r['until'])}:R>"
         out.append(f"• **{ng.captcha_watch.shop_link(r['name'], r['host'])}** ({r['kind']}, since {since}): {what}")
