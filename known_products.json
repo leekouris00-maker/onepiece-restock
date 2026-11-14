@@ -58,7 +58,9 @@
   "list|Card Bot|one-piece-card-game-kaku-full-art-starter-deck-29-egghead-st-29"
  ],
  "Card Bot (pokemon:30th-celebration)": [],
- "Card Bot (pokemon:delta-reign)": [],
+ "Card Bot (pokemon:delta-reign)": [
+  "plist|delta-reign|Card Bot|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box"
+ ],
  "CardPlus TCG": [
   "list|CardPlus TCG|13708",
   "list|CardPlus TCG|13721",

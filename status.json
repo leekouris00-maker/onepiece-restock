@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-15 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794661789,
+ "ebay_ts": 1794662946,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794662350,
+ "pokemon_ts": 1794663163,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -76,10 +76,6 @@
   "list|GUF|my-name-is-shirahoshi-extra-booster-one-piece-heroines-edition-vol-2": [
    1.0,
    1794545128
-  ],
-  "list|GUF|nico-robin-sp-extra-booster-one-piece-heroines-edition-vol-2": [
-   624.5,
-   1794403251
   ],
   "list|Good Games (sealed)|one-piece-card-game-booster-box-tba-op-15": [
    339.0,
@@ -124,6 +120,10 @@
   "plist|30th-celebration|Rogue Online|pre-order-pokemon-tcg-30th-celebration-ultra-premium-collection-day-night-random-box": [
    899.99,
    1794449402
+  ],
+  "plist|delta-reign|Card Bot|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": [
+   119.99,
+   1794663164
   ],
   "plist|delta-reign|Cherry Collectables|kyogre-117-pokemon-me-mega-evolution-promo": [
    8.39,
@@ -683,7 +683,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794563693.7578554
+   "t": 1794663137.092951
   },
   "cardplustcg.com.au": {
    "rules": [
@@ -6099,7 +6099,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794662534,
+ "sealed_ts": 1794663163,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6136,6 +6136,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794661789,
- "sweep_ts": 1794661789
+ "singles_ts": 1794662946,
+ "sweep_ts": 1794662946
 }
