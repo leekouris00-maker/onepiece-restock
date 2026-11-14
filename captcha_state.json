@@ -211,14 +211,14 @@
    "url": "https://www.irresistibleforce.com.au/robots.txt"
   },
   "www.jbhifi.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794633883,
    "kind": "Cloudflare challenge",
-   "since": 1794633883,
+   "since": 1794634490,
    "status": 429,
    "told": null,
-   "until": 1794634483,
-   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-starter-deck-st-28.js"
+   "until": 1794635690,
+   "url": "https://www.jbhifi.com.au/products.json?limit=250"
   },
   "www.kollecter.com.au": {
    "count": 5,

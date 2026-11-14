@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-14 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794633449,
+ "ebay_ts": 1794634686,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -6095,7 +6095,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794634308,
+ "sealed_ts": 1794634686,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6107,7 +6107,7 @@
   "grailborne.com.au": 0,
   "guf.com.au": 0,
   "lightofcards.com.au": 0,
-  "morethanmeeples.com.au": 0,
+  "morethanmeeples.com.au": 1,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
@@ -6122,7 +6122,7 @@
   "www.gumnut.com.au": 0,
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
-  "www.jtoys.com.au": 1,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -6132,6 +6132,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794633449,
- "sweep_ts": 1794633449
+ "singles_ts": 1794634686,
+ "sweep_ts": 1794634686
 }
