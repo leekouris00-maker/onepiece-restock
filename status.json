@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-14 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794623007,
+ "ebay_ts": 1794623974,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -43,7 +43,7 @@
   "TCGroup": 99,
   "The Wandering Collector": 99
  },
- "pc_on": false,
+ "pc_on": true,
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794623208,
+ "pokemon_ts": 1794623974,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -6079,10 +6079,8 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794623208,
- "shop_down": [
-  "morethanmeeples.com.au"
- ],
+ "sealed_ts": 1794623974,
+ "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -6093,7 +6091,7 @@
   "grailborne.com.au": 0,
   "guf.com.au": 0,
   "lightofcards.com.au": 0,
-  "morethanmeeples.com.au": 3,
+  "morethanmeeples.com.au": 0,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
@@ -6117,9 +6115,7 @@
   "www.tcgroupau.com.au": 0
  },
  "shop_locked": [],
- "shop_retry": {
-  "morethanmeeples.com.au": 1794623526
- },
- "singles_ts": 1794623007,
- "sweep_ts": 1794623007
+ "shop_retry": {},
+ "singles_ts": 1794623974,
+ "sweep_ts": 1794623974
 }
