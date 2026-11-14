@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-14 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794651619,
+ "ebay_ts": 1794652628,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794651819,
+ "pokemon_ts": 1794652434,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -977,7 +977,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794565962.7088578
+   "t": 1794652422.1583755
   },
   "elementalarcade.com.au": {
    "rules": [],
@@ -1503,7 +1503,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794565962.7077532
+   "t": 1794652422.1557348
   },
   "guf.com.au": {
    "rules": [
@@ -2873,7 +2873,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794565961.9241645
+   "t": 1794652422.1552186
   },
   "tcg.goodgames.com.au": {
    "rules": [],
@@ -3403,7 +3403,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1794565961.9294908
+   "t": 1794652422.1434104
   },
   "www.fpvfaster.com.au": {
    "rules": [
@@ -3684,7 +3684,7 @@
      "/*.atom"
     ]
    ],
-   "t": 1794561632.2802734
+   "t": 1794652422.1462824
   },
   "www.gameology.com.au": {
    "rules": [
@@ -3941,7 +3941,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794565961.9281814
+   "t": 1794652422.1427383
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -6099,7 +6099,7 @@
    "t": 1794580293.2804754
   }
  },
- "sealed_ts": 1794652030,
+ "sealed_ts": 1794652628,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6111,7 +6111,7 @@
   "grailborne.com.au": 0,
   "guf.com.au": 0,
   "lightofcards.com.au": 0,
-  "morethanmeeples.com.au": 1,
+  "morethanmeeples.com.au": 0,
   "overhauledgames.com.au": 0,
   "pocketgames.com.au": 0,
   "rogueonline.com.au": 0,
@@ -6136,6 +6136,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794651619,
- "sweep_ts": 1794651619
+ "singles_ts": 1794652628,
+ "sweep_ts": 1794652628
 }
