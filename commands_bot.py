@@ -1488,7 +1488,7 @@ def build_captcha(cfg, resume=""):
             what = f"waiting for you - open https://{r['host']} in your browser, then `/captcha resume:{r['name']}`"
         else:
             what = f"asked to slow down; the bot tries again by itself <t:{int(r['until'])}:R>"
-        out.append(f"• **{r['name']}** ({r['kind']}, since {since}): {what}")
+        out.append(f"• **{ng.captcha_watch.shop_link(r['name'], r['host'])}** ({r['kind']}, since {since}): {what}")
     if len(rows) > 30:
         out.append(f"…and {len(rows) - 30} more")
     return "\n".join(out)[:1900]

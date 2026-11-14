@@ -25,6 +25,7 @@ Settings (config.json "security" > "captcha"):
   "recheck_hours": 0     0 = wait for you to press Resume. A number = try the shop once after that many
                          hours by itself (at least 6).
 """
+import re
 import time
 
 MIN_RECHECK_HOURS = 6
@@ -168,24 +169,34 @@ HOW_CLOUD = ("This is the cloud copy, which shops often refuse because it runs f
              "your home connection may still read them fine. The cloud copy tries each one again once a day by itself.")
 
 
+def shop_link(name, host):
+    """v2.19.5: the shop's name as a Discord link to its front page, so a notice can be tapped straight
+    through to the shop. (The address the bot was refused on is usually a products.json feed, which is no
+    use in a browser.) Markdown characters in the name are escaped so they can't break the link."""
+    label = re.sub(r"([\\\[\]()*_~`|>])", r"\\\1", str(name or host))
+    h = str(host or "").strip().strip("/")
+    return f"[{label}](https://{h}/)" if h else label
+
+
 def message(name, host, e, how=HOW_PAGE, cloud=False):
     """The notice for one shop. "how" is what Resume looks like where this copy runs."""
     how = how.replace("{name}", str(name))
+    shop = shop_link(name, host)
     if cloud:
-        return (f"🧩 **{name} is asking the bot for human verification** ({e.get('kind')}). The bot has stopped checking "
+        return (f"🧩 **{shop} is asking the bot for human verification** ({e.get('kind')}). The bot has stopped checking "
                 f"it and won't try to get round it. {HOW_CLOUD}")
     if int(e.get("status") or 0) == 429:
-        return (f"🧩 **{name} has been asking the bot to verify it's human for {STUCK_AFTER // 3600} hours** "
+        return (f"🧩 **{shop} has been asking the bot to verify it's human for {STUCK_AFTER // 3600} hours** "
                 f"({e.get('kind')}). The bot has stopped checking it and won't try to get round it. If the shop opens "
                 f"normally in your own browser, {how} to try again.")
-    return (f"🧩 **{name} is asking for human verification** ({e.get('kind')}). The bot has stopped checking it and "
+    return (f"🧩 **{shop} is asking for human verification** ({e.get('kind')}). The bot has stopped checking it and "
             f"won't try to get round it. To carry on: open https://{host} in your own browser, and if it lets you in, "
             f"{how}. If the shop challenges the bot again it'll be paused again.")
 
 
 def digest(items, how=HOW_DISCORD, cloud=False):
     """One notice for several shops from the same check. items: [(name, host, entry), ...]"""
-    lines = "\n".join(f"• **{name}** ({e.get('kind')})" for name, host, e in items[:40])
+    lines = "\n".join(f"• **{shop_link(name, host)}** ({e.get('kind')})" for name, host, e in items[:40])
     more = f"\n…and {len(items) - 40} more" if len(items) > 40 else ""
     head = (f"🧩 **{len(items)} shops are asking the bot for human verification.** The bot has stopped checking them "
             f"and won't try to get round it.\n{lines}{more}\n")
