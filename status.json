@@ -55,7 +55,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794667532,
+ "pokemon_ts": 1794668148,
  "recent_alerts": {
   "ebay|v1|158366644617|0": [
    265.8,
@@ -6099,10 +6099,8 @@
    "t": 1794666738.346302
   }
  },
- "sealed_ts": 1794667912,
- "shop_down": [
-  "www.jtoys.com.au"
- ],
+ "sealed_ts": 1794668698,
+ "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -6128,7 +6126,7 @@
   "www.gumnut.com.au": 0,
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
-  "www.jtoys.com.au": 3,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -6137,9 +6135,7 @@
   "www.tcgroupau.com.au": 0
  },
  "shop_locked": [],
- "shop_retry": {
-  "www.jtoys.com.au": 1794668231
- },
+ "shop_retry": {},
  "singles_ts": 1794667912,
  "sweep_ts": 1794667912
 }
