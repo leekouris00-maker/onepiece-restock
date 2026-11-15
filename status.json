@@ -7,8 +7,33 @@
  "drops_slot": "2026-11-15 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794718475,
- "held": {},
+ "ebay_ts": 1794719535,
+ "held": {
+  "plist|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-tin-4th-december": {
+   "f": {
+    "available": false,
+    "box_id": "poke|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-tin-4th-december",
+    "cart": "",
+    "game": "pokemon",
+    "group": "pokemon",
+    "id": "plist|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-tin-4th-december",
+    "kind": "New listing",
+    "max": 45.0,
+    "name": "Pokemon TCG: 30th Celebration Tin",
+    "note": "Tin, out Fri 4 Dec \u00b7 listed, not buyable yet",
+    "page": 1,
+    "poke_id": "poke|30th-celebration|Gametraders Modbury Heights|pre-order-pokemon-tcg-30th-celebration-tin-4th-december",
+    "preorder": false,
+    "price": 79.99,
+    "ptype": "Tin",
+    "section": "30th-celebration",
+    "section_name": "30th Celebration",
+    "shop": "Gametraders Modbury Heights",
+    "url": "https://www.gametradersinglefarm.com.au/products/pre-order-pokemon-tcg-30th-celebration-tin-4th-december"
+   },
+   "t": 1794719544
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -44,7 +69,7 @@
   "The Wandering Collector": 99
  },
  "pc_on": true,
- "pc_version": "2.22.0",
+ "pc_version": "2.23.0",
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -56,7 +81,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794718855,
+ "pokemon_ts": 1794719535,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -6092,7 +6117,7 @@
    "t": 1794666738.346302
   }
  },
- "sealed_ts": 1794719039,
+ "sealed_ts": 1794719728,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6129,6 +6154,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794718475,
- "sweep_ts": 1794718475
+ "singles_ts": 1794719535,
+ "sweep_ts": 1794719535
 }
