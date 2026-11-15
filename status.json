@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-16 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794749834,
+ "ebay_ts": 1794750830,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -44,7 +44,7 @@
   "The Wandering Collector": 99
  },
  "pc_on": true,
- "pc_version": "2.23.0",
+ "pc_version": "2.24.0",
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -56,7 +56,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794750046,
+ "pokemon_ts": 1794750830,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -5110,6 +5110,43 @@
    ],
    "t": 1794737380.6197307
   },
+  "www.kaika.com.au": {
+   "rules": [
+    [
+     0,
+     "/_"
+    ],
+    [
+     0,
+     "/cgi-bin/"
+    ],
+    [
+     0,
+     "/do/"
+    ],
+    [
+     0,
+     "/*?*rf="
+    ],
+    [
+     0,
+     "/_cpanel"
+    ],
+    [
+     0,
+     "/cgi-bin/suppliers/"
+    ],
+    [
+     0,
+     "/_mycart"
+    ],
+    [
+     0,
+     "/_myacct"
+    ]
+   ],
+   "t": 1794750781.014036
+  },
   "www.kollecter.com.au": {
    "rules": [
     [
@@ -6092,7 +6129,7 @@
    "t": 1794666738.346302
   }
  },
- "sealed_ts": 1794750598,
+ "sealed_ts": 1794751209,
  "shop_down": [
   "www.jtoys.com.au"
  ],
@@ -6133,6 +6170,6 @@
  "shop_retry": {
   "www.jtoys.com.au": 1794751498
  },
- "singles_ts": 1794749834,
- "sweep_ts": 1794749834
+ "singles_ts": 1794750830,
+ "sweep_ts": 1794750830
 }
