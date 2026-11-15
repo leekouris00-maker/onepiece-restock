@@ -1018,6 +1018,7 @@
   "list|Irresistible Force|one-piece-card-game-starter-deck-red-black-sabo-st-35",
   "list|Irresistible Force|one-piece-card-game-starter-deck-yellow-eustasscaptainkid-st-36"
  ],
+ "Irresistible Force (japanese)": [],
  "Irresistible Force (pokemon:30th-celebration)": [
   "plist|30th-celebration|Irresistible Force|pokemon-tcg-30th-celebration-ditto-premium-collection",
   "plist|30th-celebration|Irresistible Force|pokemon-tcg-30th-celebration-figure-collection-mew-mewtwo-assorted-please-read-description",
@@ -1246,6 +1247,13 @@
   "list|Lootable|one-piece-card-game-double-pack-set-vol-13-dp-13-english",
   "list|Lootable|one-piece-card-game-starter-deck-baroque-works-st-38-english",
   "list|Lootable|one-piece-card-game-starter-deck-the-desert-princess-and-the-pirates-st-37-english"
+ ],
+ "Lootable (pokemon:30th-celebration)": [],
+ "Lootable (pokemon:delta-reign)": [
+  "plist|delta-reign|Lootable|pokemon-tcg-mega-evolution-delta-reign-3-pack-blister-english",
+  "plist|delta-reign|Lootable|pokemon-tcg-mega-evolution-delta-reign-booster-box-english",
+  "plist|delta-reign|Lootable|pokemon-tcg-mega-evolution-delta-reign-booster-bundle-english",
+  "plist|delta-reign|Lootable|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box-english"
  ],
  "M-G": [],
  "M-G (all sealed)": [],
@@ -1683,6 +1691,13 @@
  ],
  "X-Playground (other sealed)": [
   "list|X-Playground|one-piece-card-game-the-dominance-of-god-double-pack-set-dp-13-single-box"
+ ],
+ "X-Playground (pokemon:30th-celebration)": [
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-booster-bundle",
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-elite-trainer-box",
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-ex-tin-greninja-ex",
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-ex-tin-sylveon-ex",
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-mini-tin-set-of-10"
  ],
  "X-Playground (pokemon:delta-reign)": [
   "plist|delta-reign|X-Playground|pokemon-tcg-mega-evolution-delta-reign-booster-box",
