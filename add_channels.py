@@ -61,6 +61,13 @@ CHANNELS = [
      "on the day (\"out today\", with a ping), listing what's out, which shops have it online right now and "
      "where to look on a shelf. Spotted stock in a store? Type `/onepiece report` anywhere in the server and it "
      "posts here for everyone. `/onepiece releases` shows the calendar."),
+    # v2.25: quiet restock alerts (boxes back in stock above your max). No pings.
+    ("🔔・restocks", "Bot: booster boxes and watched sealed back in stock ABOVE your max. No pings; the loud alerts "
+     "stay in #booster-boxes.",
+     "discord_webhook_restocks", "DISCORD_WEBHOOK_RESTOCKS",
+     "🔔 **Restocks above your max will post here**, without a ping: a booster box or watched sealed item that "
+     "comes back into stock for more than your max (`/boxmax`). Boxes at or under your max still ping in "
+     "#booster-boxes. The same product at the same shop posts at most once a day."),
 ]
 
 ONEPIECE_KEYS = ("discord_webhook_instore",)        # what `/onepiece setup` in Discord makes (the rest need the .bat)

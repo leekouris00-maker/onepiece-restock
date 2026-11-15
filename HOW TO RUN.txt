@@ -82,7 +82,8 @@ New in v2.25: QUIET RESTOCK ALERTS. A booster box (or a watched sealed item) tha
   the loud alerts stay the ones at or under your max (/boxmax sets that). The same product at the same shop
   posts at most once a day, and anything over 4 times your max is left out. Change with
       "restock_alerts": {"repeat_hours": 24, "max_times": 4}     or     "restock_alerts": false
-  To send them to a channel of their own, put that channel's webhook in alerts as "discord_webhook_restocks".
+  To give them a channel of their own (#restocks), double-click add_channels.bat once: it makes the channel
+  and saves its webhook. Without that they go to your boxes channel, still without a ping.
   Auto-buy never acts on these.
 New in v2.24: ANIME KAIKA. The bot now watches Anime Kaika (kaika.com.au, Sydney), which lists English booster
   boxes at the A$214.99 RRP: its One Piece section plus its OP-18 and OP-19 box pages. Kaika marks some boxes

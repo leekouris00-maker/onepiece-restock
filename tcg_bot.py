@@ -251,6 +251,7 @@ ENV_ALERTS = {
     "DISCORD_WEBHOOK_DROPS": "discord_webhook_drops",      # optional: the 6-hourly price drops get their own channel
     "DISCORD_WEBHOOK_PRICES": "discord_webhook_prices",    # optional: v2.8 daily TCGplayer report (tcgplayer.py)
     "DISCORD_WEBHOOK_INSTORE": "discord_webhook_instore",  # optional: v2.10 One Piece in-store posts (onepiece_instore.py)
+    "DISCORD_WEBHOOK_RESTOCKS": "discord_webhook_restocks",  # optional: v2.25 quiet over-max restocks get their own channel
     "LEDGER_URL": "ledger_url",
     "HEARTBEAT_TOPIC": "heartbeat_topic",
     "HEARTBEAT_ROLE": "heartbeat_role",
@@ -3556,6 +3557,7 @@ HOOK_LABELS = {"discord_webhook_boxes": "#booster-boxes", "discord_webhook_singl
                "discord_webhook_watch": "#watched-links",
                "discord_webhook_status": "#bot-status", "discord_webhook_drops": "price drops",
                "discord_webhook_prices": "#tcgplayer-prices", "discord_webhook_instore": "#onepiece-in-store",
+               "discord_webhook_restocks": "#restocks",
                "discord_webhook_recap": "daily recap", "discord_webhook_autobuy": "🔒 auto-buy",
                "discord_webhook_deals": "🔒 deals",
                "discord_webhook": "main channel"}
