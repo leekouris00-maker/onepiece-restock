@@ -1683,5 +1683,11 @@
  ],
  "X-Playground (other sealed)": [
   "list|X-Playground|one-piece-card-game-the-dominance-of-god-double-pack-set-dp-13-single-box"
+ ],
+ "X-Playground (pokemon:delta-reign)": [
+  "plist|delta-reign|X-Playground|pokemon-tcg-mega-evolution-delta-reign-booster-box",
+  "plist|delta-reign|X-Playground|pokemon-tcg-mega-evolution-delta-reign-booster-bundle",
+  "plist|delta-reign|X-Playground|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box",
+  "plist|delta-reign|X-Playground|pokemon-tcg-mega-evolution-delta-reign-three-booster-blister"
  ]
 }

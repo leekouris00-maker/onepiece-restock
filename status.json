@@ -56,7 +56,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794767983,
+ "pokemon_ts": 1794768781,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -157,6 +157,10 @@
   "poke|delta-reign|M-G|137861": [
    10.0,
    1794552051
+  ],
+  "poke|delta-reign|X-Playground|pokemon-tcg-mega-evolution-delta-reign-booster-box": [
+   359.95,
+   1794768783
   ],
   "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
    99.0,
@@ -7619,7 +7623,7 @@
    "t": 1794765489.27715
   }
  },
- "sealed_ts": 1794767983,
+ "sealed_ts": 1794768781,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
