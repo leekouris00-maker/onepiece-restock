@@ -126,6 +126,10 @@ try:
 except ImportError:
     cv = None
 try:
+    import flip as fp          # v2.22: /flip
+except ImportError:
+    fp = None
+try:
     import tcgplayer as tp     # v2.8: /tcgp, and the TCGplayer line in /value
 except ImportError:
     tp = None
@@ -528,6 +532,10 @@ def build_status(cfg):
     fields.append({"name": "Discord posts", "value": "\n".join(
         f"⚠️ {tb.hook_label(k)}: failing for {h['fails']} check(s), first {ago(h.get('since'))} · {h.get('error', '')[:120]}"
         for k, h in bad)[:1000] if bad else "All channels taking the bot's posts ✅"})
+    try:                                      # v2.22: both copies' health in one place
+        fields.append({"name": "Both copies (last 24 h)", "value": "\n".join(tb.copies_health(cfg))[:1000]})
+    except Exception:  # noqa: BLE001
+        pass
     if tb.CONFIG_WARNINGS:
         fields.append({"name": "⚠️ config.json", "value": "\n".join("• " + w for w in tb.CONFIG_WARNINGS)[:1000]})
     return embed(f"🩺 Bot status (PC, v{tb.VERSION})", fields, GREY)
@@ -595,6 +603,7 @@ HELP = (
     "`/card <search>` look up a card, e.g. `/card OP13-120` or `/card sabo`\n"
     "`/history <search>` price history and lowest price seen, e.g. `/history op-18`\n"
     "`/value <card>` a single's value at the shops now + its price chart for the last week, e.g. `/value OP13-120`\n"
+    "`/flip <set code> [price]` what a booster box is worth (US market in A$) and what a resale would leave, e.g. `/flip OP-18 215`\n"
     "`/tcgp <search>` TCGplayer's US market price in US$ and A$, e.g. `/tcgp OP13-120` or `/tcgp op13 booster box`\n"
     "`/pricecheck deck <deck>` what a whole deck costs at the shops now and at TCGplayer: a saved deck, a want-list "
     "deck, or paste a list (`1xOP12-001 4xOP12-016 ...`). `/pricecheck save` keeps one · `/pricecheck list`\n"
@@ -933,6 +942,21 @@ if tp:
             await inter.followup.send(embed=discord.Embed.from_dict(tp.lookup_embed(store, search.strip()[:100])))
         except Exception as e:  # noqa: BLE001
             await fail(inter, e)
+
+
+def build_flip(cfg, item, price):
+    store = fp.refresh(tb, cfg)
+    title, lines = fp.report(cfg, item, price, store=store)
+    return embed(f"💱 {title}", [], BLUE, description="\n".join(lines)[:4000],
+                 footer="An estimate from TCGplayer's US market price. Your costs: config.json > \"flip\".")
+
+
+if fp:
+    @bot.tree.command(name="flip", description="What a booster box is worth vs what you'd pay: market price and what a resale leaves")
+    @app_commands.describe(item="A set code for its English booster box (OP-18, EB-05), or a TCGplayer product number",
+                           price="What you'd pay for it, in A$ (leave out to just see the market and break-even)")
+    async def flip_cmd(inter: discord.Interaction, item: str, price: Optional[float] = None):
+        await respond(inter, build_flip, item.strip()[:60], price)
 
 
 if dk:

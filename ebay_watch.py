@@ -14,6 +14,17 @@ on exactly as before.
 "max" in ebay_watch.json is the most you'd pay in AUD, delivered: the item price, plus postage to
 Australia, plus the 10% GST eBay adds at checkout on items posted from overseas (an estimate).
 
+v2.22 - a max that follows the market. Instead of (or as well as) a fixed "max", an entry can say
+    "under_market_pct": 20
+and where its market price comes from, one of:
+    "market_tcgplayer": "OP-18"      a set code = that set's English booster box on TCGplayer (US market,
+                                     converted to A$), or the number in a product's tcgplayer.com link
+    "market_aud": 650                a figure you type in yourself (e.g. for graded cards TCGplayer doesn't price)
+The bot then alerts on listings at least that far under the market, delivered. If "max" is there too, the
+lower of the two applies. If the market price can't be found (no price data, or older than a week), the
+entry falls back to its "max", or is skipped with a note if it has none. The TCGplayer figure is a US
+price: a guide, not what the item sells for in Australia.
+
 Get the eBay key (once, free, about 10 minutes):
   1. developer.ebay.com > sign in with your eBay account > join the eBay Developers Program.
   2. Application Keysets > create a keyset under "Production". If it asks about "marketplace account
@@ -37,6 +48,11 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+
+try:
+    import flip                 # v2.22: market prices for "under_market_pct"; optional
+except ImportError:
+    flip = None
 
 HERE = os.environ.get("BOT_DATA_DIR") or os.path.dirname(os.path.abspath(__file__))   # v2.15: data folder (container)
 WATCH_PATH = os.path.join(HERE, "ebay_watch.json")
@@ -150,15 +166,49 @@ def load_watch(path=None):
             continue
         mx = _num(c.get("max"))
         search = _strings(c.get("search") or c.get("name"))
+        market, pct = market_for(c), _num(c.get("under_market_pct"))
+        if pct is not None and not 0 < pct < 95:
+            _say_once(f"   ! ebay_watch.json: \"{c.get('name', '?')}\": \"under_market_pct\" should be between "
+                      f"1 and 94, so it's ignored")
+            pct = None
+        if pct and market:
+            target = round(market * (1 - pct / 100), 2)
+            mx = min(mx, target) if mx and mx > 0 else target
+        elif pct and not (mx and mx > 0):
+            _say_once(f"   ! ebay_watch.json: \"{c.get('name', '?')}\" has \"under_market_pct\" but no market "
+                      f"price could be found and it has no \"max\" to fall back on, so it's skipped")
+            continue
+        else:
+            market = market if pct else None
         if not mx or mx <= 0 or not search:
             _say_once(f"   ! ebay_watch.json: \"{c.get('name', '?')}\" needs a number for \"max\" and a "
                       f"\"search\", so it's skipped")
             continue
         cards.append({"name": str(c.get("name") or search[0]), "max": mx, "search": search,
+                      "market": market if pct else None, "under_pct": pct if market else None,
                       "must_have": _strings(c.get("must_have")), "exclude": _strings(c.get("exclude")),
                       "note": str(c.get("note") or ""), "add_gst": c.get("add_gst", True) is not False,
                       "skip_all": skip_all, "min_pct": min_pct, "min_n": min_n})
     return cards, every
+
+
+def market_for(c, store=None):
+    """v2.22: the market price (A$) an entry is measured against: "market_aud" as typed, else "market_tcgplayer"
+    looked up in the bot's daily TCGplayer prices. None if there isn't one that can be trusted."""
+    typed = _num(c.get("market_aud"))
+    if typed and typed > 0:
+        return typed
+    ref = c.get("market_tcgplayer")
+    if not ref or not flip:
+        return None
+    try:
+        store = flip.load_store() if store is None else store
+        if not flip.fresh(store):
+            return None
+        m = flip.lookup(store, ref)
+        return m["aud"] if m else None
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def credentials(cfg=None):
@@ -270,6 +320,9 @@ def make_find(card, item, c):
     if _has(_norm(title), "psa"):
         extra.append("check the cert number at psacard.com/cert before paying")
     note = f"[{title}]({url})\n" + " + ".join(parts) + (" · " + " · ".join(extra) if extra else "")
+    if card.get("market") and total:
+        under = (card["market"] - total) / card["market"] * 100
+        note += f"\n{under:.0f}% under the market price of {_money(card['market'])} (a guide, not an Australian sold price)"
     if card.get("note"):
         note += "\n" + card["note"]
     return {"id": f"ebay|{iid}", "kind": "Single", "name": card["name"], "deck": "eBay watch", "qty": 1,

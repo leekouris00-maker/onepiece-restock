@@ -683,13 +683,14 @@ class FullRuns(Patched):
         self.assertEqual(tb.heartbeat_body(base_cfg(), {}), "pc-on")              # no Pokémon channels on the PC
 
     def test_cloud_reads_the_heartbeat(self):
-        lines = [{"event": "open"}, {"event": "message", "time": 100, "message": "pc-on pokemon r=a|eve"},
-                 {"event": "message", "time": 200, "message": "pc-on pokemon r=a|day,b|day"}]
+        t = int(time.time())       # v2.22: the cloud copy reads 6 hours back and itself keeps the last 20 minutes
+        lines = [{"event": "open"}, {"event": "message", "time": t - 300, "message": "pc-on pokemon r=a|eve"},
+                 {"event": "message", "time": t - 100, "message": "pc-on pokemon r=a|day,b|day"}]
         real = tb.HTTP.fetch
         tb.HTTP.fetch = lambda *a, **k: "\n".join(json.dumps(x) for x in lines).encode()
         self.addCleanup(setattr, tb.HTTP, "fetch", real)
         read = self.saved["pc_last_seen"]                      # the real one (setUp swaps in a stand-in)
-        self.assertEqual(read({"alerts": {"heartbeat_topic": "t"}}), 200)
+        self.assertEqual(read({"alerts": {"heartbeat_topic": "t"}}), t - 100)
         self.assertEqual(tb.PC_INFO, {"pokemon": True, "posted": {"a|eve", "a|day", "b|day"}})
         lines[2]["message"] = "pc-on"
         read({"alerts": {"heartbeat_topic": "t"}})
