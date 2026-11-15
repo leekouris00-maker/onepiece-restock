@@ -91,16 +91,6 @@
    "told": 1794684178,
    "url": "https://www.irresistibleforce.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
   },
-  "www.jbhifi.com.au": {
-   "count": 4,
-   "first": 1794726522,
-   "kind": "Cloudflare challenge",
-   "since": 1794731095,
-   "status": 429,
-   "told": null,
-   "until": 1794735895,
-   "url": "https://www.jbhifi.com.au/products.json?limit=250"
-  },
   "www.kollecter.com.au": {
    "count": 7,
    "first": 1794620344,
@@ -120,26 +110,6 @@
    "told": null,
    "until": 1794739371,
    "url": "https://www.mayhemcollectables.com.au/search/suggest.json?q=Belo%20Betty&resources[type]=product&resources[limit]=10"
-  },
-  "www.monstermart.com.au": {
-   "count": 5,
-   "first": 1794715328,
-   "kind": "Cloudflare challenge",
-   "since": 1794725740,
-   "status": 429,
-   "told": null,
-   "until": 1794735340,
-   "url": "https://www.monstermart.com.au/search/suggest.json?q=Delta%20Reign&resources[type]=product&resources[limit]=10"
-  },
-  "www.pokebox.com.au": {
-   "count": 2,
-   "first": 1794733729,
-   "kind": "Cloudflare challenge",
-   "since": 1794734386,
-   "status": 429,
-   "told": null,
-   "until": 1794735586,
-   "url": "https://www.pokebox.com.au/collections/one-piece-card-game-booster-boxes-english/products.json?limit=250"
   }
  }
 }
