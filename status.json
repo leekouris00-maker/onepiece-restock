@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-16 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794771970,
+ "ebay_ts": 1794772949,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -24,8 +24,11 @@
   "CardPlus TCG": 99,
   "Cherry Collectables": 99,
   "Collectible Madness": 99,
+  "GB Toys": 99,
   "GUF": 99,
   "Gameology": 99,
+  "Games Empire": 99,
+  "Games Portal": 99,
   "Gametraders Modbury Heights": 99,
   "Goldfields Games": 99,
   "Good Games (sealed)": 99,
@@ -34,6 +37,7 @@
   "Irresistible Force": 99,
   "JToys": 99,
   "Light of Cards": 99,
+  "Lootable": 99,
   "M-G": 99,
   "More Than Meeples": 99,
   "Overhauled Games": 99,
@@ -41,7 +45,8 @@
   "Pocket Games": 99,
   "Rogue Online": 99,
   "TCGroup": 99,
-  "The Wandering Collector": 99
+  "The Wandering Collector": 99,
+  "X-Playground": 99
  },
  "pc_on": false,
  "pc_version": "2.25.0",
@@ -56,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794772352,
+ "pokemon_ts": 1794773176,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -164,7 +169,7 @@
   ],
   "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
    99.0,
-   1794714521
+   1794772961
   ]
  },
  "robots": {
@@ -7623,7 +7628,7 @@
    "t": 1794765489.27715
   }
  },
- "sealed_ts": 1794772536,
+ "sealed_ts": 1794773176,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7666,7 +7671,7 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794771970,
+ "singles_ts": 1794772949,
  "soft_alerts": {},
- "sweep_ts": 1794771970
+ "sweep_ts": 1794772949
 }
