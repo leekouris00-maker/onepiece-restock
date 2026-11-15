@@ -59,10 +59,19 @@
  "Anime Kaika (all sealed)": [
   "list|Anime Kaika|one-piece-card-game-set-sail-deck-set-sd-01-tcg"
  ],
+ "Anime Kaika (japanese)": [],
  "Card Bot": [],
  "Card Bot (all sealed)": [
   "list|Card Bot|2025-one-piece-nami-070-psa-10-162498806",
   "list|Card Bot|one-piece-card-game-kaku-full-art-starter-deck-29-egghead-st-29"
+ ],
+ "Card Bot (japanese)": [
+  "list|Card Bot|one-piece-card-game-adventure-on-kami-s-island-op-15-booster-box-japanese",
+  "list|Card Bot|one-piece-card-game-carrying-on-his-will-op-13-booster-box-japanese-1",
+  "list|Card Bot|one-piece-card-game-heroines-edition-eb-03-booster-box-japanese",
+  "list|Card Bot|one-piece-card-game-heroines-edition-vol-2-eb-05-booster-box-japanese",
+  "list|Card Bot|one-piece-card-game-the-moment-of-decisive-battle-op-16-booster-box-japanese",
+  "list|Card Bot|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-japanese"
  ],
  "Card Bot (pokemon:30th-celebration)": [],
  "Card Bot (pokemon:delta-reign)": [
@@ -84,6 +93,7 @@
   "list|CardPlus TCG|13728",
   "list|CardPlus TCG|13734"
  ],
+ "CardPlus TCG (japanese)": [],
  "CardPlus TCG (other sealed)": [
   "list|CardPlus TCG|13728",
   "list|CardPlus TCG|13734",
@@ -147,6 +157,7 @@
   "list|Cherry Collectables|super-prerelease-one-piece-card-game-st-02-worst-generation-starter-deck",
   "list|Cherry Collectables|super-prerelease-one-piece-card-game-st-04-animal-kingdom-pirates-starter-deck"
  ],
+ "Cherry Collectables (japanese)": [],
  "Cherry Collectables (other sealed)": [
   "list|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards",
   "list|Cherry Collectables|yamato-gift-collection-2023-st09-012-one-piece-one-piece-promotion-cards"
@@ -175,6 +186,10 @@
   "list|Collectible Madness|one-piece-card-game-tba-op-18-booster-box"
  ],
  "Collectible Madness (all sealed)": [],
+ "Collectible Madness (japanese)": [
+  "list|Collectible Madness|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box-japanese",
+  "list|Collectible Madness|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-japanese"
+ ],
  "Collectible Madness (pokemon:30th-celebration)": [
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-battle-deck-espeon-ex",
   "plist|30th-celebration|Collectible Madness|pokemon-tcg-30th-celebration-battle-deck-umbreon-ex",
@@ -406,6 +421,27 @@
   "list|Gameology|one-piece-card-game-zoro-and-sanji-starter-deck-st-12",
   "list|Gameology|one-piece-luffy-with-momonosuke-exclusive-pop-premium"
  ],
+ "Gameology (japanese)": [
+  "list|Gameology|one-piece-card-game-a-fist-of-divine-speed-op-11-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-awakening-of-the-new-era-op-05-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-eb-01-memorial-collection-extra-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-extra-booster-box-eb-03-japanese",
+  "list|Gameology|one-piece-card-game-inherited-will-op-13-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-kingdoms-of-intrigue-op-04-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-legacy-of-the-master-op-12-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-op-07-500-years-in-the-future-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-op-14-seven-heroes-of-the-blue-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-op-15-adventure-on-kamis-island-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-op-16-the-time-of-battle-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-op-17-the-worlds-strongest-warriors-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-paramount-war-op-02-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-pillars-of-strength-op-03-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-premium-booster-box-the-best-prb-01-japanese",
+  "list|Gameology|one-piece-card-game-royal-blood-op-10-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-the-four-emperors-op-09-booster-box-japanese",
+  "list|Gameology|one-piece-card-game-wings-of-the-captain-op-05-booster-box-japanese",
+  "list|Gameology|one-piece-tcg-romance-dawn-op-01-booster-box-japanese"
+ ],
  "Gameology (other sealed)": [
   "list|Gameology|one-piece-card-game-dp-13-double-pack",
   "list|Gameology|one-piece-card-game-illustration-box-ib-05",
@@ -495,6 +531,7 @@
   "list|Gametraders Modbury Heights|pre-order-one-piece-luffy-w-momonosuke-pop-premium-eta-october",
   "list|Gametraders Modbury Heights|pre-order-one-piece-zoro-sleeping-us-exclusive-pop-premium-eta-april"
  ],
+ "Gametraders Modbury Heights (japanese)": [],
  "Gametraders Modbury Heights (other sealed)": [
   "list|Gametraders Modbury Heights|pre-order-one-piece-card-game-gift-collection-heroines-gc-2026-20th-november"
  ],
@@ -664,6 +701,10 @@
   "list|Good Games (sealed)|one-piece-sweet-dreams-lamp-blind-box",
   "list|Good Games (sealed)|one-piece-x-luo-xiao-hei-s1"
  ],
+ "Good Games (sealed) (japanese)": [
+  "list|Good Games (sealed)|japanese-one-piece-tcg-eb-04-egghead-crisis-booster-box",
+  "list|Good Games (sealed)|japanese-one-piece-tcg-prb-02-the-best-booster-box"
+ ],
  "Good Games (sealed) (other sealed)": [
   "list|Good Games (sealed)|ace-sabo-luffy-op13-007-carrying-on-his-will-foil",
   "list|Good Games (sealed)|one-piece-card-game-double-pack-tba-dp-13",
@@ -702,6 +743,7 @@
   "list|Grailborne|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-case-12-boxes-english",
   "list|Grailborne|one-piece-tcg-ace-luffy-starter-deck-ex-st-30"
  ],
+ "Grailborne (japanese)": [],
  "Grailborne (other sealed)": [
   "list|Grailborne|one-piece-card-game-double-pack-set-vol-13-dp-13",
   "list|Grailborne|one-piece-card-game-double-pack-set-vol-13-dp-13-display-8-double-packs",
@@ -903,6 +945,7 @@
   "list|JB Hi-Fi|one-piece-card-game-premium-card-collection-best-selection-vol-4",
   "list|JB Hi-Fi|one-piece-card-game-special-goods-set-former-four-emperors"
  ],
+ "JB Hi-Fi (japanese)": [],
  "JToys": [
   "list|JToys|78683",
   "list|JToys|83985",
@@ -912,6 +955,13 @@
   "list|JToys|90304"
  ],
  "JToys (all sealed)": [],
+ "JToys (japanese)": [
+  "list|JToys|72388",
+  "list|JToys|81895",
+  "list|JToys|85950",
+  "list|JToys|86711",
+  "list|JToys|89423"
+ ],
  "JToys (pokemon:30th-celebration)": [
   "plist|30th-celebration|JToys|88578",
   "plist|30th-celebration|JToys|89316",
@@ -961,6 +1011,7 @@
  ],
  "M-G": [],
  "M-G (all sealed)": [],
+ "M-G (japanese)": [],
  "M-G (pokemon:30th-celebration)": [
   "plist|30th-celebration|M-G|127826",
   "plist|30th-celebration|M-G|127827",
@@ -1039,6 +1090,22 @@
   "list|More Than Meeples|98420",
   "list|More Than Meeples|98423"
  ],
+ "More Than Meeples (japanese)": [
+  "list|More Than Meeples|107850",
+  "list|More Than Meeples|107857",
+  "list|More Than Meeples|117821",
+  "list|More Than Meeples|117827",
+  "list|More Than Meeples|124260",
+  "list|More Than Meeples|133674",
+  "list|More Than Meeples|133680",
+  "list|More Than Meeples|141991",
+  "list|More Than Meeples|146856",
+  "list|More Than Meeples|170424",
+  "list|More Than Meeples|170468",
+  "list|More Than Meeples|93455",
+  "list|More Than Meeples|97715",
+  "list|More Than Meeples|97721"
+ ],
  "More Than Meeples (pokemon:30th-celebration)": [
   "plist|30th-celebration|More Than Meeples|185938",
   "plist|30th-celebration|More Than Meeples|185941",
@@ -1097,6 +1164,32 @@
   "list|Overhauled Games TCG|8435"
  ],
  "Overhauled Games TCG (all sealed)": [],
+ "Overhauled Games TCG (japanese)": [
+  "list|Overhauled Games TCG|10568",
+  "list|Overhauled Games TCG|10593",
+  "list|Overhauled Games TCG|14653",
+  "list|Overhauled Games TCG|15034",
+  "list|Overhauled Games TCG|15377",
+  "list|Overhauled Games TCG|16807",
+  "list|Overhauled Games TCG|17102",
+  "list|Overhauled Games TCG|17794",
+  "list|Overhauled Games TCG|17797",
+  "list|Overhauled Games TCG|20091",
+  "list|Overhauled Games TCG|20890",
+  "list|Overhauled Games TCG|22306",
+  "list|Overhauled Games TCG|8384",
+  "list|Overhauled Games TCG|8387",
+  "list|Overhauled Games TCG|8390",
+  "list|Overhauled Games TCG|8391",
+  "list|Overhauled Games TCG|8394",
+  "list|Overhauled Games TCG|8397",
+  "list|Overhauled Games TCG|8400",
+  "list|Overhauled Games TCG|8403",
+  "list|Overhauled Games TCG|8406",
+  "list|Overhauled Games TCG|8409",
+  "list|Overhauled Games TCG|8412",
+  "list|Overhauled Games TCG|9535"
+ ],
  "Overhauled Games TCG (pokemon:30th-celebration)": [
   "plist|30th-celebration|Overhauled Games TCG|20704",
   "plist|30th-celebration|Overhauled Games TCG|20706"
@@ -1200,6 +1293,7 @@
  "Rogue Online (all sealed)": [
   "list|Rogue Online|pre-order-one-piece-card-game-tin-vol-2-ts-03-sealed-display-box-of-12-tins"
  ],
+ "Rogue Online (japanese)": [],
  "Rogue Online (pokemon:30th-celebration)": [
   "plist|30th-celebration|Rogue Online|pre-order-pokemon-tcg-30th-celebration-elite-trainer-box-1",
   "plist|30th-celebration|Rogue Online|pre-order-pokemon-tcg-30th-celebration-ultra-premium-collection-day-night-random-box"
@@ -1239,6 +1333,7 @@
   "list|TCGroup|one-piece-card-game-premium-card-collection-live-action-edition",
   "list|TCGroup|one-piece-card-game-special-goods-set-former-four-emperors"
  ],
+ "TCGroup (japanese)": [],
  "TCGroup (other sealed)": [
   "list|TCGroup|one-piece-card-game-heroines-gift-collection-display-gc-2026-english",
   "list|TCGroup|one-piece-card-game-the-dominance-of-god-double-pack-display-dp-13-english"
