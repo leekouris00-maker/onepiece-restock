@@ -131,6 +131,8 @@ def skip_reason(tb, cfg, title, variants=None):
     watch = cfg.get("sealed_watch", tb.DEFAULT_SEALED_WATCH) or []
     if tb.is_box_title(title) or tb.watch_item(title, watch):
         return None
+    if cfg.get("japanese_alerts", True) and tb.is_jp_box_title(title, variants):
+        return None                          # v2.26: Japanese boxes are watched now (quietly)
     t = tb.norm(title)
     if tb.is_excluded(title, tb.BOX_EXCLUDE) and ("booster box" in low or "booster display" in low):
         word = next(w.strip() for w in tb.BOX_EXCLUDE if w.lower() in t)
@@ -167,6 +169,9 @@ def seen_reason(tb, cfg, entries):
         return ("it's in the \"all sealed\" group, which alerts once when first listed and again when it becomes "
                 "buyable, and the bot has no record of either (it may already have been listed when the bot "
                 "started reading that shop)")
+    if key.startswith("jp|"):
+        return ("it's a Japanese box, which only posts quietly when first listed and again when it becomes "
+                "buyable, and the bot has no record of either")
     if not h.get("avail"):
         return f"it was listed but not buyable when the bot last looked ({tb.money(price)})"
     limit = None

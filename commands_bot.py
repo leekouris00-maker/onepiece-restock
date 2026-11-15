@@ -1765,10 +1765,13 @@ if lw:
         for it in items:
             r = last.get(it["id"])
             line = lw.describe(it, r)
+            if it.get("auto"):
+                line += " · 🤖 added by the scorecard (quiet)"
             if r and r.get("ts"):
                 line += f" · {datetime.fromtimestamp(r['ts']):%I:%M %p}".replace(" 0", " ")
             lines.append(f"{line}\n<{it['url']}>")
-        e = embed(f"🔗 Watched links ({len(items)}/{lw.MAX_WATCHES})", [], BLUE, description="\n".join(lines)[:4000],
+        mine = sum(1 for it in items if not it.get("auto"))
+        e = embed(f"🔗 Watched links ({mine}/{lw.MAX_WATCHES})" + (f" + {len(items) - mine} added by the scorecard" if mine < len(items) else ""), [], BLUE, description="\n".join(lines)[:4000],
                   footer="✅ buyable within your max · 💸 buyable but over · ⏳ not buyable yet · ⚠️ page not readable")
         await inter.response.send_message(embed=e, ephemeral=True)
 

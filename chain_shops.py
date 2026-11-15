@@ -214,7 +214,7 @@ def _rows(tb, p, max_price, watch):
                "price": price if price is not None else (min(all_prices) if all_prices else 0.0),
                "available": price is not None, "url": page, "cart": cart, "note": note, "max": limit, "page": 1}
     find = None
-    if group != "new" and price is not None and price <= limit:
+    if group not in ("new", "jp") and price is not None and price <= limit:
         find = {"id": f"{prefix}|{JB_NAME}|{handle}", "kind": kind, "name": title, "shop": JB_NAME,
                 "price": price, "url": page, "cart": cart, "note": note}
     return find, listing

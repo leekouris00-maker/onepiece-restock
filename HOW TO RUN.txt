@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.25.0)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.26.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -77,6 +77,20 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.26: CATCH MORE OF WHAT OTHER GROUPS PING (all of it quiet: no @ping, no phone push, no auto-buy).
+  - SIX MORE SHOPS that other groups post from but that price above retail: Games Empire, X-Playground,
+    Dropstore, Lootable, Games Portal, GB Toys. Their new listings and restocks post in #restocks. A box
+    there at or under your max still alerts loudly, like anywhere else. The first check only remembers
+    what each shop has, so there's no flood.
+  - JAPANESE BOOSTER BOXES are no longer thrown away: a new one, or one that becomes buyable, posts as
+    "🇯🇵 Japanese" in #restocks. Never a loud alert. Off with "japanese_alerts": false in config.json.
+  - LEARNING FROM MISSES. When the scorecard grades a feed post "never seen" or "shop not watched", the bot
+    puts that product on the watch list by itself, so its next restock is caught (the reply under the post
+    says "now on the watch list"). Only https product pages for One Piece sealed products in A$, at most 10
+    at a time, each dropped after 30 days; they don't use up your own 25. /watch list marks them 🤖 and
+    /watch remove takes one off. If a shop the bot doesn't read comes up 3 times, the reply suggests adding
+    it (it's never added by itself). Off with "scorecard": {"auto_watch": false}.
+  - A quiet "now buyable" for the same product posts at most once a day.
 New in v2.25: QUIET RESTOCK ALERTS. A booster box (or a watched sealed item) that comes back into stock ABOVE
   your max used to say nothing. Now it posts once as "Restock (over max)" with no @ping and no phone push, so
   the loud alerts stay the ones at or under your max (/boxmax sets that). The same product at the same shop
