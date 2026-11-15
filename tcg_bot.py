@@ -190,7 +190,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.22.0"
+VERSION = "2.23.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 

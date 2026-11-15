@@ -2132,6 +2132,42 @@ if ab:
             msg += await ensure_private(inter, cfg)
         await reply(inter, msg)
 
+    def phone_text(cfg):
+        """v2.23: a fresh 6-digit code for the collection / auto-buy page, without being at the PC."""
+        import auto_buy_web as abw
+        try:
+            d = abw.remote_code(cfg)
+        except Exception as e:  # noqa: BLE001
+            return ("The page isn't running on the PC right now, so there's no code to give "
+                    f"({type(e).__name__}). It starts with the bot; check `/status`.")
+        if not d["away_urls"] and not d["lan"]:
+            return ("Phone access is off on the PC, so a code wouldn't get you in. Away access has to be switched on "
+                    "at the PC itself: open_autobuy.bat > 📱 Phone > Turn on away access (needs the free Tailscale app "
+                    "on the PC and your phone).")
+        lines = [f"📱 **Code: {d['code'][:3]} {d['code'][3:]}** (works once, for {d['seconds'] // 60} minutes)"]
+        if d["away_urls"]:
+            lines.append("Anywhere, with Tailscale switched on on your phone:\n" + "\n".join(f"<{u}>" for u in d["away_urls"][:2]))
+        elif d["away"]:
+            lines.append("⚠️ Away access is on but Tailscale isn't connected on the PC, so from outside your home this "
+                         "code can't be used yet.")
+        if d["lan"] and d["urls"]:
+            lines.append("On your home Wi-Fi:\n" + "\n".join(f"<{u}>" for u in d["urls"][:3]))
+        lines.append("Open the same address you used before and type the code. Only you can see this message.")
+        return "\n".join(lines)
+
+    @autobuy.command(name="phone", description="A new 6-digit code to open My collection / auto-buy on your phone (only you see it)")
+    async def autobuy_phone(inter: discord.Interaction):
+        cfg = await autobuy_only(inter)
+        if cfg is None:
+            return
+        await inter.response.defer(ephemeral=True, thinking=True)
+        text = await asyncio.to_thread(phone_text, cfg)
+        try:
+            tb.append_text(os.path.join(tb.HERE, "commands_audit.log"), f"{datetime.now():%Y-%m-%d %H:%M:%S}  {inter.user}  /autobuy phone\n", 500_000)
+        except Exception:  # noqa: BLE001
+            pass
+        await inter.followup.send(text, ephemeral=True)
+
     @autobuy.command(name="try", description="A test checkout of any Shopify product now (never pays)")
     @app_commands.describe(link="A product page (…/products/…) on a Shopify shop")
     async def autobuy_try(inter: discord.Interaction, link: str):

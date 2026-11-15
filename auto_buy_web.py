@@ -17,6 +17,13 @@ On your phone (v2.11.5): on the PC page press 📱 Phone. It can switch phone ac
 address to open on the phone and a 6-digit code (good for 10 minutes, one use). The phone remembers the key
 after that, so "Add to Home Screen" gives you a Collection icon that opens like an app. Home Wi-Fi only.
 Other settings: "web_port": 8765, "web": false to switch the page off.
+
+Away from home (v2.23): "auto_buy": {"web_away": true} also serves the page on this PC's Tailscale address,
+so a phone with Tailscale on (same Tailscale account) opens it from anywhere, over Tailscale's encrypted
+link. It listens ONLY on the Tailscale address - nothing is opened to the internet - and needs the same key
+or 6-digit code. Tailscale is a free app (tailscale.com/download) on the PC and the phone; the bot doesn't
+install or configure it. The 📱 Phone box turns this on and shows the address.
+A code without being at the PC: /autobuy phone in Discord (server owner only, only you see the reply).
 """
 import json
 import os
@@ -47,7 +54,8 @@ def web_settings(cfg):
         port = int(raw["web_port"]) if raw.get("web_port") is not None else DEFAULT_PORT
     except (TypeError, ValueError):
         port = DEFAULT_PORT
-    return {"on": raw.get("web", True) is not False, "lan": raw.get("web_lan") is True, "port": port}
+    return {"on": raw.get("web", True) is not False, "lan": raw.get("web_lan") is True, "port": port,
+            "away": raw.get("web_away") is True}
 
 
 def token():
@@ -94,14 +102,157 @@ def lan_addresses():
     return out
 
 
-def set_lan(on):
-    """Switch phone access on/off in config.json ("auto_buy": {"web_lan": ...}), keeping a backup."""
+# ---------------------------------------------------------------- v2.23: away from home, over Tailscale
+TS_EXE = ("tailscale", r"C:\Program Files\Tailscale\tailscale.exe", r"C:\Program Files (x86)\Tailscale\tailscale.exe")
+TS_CACHE_SECONDS = 30
+AWAY_RECHECK = 45
+_ts_cache = {"t": 0.0, "info": None}
+_away = {"srv": None, "ip": None, "stop": None, "hosts": set()}
+
+
+def _is_ts_ip(ip):
+    """Tailscale hands every device an address in 100.64.0.0/10."""
+    m = re.fullmatch(r"(\d+)\.(\d+)\.\d+\.\d+", str(ip or ""))
+    return bool(m) and int(m.group(1)) == 100 and 64 <= int(m.group(2)) <= 127
+
+
+def _ts_status():
+    """What `tailscale status --json` says, or None if Tailscale isn't installed (or can't be asked)."""
+    import subprocess
+    for exe in TS_EXE:
+        try:
+            out = subprocess.run([exe, "status", "--json"], capture_output=True, timeout=6,
+                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+            data = json.loads(out.stdout.decode("utf-8", "replace") or "{}")
+            if isinstance(data, dict):
+                return data
+        except Exception:  # noqa: BLE001  (not there, not allowed, or not JSON: try the next place)
+            continue
+    return None
+
+
+def tailscale_info(fresh=False):
+    """{"installed", "running", "ip", "name"}: this PC's Tailscale address and name, asked at most every 30 s.
+    The bot only reads this; it never installs, signs in to or changes Tailscale."""
+    now = time.time()
+    if not fresh and _ts_cache["info"] is not None and now - _ts_cache["t"] < TS_CACHE_SECONDS:
+        return _ts_cache["info"]
+    info = {"installed": False, "running": False, "ip": None, "name": None}
+    st = _ts_status()
+    if st is not None:
+        me = st.get("Self") if isinstance(st.get("Self"), dict) else {}
+        info["installed"] = True
+        info["running"] = st.get("BackendState") == "Running"
+        if info["running"]:
+            info["ip"] = next((ip for ip in me.get("TailscaleIPs") or [] if _is_ts_ip(ip)), None)
+            name = str(me.get("DNSName") or "").rstrip(".").lower()
+            info["name"] = name if re.fullmatch(r"[a-z0-9.-]{3,200}", name) else None
+    else:
+        import socket
+        try:
+            ips = socket.gethostbyname_ex(socket.gethostname())[2]
+        except OSError:
+            ips = []
+        ip = next((x for x in ips if _is_ts_ip(x)), None)
+        if ip:
+            info.update(installed=True, running=True, ip=ip)
+    _ts_cache.update(t=now, info=info)
+    return info
+
+
+def away_urls(port):
+    """The addresses a phone with Tailscale on opens, while the away listener is up."""
+    if not _away["srv"] or not _away["ip"]:
+        return []
+    info = _ts_cache["info"] or {}
+    return ([f"http://{info['name']}:{port}"] if info.get("name") else []) + [f"http://{_away['ip']}:{port}"]
+
+
+def _away_sync(handler, port, info=None):
+    """Make the away listener match where Tailscale is now: start it, move it, or stop it."""
+    info = tailscale_info(fresh=True) if info is None else info
+    ip = info.get("ip") if info.get("running") else None
+    if ip == _away["ip"] and (_away["srv"] or not ip):
+        return bool(_away["srv"])
+    if _away["srv"]:
+        try:
+            _away["srv"].shutdown()
+            _away["srv"].server_close()
+        except Exception:  # noqa: BLE001
+            pass
+        _away.update(srv=None, ip=None)
+    _away["hosts"].clear()
+    if not ip:
+        return False
+    try:
+        srv = ThreadingHTTPServer((ip, port), handler)
+    except OSError as e:
+        print(f"   ! away access couldn't listen on the Tailscale address {ip}:{port} ({e})")
+        return False
+    srv.daemon_threads = True
+    _away["hosts"].update(h for h in (ip, info.get("name")) if h)
+    _away.update(srv=srv, ip=ip)
+    threading.Thread(target=srv.serve_forever, name="auto-buy page (away)", daemon=True).start()
+    print(f"   (away access on: {', '.join(away_urls(srv.server_address[1]))} - needs Tailscale on the phone)")
+    return True
+
+
+def serve_away(handler, port, recheck=AWAY_RECHECK):
+    """Start the away listener and keep it following Tailscale (connects late, address changes)."""
+    stop_flag = threading.Event()
+    _away["stop"] = stop_flag
+    _away_sync(handler, port)
+
+    def watch():
+        while not stop_flag.wait(recheck):
+            try:
+                _away_sync(handler, port)
+            except Exception:  # noqa: BLE001
+                pass
+    threading.Thread(target=watch, name="auto-buy page (away watch)", daemon=True).start()
+
+
+def stop_away():
+    if _away["stop"]:
+        _away["stop"].set()
+    if _away["srv"]:
+        try:
+            _away["srv"].shutdown()
+            _away["srv"].server_close()
+        except Exception:  # noqa: BLE001
+            pass
+    _away.update(srv=None, ip=None, stop=None)
+    _away["hosts"].clear()
+
+
+def remote_code(cfg, timeout=5):
+    """For /autobuy phone: ask this PC's own page for a new 6-digit code, as the 📱 Phone box does.
+    -> {"code", "seconds", "urls", "away_urls", "lan", "away"}. Raises OSError if the page isn't running."""
+    import urllib.request
+    port = web_settings(cfg)["port"]
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))      # straight to this PC, never a proxy
+
+    def ask(path, body=None):
+        req = urllib.request.Request(f"http://127.0.0.1:{port}{path}", data=None if body is None else json.dumps(body).encode(),
+                                     headers={"X-Token": token(), "Content-Type": "application/json"},
+                                     method="GET" if body is None else "POST")
+        with opener.open(req, timeout=timeout) as r:
+            return json.loads(r.read().decode("utf-8"))
+    info = ask("/api/phone")
+    code = ask("/api/phone/code", {})
+    return {"code": code["code"], "seconds": code["seconds"], "urls": info.get("urls") or [],
+            "away_urls": info.get("away_urls") or [], "lan": bool(info.get("lan")), "away": bool(info.get("away"))}
+
+
+def set_lan(on, key="web_lan"):
+    """Switch phone access on/off in config.json ("auto_buy": {"web_lan": ...}), keeping a backup.
+    key="web_away" switches away access (v2.23) the same way."""
     import tcg_bot as tb
     with open(tb.CONFIG_PATH, encoding="utf-8-sig") as f:
         old = f.read()
     raw = json.loads(old)
     ab_cfg = raw.get("auto_buy") if isinstance(raw.get("auto_buy"), dict) else {}
-    ab_cfg["web_lan"] = bool(on)
+    ab_cfg[key] = bool(on)
     raw["auto_buy"] = ab_cfg
     with open(tb.CONFIG_PATH + ".bak", "w", encoding="utf-8") as f:
         f.write(old)
@@ -159,7 +310,7 @@ def _collection():
         return None
 
 
-def make_handler(tb, ab, lan=False):
+def make_handler(tb, ab, lan=False, away=False):
     key = token()
     pair = {"code": None, "exp": 0.0, "tries": 0}
     pair_lock = threading.Lock()
@@ -188,6 +339,8 @@ def make_handler(tb, ab, lan=False):
             if lan:
                 return True
             host = (self.headers.get("Host") or "").split(":")[0].strip("[]").lower()
+            if self.server is _away["srv"]:          # v2.23: the away listener answers only to its own Tailscale name
+                return host in _away["hosts"]
             return host in ("localhost", "127.0.0.1", "::1")
 
         def _local(self):
@@ -226,8 +379,12 @@ def make_handler(tb, ab, lan=False):
                 if not self._authed(q):
                     return self._send(401, {"error": "wrong or missing key"})
                 port = self.server.server_address[1]
+                ts = tailscale_info() if away or self._local() else {}
                 return self._send(200, {"lan": lan, "port": port, "local": self._local(),
-                                        "urls": [f"http://{ip}:{port}" for ip in lan_addresses()]})
+                                        "urls": [f"http://{ip}:{port}" for ip in lan_addresses()],
+                                        "away": away, "away_urls": away_urls(port) or (     # phone access on: 0.0.0.0 covers it
+                                            [f"http://{ts.get('name') or ts['ip']}:{port}"] if away and lan and ts.get("ip") else []),
+                                        "ts": {"installed": bool(ts.get("installed")), "running": bool(ts.get("running"))}})
             if u.path == "/api/state":
                 if not self._authed(q):
                     return self._send(401, {"error": "wrong or missing key: open the page with open_autobuy.bat"})
@@ -288,6 +445,20 @@ def make_handler(tb, ab, lan=False):
                 with pair_lock:
                     pair.update(code=f"{secrets.randbelow(1_000_000):06d}", exp=time.time() + PAIR_SECONDS, tries=0)
                     return self._send(200, {"code": pair["code"], "seconds": PAIR_SECONDS})
+            if path == "/api/phone/away":                # v2.23: switched from the PC itself only, like phone access
+                if not self._local():
+                    return self._send(403, {"error": "away access can only be switched from the PC itself"})
+                try:
+                    on = bool(self._body().get("on"))
+                    set_lan(on, "web_away")
+                except Exception as e:  # noqa: BLE001
+                    return self._send(500, {"error": f"couldn't change config.json ({type(e).__name__}: {str(e)[:120]})"})
+                self._audit(path, {"on": on})
+                live = restart_soon(tb, ab)
+                return self._send(200, {"ok": True, "restarting": live, "note": (
+                    ("Away access on. " if on else "Away access off. ") +
+                    ("The page restarts in a moment" + (": if Windows asks about Python, allow Private networks."
+                                                        if on else ".") if live else "Run restart_bot.bat to apply it."))})
             if path == "/api/phone/lan":
                 if not self._local():
                     return self._send(403, {"error": "phone access can only be switched from the PC itself"})
@@ -388,13 +559,16 @@ def start(tb, ab, cfg):
     if not ws["on"] or _server[0]:
         return None
     try:
-        srv = ThreadingHTTPServer(("0.0.0.0" if ws["lan"] else "127.0.0.1", ws["port"]), make_handler(tb, ab, ws["lan"]))
+        handler = make_handler(tb, ab, ws["lan"], ws["away"])
+        srv = ThreadingHTTPServer(("0.0.0.0" if ws["lan"] else "127.0.0.1", ws["port"]), handler)
     except OSError as e:
         print(f"   ! auto-buy page couldn't start on port {ws['port']} ({e}); set \"web_port\" in auto_buy")
         return None
     srv.daemon_threads = True
     threading.Thread(target=srv.serve_forever, name="auto-buy page", daemon=True).start()
     _server[0] = srv
+    if ws["away"] and not ws["lan"]:           # with phone access on, 0.0.0.0 already covers the Tailscale address
+        serve_away(handler, srv.server_address[1])
     col = _collection()
     if col and not getattr(tb, "IN_ACTIONS", False) and ws["port"] != 0 and not _ticking[0]:
         _ticking[0] = True
@@ -406,6 +580,7 @@ def start(tb, ab, cfg):
 
 
 def stop():
+    stop_away()
     if _server[0]:
         _server[0].shutdown()
         _server[0].server_close()
@@ -696,18 +871,36 @@ $('#pairform').addEventListener('submit',async e=>{e.preventDefault();$('#pairms
 let codeTimer=null;
 async function phoneSheet(){const b=$('#phonebody');$('#phonesheet').hidden=false;b.innerHTML='Loading…';
  try{const p=await api('/api/phone');
-  if(!p.lan){b.innerHTML=`<p>Phone access is off, so only this PC can open the page.</p><p>Turning it on lets phones and iPads <b>on your home Wi-Fi</b> open it (they still need a code from here). The connection isn't encrypted, so only do this on a network you trust.</p>
-   ${p.local?'<button class="btn primary" id="lanon">Turn on phone access</button>':'<p class="muted">Switch it on from the PC itself.</p>'}`;
+  const awayOn=async on=>{try{const d=await api('/api/phone/away',{on});toast(d.note);
+    if(d.restarting){b.innerHTML='<p>Restarting the page… If Windows asks whether Python can use networks, allow <b>Private networks</b>.</p>';setTimeout(()=>phoneSheet(),3000)}
+    else b.innerHTML='<p>'+esc(d.note)+'</p>'}catch(e){toast(e.message,true)}};
+  if(!p.lan&&!p.away){b.innerHTML=`<p>Phone access is off, so only this PC can open the page.</p>
+   <p><b>Anywhere (recommended):</b> with the free Tailscale app on this PC and on your phone, the phone opens this page from anywhere over an encrypted link. Nothing is opened to the internet.</p>
+   ${p.local?'<button class="btn primary" id="awayon">Turn on away access</button>':''}
+   <p style="margin-top:14px"><b>Home Wi-Fi only:</b> lets phones and iPads on your home Wi-Fi open it. That connection isn't encrypted, so only do this on a network you trust.</p>
+   ${p.local?'<button class="btn" id="lanon">Turn on home Wi-Fi access</button>':'<p class="muted">Switch these on from the PC itself.</p>'}`;
+   const aw=$('#awayon');if(aw)aw.onclick=()=>{aw.disabled=true;awayOn(true)};
    const on=$('#lanon');if(on)on.onclick=async()=>{on.disabled=true;try{const d=await api('/api/phone/lan',{on:true});toast(d.note);
     if(d.restarting){b.innerHTML='<p>Restarting the page… If Windows asks whether Python can use networks, allow <b>Private networks</b> only.</p>';setTimeout(()=>phoneSheet(),2500)}
     else b.innerHTML='<p>'+esc(d.note)+'</p>'}catch(e){toast(e.message,true);on.disabled=false}};return}
-  const c=await api('/api/phone/code',{});const urls=p.urls.length?p.urls:['http://<this PC\'s address>:'+p.port];
-  b.innerHTML=`<ol><li>Join the phone to the same Wi-Fi as this PC.</li>
-   <li>In Safari (iPhone) or Chrome (Android) open<br>${urls.map(u=>`<span class="addr">${esc(u)}</span>`).join('<br>')}</li>
+  const au=p.away_urls||[];
+  if(p.away&&!p.lan&&!au.length){b.innerHTML=`<p><b>Away access is on, but Tailscale isn't connected on this PC</b> ${p.ts&&p.ts.installed?'(it is installed but not signed in or switched on)':'(it doesn\'t look installed)'}.</p>
+   <ol><li>On this PC: install Tailscale from <span class="addr">tailscale.com/download</span> and sign in.</li>
+   <li>On your phone: install the Tailscale app and sign in with the <b>same account</b>.</li>
+   <li>Come back here: the address appears within a minute.</li></ol>
+   ${p.local?'<p><button class="btn small" id="newcode">Check again</button> <button class="btn small danger" id="awayoff">Turn away access off</button></p>':''}`;
+   const nc0=$('#newcode');if(nc0)nc0.onclick=phoneSheet;const ao0=$('#awayoff');if(ao0)ao0.onclick=()=>awayOn(false);return}
+  const c=await api('/api/phone/code',{});const lanUrls=p.lan?(p.urls.length?p.urls:['http://<this PC\'s address>:'+p.port]):[];
+  const urls=au.concat(lanUrls);
+  b.innerHTML=`<ol><li>${au.length?'<b>Anywhere:</b> open the Tailscale app on the phone and switch it on'+(p.lan?' (or join the same Wi-Fi as this PC).':'.'):'Join the phone to the same Wi-Fi as this PC.'}</li>
+   <li>In Safari (iPhone) or Chrome (Android) open<br>${urls.map(u=>`<span class="addr">${esc(u)}</span>`).join('<br>')}${au.length&&p.lan?'<br><span class="muted">The first works anywhere with Tailscale on; the others only on your home Wi-Fi.</span>':''}</li>
    <li>Type this code:<div class="code">${c.code.slice(0,3)} ${c.code.slice(3)}</div><span class="muted" id="codeleft"></span></li>
    <li>Then add it to the Home Screen: iPhone <b>Share → Add to Home Screen</b>, Android <b>⋮ → Add to Home screen</b>. The 📦 Collection icon opens straight to your collection.</li></ol>
    <p class="muted">The phone remembers it after that. If you add the icon first, enter a code inside the icon's app too (iPhone keeps them apart).</p>
-   ${p.local?'<p style="margin:10px 0 0"><button class="btn small" id="newcode">New code</button> <button class="btn small danger" id="lanoff">Turn phone access off</button></p>':''}`;
+   <p class="muted">Use the same address every time: the phone treats each address as a separate site and asks for a code again. Away from the PC? <b>/autobuy phone</b> in Discord gives you a code.</p>
+   ${p.local?'<p style="margin:10px 0 0"><button class="btn small" id="newcode">New code</button> '+(p.lan?'<button class="btn small danger" id="lanoff">Turn home Wi-Fi access off</button> ':'')+(p.away?'<button class="btn small danger" id="awayoff">Turn away access off</button>':'<button class="btn small" id="awayon2">Turn on away access</button>')+'</p>':''}`;
+  const ao=$('#awayoff');if(ao)ao.onclick=()=>{if(confirm('Turn away access off?'))awayOn(false)};
+  const a2=$('#awayon2');if(a2)a2.onclick=()=>awayOn(true);
   const end=Date.now()+c.seconds*1000;clearInterval(codeTimer);codeTimer=setInterval(()=>{const el=$('#codeleft');if(!el||$('#phonesheet').hidden){clearInterval(codeTimer);return}
    const s=Math.max(0,Math.round((end-Date.now())/1000));el.textContent=s?`Works once, for ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} more`:'Expired: press New code'},1000);
   const nc=$('#newcode');if(nc)nc.onclick=phoneSheet;
@@ -749,8 +942,10 @@ if __name__ == "__main__":
         sys.exit(0)
     print("The bot isn't running (or its page is off), so this window is serving the page. Close it to stop.")
     tcg_bot.CONFIG_WARNINGS.clear()
-    srv = ThreadingHTTPServer(("0.0.0.0" if ws["lan"] else "127.0.0.1", ws["port"]),
-                              make_handler(tcg_bot, auto_buy, ws["lan"]))
+    handler = make_handler(tcg_bot, auto_buy, ws["lan"], ws["away"])
+    srv = ThreadingHTTPServer(("0.0.0.0" if ws["lan"] else "127.0.0.1", ws["port"]), handler)
+    if ws["away"] and not ws["lan"]:
+        serve_away(handler, ws["port"])
     print(f"Opening {url}")
     webbrowser.open(url)
     try:
