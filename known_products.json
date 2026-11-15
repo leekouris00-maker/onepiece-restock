@@ -996,6 +996,18 @@
   "list|Light of Cards|one-piece-card-game-ts-03-tin-pack-vol-3",
   "list|Light of Cards|one-piece-starter-deck-st-34"
  ],
+ "Light of Cards (japanese)": [
+  "list|Light of Cards|one-piece-card-game-paramount-war-op-02-booster-box-japanese",
+  "list|Light of Cards|one-piece-eb-03-jp-heroines-edition-booster-box",
+  "list|Light of Cards|one-piece-eb-05-heroines-edition-vol-2-booster-box-jp",
+  "list|Light of Cards|one-piece-op-09-the-new-emperor-booster-box-jp",
+  "list|Light of Cards|one-piece-op-10-royal-bloodline-booster-box-jp",
+  "list|Light of Cards|one-piece-op-12-legacy-of-the-master-booster-box-jp",
+  "list|Light of Cards|one-piece-op-13-carrying-on-his-will-booster-box",
+  "list|Light of Cards|one-piece-op-15-adventure-on-kami-s-island-booster-box-jp",
+  "list|Light of Cards|one-piece-op-16-the-time-of-battle-booster-box-jp",
+  "list|Light of Cards|one-piece-op-17-the-worlds-strongest-warriors-booster-box-jp"
+ ],
  "Light of Cards (pokemon:30th-celebration)": [
   "plist|30th-celebration|Light of Cards|pokemon-tcg-30th-celebration-elite-trainer-box",
   "plist|30th-celebration|Light of Cards|pokemon-tcg-30th-celebration-poster-collection",
@@ -1335,7 +1347,10 @@
   "list|TCGroup|one-piece-card-game-premium-card-collection-live-action-edition",
   "list|TCGroup|one-piece-card-game-special-goods-set-former-four-emperors"
  ],
- "TCGroup (japanese)": [],
+ "TCGroup (japanese)": [
+  "list|TCGroup|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box-japanese",
+  "list|TCGroup|one-piece-card-game-op-18-the-dominance-of-god-booster-box-japanese"
+ ],
  "TCGroup (other sealed)": [
   "list|TCGroup|one-piece-card-game-heroines-gift-collection-display-gc-2026-english",
   "list|TCGroup|one-piece-card-game-the-dominance-of-god-double-pack-display-dp-13-english"

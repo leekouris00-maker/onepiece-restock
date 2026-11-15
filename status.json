@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-16 00",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794761906,
+ "ebay_ts": 1794762915,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -56,7 +56,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794762131,
+ "pokemon_ts": 1794762915,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -82,13 +82,13 @@
    1.0,
    1794545128
   ],
-  "list|JToys|90304": [
-   499.99,
-   1794495934
+  "list|TCGroup|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box-japanese": [
+   184.99,
+   1794762926
   ],
-  "list|TCGroup|one-piece-card-game-the-dominance-of-god-double-pack-display-dp-13-english": [
-   24.99,
-   1794468638
+  "list|TCGroup|one-piece-card-game-op-18-the-dominance-of-god-booster-box-japanese": [
+   164.99,
+   1794762926
   ],
   "open|item|Gameology|one-piece-card-game-mini-case-set-vol-3-ts-03-random-select|498485": [
    44.95,
@@ -133,10 +133,6 @@
   "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-elite-trainer-box": [
    130.0,
    1794521905
-  ],
-  "poke|delta-reign|Gameology|pokemon-tcg-mega-evolution-delta-reign-booster-box": [
-   359.95,
-   1794464454
   ],
   "poke|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": [
    159.0,
@@ -6129,7 +6125,7 @@
    "t": 1794753485.8523526
   }
  },
- "sealed_ts": 1794762686,
+ "sealed_ts": 1794763294,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6166,7 +6162,7 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794761906,
+ "singles_ts": 1794762915,
  "soft_alerts": {},
- "sweep_ts": 1794761906
+ "sweep_ts": 1794762915
 }
