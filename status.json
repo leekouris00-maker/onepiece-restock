@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-15 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794713531,
+ "ebay_ts": 1794714511,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -55,8 +55,12 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794713315,
+ "pokemon_ts": 1794713920,
  "recent_alerts": {
+  "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
+   0.3,
+   1794714521
+  ],
   "ebay|v1|158366644617|0": [
    265.8,
    1794621944
@@ -89,10 +93,6 @@
    44.95,
    1794547528
   ],
-  "plist|30th-celebration|Gameology|pokemon-tcg-30th-celebration-binder-collection": [
-   149.95,
-   1794437067
-  ],
   "plist|30th-celebration|Light of Cards|pokemon-tcg-30th-celebration-poster-collection": [
    84.99,
    1794624726
@@ -112,10 +112,6 @@
   "plist|30th-celebration|Pokebox|usa-import-pokemon-tcg-30th-celebration-ultra-premium-collection-night-umbreon": [
    749.99,
    1794625564
-  ],
-  "plist|30th-celebration|Rogue Online|pre-order-pokemon-tcg-30th-celebration-ultra-premium-collection-day-night-random-box": [
-   899.99,
-   1794449402
   ],
   "plist|delta-reign|Card Bot|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": [
    119.99,
@@ -155,7 +151,7 @@
   ],
   "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
    99.0,
-   1794693622
+   1794714521
   ]
  },
  "robots": {
@@ -6095,7 +6091,7 @@
    "t": 1794666738.346302
   }
  },
- "sealed_ts": 1794713727,
+ "sealed_ts": 1794714511,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -6132,6 +6128,6 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794713531,
- "sweep_ts": 1794713531
+ "singles_ts": 1794714511,
+ "sweep_ts": 1794714511
 }
