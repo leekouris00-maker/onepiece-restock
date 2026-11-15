@@ -127,6 +127,7 @@ import http.client
 import json
 import os
 import random
+import calendar
 import re
 import ssl
 import sys
@@ -148,6 +149,10 @@ try:
     import link_watch          # any product link you /watch (watches.json); optional
 except ImportError:
     link_watch = None
+try:
+    import flip                # v2.22: market price and flip estimate on booster-box alerts, /flip; optional
+except ImportError:
+    flip = None
 try:
     import rehearsal           # v2.21: readiness card in #bot-status a few hours before a drop window; optional
 except ImportError:
@@ -185,7 +190,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.21.0"
+VERSION = "2.22.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -1343,7 +1348,7 @@ def _num(x):
         return None
 
 
-KNOWN_SETTINGS = {"_help", "drop_rehearsal", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
+KNOWN_SETTINGS = {"_help", "drop_rehearsal", "flip", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
                   "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
@@ -1494,6 +1499,8 @@ def check_config(cfg):
         w += pokemon_watch.warnings(cfg)
     if onepiece_instore:
         w += onepiece_instore.warnings(cfg)
+    if flip:
+        w += flip.warnings(cfg)
     return w
 
 
@@ -3086,8 +3093,9 @@ def send_heartbeat(cfg, force=False, status=None):
         return
     topic = cfg["alerts"]["heartbeat_topic"]
     try:
+        body = heartbeat_body(cfg, status) + f" v={VERSION}"     # v2.22: the cloud copy records the PC's version
         status_code, _, _ = HTTP.post(f"https://ntfy.sh/{urllib.parse.quote(topic)}",
-                                      heartbeat_body(cfg, status).encode("utf-8"), {"Cache": "yes"})
+                                      body.encode("utf-8"), {"Cache": "yes"})
         if status_code >= 400:
             raise HttpError(status_code)
         _last_heartbeat = time.time()
@@ -3098,6 +3106,11 @@ def send_heartbeat(cfg, force=False, status=None):
 # What the PC copy's latest "I'm on" said (cloud copy): does it post Pokémon itself, and which
 # release-day posts has it made. Filled in by pc_last_seen().
 PC_INFO = {"pokemon": False, "posted": set()}
+# v2.22: what the cloud copy learned about the PC copy's health from its "I'm on" messages: the version it
+# runs, and the hours (unix time of each hour's start) it checked in during the last few hours.
+PC_HEALTH = {"version": "", "hours": set(), "last": None}
+HEARTBEAT_LOOKBACK = "6h"       # how far back the cloud copy reads the PC's messages, to fill in the PC's hours
+HEARTBEAT_FRESH_SECS = 20 * 60
 
 
 def pc_last_seen(cfg):
@@ -3105,8 +3118,9 @@ def pc_last_seen(cfg):
     If ntfy can't be read, None (a doubled alert is better than a missed one)."""
     topic = cfg["alerts"]["heartbeat_topic"]
     PC_INFO.update(pokemon=False, posted=set())
+    PC_HEALTH.update(hours=set(), last=None)
     try:
-        body = HTTP.fetch(f"https://ntfy.sh/{urllib.parse.quote(topic)}/json?poll=1&since={HEARTBEAT_FRESH}",
+        body = HTTP.fetch(f"https://ntfy.sh/{urllib.parse.quote(topic)}/json?poll=1&since={HEARTBEAT_LOOKBACK}",
                           tries=1, conditional=False, robots=False, memo=False)
         msgs = []
         for line in body.decode("utf-8", "replace").splitlines():
@@ -3114,9 +3128,18 @@ def pc_last_seen(cfg):
                 m = json.loads(line)
                 if m.get("event") == "message":
                     msgs.append((float(m.get("time") or time.time()), str(m.get("message") or "")))
+        msgs.sort()
+        # v2.22: every message in the last few hours says the PC was checking in that hour (for uptime.json);
+        # only one in the last 20 minutes means the PC is on right now, exactly as before.
+        if msgs:
+            PC_HEALTH["hours"] = {int(t // 3600) * 3600 for t, _ in msgs}
+            PC_HEALTH["last"] = msgs[-1][0]
+            for word in msgs[-1][1].split():
+                if word.startswith("v=") and re.fullmatch(r"[\w.\-]{1,20}", word[2:]):
+                    PC_HEALTH["version"] = word[2:]
+        msgs = [m for m in msgs if m[0] >= time.time() - HEARTBEAT_FRESH_SECS]
         if not msgs:
             return None
-        msgs.sort()
         PC_INFO["pokemon"] = "pokemon" in msgs[-1][1].split()
         for _, text in msgs:
             for word in text.split():
@@ -3715,6 +3738,13 @@ def _discord_embeds(finds, cfg=None):
             if low:
                 tag = " (today's price is the lowest yet)" if f["price"] <= low[0] + 0.001 else ""
                 fields.append({"name": "Lowest seen", "value": f"{money(low[0])} on {low[1]}{tag}", "inline": True})
+        if flip and not poke and not f.get("link_watch") and (kind == "Booster box" or (kind == "New listing" and f.get("price"))):
+            try:                                # v2.22: US market price and what a resale would leave
+                extra = flip.alert_field(cfg, f["name"], f.get("price"))
+            except Exception:  # noqa: BLE001
+                extra = None
+            if extra:
+                fields.append(extra)
         if f.get("cart"):
             qty = f" (x{f['qty']})" if kind == "Single" and f.get("qty", 1) > 1 else ""
             fields.append({"name": "⚡ Buy", "value": f"[Add to cart → checkout{qty}]({f['cart']})", "inline": False})
@@ -3975,6 +4005,41 @@ def mark_uptime(now=None, copy=None):
         print(f"   ! couldn't save uptime.json ({redact(e)})")
         return False
     return True
+
+
+def copies_health(cfg, now=None, remote=True):
+    """v2.22: one line per copy for /status: hours checked in out of the last 24 whole hours, the version, and
+    when it was last heard. Reads this copy's uptime.json and, for the other copy, the one in the GitHub repo
+    (the cloud copy writes both rows there, so the PC's health can be seen from anywhere)."""
+    now = time.time() if now is None else now
+    local = read_json(UPTIME_PATH, {}) or {}
+    other = (repo_json(cfg, "uptime.json", max_age=600) or {}) if remote else {}
+    far = (repo_json(cfg, "status.json", max_age=600) or {}) if remote else {}
+    end = int(now // 3600)
+    lines = []
+    for name, label in (("pc", "PC"), ("cloud", "Cloud")):
+        hours = set()
+        for src in (local, other):
+            days = src.get(name) if isinstance(src, dict) else None
+            for day, line in (days or {}).items() if isinstance(days, dict) else ():
+                try:
+                    base = calendar.timegm(time.strptime(day, "%Y-%m-%d")) // 3600
+                except (TypeError, ValueError):
+                    continue
+                hours |= {base + h for h, c in enumerate(str(line)[:24]) if c == "1"}
+        mine = name == ("cloud" if IN_ACTIONS else "pc")
+        version = VERSION if mine else (str(far.get("pc_version") or "") if name == "pc" and isinstance(far, dict) else "")
+        if not hours:
+            lines.append(f"{label}: no record yet")
+            continue
+        up = len(hours & set(range(end - 24, end)))
+        last = max(hours)
+        ago = end - last
+        heard = "this hour" if ago <= 0 else "last hour" if ago == 1 else f"{ago} h ago"
+        warn = " ⚠️" if ago > 2 else ""
+        lines.append(f"{label}" + (f" v{version}" if version else "") + f": checked in {up} of the last 24 hours · "
+                     f"last heard {heard}{warn}" + (" (this one)" if mine else ""))
+    return lines
 
 
 def read_events(days=30):
@@ -4333,6 +4398,11 @@ def run_once(cfg, args, drop=None):
         if fast_lane:
             status["fast_lane"] = dict(fast_lane.STATUS)
     mark_uptime()
+    if role == "listen":           # v2.22: the cloud copy writes down what it heard from the PC copy
+        for hour in sorted(PC_HEALTH["hours"]):
+            mark_uptime(now=hour, copy="pc")
+        if PC_HEALTH["version"] and status.get("pc_version") != PC_HEALTH["version"]:
+            status["pc_version"] = PC_HEALTH["version"]
     posts = shop_health(cfg, status)
     for name, saved in RESTORED:
         posts.append((f"🩹 **{name} was damaged**, so the bot loaded its last good copy (saved {saved:%d %b %I:%M %p}) "
@@ -4464,6 +4534,11 @@ def run_once(cfg, args, drop=None):
     metrics = run_metrics()
     if netguard:
         netguard.flush_notices(_me(), cfg)      # v2.16: one #bot-status notice for shops that asked for human verification
+    if flip and not IN_ACTIONS:
+        try:                                    # v2.22: keep the PC's copy of the daily market prices current
+            flip.refresh(_me(), cfg)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ! market prices not refreshed ({redact(e)})")
     if rehearsal and do_sealed and by_shop and not drop and not DRY_RUN[0]:
         try:                                    # v2.21: readiness card a few hours before a drop window
             rehearsal.maybe_post(_me(), cfg, status, by_shop)
@@ -4733,14 +4808,14 @@ def self_test(cfg):
 def fetch_new_files():
     """v2.11: an update_bot.bat from before v2.11 doesn't know about auto_buy.py or setup_autobuy.bat, and never
     updates itself. Fetch those (and the newer update_bot.bat) once from the bot's GitHub repo. PC copy only."""
-    global auto_buy, deal_finder, chain_shops, settings_check, rehearsal
+    global auto_buy, deal_finder, chain_shops, settings_check, rehearsal, flip
     if IN_ACTIONS or IN_CONTAINER:      # the container's code is read-only: it's updated by rebuilding the image
         return
     # v2.21: update_bot.bat is now a short file that runs updater.py (which reads the file list from GitHub and
     # keeps update_bot.bat itself current). An older update_bot.bat is swapped for it here, once. The new one is
     # much shorter than the old, so an old copy that's still on screen just ends.
     for name in ("auto_buy.py", "auto_buy_web.py", "collection.py", "deal_finder.py", "chain_shops.py", "setup_autobuy.bat",
-                 "open_autobuy.bat", "settings_check.py", "rehearsal.py", "restock_trend.py", "scorecard.py", "updater.py",
+                 "open_autobuy.bat", "settings_check.py", "rehearsal.py", "flip.py", "restock_trend.py", "scorecard.py", "updater.py",
                  "update_files.txt", "update_bot.bat"):
         path = os.path.join(CODE_DIR, name)
         try:
@@ -4761,6 +4836,12 @@ def fetch_new_files():
         try:
             import auto_buy as _ab
             auto_buy = _ab
+        except ImportError:
+            pass
+    if flip is None:
+        try:
+            import flip as _fp
+            flip = _fp
         except ImportError:
             pass
     if rehearsal is None:
