@@ -202,13 +202,13 @@
    "url": "https://www.irresistibleforce.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
   },
   "www.jbhifi.com.au": {
-   "count": 3,
+   "count": 4,
    "first": 1794726522,
    "kind": "Cloudflare challenge",
-   "since": 1794728540,
+   "since": 1794731095,
    "status": 429,
    "told": null,
-   "until": 1794730940,
+   "until": 1794735895,
    "url": "https://www.jbhifi.com.au/products.json?limit=250"
   },
   "www.kollecter.com.au": {
