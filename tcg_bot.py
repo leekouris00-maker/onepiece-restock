@@ -194,7 +194,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.25.0"
+VERSION = "2.26.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -275,6 +275,12 @@ DEFAULT_EXCLUDE = [
 BOX_EXCLUDE = ["japanese", "(jp)", " jp ", "[jp]", "jpn", "asia", "asian", "chinese", "korean",
                "case", "sleeved", "single pack", "booster pack", "display case"]
 
+# v2.26: Japanese booster boxes used to be thrown away. Now they're remembered as their own quiet group:
+# a new listing, or one that becomes buyable, posts without a ping (never a loud alert, never auto-bought).
+# Off with "japanese_alerts": false in config.json.
+JP_WORDS = ("japanese", "(jp)", " jp ", "[jp]", "jpn")
+JP_BOX_SKIP = ("case", "sleeved", "single pack", "booster pack", "chinese", "korean", "simplified", "traditional")
+
 BOX_KINDS = ("Booster box", "Sealed", "New listing")
 
 # Other English sealed products to watch (besides booster boxes). Each alerts when it's buyable at or
@@ -326,6 +332,18 @@ EXTRA_SHOPIFY_COLLECTIONS = [
     # v2.16.1 (10 Nov 2026): from the shop audit. GUF (Geelong, Werribee, Ballarat, Bendigo) prices at retail
     # (EB-05 display A$216); its options are its four stores, so "in stock" can mean one store only.
     {"name": "GUF", "url": "https://guf.com.au/collections/one-piece-card-game/products.json?limit=250"},
+    # v2.26 (16 Nov 2026): shops Fellowship of the Ping posts from that price ABOVE retail (OP-18 at A$400+).
+    # "soft": their new listings and restocks post quietly (no ping, no phone push). A box that really is at
+    # or under your max there still alerts loudly, like anywhere else.
+    {"name": "Games Empire", "url": "https://gamesempire.com.au/collections/one-piece-card-game/products.json?limit=250",
+     "soft": True},
+    {"name": "X-Playground", "url": "https://x-playground.com/collections/one-piece-trading-cards/products.json?limit=250",
+     "soft": True},
+    {"name": "Dropstore", "url": "https://dropstore.com.au/collections/one-piece-tcg/products.json?limit=250", "soft": True},
+    {"name": "Lootable", "url": "https://lootable.com.au/collections/one-piece-sealed/products.json?limit=250", "soft": True},
+    {"name": "Games Portal", "url": "https://gamesportal.com.au/collections/one-piece-card-game/products.json?limit=250",
+     "soft": True},
+    {"name": "GB Toys", "url": "https://gbtoys.com.au/collections/one-piece-tcg/products.json?limit=250", "soft": True},
 ]
 # Single products to check directly (Shopify .js), for ones a shop hasn't put in its One Piece section yet.
 EXTRA_SHOPIFY_PRODUCTS = [
@@ -400,7 +418,7 @@ PROMO_RE = re.compile(r"\bpromo(?:tion(?:al)?)?(?:\s+cards?)?\b(?!\s*(?:packs?|b
 MULTI_CARD_RE = re.compile(r"\b\d+\s*cards\b|card collection", re.I)
 BRACKETS_RE = re.compile(r"[\(\[][^)\]]*[\)\]]")
 PRODUCT_LINE_RE = re.compile(r"one piece|card game|\btcg\b", re.I)   # v2.19.2: see is_sealed_listing
-SEALED_OPTS = {"new": True, "packs": False}      # set from config.json in begin_check()
+SEALED_OPTS = {"new": True, "packs": False, "jp": True}      # set from config.json in begin_check()
 
 # ---- v2.4: release-code sweep
 # A shop's One Piece section doesn't always hold its pre-orders (Good Games' had no OP-18 or EB-05 at all
@@ -1154,7 +1172,8 @@ def begin_check(cfg, status=None, drop=None, skip_down=True):
     _seen_errors.clear()
     HTTP.reset_metrics()
     SEALED_OPTS.update(new=bool((cfg or {}).get("new_sealed", True)),
-                       packs=bool((cfg or {}).get("new_sealed_packs", False)))
+                       packs=bool((cfg or {}).get("new_sealed_packs", False)),
+                       jp=bool((cfg or {}).get("japanese_alerts", True)))
     HTTP.user_agent = (cfg or {}).get("user_agent") or UA
     HTTP.classic = bool((cfg or {}).get("classic_requests", True))
     HTTP.ua_by_host = {**UA_BY_HOST, **{str(k).lower(): v for k, v in
@@ -1679,6 +1698,14 @@ def is_box_title(title, variants=None):
             and not is_other_game(title) and not looks_like_single(title, variants))
 
 
+def is_jp_box_title(title, variants=None):
+    """v2.26: a Japanese One Piece booster box: a box title that is_box_title() turned down only for its language."""
+    t = (title or "").lower()
+    return (("booster box" in t or "booster display" in t) and is_excluded(title, JP_WORDS)
+            and not is_excluded(title, JP_BOX_SKIP) and not is_other_game(title)
+            and not looks_like_single(title, variants))
+
+
 def is_preorder(title, tags=""):
     """Pre-order / pre-sale wording in the title or tags (v1 matched any 'pre', e.g. 'PREmium')."""
     blob = (json.dumps(tags) if not isinstance(tags, str) else tags) + " " + (title or "")
@@ -1762,6 +1789,8 @@ def classify(title, watch, max_price, variants=None):
         return "Sealed", "sealed", "watch", w["max"], w
     if is_sealed_listing(title, variants):
         return "New listing", "item", "new", 0.0, None
+    if SEALED_OPTS.get("jp", True) and is_jp_box_title(title, variants):
+        return "New listing", "jp", "jp", 0.0, None            # v2.26: quiet group, never a buy alert
     return None
 
 
@@ -1930,7 +1959,7 @@ def shopify_boxes(shop_name, url, max_price, watch=(), must_include=None, max_pa
             "cart": shopify_cart_link(base, vid) if vid else "",
             "note": note, "max": limit, "page": pages.get(handle, 1),
         })
-        if group == "new" or price is None or price > limit:
+        if group in ("new", "jp") or price is None or price > limit:
             continue
         finds.append({
             "id": f"{prefix}|{shop_name}|{handle}", "kind": kind, "name": title, "shop": shop_name,
@@ -1970,7 +1999,7 @@ def shopify_search_boxes(shop_name, base, max_price, watch=(), queries=None, pag
         price = float(_num(p.get("price") or p.get("price_min")) or 0)
         rows.append((handle, p, c, price, bool(p.get("available"))))
     # only look up cart IDs for what's worth alerting, all at once
-    want = [r[0] for r in rows if r[4] and r[2][2] != "new" and 0 < r[3] <= r[2][3]]
+    want = [r[0] for r in rows if r[4] and r[2][2] not in ("new", "jp") and 0 < r[3] <= r[2][3]]
     carts = dict(zip(want, pmap(lambda h: product_js(base, h) or {}, want)))
     finds, listings = [], []
     for handle, p, (kind, prefix, group, limit, w), price, available in rows:
@@ -1985,7 +2014,7 @@ def shopify_search_boxes(shop_name, base, max_price, watch=(), queries=None, pag
                          "group": group, "kind": "New listing", "name": title, "shop": shop_name,
                          "price": price, "available": available, "url": page, "cart": cart,
                          "note": note, "max": limit, "page": page_no})
-        if group != "new" and available and 0 < price <= limit:
+        if group not in ("new", "jp") and available and 0 < price <= limit:
             finds.append({"id": f"{prefix}|{shop_name}|{handle}", "kind": kind, "name": title,
                           "shop": shop_name, "price": price, "url": page, "cart": cart, "note": note})
     return finds, listings
@@ -2066,7 +2095,7 @@ def woo_boxes(shop_name, url, max_price, watch=(), page_no=1):
             "group": group, "kind": "New listing", "name": name, "shop": shop_name, "price": price,
             "available": buyable, "url": p.get("permalink"), "cart": link, "note": note, "max": limit, "page": page_no,
         })
-        if group == "new" or not buyable or price <= 0 or price > limit:
+        if group in ("new", "jp") or not buyable or price <= 0 or price > limit:
             continue
         finds.append({"id": f"{prefix}|{shop_name}|{p.get('id')}", "kind": kind, "name": name,
                       "shop": shop_name, "price": price, "url": p.get("permalink"), "cart": link, "note": note})
@@ -2215,7 +2244,7 @@ def save_known(known):
     atomic_write_json(KNOWN_PATH, known, indent=1, sort_keys=True)
 
 
-KNOWN_SUFFIX = {"box": "", "watch": " (other sealed)", "new": " (all sealed)"}
+KNOWN_SUFFIX = {"box": "", "watch": " (other sealed)", "new": " (all sealed)", "jp": " (japanese)"}
 
 
 def known_key(shop, group):
@@ -2225,7 +2254,7 @@ def known_key(shop, group):
 
 
 def _base_shop(key):
-    for suffix in (" (other sealed)", " (all sealed)"):
+    for suffix in (" (other sealed)", " (all sealed)", " (japanese)"):
         if key.endswith(suffix):
             return key[:-len(suffix)]
     return key
@@ -2251,6 +2280,8 @@ def new_listings(by_shop, known, box_finds, pages_seen=None, swept=()):
         groups.setdefault(shop, [])              # a shop with no boxes still gets remembered
         if SEALED_OPTS.get("new", True):
             groups.setdefault(known_key(shop, "new"), [])   # ...and with no other sealed, so its first one alerts
+        if SEALED_OPTS.get("jp", True):
+            groups.setdefault(known_key(shop, "jp"), [])    # v2.26: the same for Japanese boxes
     deepest = {}
     for shop, listings in groups.items():
         base_shop = _base_shop(shop)
@@ -2303,7 +2334,7 @@ def opened_listings(by_shop, skip_ids=(), hist=None, now=None):
     out, seen = [], set(skip_ids)
     for listings in by_shop.values():
         for l in listings or []:
-            if l.get("group") != "new" or not l.get("available") or l["box_id"] in seen:
+            if l.get("group") not in ("new", "jp") or not l.get("available") or l["box_id"] in seen:
                 continue
             h = (hist or {}).get(l["box_id"])
             if not h or h.get("avail") or now - float(h.get("since") or now) < OPEN_MIN_GAP:
@@ -2370,6 +2401,33 @@ def restocked_over_max(cfg, by_shop, status, skip_ids=(), hist=None, now=None):
             what = "pre-order open" if is_preorder(l["name"], l.get("note", "")) else "back in stock"
             out.append(dict(l, id=f"open|{l['box_id']}|{int(now) // 3600}", opened=True, soft=True,
                             note=(l["note"] + ", " if l.get("note") else "") + f"{what}, over your {money(mx)} max"))
+    return out
+
+
+def soft_shop_names(cfg):
+    """v2.26: shops marked "soft" (they price above retail): what they list and restock posts quietly."""
+    return {x["name"] for group in sealed_shops(cfg) for x in group if x.get("soft")}
+
+
+def quieten(cfg, listed, status, now=None):
+    """v2.26: mark the listing alerts that should post quietly ("soft": no @ping, no phone push, never
+    auto-bought): Japanese boxes, and anything from a "soft" shop. A quiet "now buyable" for the same product
+    comes at most once per "repeat_hours" (24), like the over-max restocks. -> the alerts to send."""
+    soft_shops = soft_shop_names(cfg)
+    s = soft_settings(cfg) or dict(SOFT_DEFAULTS)
+    now = now or time.time()
+    sent = status.setdefault("soft_alerts", {})
+    out = []
+    for l in listed:
+        if l.get("soft") or not (l.get("group") == "jp" or l.get("shop") in soft_shops):
+            out.append(l)                    # loud, or already a quiet over-max restock (throttled there)
+            continue
+        if l.get("opened"):
+            key = l.get("box_id") or l["id"]
+            if now - float(sent.get(key) or 0) < s["repeat_hours"] * 3600:
+                continue
+            sent[key] = round(now)
+        out.append(dict(l, soft=True))
     return out
 
 
@@ -3708,7 +3766,7 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
         elif f.get("ebay"):
             hook = ebay_hook                 # eBay watch (ebay_watch.json): Nike TNs, promos, graded cards
         elif f.get("link_watch"):
-            hook = watch_hook                # a link you asked to /watch
+            hook = soft_hook if f.get("soft") and soft_hook else watch_hook   # a link you asked to /watch (v2.26: or the scorecard's, quiet)
         elif f.get("soft") and soft_hook:
             hook = soft_hook
         elif f["kind"] == "Sealed" or (f["kind"] == "New listing" and f.get("group") in ("watch", "new")):
@@ -3732,7 +3790,10 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
         role = pokemon_watch.ping(alerts) if is_poke else alerts.get("discord_ping", "")
         if all(f.get("soft") for f in group):
             role = ""                        # v2.25: a message of nothing but quiet restocks pings nobody
-            t = f"{len(group)} restock(s) over your max (no ping)"
+            if all("over your" in str(f.get("note", "")) and f.get("opened") for f in group):
+                t = f"{len(group)} restock(s) over your max (no ping)"
+            else:
+                t = f"{len(group)} quiet alert(s) (no ping)"
         username = pokemon_watch.bot_name(alerts) if is_poke else (alerts.get("bot_name") or "One Piece Restock")
         items = [(e, {f["id"]}) for e, f in zip(_discord_embeds(group, cfg), group)]
         carts = combined_carts(group)
@@ -3847,8 +3908,12 @@ def _discord_embeds(finds, cfg=None):
             icon, color = "📦 ", 0xF4A261
         elif kind == "Sealed":
             icon, color = "🎁 ", 0x2A9D8F
-        elif kind == "New listing" and f.get("soft"):
+        elif kind == "New listing" and f.get("group") == "jp":
+            icon, color = ("🇯🇵 Japanese, now buyable: " if f.get("opened") else "🇯🇵 Japanese, new listing: "), 0x8D99AE
+        elif kind == "New listing" and f.get("soft") and "over your" in str(f.get("note", "")) and f.get("opened"):
             icon, color = "🔔 Restock (over max): ", 0x8D99AE
+        elif kind == "New listing" and f.get("soft"):
+            icon, color = ("🔔 Now buyable: " if f.get("opened") else "🔔 New listing: "), 0x8D99AE
         elif kind == "New listing" and f.get("opened"):
             icon, color = "🔓 Now buyable: ", 0x2A9D8F
         elif kind == "New listing":
@@ -4386,6 +4451,7 @@ def run_once(cfg, args, drop=None):
             if not args.all:                 # v2.25: a box back in stock above your max: posted, but quietly
                 listed += restocked_over_max(cfg, by_shop, status,
                                              {l["box_id"] for l in listed} | {f["id"] for f in box_finds})
+        listed = quieten(cfg, listed, status)              # v2.26: Japanese boxes and over-retail shops: no ping
     alerts = cfg.get("alerts") or {}
     poke_ok, poke_secs, poke_shops, intro = set(), set(), set(), []
     if poke is not None and not poke.problem:
@@ -4417,6 +4483,10 @@ def run_once(cfg, args, drop=None):
     links = None
     if link_watch and not only_poke:                 # /watch links: every check, they're few and cheap
         links = link_watch.check(cfg, fetch=lambda u: HTTP.fetch(u, tries=2))
+        for f in links.finds:                        # v2.26: links the scorecard added by itself are quiet,
+            if f.get("auto") and not (is_box_title(f.get("name")) and (f.get("price") or 0) >= BOX_MIN_PRICE
+                                      and f["price"] <= cfg["sealed"]["max_price"]):
+                f["soft"] = True                     # unless it's a booster box at or under your max
         finds += links.finds
         link_watch.remember(status, links)
 

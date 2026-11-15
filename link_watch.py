@@ -34,10 +34,13 @@ import time
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 
 HERE = os.environ.get("BOT_DATA_DIR") or os.path.dirname(os.path.abspath(__file__))   # v2.15: data folder (container)
 WATCH_PATH = os.path.join(HERE, "watches.json")
 MAX_WATCHES = 25
+AUTO_MAX = 10          # v2.26: links the scorecard adds by itself (on top of yours; they never use up your 25)
+AUTO_DAYS = 30         # ...and each one is dropped after this many days
 WORKERS = 6
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
       "Chrome/126.0 Safari/537.36")
@@ -88,7 +91,8 @@ def load(path=None):
         q = _num(it.get("qty"))
         out.append({"id": str(it.get("id") or link_id(url)), "url": url, "name": str(it.get("name") or ""),
                     "max": mx if mx and mx > 0 else None, "by": str(it.get("by") or ""),
-                    "added": it.get("added"), "qty": max(1, min(10, int(q))) if q else 1})
+                    "added": it.get("added"), "qty": max(1, min(10, int(q))) if q else 1,
+                    "auto": bool(it.get("auto"))})
     return out
 
 
@@ -118,14 +122,18 @@ def link_id(url):
     return hashlib.sha1(clean_url(url).encode("utf-8")).hexdigest()[:8]
 
 
-def add(url, max_price=None, name="", by="", path=None, qty=None):
+def add(url, max_price=None, name="", by="", path=None, qty=None, auto=False):
     """Add a link (or update its max/name if it's already watched). Returns (item, "added"|"updated").
-    Raises ValueError with a plain-English reason."""
+    Raises ValueError with a plain-English reason.
+    auto (v2.26): added by the scorecard, not by you: https only, its own limit (AUTO_MAX), quiet alerts,
+    dropped after AUTO_DAYS. An auto link that's already watched is left exactly as it is."""
     path = path or WATCH_PATH
     url = url.strip().strip("<>")
     if not re.match(r"https?://[^/\s]+\.[^/\s]+", url, re.I):
         raise ValueError("That doesn't look like a web link. Paste the whole product page address, "
                          "starting with https://")
+    if auto and not public_https(url):
+        raise ValueError("Only https links to a public shop address are added automatically.")
     url = clean_url(url)
     mx = _num(max_price)
     if mx is not None and mx < 0:
@@ -138,6 +146,9 @@ def add(url, max_price=None, name="", by="", path=None, qty=None):
         wid = link_id(url)
         for it in items:
             if it.get("id") == wid or clean_url(str(it.get("url", ""))) == url:
+                if auto:
+                    return dict(it), "already"
+                it.pop("auto", None)                # you added it yourself now: it's yours, and loud
                 it.update({"max": mx if mx else None, "enabled": True})
                 if name:
                     it["name"] = name
@@ -145,15 +156,60 @@ def add(url, max_price=None, name="", by="", path=None, qty=None):
                     it["qty"] = max(1, min(10, int(qty)))
                 _write(data, path)
                 return dict(it), "updated"
-        if sum(1 for it in items if it.get("enabled", True) is not False) >= MAX_WATCHES:
+        mine = [it for it in items if it.get("enabled", True) is not False and not it.get("auto")]
+        if auto:
+            if len(items) - len(mine) >= AUTO_MAX:
+                raise ValueError(f"The bot is already watching {AUTO_MAX} links it added itself.")
+        elif len(mine) >= MAX_WATCHES:
             raise ValueError(f"You're already watching {MAX_WATCHES} links. Remove one first (/watch remove).")
         it = {"id": wid, "url": url, "name": name, "max": mx if mx else None, "by": by,
               "added": time.strftime("%Y-%m-%d"), "enabled": True}
+        if auto:
+            it["auto"] = True
         if qty and int(qty) > 1:
             it["qty"] = max(1, min(10, int(qty)))
         items.append(it)
         _write(data, path)
         return dict(it), "added"
+
+
+def public_https(url):
+    """v2.26: an https link to an ordinary public hostname (no IP address, port, login or local name)."""
+    try:
+        u = urllib.parse.urlsplit(str(url).strip())
+        host = (u.hostname or "").lower()
+        if u.scheme.lower() != "https" or u.port or u.username or u.password:
+            return False
+    except ValueError:
+        return False
+    if not re.fullmatch(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}", host):
+        return False
+    return not host.endswith((".local", ".localhost", ".internal", ".lan", ".home", ".test", ".invalid", ".onion"))
+
+
+def prune_auto(path=None, today=None):
+    """v2.26: drop the scorecard's own links once they're AUTO_DAYS old. -> how many were dropped."""
+    path = path or WATCH_PATH
+    today = today or datetime.now().date()
+    with _lock:
+        data = _read(path)
+        if not data:
+            return 0
+        keep = []
+        for it in data.get("items") or []:
+            old = False
+            if isinstance(it, dict) and it.get("auto"):
+                try:
+                    old = (today - datetime.strptime(str(it.get("added")), "%Y-%m-%d").date()).days >= AUTO_DAYS
+                except ValueError:
+                    old = True
+            if not old:
+                keep.append(it)
+        dropped = len(data.get("items") or []) - len(keep)
+        if dropped:
+            data["items"] = keep
+            _write(data, path)
+        return dropped
 
 
 def set_name(wid, name, path=None):
@@ -424,7 +480,8 @@ def make_find(item, r):
     name = item["name"] or r["title"] or shop_name(item["url"])
     cur = f" {r['currency']}" if r.get("currency") and r["currency"].upper() != "AUD" else ""
     bits = [r["status"]]
-    bits.append(f"your max {_money(item['max'])}" if item.get("max") else "any price")
+    bits.append(f"your max {_money(item['max'])}" if item.get("max") else
+                "added by the scorecard" if item.get("auto") else "any price")
     if cur:
         bits.append(f"priced in{cur}")
     note = " · ".join(b for b in bits if b)
@@ -432,7 +489,8 @@ def make_find(item, r):
         note = r["title"][:200] + "\n" + note
     return {"id": f"watch|{item['id']}", "kind": "Sealed", "name": name[:200], "deck": "", "qty": 1,
             "shop": shop_name(item["url"]), "price": r["price"], "url": item["url"], "cart": r.get("cart", ""),
-            "note": note[:1000], "priority": True, "link_watch": True, "cart_qty": int(item.get("qty") or 1)}
+            "note": note[:1000], "priority": True, "link_watch": True, "cart_qty": int(item.get("qty") or 1),
+            **({"auto": True, "priority": False} if item.get("auto") else {})}
 
 
 def check(cfg=None, fetch=None, path=None, items=None):

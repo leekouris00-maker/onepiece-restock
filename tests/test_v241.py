@@ -214,9 +214,10 @@ class Missed(unittest.TestCase):
         self.assertIn("Shopify", r["lines"][0])
 
     def test_filtered_out_says_why(self):
-        ms.live_look = lambda tb_, host, handle: {"title": "One Piece Card Game Japanese Booster Box OP-18",
+        # v2.26: Japanese booster boxes are watched (quietly) now, so the example is a Japanese starter deck
+        ms.live_look = lambda tb_, host, handle: {"title": "One Piece Card Game Japanese Starter Deck ST-30",
                                                   "available": True, "price": 150, "variants": []}
-        r = self.explain("https://www.gumnut.com.au/products/jp-op18", mem(), live=True)
+        r = self.explain("https://www.gumnut.com.au/products/jp-st30", mem(), live=True)
         self.assertEqual(r["kind"], "filtered")
         self.assertIn("japanese", r["headline"])
 

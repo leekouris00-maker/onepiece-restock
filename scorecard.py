@@ -33,6 +33,14 @@ coverage gaps, not counted as losses: add the ones you'll never care about to "i
 Security: grading never looks up a shop the bot doesn't already read, so feed links can't trip the
 allowed-sites check (v2.15).
 
+4. Learning from misses (v2.26). A feed product graded "never seen" or "shop not watched" is added to the
+   watched links by itself, so its next restock is caught: https links to a public shop address only, read
+   politely (robots.txt), a One Piece sealed product only, at most 10 at a time, each dropped after 30 days,
+   and alerts from them are quiet unless it's a booster box at or under your max. /watch remove takes one
+   off; "auto_watch": false under "scorecard" switches it off. With the allowed-sites check on (security
+   "enforce"), links at shops the bot doesn't already read are NOT added (that would widen the allowed list
+   from a feed post): the reply says so instead. A shop that keeps coming up is suggested, never added by itself.
+
 Try it (prints the scorecard; posts nothing):
     py -3 scorecard.py
     py -3 scorecard.py 14
@@ -55,6 +63,8 @@ DEFAULTS = {
     "same_drop_hours": 6,          # a bot alert more than this long before the feed post was a different drop
     "ignore_hosts": [],            # shops you'll never want the bot to read: left out of the coverage gaps
     "weekly_post": True,           # post the scorecard on Monday mornings
+    "auto_watch": True,            # v2.26: a product the bot never saw goes on the watch list by itself (quietly)
+    "suggest_shop_after": 3,       # ...and a shop the bot doesn't read is suggested after this many of its drops
     "ready": {"days": 28, "comparisons": 30, "win_rate": 0.8, "close_minutes": 1, "uptime": 0.99},
 }
 IN_SCOPE = ("first", "late", "seen", "not_found", "filtered")
@@ -197,6 +207,70 @@ def grade(tb, cfg, item, mem=None):
     return res
 
 
+# ---------------------------------------------------------------- v2.26: learning from misses
+def _lw():
+    try:
+        import link_watch
+        return link_watch
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def auto_watch(tb, cfg, item, res, fetch=None):
+    """Put a missed feed product on the watched links. -> a short note for the reply ("" = nothing to say).
+    Never raises."""
+    s = settings(cfg)
+    lw = _lw()
+    if (not s.get("auto_watch") or lw is None or item.get("source", "feed") != "feed"
+            or res.get("kind") not in ("not_found", "not_watched")):
+        return ""
+    link = item.get("link") or ""
+    try:
+        if not lw.public_https(link):
+            return ""
+        if res["kind"] == "not_watched" and ms._guarded(tb):
+            return "not added to the watch list: security only allows the shops the bot already reads"
+        lw.prune_auto()
+        r = lw.read(link, fetch or (lambda u: tb.HTTP.fetch(u, tries=1)))
+        title = (r.get("title") or "").strip()
+        if not r.get("ok") or not title:
+            return ""
+        low = title.lower()
+        if (tb.is_other_game(title) or tb.looks_like_single(title) or not tb.SEALED_WORD_RE.search(title)
+                or any(w in low for w in tb.NOT_SEALED)
+                or not ("one piece" in low or tb.TCG_RE.search(title))):
+            return ""                                    # not a One Piece sealed product: leave it
+        if r.get("currency") and str(r["currency"]).upper() != "AUD":
+            return ""                                    # an overseas shop: its price isn't comparable
+        _, what = lw.add(link, None, title[:120], "scorecard", None, None, True)
+        if what == "added":
+            return "➕ now on the watch list (quiet alerts; `/watch remove` takes it off)"
+    except ValueError as e:
+        return f"not added to the watch list: {str(e)[:120]}" if "already watching" in str(e) else ""
+    except Exception as e:  # noqa: BLE001
+        print(f"   ! auto-watch skipped ({tb.redact(e)})", flush=True)
+    return ""
+
+
+def shop_suggestion(tb, cfg, res):
+    """Count the drops at a shop the bot doesn't read; say so once when it reaches "suggest_shop_after"."""
+    s = settings(cfg)
+    host = res.get("host") or ms.clean_link(res.get("link", ""))[0]
+    need = int(s.get("suggest_shop_after") or 0)
+    if res.get("kind") != "not_watched" or not host or need <= 0:
+        return ""
+    st = load_state(tb)
+    seen = st.setdefault("unwatched", {})
+    seen[host] = int(seen.get(host) or 0) + 1
+    if len(seen) > 300:
+        st["unwatched"] = seen = dict(sorted(seen.items(), key=lambda kv: kv[1])[-300:])
+    save_state(tb, st)
+    if seen[host] == need:
+        return (f"💡 {host} has come up {need} times: worth adding as a shop (ask for it), or put it in "
+                f"\"ignore_hosts\" if you'll never buy there")
+    return ""
+
+
 def grade_due(tb, cfg, now=None):
     """Everything whose wait is over: [(item, result)]. Reads the bot's memory once for the lot."""
     items = take_due(tb, now)
@@ -206,14 +280,17 @@ def grade_due(tb, cfg, now=None):
     out = []
     for it in items:
         try:
-            out.append((it, grade(tb, cfg, it, mem)))
+            res = grade(tb, cfg, it, mem)
+            notes = [n for n in (auto_watch(tb, cfg, it, res), shop_suggestion(tb, cfg, res)) if n]
+            if notes:
+                res["extra"] = notes
+            out.append((it, res))
         except Exception as e:  # noqa: BLE001  one bad link never blocks the rest
             out.append((it, {"kind": "error", "headline": f"couldn't grade it ({tb.redact(e)})", "link": it["link"]}))
     return out
 
 
-def one_line(res):
-    """The short reply under a feed post."""
+def _one_line(res):
     k = res.get("kind")
     where = res.get("shop") or res.get("host") or ""
     if k == "first":
@@ -230,6 +307,11 @@ def one_line(res):
     if k == "not_watched":
         return f"🔭 Not a shop the bot reads · {where}"
     return f"🤔 {res.get('headline', 'Not graded')}"
+
+
+def one_line(res):
+    """The short reply under a feed post (v2.26: plus what the bot did about a miss)."""
+    return "\n".join([_one_line(res)] + [str(x) for x in res.get("extra") or []])
 
 
 # ---------------------------------------------------------------- uptime

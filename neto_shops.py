@@ -215,7 +215,7 @@ def boxes(tb, shop, max_price, watch=()):
                          "kind": "New listing", "name": name, "shop": name_of, "price": price,
                          "available": bool(r["buyable"]), "url": r["url"], "cart": "", "note": note, "max": limit,
                          "page": 1})
-        if group == "new" or not r["buyable"] or price <= 0 or price > limit:
+        if group in ("new", "jp") or not r["buyable"] or price <= 0 or price > limit:
             continue
         finds.append({"id": f"{prefix}|{name_of}|{key}", "kind": kind, "name": name, "shop": name_of, "price": price,
                       "url": r["url"], "cart": "", "note": note})

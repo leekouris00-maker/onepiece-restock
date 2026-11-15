@@ -56,7 +56,7 @@ class Classify(unittest.TestCase):
                   "One Piece Card Game Storage Box Standard Black",
                   "One Piece Card Game Japanese 3rd Anniversary Set Simplified Chinese Version",
                   "One Piece Card Game Premium Card Collection - Kumamoto Japanese",
-                  "One Piece｜OP-16 The Time of Battle Booster Box - JP",
+                  "One Piece｜OP-16 The Time of Battle Booster Case - JP",     # v2.26: a JP box is its own group
                   "Sabo - OP13-120 [Carrying On His Will] (Starter Deck set)",       # card number: a single
                   "Koala (P-069) Promo Set"):
             self.assertIsNone(self.group(t), t)
@@ -301,9 +301,9 @@ class Settings(unittest.TestCase):
 
     def test_begin_check_applies_new_sealed_settings(self):
         tb.begin_check({"new_sealed": False, "new_sealed_packs": True}, status={})
-        self.assertEqual(tb.SEALED_OPTS, {"new": False, "packs": True})
+        self.assertEqual(tb.SEALED_OPTS, {"new": False, "packs": True, "jp": True})
         tb.begin_check({}, status={})
-        self.assertEqual(tb.SEALED_OPTS, {"new": True, "packs": False})
+        self.assertEqual(tb.SEALED_OPTS, {"new": True, "packs": False, "jp": True})
 
 
 if __name__ == "__main__":
