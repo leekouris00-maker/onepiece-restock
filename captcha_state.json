@@ -11,13 +11,13 @@
    "url": "https://alphagaming.com.au/collections/one-piece-sealed-products/products.json?limit=250"
   },
   "cardbot.com.au": {
-   "count": 3,
+   "count": 4,
    "first": 1794717481,
    "kind": "Cloudflare challenge",
-   "since": 1794719503,
+   "since": 1794722078,
    "status": 429,
    "told": null,
-   "until": 1794721903,
+   "until": 1794726878,
    "url": "https://cardbot.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
   },
   "collectiblemadness.com.au": {
@@ -72,13 +72,13 @@
    "url": "https://guf.com.au/search/suggest.json?q=Delta%20Reign%20box&resources[type]=product&resources[limit]=10"
   },
   "lightofcards.com.au": {
-   "count": 3,
+   "count": 4,
    "first": 1794717477,
    "kind": "Cloudflare challenge",
-   "since": 1794719503,
+   "since": 1794722079,
    "status": 429,
    "told": null,
-   "until": 1794721903,
+   "until": 1794726879,
    "url": "https://lightofcards.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
   },
   "pocketgames.com.au": {
