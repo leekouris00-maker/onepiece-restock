@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-16 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794785977,
+ "ebay_ts": 1794786952,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794785590,
+ "pokemon_ts": 1794786371,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -114,6 +114,10 @@
   "list|TCGroup|one-piece-card-game-protagonist-of-the-new-generation-op-05-booster-box-japanese": [
    799.99,
    1794767995
+  ],
+  "list|X-Playground|one-piece-card-game-the-dominance-of-god-op-18-booster-box-japanese": [
+   189.95,
+   1794786372
   ],
   "open|item|Gameology|one-piece-card-game-mini-case-set-vol-3-ts-03-random-select|498485": [
    44.95,
@@ -7656,7 +7660,7 @@
    "t": 1794765489.27715
   }
  },
- "sealed_ts": 1794786173,
+ "sealed_ts": 1794786952,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7699,7 +7703,7 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794785977,
+ "singles_ts": 1794786952,
  "soft_alerts": {},
- "sweep_ts": 1794785977
+ "sweep_ts": 1794786952
 }
