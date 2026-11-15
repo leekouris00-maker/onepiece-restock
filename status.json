@@ -44,7 +44,7 @@
   "The Wandering Collector": 99
  },
  "pc_on": true,
- "pc_version": "2.24.0",
+ "pc_version": "2.25.0",
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -56,7 +56,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794752898,
+ "pokemon_ts": 1794753505,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -6126,10 +6126,10 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794666738.346302
+   "t": 1794753485.8523526
   }
  },
- "sealed_ts": 1794752898,
+ "sealed_ts": 1794753689,
  "shop_down": [
   "www.jtoys.com.au"
  ],
@@ -6168,8 +6168,9 @@
  },
  "shop_locked": [],
  "shop_retry": {
-  "www.jtoys.com.au": 1794753572
+  "www.jtoys.com.au": 1794754590
  },
  "singles_ts": 1794752898,
+ "soft_alerts": {},
  "sweep_ts": 1794752898
 }
