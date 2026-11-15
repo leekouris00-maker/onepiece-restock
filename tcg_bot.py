@@ -150,6 +150,10 @@ try:
 except ImportError:
     link_watch = None
 try:
+    import neto_shops          # v2.24: shops on Neto (Anime Kaika), read from their pages; optional
+except ImportError:
+    neto_shops = None
+try:
     import flip                # v2.22: market price and flip estimate on booster-box alerts, /flip; optional
 except ImportError:
     flip = None
@@ -190,7 +194,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.23.0"
+VERSION = "2.24.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -1348,7 +1352,7 @@ def _num(x):
         return None
 
 
-KNOWN_SETTINGS = {"_help", "drop_rehearsal", "flip", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
+KNOWN_SETTINGS = {"_help", "drop_rehearsal", "flip", "neto_shops", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
                   "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
@@ -1501,6 +1505,8 @@ def check_config(cfg):
         w += onepiece_instore.warnings(cfg)
     if flip:
         w += flip.warnings(cfg)
+    if neto_shops:
+        w += neto_shops.warnings(cfg)
     return w
 
 
@@ -2144,6 +2150,11 @@ def chain_boxes(shop_name, max_price, watch, fast):
     return chain_shops.jb_boxes(_me(), max_price, watch, fast=fast)
 
 
+def neto_boxes(shop_name, shop, max_price, watch):
+    """v2.24: a shop on Neto (neto_shops.py). Same answer shape as woo_boxes."""
+    return neto_shops.boxes(_me(), shop, max_price, watch)
+
+
 def check_sealed(cfg, sweep=False):
     """Returns (finds, listings_by_shop). listings_by_shop[shop] is None when that shop failed.
     sweep: also run the release-code sweep (v2.4) this check."""
@@ -2164,6 +2175,11 @@ def check_sealed(cfg, sweep=False):
         jobs.append((shopify_search_boxes, shop["name"], shop["base"], mx, watch))
     if chain_shops and chain_shops.enabled(cfg, _me()):
         jobs.append((chain_boxes, chain_shops.JB_NAME, mx, watch, bool(sweep)))
+    if neto_shops:
+        paused = paused_shops(cfg)
+        for shop in neto_shops.shops(cfg):
+            if shop["name"] not in paused:
+                jobs.append((neto_boxes, shop["name"], shop, mx, watch))
     if sweep:
         SWEPT.clear()
         jobs += sweep_jobs(cfg, mx, watch)
@@ -3200,6 +3216,9 @@ def shop_names(cfg):
         names.setdefault(urllib.parse.urlparse(base).netloc, name)
     if chain_shops and chain_shops.enabled(cfg, _me()):
         for host, name in chain_shops.hosts().items():
+            names.setdefault(host, name)
+    if neto_shops:
+        for host, name in neto_shops.hosts(cfg).items():
             names.setdefault(host, name)
     if pokemon_watch:
         try:
@@ -4808,14 +4827,14 @@ def self_test(cfg):
 def fetch_new_files():
     """v2.11: an update_bot.bat from before v2.11 doesn't know about auto_buy.py or setup_autobuy.bat, and never
     updates itself. Fetch those (and the newer update_bot.bat) once from the bot's GitHub repo. PC copy only."""
-    global auto_buy, deal_finder, chain_shops, settings_check, rehearsal, flip
+    global auto_buy, deal_finder, chain_shops, settings_check, rehearsal, flip, neto_shops
     if IN_ACTIONS or IN_CONTAINER:      # the container's code is read-only: it's updated by rebuilding the image
         return
     # v2.21: update_bot.bat is now a short file that runs updater.py (which reads the file list from GitHub and
     # keeps update_bot.bat itself current). An older update_bot.bat is swapped for it here, once. The new one is
     # much shorter than the old, so an old copy that's still on screen just ends.
     for name in ("auto_buy.py", "auto_buy_web.py", "collection.py", "deal_finder.py", "chain_shops.py", "setup_autobuy.bat",
-                 "open_autobuy.bat", "settings_check.py", "rehearsal.py", "flip.py", "restock_trend.py", "scorecard.py", "updater.py",
+                 "open_autobuy.bat", "settings_check.py", "rehearsal.py", "flip.py", "neto_shops.py", "restock_trend.py", "scorecard.py", "updater.py",
                  "update_files.txt", "update_bot.bat"):
         path = os.path.join(CODE_DIR, name)
         try:
@@ -4836,6 +4855,12 @@ def fetch_new_files():
         try:
             import auto_buy as _ab
             auto_buy = _ab
+        except ImportError:
+            pass
+    if neto_shops is None:
+        try:
+            import neto_shops as _ns
+            neto_shops = _ns
         except ImportError:
             pass
     if flip is None:

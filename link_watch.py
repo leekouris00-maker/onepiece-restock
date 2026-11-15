@@ -388,6 +388,14 @@ def read(url, fetch=None):
     r = parse_html(page)
     if r:
         return r
+    try:                                    # v2.24: Neto shops (e.g. Kaika) put price and stock in the page's microdata
+        import neto_shops
+        n = neto_shops.parse_product(page, url)
+    except Exception:  # noqa: BLE001
+        n = None
+    if n:
+        return _reading(ok=True, title=n["name"], price=round(n["price"], 2), currency=n["currency"],
+                        buyable=n["buyable"], status=n["status"], how="page data")
     return _reading(problem="the page loaded, but it doesn't say a price and stock the bot can read")
 
 

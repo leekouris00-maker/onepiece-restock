@@ -36,7 +36,7 @@ ALLOWED_NAMES = ("Dockerfile", ".dockerignore", ".env.example")
 NEVER = ("run_forever.bat", "run_commands.bat", "start_bot_hidden.vbs", "config.json", "secrets.json", ".env")
 # used only if update_files.txt can't be downloaded; kept the same as that file (a test checks)
 BUILTIN = [
-    "updater.py", "tcg_bot.py", "commands_bot.py", "settings_check.py", "rehearsal.py", "flip.py", "value.py", "tcgplayer.py", "deck_price.py",
+    "updater.py", "tcg_bot.py", "commands_bot.py", "settings_check.py", "rehearsal.py", "flip.py", "neto_shops.py", "value.py", "tcgplayer.py", "deck_price.py",
     "link_watch.py", "ebay_watch.py", "pokemon_watch.py", "fast_lane.py", "misses.py", "onepiece_instore.py",
     "auto_buy.py", "auto_buy_web.py", "auto_buy_host.py", "collection.py", "deal_finder.py", "chain_shops.py",
     "restock_trend.py", "scorecard.py", "netguard.py", "captcha_watch.py", "fileguard.py", "security_log.py",
