@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.23.0)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.24.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -77,6 +77,11 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.24: ANIME KAIKA. The bot now watches Anime Kaika (kaika.com.au, Sydney), which lists English booster
+  boxes at the A$214.99 RRP: its One Piece section plus its OP-18 and OP-19 box pages. Kaika marks some boxes
+  "Burwood Store Only": those show as not sold online and never alert as in stock. There is no one-tap cart
+  link for Kaika (its site has none), so the alert links to the product page. /watch can now read Kaika
+  product links too. Off with "neto_shops": false in config.json, or pause it with "pause_shops".
 New in v2.23: MY COLLECTION AWAY FROM HOME.
   - AWAY ACCESS. The My collection / auto-buy page can now be opened on your phone from anywhere, through
     Tailscale (a free app; tailscale.com/download). Nothing is opened to the internet: the page listens only

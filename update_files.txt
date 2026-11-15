@@ -7,6 +7,7 @@ commands_bot.py
 settings_check.py
 rehearsal.py
 flip.py
+neto_shops.py
 value.py
 tcgplayer.py
 deck_price.py
