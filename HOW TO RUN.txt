@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.22.0)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.23.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -77,6 +77,17 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.23: MY COLLECTION AWAY FROM HOME.
+  - AWAY ACCESS. The My collection / auto-buy page can now be opened on your phone from anywhere, through
+    Tailscale (a free app; tailscale.com/download). Nothing is opened to the internet: the page listens only
+    on the PC's Tailscale address, the link is encrypted, and the phone still needs the 6-digit code once.
+      1. Install Tailscale on the PC and sign in.   2. Install it on the phone, same account.
+      3. open_autobuy.bat > 📱 Phone > Turn on away access (allow Python on Private networks if Windows asks).
+      4. On the phone open the address shown, type the code, then Add to Home Screen.
+    Use that same address at home too: the phone treats each address as a separate site and asks again.
+  - A CODE WITHOUT BEING AT THE PC. /autobuy phone in Discord (server owner only, only you see the reply)
+    gives a new 6-digit code and the address. Anyone who can use your Discord account as the server owner
+    could do the same, so keep two-step login on for Discord.
 New in v2.22: IS IT WORTH FLIPPING, AND IS THE PC COPY HEALTHY.
   - MARKET LINE ON BOX ALERTS. An English booster-box alert now adds TCGplayer's US market price in A$ and
     what would be left if you resold at that price after your selling costs. /flip OP-18 215 does the same
