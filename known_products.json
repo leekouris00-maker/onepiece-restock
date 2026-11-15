@@ -1464,7 +1464,13 @@
   "list|Pocket Games|one-piece-former-four-emperors-set",
   "list|Pocket Games|one-piece-tcg-the-time-of-battle-double-pack-dp11-english"
  ],
- "Pocket Games (japanese)": [],
+ "Pocket Games (japanese)": [
+  "list|Pocket Games|one-piece-tcg-eb-03-heroines-edition-booster-box-japanese",
+  "list|Pocket Games|one-piece-tcg-op-12-legacy-of-master-booster-box-pack-jp",
+  "list|Pocket Games|one-piece-tcg-op-13-carrying-on-his-will-booster-box-pack-japanese",
+  "list|Pocket Games|one-piece-tcg-op-14-the-azure-sea-s-seven-booster-box-japanese",
+  "list|Pocket Games|one-piece-tcg-premium-booster-box-the-best-prb-01"
+ ],
  "Pocket Games (pokemon:30th-celebration)": [],
  "Pocket Games (pokemon:delta-reign)": [],
  "Pokebox": [
@@ -1698,11 +1704,17 @@
   "list|X-Playground|one-piece-card-game-the-dominance-of-god-double-pack-set-dp-13-single-box"
  ],
  "X-Playground (pokemon:30th-celebration)": [
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-5-booster-tin-greninja-ex",
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-5-booster-tin-sylveon-ex",
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-binder-collection",
   "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-booster-bundle",
   "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-elite-trainer-box",
   "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-ex-tin-greninja-ex",
   "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-ex-tin-sylveon-ex",
-  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-mini-tin-set-of-10"
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-mini-tin-sealed-display-of-10",
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-mini-tin-set-of-10",
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-ultra-premium-collection-day",
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-ultra-premium-collection-night"
  ],
  "X-Playground (pokemon:delta-reign)": [
   "plist|delta-reign|X-Playground|pokemon-tcg-mega-evolution-delta-reign-booster-box",

@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-16 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794782982,
+ "ebay_ts": 1794784034,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794783368,
+ "pokemon_ts": 1794784034,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -70,10 +70,6 @@
   "ebay|v1|158366644617|0": [
    265.8,
    1794621944
-  ],
-  "ebay|v1|178490730493|0": [
-   273.91,
-   1794515532
   ],
   "ebay|v1|366683562606|0": [
    76.4,
@@ -86,6 +82,14 @@
   "list|GUF|my-name-is-shirahoshi-extra-booster-one-piece-heroines-edition-vol-2": [
    1.0,
    1794545128
+  ],
+  "list|Pocket Games|one-piece-tcg-op-12-legacy-of-master-booster-box-pack-jp": [
+   9.0,
+   1794784046
+  ],
+  "list|Pocket Games|one-piece-tcg-op-14-the-azure-sea-s-seven-booster-box-japanese": [
+   7.0,
+   1794784046
   ],
   "list|TCGroup|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box-japanese": [
    184.99,
@@ -131,6 +135,30 @@
    749.99,
    1794625564
   ],
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-5-booster-tin-greninja-ex": [
+   119.95,
+   1794784046
+  ],
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-5-booster-tin-sylveon-ex": [
+   119.95,
+   1794784046
+  ],
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-binder-collection": [
+   139.95,
+   1794784046
+  ],
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-mini-tin-sealed-display-of-10": [
+   549.95,
+   1794784046
+  ],
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-ultra-premium-collection-day": [
+   719.95,
+   1794784046
+  ],
+  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-ultra-premium-collection-night": [
+   749.95,
+   1794784046
+  ],
   "plist|delta-reign|Card Bot|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": [
    119.99,
    1794663164
@@ -146,10 +174,6 @@
   "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-bundle": [
    70.0,
    1794659546
-  ],
-  "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-elite-trainer-box": [
-   130.0,
-   1794521905
   ],
   "poke|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": [
    159.0,
@@ -169,7 +193,7 @@
   ],
   "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
    99.0,
-   1794772961
+   1794784046
   ]
  },
  "robots": {
@@ -3321,7 +3345,7 @@
   },
   "overhauledgames.com.au": {
    "rules": [],
-   "t": 1794697593.6995573
+   "t": 1794784009.777711
   },
   "pocketgames.com.au": {
    "rules": [
@@ -7628,7 +7652,7 @@
    "t": 1794765489.27715
   }
  },
- "sealed_ts": 1794783767,
+ "sealed_ts": 1794784415,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7671,7 +7695,7 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794782982,
+ "singles_ts": 1794784034,
  "soft_alerts": {},
- "sweep_ts": 1794782982
+ "sweep_ts": 1794784034
 }
