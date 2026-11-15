@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-16 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794784034,
+ "ebay_ts": 1794785042,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794784034,
+ "pokemon_ts": 1794784837,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -78,6 +78,10 @@
   "ebay|v1|880065792892|0": [
    252.0,
    1794608767
+  ],
+  "list|Dropstore|the-dominance-of-god-op-18-booster-box-one-piece-card-game": [
+   399.95,
+   1794784837
   ],
   "list|GUF|my-name-is-shirahoshi-extra-booster-one-piece-heroines-edition-vol-2": [
    1.0,
@@ -7652,7 +7656,7 @@
    "t": 1794765489.27715
   }
  },
- "sealed_ts": 1794784415,
+ "sealed_ts": 1794785042,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7695,7 +7699,7 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794784034,
+ "singles_ts": 1794785042,
  "soft_alerts": {},
- "sweep_ts": 1794784034
+ "sweep_ts": 1794785042
 }
