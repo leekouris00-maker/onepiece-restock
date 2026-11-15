@@ -4,7 +4,7 @@ Start it, or restart it after an update:   double-click restart_bot.bat
 Make it start by itself at every login:    double-click install_autostart.bat (once; it also starts it now)
 Stop it starting by itself:                remove_autostart.bat
 
-Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.24.0)".
+Within a minute or two, Discord's #bot-status shows "Bot online (PC, v2.25.0)".
 Pokémon channels: type /pokemon setup in Discord (once).
 One Piece in-store channel: type /onepiece setup in Discord (once).
 
@@ -77,6 +77,14 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.25: QUIET RESTOCK ALERTS. A booster box (or a watched sealed item) that comes back into stock ABOVE
+  your max used to say nothing. Now it posts once as "Restock (over max)" with no @ping and no phone push, so
+  the loud alerts stay the ones at or under your max (/boxmax sets that). The same product at the same shop
+  posts at most once a day, and anything over 4 times your max is left out. Change with
+      "restock_alerts": {"repeat_hours": 24, "max_times": 4}     or     "restock_alerts": false
+  To give them a channel of their own (#restocks), double-click add_channels.bat once: it makes the channel
+  and saves its webhook. Without that they go to your boxes channel, still without a ping.
+  Auto-buy never acts on these.
 New in v2.24: ANIME KAIKA. The bot now watches Anime Kaika (kaika.com.au, Sydney), which lists English booster
   boxes at the A$214.99 RRP: its One Piece section plus its OP-18 and OP-19 box pages. Kaika marks some boxes
   "Burwood Store Only": those show as not sold online and never alert as in stock. There is no one-tap cart

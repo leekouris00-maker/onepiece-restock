@@ -194,7 +194,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.24.0"
+VERSION = "2.25.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -251,6 +251,7 @@ ENV_ALERTS = {
     "DISCORD_WEBHOOK_DROPS": "discord_webhook_drops",      # optional: the 6-hourly price drops get their own channel
     "DISCORD_WEBHOOK_PRICES": "discord_webhook_prices",    # optional: v2.8 daily TCGplayer report (tcgplayer.py)
     "DISCORD_WEBHOOK_INSTORE": "discord_webhook_instore",  # optional: v2.10 One Piece in-store posts (onepiece_instore.py)
+    "DISCORD_WEBHOOK_RESTOCKS": "discord_webhook_restocks",  # optional: v2.25 quiet over-max restocks get their own channel
     "LEDGER_URL": "ledger_url",
     "HEARTBEAT_TOPIC": "heartbeat_topic",
     "HEARTBEAT_ROLE": "heartbeat_role",
@@ -1352,7 +1353,7 @@ def _num(x):
         return None
 
 
-KNOWN_SETTINGS = {"_help", "drop_rehearsal", "flip", "neto_shops", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
+KNOWN_SETTINGS = {"_help", "drop_rehearsal", "flip", "neto_shops", "restock_alerts", "alerts", "sealed", "singles", "sealed_watch", "releases", "drop_windows", "new_listings",
                   "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
@@ -2311,6 +2312,64 @@ def opened_listings(by_shop, skip_ids=(), hist=None, now=None):
             what = "pre-order open" if is_preorder(l["name"], l.get("note", "")) else "now buyable"
             out.append(dict(l, id=f"open|{l['box_id']}|{int(now) // 3600}", opened=True,
                             note=(l["note"] + ", " if l.get("note") else "") + what))
+    return out
+
+
+# v2.25: quiet restock alerts. A booster box (or watched sealed item) that comes back into stock ABOVE your max
+# used to say nothing at all. Now it posts once, without a ping or phone push, so you still see it.
+#   "restock_alerts": false                      in config.json switches these off
+#   "restock_alerts": {"repeat_hours": 24,       the same product at the same shop at most this often
+#                      "max_times": 4}           ...and nothing priced over this many times your max (cases, scalpers)
+# alerts "discord_webhook_restocks": a channel of their own; without it they go to the usual channel, unpinged.
+SOFT_DEFAULTS = {"repeat_hours": 24.0, "max_times": 4.0}
+SOFT_KEEP_DAYS = 14
+
+
+def soft_settings(cfg):
+    raw = (cfg or {}).get("restock_alerts", True)
+    if raw is False:
+        return None
+    s = dict(SOFT_DEFAULTS)
+    if isinstance(raw, dict):
+        for k in s:
+            v = _num(raw.get(k))
+            if v is not None and v > 0:
+                s[k] = float(v)
+    return s
+
+
+def restocked_over_max(cfg, by_shop, status, skip_ids=(), hist=None, now=None):
+    """Booster boxes and watched sealed items that were listed but not buyable for at least OPEN_MIN_GAP and
+    are buyable now at MORE than your max. Returned as quiet finds ("soft": no @ping, no phone push, never
+    auto-bought). Uses price_history.json like opened_listings, and must run before record_history()."""
+    s = soft_settings(cfg)
+    if not s:
+        return []
+    hist = read_json(HISTORY_PATH, {}) if hist is None else hist
+    now = now or time.time()
+    sent = status.setdefault("soft_alerts", {})
+    for k in [k for k, t in sent.items() if not isinstance(t, (int, float)) or now - t > SOFT_KEEP_DAYS * 86400]:
+        sent.pop(k)
+    out, seen = [], set(skip_ids)
+    for listings in by_shop.values():
+        for l in listings or []:
+            mx = float(l.get("max") or 0)
+            price = float(l.get("price") or 0)
+            if (l.get("group") not in ("box", "watch") or not l.get("available") or l["box_id"] in seen
+                    or mx <= 0 or price <= mx or price > mx * s["max_times"]):
+                continue
+            if l.get("group") == "box" and (price < BOX_MIN_PRICE or DEPOSIT_RE.search(l.get("name") or "")):
+                continue
+            h = (hist or {}).get(l["box_id"])
+            if not h or h.get("avail") or now - float(h.get("since") or now) < OPEN_MIN_GAP:
+                continue            # new to us (a new-listing alert covers it), already buyable, or just flickered
+            if now - float(sent.get(l["box_id"]) or 0) < s["repeat_hours"] * 3600:
+                continue            # this shop puts the same box in and out of stock all day: once is enough
+            seen.add(l["box_id"])
+            sent[l["box_id"]] = round(now)
+            what = "pre-order open" if is_preorder(l["name"], l.get("note", "")) else "back in stock"
+            out.append(dict(l, id=f"open|{l['box_id']}|{int(now) // 3600}", opened=True, soft=True,
+                            note=(l["note"] + ", " if l.get("note") else "") + f"{what}, over your {money(mx)} max"))
     return out
 
 
@@ -3498,6 +3557,7 @@ HOOK_LABELS = {"discord_webhook_boxes": "#booster-boxes", "discord_webhook_singl
                "discord_webhook_watch": "#watched-links",
                "discord_webhook_status": "#bot-status", "discord_webhook_drops": "price drops",
                "discord_webhook_prices": "#tcgplayer-prices", "discord_webhook_instore": "#onepiece-in-store",
+               "discord_webhook_restocks": "#restocks",
                "discord_webhook_recap": "daily recap", "discord_webhook_autobuy": "🔒 auto-buy",
                "discord_webhook_deals": "🔒 deals",
                "discord_webhook": "main channel"}
@@ -3623,6 +3683,7 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
     sealed_hook = alerts.get("discord_webhook_sealed") or boxes_hook
     ebay_hook = alerts.get("discord_webhook_ebay") or singles_hook   # eBay resale finds: their own channel if set up
     watch_hook = alerts.get("discord_webhook_watch") or sealed_hook  # /watch links: own channel if set up
+    soft_hook = alerts.get("discord_webhook_restocks")               # v2.25: quiet over-max restocks, own channel if set up
     poke_hooks = pokemon_watch.hooks(alerts) if pokemon_watch else {}
     if not (default or boxes_hook or singles_hook or poke_hooks):
         return False, set()
@@ -3648,6 +3709,8 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
             hook = ebay_hook                 # eBay watch (ebay_watch.json): Nike TNs, promos, graded cards
         elif f.get("link_watch"):
             hook = watch_hook                # a link you asked to /watch
+        elif f.get("soft") and soft_hook:
+            hook = soft_hook
         elif f["kind"] == "Sealed" or (f["kind"] == "New listing" and f.get("group") in ("watch", "new")):
             hook = sealed_hook               # other sealed products: their own channel if set up
         elif f["kind"] in BOX_KINDS:
@@ -3667,6 +3730,9 @@ def push_discord_detailed(cfg, title, body, finds=None, ping=True):
             t = f"{len(group)} new find(s)" + (f", {n_box} box(es)" if n_box else "") + \
                 (f", {n_new} new listing(s)" if n_new else "")
         role = pokemon_watch.ping(alerts) if is_poke else alerts.get("discord_ping", "")
+        if all(f.get("soft") for f in group):
+            role = ""                        # v2.25: a message of nothing but quiet restocks pings nobody
+            t = f"{len(group)} restock(s) over your max (no ping)"
         username = pokemon_watch.bot_name(alerts) if is_poke else (alerts.get("bot_name") or "One Piece Restock")
         items = [(e, {f["id"]}) for e, f in zip(_discord_embeds(group, cfg), group)]
         carts = combined_carts(group)
@@ -3781,6 +3847,8 @@ def _discord_embeds(finds, cfg=None):
             icon, color = "📦 ", 0xF4A261
         elif kind == "Sealed":
             icon, color = "🎁 ", 0x2A9D8F
+        elif kind == "New listing" and f.get("soft"):
+            icon, color = "🔔 Restock (over max): ", 0x8D99AE
         elif kind == "New listing" and f.get("opened"):
             icon, color = "🔓 Now buyable: ", 0x2A9D8F
         elif kind == "New listing":
@@ -4315,6 +4383,9 @@ def run_once(cfg, args, drop=None):
                               swept=set(SWEPT) if do_sweep else ())
         if cfg.get("history", True):     # v2.4: a listed sealed product's pre-order / stock just opened
             listed += opened_listings(by_shop, {l["box_id"] for l in listed} | {f["id"] for f in box_finds})
+            if not args.all:                 # v2.25: a box back in stock above your max: posted, but quietly
+                listed += restocked_over_max(cfg, by_shop, status,
+                                             {l["box_id"] for l in listed} | {f["id"] for f in box_finds})
     alerts = cfg.get("alerts") or {}
     poke_ok, poke_secs, poke_shops, intro = set(), set(), set(), []
     if poke is not None and not poke.problem:
@@ -4504,7 +4575,7 @@ def run_once(cfg, args, drop=None):
         desktop_beep()
         if auto_buy and role != "listen":      # v2.11: before the alert goes out, so it can say "auto-buying"
             try:
-                auto_buy.offer(sys.modules[__name__], cfg, deliver)
+                auto_buy.offer(sys.modules[__name__], cfg, [f for f in deliver if not f.get("soft")])
             except Exception as e:  # noqa: BLE001
                 print(f"   ! auto-buy skipped ({redact(e)})")
         if fast_lane:
@@ -4513,9 +4584,11 @@ def run_once(cfg, args, drop=None):
                                                     else "New since last check")
         append_text(LOG_PATH, f"\n--- {stamp} ---\n{dtext}\n")
         title = finds_title(deliver)
-        ping = ping_allowed(cfg, deliver)
+        loud = [f for f in deliver if not f.get("soft")]       # v2.25: quiet restocks never ping or push
+        ping = bool(loud) and ping_allowed(cfg, loud)
         if ping:
-            push_phone(cfg, title, dtext[:3500])
+            push_phone(cfg, finds_title(loud), (dtext if len(loud) == len(deliver) else
+                                                report(loud, "New since last check"))[:3500])
         # boxes first, then new listings, then priority singles, so the important ones fill the first message
         order = {"Booster box": 0, "Sealed": 1, "New listing": 2, "Single": 3}
         ordered = sorted(deliver, key=lambda f: (order.get(f["kind"], 4), not f.get("priority"), f["price"]))
