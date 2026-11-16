@@ -8,7 +8,65 @@
  "ebay_fails": 0,
  "ebay_state": "ok",
  "ebay_ts": 1794806421,
- "held": {},
+ "held": {
+  "list|Dropstore|gift-collection-heroines-gc-2026-one-piece-card-game": {
+   "f": {
+    "available": true,
+    "box_id": "sealed|Dropstore|gift-collection-heroines-gc-2026-one-piece-card-game",
+    "cart": "https://dropstore.com.au/cart/67981371932739:1",
+    "group": "watch",
+    "id": "list|Dropstore|gift-collection-heroines-gc-2026-one-piece-card-game",
+    "kind": "New listing",
+    "max": 120,
+    "name": "Gift Collection Heroines GC-2026 | One Piece Card Game",
+    "note": "Heroines Gift Collection, pre-order, in stock (over your $120.00 max)",
+    "page": 1,
+    "price": 299.95,
+    "shop": "Dropstore",
+    "soft": true,
+    "url": "https://dropstore.com.au/products/gift-collection-heroines-gc-2026-one-piece-card-game"
+   },
+   "t": 1794806670
+  },
+  "list|Dropstore|illustration-box-vol-10-ib-10-one-piece-card-game": {
+   "f": {
+    "available": true,
+    "box_id": "sealed|Dropstore|illustration-box-vol-10-ib-10-one-piece-card-game",
+    "cart": "https://dropstore.com.au/cart/67981366427715:1",
+    "group": "watch",
+    "id": "list|Dropstore|illustration-box-vol-10-ib-10-one-piece-card-game",
+    "kind": "New listing",
+    "max": 130,
+    "name": "Illustration Box Vol. 10 IB-10 (Shanks/Benn Beckman) | One Piece Card Game",
+    "note": "Illustration Box IB-09 / IB-10, pre-order, in stock (over your $130.00 max)",
+    "page": 1,
+    "price": 149.95,
+    "shop": "Dropstore",
+    "soft": true,
+    "url": "https://dropstore.com.au/products/illustration-box-vol-10-ib-10-one-piece-card-game"
+   },
+   "t": 1794806670
+  },
+  "list|Dropstore|illustration-box-vol-9-ib-09-one-piece-card-game": {
+   "f": {
+    "available": true,
+    "box_id": "sealed|Dropstore|illustration-box-vol-9-ib-09-one-piece-card-game",
+    "cart": "https://dropstore.com.au/cart/67981370228803:1",
+    "group": "watch",
+    "id": "list|Dropstore|illustration-box-vol-9-ib-09-one-piece-card-game",
+    "kind": "New listing",
+    "max": 130,
+    "name": "Illustration Box Vol. 9 IB-09 (Sanji/Pudding) | One Piece Card Game",
+    "note": "Illustration Box IB-09 / IB-10, pre-order, in stock (over your $130.00 max)",
+    "page": 1,
+    "price": 149.95,
+    "shop": "Dropstore",
+    "soft": true,
+    "url": "https://dropstore.com.au/products/illustration-box-vol-9-ib-09-one-piece-card-game"
+   },
+   "t": 1794806670
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -61,7 +119,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794805841,
+ "pokemon_ts": 1794807254,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7672,8 +7730,10 @@
    "t": 1794765489.27715
   }
  },
- "sealed_ts": 1794806421,
- "shop_down": [],
+ "sealed_ts": 1794807254,
+ "shop_down": [
+  "www.jtoys.com.au"
+ ],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -7704,7 +7764,7 @@
   "www.gumnut.com.au": 0,
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 3,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -7714,7 +7774,9 @@
   "x-playground.com": 0
  },
  "shop_locked": [],
- "shop_retry": {},
+ "shop_retry": {
+  "www.jtoys.com.au": 1794807756
+ },
  "singles_ts": 1794806421,
  "soft_alerts": {
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
