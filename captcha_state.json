@@ -10,16 +10,6 @@
    "told": 1794700779,
    "url": "https://alphagaming.com.au/robots.txt"
   },
-  "dropstore.com.au": {
-   "count": 2,
-   "first": 1794828086,
-   "kind": "Cloudflare challenge",
-   "since": 1794828861,
-   "status": 429,
-   "told": null,
-   "until": 1794830061,
-   "url": "https://dropstore.com.au/collections/one-piece-tcg/products.json?limit=250"
-  },
   "elementalarcade.com.au": {
    "count": 11,
    "first": 1794301076,
@@ -30,26 +20,6 @@
    "status": 429,
    "told": 1794684753,
    "url": "https://elementalarcade.com.au/robots.txt"
-  },
-  "gamesempire.com.au": {
-   "count": 2,
-   "first": 1794828086,
-   "kind": "Cloudflare challenge",
-   "since": 1794828861,
-   "status": 429,
-   "told": null,
-   "until": 1794830061,
-   "url": "https://gamesempire.com.au/collections/one-piece-card-game/products.json?limit=250"
-  },
-  "gbtoys.com.au": {
-   "count": 2,
-   "first": 1794828086,
-   "kind": "Cloudflare challenge",
-   "since": 1794828862,
-   "status": 429,
-   "told": null,
-   "until": 1794830062,
-   "url": "https://gbtoys.com.au/collections/one-piece-tcg/products.json?limit=250"
   },
   "goldfieldsgames.com.au": {
    "count": 8,
@@ -81,16 +51,6 @@
    "told": 1794820766,
    "url": "https://rogueonline.com.au/robots.txt"
   },
-  "shop.goodgames.com.au": {
-   "count": 2,
-   "first": 1794828087,
-   "kind": "Cloudflare challenge",
-   "since": 1794828862,
-   "status": 429,
-   "told": null,
-   "until": 1794830062,
-   "url": "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250"
-  },
   "tcg.goodgames.com.au": {
    "count": 7,
    "first": 1794667899,
@@ -100,46 +60,6 @@
    "status": 429,
    "told": 1794692595,
    "url": "https://tcg.goodgames.com.au/robots.txt"
-  },
-  "thewanderingcollector.com.au": {
-   "count": 2,
-   "first": 1794828086,
-   "kind": "Cloudflare challenge",
-   "since": 1794828861,
-   "status": 429,
-   "told": null,
-   "until": 1794830061,
-   "url": "https://thewanderingcollector.com.au/collections/one-piece-tcg-english-sealed-products/products.json?limit=250"
-  },
-  "www.fpvfaster.com.au": {
-   "count": 2,
-   "first": 1794828086,
-   "kind": "Cloudflare challenge",
-   "since": 1794828862,
-   "status": 429,
-   "told": null,
-   "until": 1794830062,
-   "url": "https://www.fpvfaster.com.au/products/one-piece-card-game-op-18-booster-box.js"
-  },
-  "www.gameology.com.au": {
-   "count": 2,
-   "first": 1794828085,
-   "kind": "Cloudflare challenge",
-   "since": 1794828860,
-   "status": 429,
-   "told": null,
-   "until": 1794830060,
-   "url": "https://www.gameology.com.au/collections/one-piece-card-game/products.json?limit=250"
-  },
-  "www.gametradersinglefarm.com.au": {
-   "count": 2,
-   "first": 1794828087,
-   "kind": "Cloudflare challenge",
-   "since": 1794828863,
-   "status": 429,
-   "told": null,
-   "until": 1794830063,
-   "url": "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250"
   },
   "www.gdgames.com.au": {
    "count": 8,
@@ -161,16 +81,6 @@
    "told": 1794700778,
    "url": "https://www.gumnut.com.au/robots.txt"
   },
-  "www.jbhifi.com.au": {
-   "count": 2,
-   "first": 1794828087,
-   "kind": "Cloudflare challenge",
-   "since": 1794828864,
-   "status": 429,
-   "told": null,
-   "until": 1794830064,
-   "url": "https://www.jbhifi.com.au/products.json?limit=250"
-  },
   "www.mayhemcollectables.com.au": {
    "count": 6,
    "first": 1794721490,
@@ -190,26 +100,6 @@
    "status": 429,
    "told": 1794771753,
    "url": "https://www.monstermart.com.au/search/suggest.json?q=Delta%20Reign&resources[type]=product&resources[limit]=10"
-  },
-  "www.pokebox.com.au": {
-   "count": 2,
-   "first": 1794828086,
-   "kind": "Cloudflare challenge",
-   "since": 1794828861,
-   "status": 429,
-   "told": null,
-   "until": 1794830061,
-   "url": "https://www.pokebox.com.au/collections/one-piece-card-game-booster-boxes-english/products.json?limit=250"
-  },
-  "www.tcgroupau.com.au": {
-   "count": 2,
-   "first": 1794828086,
-   "kind": "Cloudflare challenge",
-   "since": 1794828860,
-   "status": 429,
-   "told": null,
-   "until": 1794830060,
-   "url": "https://www.tcgroupau.com.au/collections/one-piece-booster-box/products.json?limit=250"
   }
  }
 }
