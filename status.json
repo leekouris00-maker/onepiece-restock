@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-16 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794791217,
+ "ebay_ts": 1794792235,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794790595,
+ "pokemon_ts": 1794792235,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -86,6 +86,10 @@
   "list|GUF|my-name-is-shirahoshi-extra-booster-one-piece-heroines-edition-vol-2": [
    1.0,
    1794545128
+  ],
+  "list|Games Portal|one-piece-card-game-the-dominance-of-god-op-18-booster": [
+   15.0,
+   1794791430
   ],
   "list|Pocket Games|one-piece-tcg-op-12-legacy-of-master-booster-box-pack-jp": [
    9.0,
@@ -205,7 +209,7 @@
   ],
   "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
    99.0,
-   1794784046
+   1794792246
   ]
  },
  "robots": {
@@ -7664,7 +7668,7 @@
    "t": 1794765489.27715
   }
  },
- "sealed_ts": 1794791217,
+ "sealed_ts": 1794792235,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7707,9 +7711,9 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794791217,
+ "singles_ts": 1794792235,
  "soft_alerts": {
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
  },
- "sweep_ts": 1794791217
+ "sweep_ts": 1794792235
 }
