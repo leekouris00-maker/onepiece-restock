@@ -15,8 +15,7 @@
  "offline_streak": 0,
  "page_hints": {
   "https://elementalarcade.com.au/collections/one-piece-singles/products.json?limit=250": 14,
-  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 4,
-  "https://www.gametradersinglefarm.com.au/collections/trading-cards/products.json?limit=250": 2
+  "https://shop.goodgames.com.au/collections/one-piece-card-game/products.json?limit=250": 4
  },
  "pages_seen": {
   "Alpha Gaming": 99,
@@ -61,7 +60,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794872776,
+ "pokemon_ts": 1794873472,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7909,7 +7908,7 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794872776,
+ "sealed_ts": 1794873472,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
