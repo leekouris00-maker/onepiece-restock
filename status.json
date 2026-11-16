@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794786371,
+ "pokemon_ts": 1794787164,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -122,6 +122,10 @@
   "open|item|Gameology|one-piece-card-game-mini-case-set-vol-3-ts-03-random-select|498485": [
    44.95,
    1794547528
+  ],
+  "open|sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13|498551": [
+   40.0,
+   1794787165
   ],
   "plist|30th-celebration|Light of Cards|pokemon-tcg-30th-celebration-poster-collection": [
    84.99,
@@ -4401,7 +4405,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794700185.7950413
+   "t": 1794787144.0960484
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -5465,7 +5469,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794699398.685912
+   "t": 1794787144.1042595
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -7660,12 +7664,12 @@
    "t": 1794765489.27715
   }
  },
- "sealed_ts": 1794786952,
+ "sealed_ts": 1794787587,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
-  "cardplustcg.com.au": 0,
+  "cardplustcg.com.au": 2,
   "collectiblemadness.com.au": 0,
   "dropstore.com.au": 0,
   "elementalarcade.com.au": 0,
@@ -7704,6 +7708,8 @@
  "shop_locked": [],
  "shop_retry": {},
  "singles_ts": 1794786952,
- "soft_alerts": {},
+ "soft_alerts": {
+  "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
+ },
  "sweep_ts": 1794786952
 }
