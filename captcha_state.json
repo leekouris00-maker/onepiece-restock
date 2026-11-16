@@ -81,16 +81,6 @@
    "told": 1794700778,
    "url": "https://www.gumnut.com.au/robots.txt"
   },
-  "www.jbhifi.com.au": {
-   "count": 2,
-   "first": 1794823906,
-   "kind": "Cloudflare challenge",
-   "since": 1794824513,
-   "status": 429,
-   "told": null,
-   "until": 1794825713,
-   "url": "https://www.jbhifi.com.au/products.json?limit=250"
-  },
   "www.kollecter.com.au": {
    "count": 8,
    "first": 1794620344,
