@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794809263,
+ "pokemon_ts": 1794809874,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7672,10 +7672,8 @@
    "t": 1794765489.27715
   }
  },
- "sealed_ts": 1794809475,
- "shop_down": [
-  "www.jtoys.com.au"
- ],
+ "sealed_ts": 1794810247,
+ "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -7706,7 +7704,7 @@
   "www.gumnut.com.au": 0,
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
-  "www.jtoys.com.au": 3,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -7716,9 +7714,7 @@
   "x-playground.com": 0
  },
  "shop_locked": [],
- "shop_retry": {
-  "www.jtoys.com.au": 1794809780
- },
+ "shop_retry": {},
  "singles_ts": 1794809475,
  "soft_alerts": {
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
