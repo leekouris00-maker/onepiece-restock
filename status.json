@@ -7,8 +7,29 @@
  "drops_slot": "2026-11-17 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794863843,
- "held": {},
+ "ebay_ts": 1794864855,
+ "held": {
+  "open|box|Grailborne|one-piece-card-game-op-18-booster-box-english|498573": {
+   "f": {
+    "available": true,
+    "box_id": "box|Grailborne|one-piece-card-game-op-18-booster-box-english",
+    "cart": "",
+    "group": "box",
+    "id": "open|box|Grailborne|one-piece-card-game-op-18-booster-box-english|498573",
+    "kind": "New listing",
+    "max": 300.0,
+    "name": "One Piece Card Game: OP-18 The Dominance of God Booster Box (English) (Releases 20 Nov 2026)",
+    "note": "pre-order, pre-order open, over your $300.00 max",
+    "opened": true,
+    "page": 1,
+    "price": 489.0,
+    "shop": "Grailborne",
+    "soft": true,
+    "url": "https://grailborne.com.au/products/one-piece-card-game-op-18-booster-box-english"
+   },
+   "t": 1794865065
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -61,7 +82,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794864429,
+ "pokemon_ts": 1794865066,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7929,7 +7950,7 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794864429,
+ "sealed_ts": 1794865066,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7972,12 +7993,15 @@
   "x-playground.com": 0
  },
  "shop_locked": [],
- "shop_refused": {},
+ "shop_refused": {
+  "www.mayhemcollectables.com.au": 1794864866
+ },
  "shop_refused_said": [],
  "shop_retry": {},
- "singles_ts": 1794863843,
+ "singles_ts": 1794864855,
  "soft_alerts": {
+  "box|Grailborne|one-piece-card-game-op-18-booster-box-english": 1794865066,
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
  },
- "sweep_ts": 1794863843
+ "sweep_ts": 1794864855
 }
