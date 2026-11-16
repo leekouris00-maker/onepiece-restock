@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-17 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794868790,
+ "ebay_ts": 1794869748,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794868998,
+ "pokemon_ts": 1794869748,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -75,10 +75,6 @@
    76.4,
    1794612912
   ],
-  "ebay|v1|880065792892|0": [
-   252.0,
-   1794608767
-  ],
   "list|Dropstore|the-dominance-of-god-op-18-booster-box-one-piece-card-game": [
    399.95,
    1794784837
@@ -86,6 +82,10 @@
   "list|Games Portal|one-piece-card-game-the-dominance-of-god-op-18-booster": [
    15.0,
    1794791430
+  ],
+  "list|Gametraders Modbury Heights|one-piece-card-game-double-pack-display-tba-dp-13": [
+   39.99,
+   1794869758
   ],
   "list|Pocket Games|one-piece-tcg-op-12-legacy-of-master-booster-box-pack-jp": [
    9.0,
@@ -7909,7 +7909,7 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794869550,
+ "sealed_ts": 1794869748,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7953,15 +7953,14 @@
  },
  "shop_locked": [],
  "shop_refused": {
-  "tcg.goodgames.com.au": 1794867815,
   "www.mayhemcollectables.com.au": 1794867815
  },
  "shop_refused_said": [],
  "shop_retry": {},
- "singles_ts": 1794868790,
+ "singles_ts": 1794869748,
  "soft_alerts": {
   "box|Grailborne|one-piece-card-game-op-18-booster-box-english": 1794865066,
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
  },
- "sweep_ts": 1794868790
+ "sweep_ts": 1794869748
 }
