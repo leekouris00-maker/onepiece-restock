@@ -7,33 +7,8 @@
  "drops_slot": "2026-11-16 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794804305,
- "held": {
-  "plist|30th-celebration|Irresistible Force|pokemon-tcg-30th-celebration-poster-box": {
-   "f": {
-    "available": false,
-    "box_id": "poke|30th-celebration|Irresistible Force|pokemon-tcg-30th-celebration-poster-box",
-    "cart": "",
-    "game": "pokemon",
-    "group": "pokemon",
-    "id": "plist|30th-celebration|Irresistible Force|pokemon-tcg-30th-celebration-poster-box",
-    "kind": "New listing",
-    "max": 50.0,
-    "name": "Pokemon TCG 30th Celebration Poster Box",
-    "note": "Small collection, out Fri 4 Dec \u00b7 listed, not buyable yet",
-    "page": 1,
-    "poke_id": "poke|30th-celebration|Irresistible Force|pokemon-tcg-30th-celebration-poster-box",
-    "preorder": false,
-    "price": 99.99,
-    "ptype": "Small collection",
-    "section": "30th-celebration",
-    "section_name": "30th Celebration",
-    "shop": "Irresistible Force",
-    "url": "https://www.irresistibleforce.com.au/products/pokemon-tcg-30th-celebration-poster-box"
-   },
-   "t": 1794804528
-  }
- },
+ "ebay_ts": 1794805431,
+ "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -86,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794804529,
+ "pokemon_ts": 1794805140,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7697,7 +7672,7 @@
    "t": 1794765489.27715
   }
  },
- "sealed_ts": 1794804930,
+ "sealed_ts": 1794805627,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7740,9 +7715,9 @@
  },
  "shop_locked": [],
  "shop_retry": {},
- "singles_ts": 1794804305,
+ "singles_ts": 1794805431,
  "soft_alerts": {
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
  },
- "sweep_ts": 1794804305
+ "sweep_ts": 1794805431
 }
