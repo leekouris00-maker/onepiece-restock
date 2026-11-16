@@ -7,8 +7,26 @@
  "drops_slot": "2026-11-17 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794861850,
- "held": {},
+ "ebay_ts": 1794862862,
+ "held": {
+  "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": {
+   "f": {
+    "cart": "https://www.mayhemcollectables.com.au/cart/67693146931514:3",
+    "cond": "",
+    "deck": "Sabo",
+    "id": "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2",
+    "kind": "Single",
+    "name": "Revolutionary Army HQ OP05-021",
+    "note": "Revolutionary Army HQ (Reprint) OP05-021 (Premium Booster -The Best- Vol. 2)",
+    "price": 0.3,
+    "priority": false,
+    "qty": 3,
+    "shop": "Mayhem",
+    "url": "https://www.mayhemcollectables.com.au/products/revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2"
+   },
+   "t": 1794862872
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -61,7 +79,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794862061,
+ "pokemon_ts": 1794862862,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7929,7 +7947,7 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794862061,
+ "sealed_ts": 1794862862,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7972,14 +7990,12 @@
   "x-playground.com": 0
  },
  "shop_locked": [],
- "shop_refused": {
-  "www.mayhemcollectables.com.au": 1794861861
- },
+ "shop_refused": {},
  "shop_refused_said": [],
  "shop_retry": {},
- "singles_ts": 1794861850,
+ "singles_ts": 1794862862,
  "soft_alerts": {
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
  },
- "sweep_ts": 1794861850
+ "sweep_ts": 1794862862
 }
