@@ -262,14 +262,14 @@
    "url": "https://www.irresistibleforce.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
   },
   "www.jbhifi.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794843931,
    "kind": "Cloudflare challenge",
-   "since": 1794843931,
+   "since": 1794844676,
    "status": 429,
    "told": null,
-   "until": 1794844531,
-   "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-gear-5-starter-deck-ex-st-21.js"
+   "until": 1794845876,
+   "url": "https://www.jbhifi.com.au/products.json?limit=250"
   },
   "www.kaika.com.au": {
    "count": 1,
@@ -312,13 +312,13 @@
    "url": "https://www.monstermart.com.au/search/suggest.json?q=Delta%20Reign&resources[type]=product&resources[limit]=10"
   },
   "www.pokebox.com.au": {
-   "count": 1,
+   "count": 2,
    "first": 1794843718,
    "kind": "Cloudflare challenge",
-   "since": 1794843718,
+   "since": 1794844492,
    "status": 429,
    "told": null,
-   "until": 1794844318,
+   "until": 1794845692,
    "url": "https://www.pokebox.com.au/collections/one-piece-card-game-booster-boxes-english/products.json?limit=250"
   },
   "www.tcgroupau.com.au": {
