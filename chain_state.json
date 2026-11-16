@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794825820,
+  "bf_ts": 1794827451,
   "cache": {
    "finds": [],
    "listings": [
@@ -735,7 +735,7 @@
      "name": "Bandai One Piece Card Game Premium Card Collection - Live Action Edition",
      "note": "sold by Gameology on JB Marketplace",
      "page": 1,
-     "price": 144.25,
+     "price": 122.05,
      "quiet": true,
      "shop": "JB Hi-Fi",
      "url": "https://www.jbhifi.com.au/products/bandai-one-piece-card-game-premium-card-collection-live-action-edition"
@@ -966,7 +966,7 @@
     }
    ]
   },
-  "cursor": 86,
+  "cursor": 88,
   "files": 110,
   "handles": {
    "5-minute-one-piece-board-game": {
@@ -2236,6 +2236,6 @@
     "ok": false
    }
   },
-  "ts": 1794826051
+  "ts": 1794827451
  }
 }
