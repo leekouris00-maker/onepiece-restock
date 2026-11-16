@@ -77,6 +77,22 @@ New in v2.11.4: MY COLLECTION. A second tab on the open_autobuy.bat page, just f
     sealed - words from shop titles ("ts-02 tin"): cheapest in stock across every shop the bot watches;
     either - or type your own estimate, for things shops don't sell.
   It checks every hour and keeps one price a day. Kept in collection.json and collection_photos/ (yours).
+New in v2.27: WHY RESTOCKS WERE BEING MISSED, AND LESS LOAD ON THE SHOPS.
+  - SHOPS REFUSING THE BOT ARE NOW REPORTED. Since 14 Nov, 16 Shopify shops (Rogue Online, TCGroup, Good
+    Games, Gameology, Cherry, GUF, Gumnut, Pokebox, The Wandering Collector and others) answered the PC copy
+    "slow down" on almost every try. That never counted as "down", so nothing told you. Now #bot-status names
+    the shops that refused every try for 2+ hours, and posts again when they answer.
+  - THE RELEASE-CODE SWEEP IS GENTLER: each sweep asks every shop 4 of its searches, taking turns (the drop
+    window's own code is always asked), instead of all 12 at once. That was ~300 requests in one burst every
+    15 minutes, the biggest part of the load. Every code is still searched about every 45 minutes.
+    "sweep_per_run": 0 in config.json goes back to all of them.
+  - "BOT ONLINE" SAYS HOW LONG THE PC WAS OFF, e.g. "It was off for 11.4 hours (last check Mon 16 Nov 03:32
+    AM)". The bot only starts when you log in to Windows, so a restart for Windows updates overnight leaves
+    it off until you sign in. Keep the PC on, signed in, with Sleep set to Never.
+  - THE CLOUD COPY TELLS YOU WHEN THE PC IS ON AN OLD VERSION, in #bot-status (once a day while it's behind).
+  - QUIET RESTOCKS REPEAT SOONER: the same over-max or quiet restock can post again after 3 hours (was 24).
+    Change with "restock_alerts": {"repeat_hours": 3}.
+  - GROOVY COLLECTABLES added as a quiet shop (one search a check).
 New in v2.26: CATCH MORE OF WHAT OTHER GROUPS PING (all of it quiet: no @ping, no phone push, no auto-buy).
   - SIX MORE SHOPS that other groups post from but that price above retail: Games Empire, X-Playground,
     Dropstore, Lootable, Games Portal, GB Toys. Their new listings and restocks post in #restocks. A box

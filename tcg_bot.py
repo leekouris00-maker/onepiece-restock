@@ -194,7 +194,7 @@ try:
 except ImportError:
     netguard = None
 
-VERSION = "2.26.0"
+VERSION = "2.27.0"
 POKE = "pokemon"
 ONE_PIECE = "onepiece"
 
@@ -234,6 +234,11 @@ DOWN_RETRY_MIN = 15             # ...and is then retried every 15 minutes instea
 # per-run record of which shop websites answered: host -> [ok, failed]
 _host_results = {}
 _host_lock = threading.Lock()
+# v2.27: shops that answered "slow down" (429) or a bot check this run, or were skipped because they did
+# recently. 429s don't count as "down" (the shop is up), so on their own they never told you anything.
+_host_refused = set()
+REFUSED_NOTICE_HOURS = 2        # a shop refusing the bot on every try for this long gets a #bot-status post
+PC_GAP_NOTICE_MIN = 15          # the PC copy starting this long after its last check says it was off
 
 # environment variable -> key in config.json "alerts"
 ENV_ALERTS = {
@@ -370,6 +375,11 @@ EXTRA_SHOPIFY_SEARCH = [
     {"name": "Light of Cards", "base": "https://lightofcards.com.au"},     # v2.4; mostly Japanese, English kept (paused: see SHOP_PAUSES)
     {"name": "Card Bot", "base": "https://cardbot.com.au"},                # v2.4; mostly Japanese, English kept
     {"name": "Irresistible Force", "base": "https://www.irresistibleforce.com.au"},   # v2.16.1; Brisbane, retail prices
+    # v2.27 (16 Nov 2026): Fellowship of the Ping posted its OP-18 pre-order (A$400, above retail); the address
+    # comes from a feed post the scorecard read. Quiet like the v2.26 shops, one search per check, no sweep,
+    # so it adds 1 request a check to the Shopify load.
+    {"name": "Groovy Collectables", "base": "https://groovycollectables.com.au", "soft": True,
+     "queries": ["one piece booster box"], "sweep": False},
 ]
 SEARCH_QUERIES = ["one piece booster box", "one piece booster display", "one piece card game"]
 # v2.10.1: shops left alone until a date (YYYY-MM-DD; the shop is back on watch from that day). Lee paused Light of
@@ -434,6 +444,13 @@ SWEEP_DAYS_BACK = 21            # release codes from 3 weeks ago...
 SWEEP_DAYS_AHEAD = 180          # ...to 6 months ahead
 SWEEP_MAX_QUERIES = 16
 SWEEP_GENERAL = ["one piece pre-order", "one piece preorder"]
+# v2.27: each sweep asks every shop only SWEEP_PER_RUN of the searches, taking turns (a drop window's own
+# codes are always asked). With 12 searches x ~25 shops a sweep was ~300 requests in one burst, the biggest
+# part of the Shopify load; from 14 Nov 2026 16 Shopify shops answered the PC copy "slow down" on nearly
+# every try. Every code is still searched about every 45 minutes (12 searches, 4 a sweep, every 15 min).
+# config.json "sweep_per_run": 0 asks all of them every sweep (the old way).
+SWEEP_PER_RUN = 4
+_SWEEP_ROUND = [0]
 SWEEP_CODE_RE = re.compile(r"\b(OP|EB|PRB|PEB|ST|DP|IB|TS)-?(\d{1,2})\b", re.I)
 
 # ---- v2.4: "now buyable" - a listed product (not a booster box or watched item, which alert through
@@ -1167,6 +1184,7 @@ def begin_check(cfg, status=None, drop=None, skip_down=True):
     """Reset the per-check counters and apply settings (user agent, robots, shops in their quiet period)."""
     with _host_lock:
         _host_results.clear()
+        _host_refused.clear()
     with _hook_lock:
         _hook_results.clear()
     _seen_errors.clear()
@@ -1376,7 +1394,7 @@ KNOWN_SETTINGS = {"_help", "drop_rehearsal", "flip", "neto_shops", "restock_aler
                   "extra_shops", "value_picks", "value_picks_per_check", "repo_raw_url", "ledger_url", "singles_every_minutes",
                   "down_retry_minutes", "respect_robots", "user_agent", "auto_drop_windows", "history",
                   "classic_requests", "user_agent_by_shop", "pokemon", "price_drops",
-                  "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries",
+                  "new_sealed", "new_sealed_packs", "sweep", "sweep_every_minutes", "sweep_queries", "sweep_per_run",
                   "fast_lane", "tcgplayer", "instore", "pause_shops", "auto_buy", "deal_finder", "chain_shops", "security", "scorecard",
                   "shopify_pace"}
 DISCORD_HOOK_RE = re.compile(r"https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/\d+/")
@@ -1645,6 +1663,8 @@ def _fail(url, err):
         # Rate-limited: the shop is up, it just wants fewer requests. Say so once per check and don't
         # count it as the shop being down (no "hasn't loaded" posts, no "can't reach the shops" alarm).
         _say_once((host, 429), f"   ~ {host} asked the bot to slow down ({redact(err)})")
+        with _host_lock:
+            _host_refused.add(host)
         return
     _say_once((host, str(err)), f"   ! couldn't read {short(url)} ({redact(err)})")
     _note_host(url, False)
@@ -2156,16 +2176,49 @@ def sweep_woo(shop_name, url, max_price, watch, queries):
     return finds, listings
 
 
-def sweep_jobs(cfg, max_price, watch):
+def window_codes(window):
+    """v2.27: the release codes a drop window is about ("OP-18 eve" -> ["OP-18"], plus its "codes")."""
+    if not window:
+        return []
+    out = []
+    for text in [str(window.get("name") or "")] + [str(c) for c in window.get("codes") or []]:
+        for m in SWEEP_CODE_RE.finditer(text):
+            out.append(f"{m.group(1).upper()}-{int(m.group(2)):02d}")
+    return list(dict.fromkeys(out))
+
+
+def sweep_batch(cfg, queries, window=None, round_no=None):
+    """v2.27: the searches this sweep asks: a drop window's own codes, then the next SWEEP_PER_RUN in turn."""
+    queries = list(queries or [])
+    per = _num((cfg or {}).get("sweep_per_run"))
+    per = SWEEP_PER_RUN if per is None else int(per)
+    if per <= 0 or len(queries) <= per:
+        return queries
+    first = [q for q in window_codes(window) if q in queries]
+    rest = [q for q in queries if q not in first]
+    take = max(1, per - len(first))
+    if not rest:
+        return first
+    if round_no is None:
+        round_no = _SWEEP_ROUND[0]
+        _SWEEP_ROUND[0] += 1
+    start = (round_no * take) % len(rest)
+    turn = [rest[(start + i) % len(rest)] for i in range(min(take, len(rest)))]
+    return first + turn
+
+
+def sweep_jobs(cfg, max_price, watch, window=None):
     """Sweep jobs for every Shopify and WooCommerce sealed shop (one per website)."""
     if not cfg.get("sweep", True):
         return []
-    queries = sweep_queries(cfg)
+    queries = sweep_batch(cfg, sweep_queries(cfg), window)
     if not queries:
         return []
     cols, _, woo, search = sealed_shops(cfg)
     jobs, seen = [], set()
     for shop in cols + search:
+        if shop.get("sweep") is False:
+            continue                     # v2.27: a shop read through one search only (Groovy Collectables)
         base = origin(shop.get("url") or shop.get("base"))
         if (shop["name"], base) not in seen:
             seen.add((shop["name"], base))
@@ -2202,7 +2255,7 @@ def check_sealed(cfg, sweep=False):
     for shop in woo:
         jobs.append((woo_boxes, shop["name"], shop["url"], mx, watch))
     for shop in search:
-        jobs.append((shopify_search_boxes, shop["name"], shop["base"], mx, watch))
+        jobs.append((shopify_search_boxes, shop["name"], shop["base"], mx, watch, shop.get("queries") or None))
     if chain_shops and chain_shops.enabled(cfg, _me()):
         jobs.append((chain_boxes, chain_shops.JB_NAME, mx, watch, bool(sweep)))
     if neto_shops:
@@ -2212,7 +2265,11 @@ def check_sealed(cfg, sweep=False):
                 jobs.append((neto_boxes, shop["name"], shop, mx, watch))
     if sweep:
         SWEPT.clear()
-        jobs += sweep_jobs(cfg, mx, watch)
+        try:
+            window = active_window(cfg)
+        except Exception:  # noqa: BLE001
+            window = None
+        jobs += sweep_jobs(cfg, mx, watch, window)
     results = pmap(lambda j: (j, j[0](*j[1:])), jobs, leaf=False)
     finds, by_shop = [], {}
     for job, (f, listings) in results:
@@ -2349,10 +2406,10 @@ def opened_listings(by_shop, skip_ids=(), hist=None, now=None):
 # v2.25: quiet restock alerts. A booster box (or watched sealed item) that comes back into stock ABOVE your max
 # used to say nothing at all. Now it posts once, without a ping or phone push, so you still see it.
 #   "restock_alerts": false                      in config.json switches these off
-#   "restock_alerts": {"repeat_hours": 24,       the same product at the same shop at most this often
+#   "restock_alerts": {"repeat_hours": 3,        the same product at the same shop at most this often (v2.27: was 24)
 #                      "max_times": 4}           ...and nothing priced over this many times your max (cases, scalpers)
 # alerts "discord_webhook_restocks": a channel of their own; without it they go to the usual channel, unpinged.
-SOFT_DEFAULTS = {"repeat_hours": 24.0, "max_times": 4.0}
+SOFT_DEFAULTS = {"repeat_hours": 3.0, "max_times": 4.0}     # v2.27: repeat_hours 24 -> 3 (restocks came twice an evening)
 SOFT_KEEP_DAYS = 14
 
 
@@ -2412,7 +2469,7 @@ def soft_shop_names(cfg):
 def quieten(cfg, listed, status, now=None):
     """v2.26: mark the listing alerts that should post quietly ("soft": no @ping, no phone push, never
     auto-bought): Japanese boxes, and anything from a "soft" shop. A quiet "now buyable" for the same product
-    comes at most once per "repeat_hours" (24), like the over-max restocks. -> the alerts to send."""
+    comes at most once per "repeat_hours" (3), like the over-max restocks. -> the alerts to send."""
     soft_shops = soft_shop_names(cfg)
     s = soft_settings(cfg) or dict(SOFT_DEFAULTS)
     now = now or time.time()
@@ -3427,6 +3484,86 @@ def shop_health(cfg, status):
     status["shop_locked"] = sorted(locked & down)
     status["shop_down"] = sorted(down)
     return posts
+
+
+def refused_shops(cfg, status, now=None):
+    """v2.27: shops that refused the bot (429 "slow down" or a bot check) on every try for REFUSED_NOTICE_HOURS.
+    A 429 never counted as "down" (the shop is up, it just wants fewer requests), so from 14 Nov 2026, when
+    16 Shopify shops refused the PC copy on almost every try, nothing said so. Now one #bot-status post names
+    them, and another says when they answer again. A shop that answers even once in between starts over, so a
+    shop that only sometimes says "slow down" never posts. -> [(text, color)]"""
+    now = now or time.time()
+    names = shop_names(cfg)
+    with _host_lock:
+        refused = set(_host_refused)
+        results = {h: list(v) for h, v in _host_results.items()}
+    since = status.setdefault("shop_refused", {})
+    said = set(status.get("shop_refused_said") or [])
+    back = []
+    for host, (ok, _bad) in results.items():
+        if ok and host in since:
+            since.pop(host, None)
+            if host in said:
+                said.discard(host)
+                back.append(names.get(host, host))
+    for host in refused:
+        if not results.get(host, [0, 0])[0]:
+            since.setdefault(host, round(now))
+    for host in [h for h in since if h not in names]:
+        since.pop(host, None)          # a shop taken off the list
+    said &= set(since)
+    gap = REFUSED_NOTICE_HOURS * 3600
+    long_ = sorted((h for h in since if now - float(since[h]) >= gap), key=lambda h: names.get(h, h).lower())
+    posts = []
+    if [h for h in long_ if h not in said]:
+        shops = ", ".join(names.get(h, h) for h in long_)
+        posts.append((f"🚧 **{len(long_)} shop{'s' if len(long_) != 1 else ''} keep refusing the bot**: {shops}. "
+                      f"For {REFUSED_NOTICE_HOURS}+ hours every try was answered with \"slow down\" or a bot check, so "
+                      f"**their stock isn't being watched from this copy.** The bot keeps trying politely (about every "
+                      f"30 minutes) and posts when each one answers again. It doesn't try to get round a shop's block.",
+                      AMBER))
+        said |= set(long_)
+    if back:
+        posts.append((f"✅ **Reading again** after refusing the bot: {', '.join(sorted(back))}.", GREEN))
+    status["shop_refused_said"] = sorted(said)
+    return posts
+
+
+def off_gap_note(status, now=None):
+    """v2.27: the PC copy's "Bot online" line says how long it was off (shut down, restarted for Windows
+    updates, asleep), because restocks in that time were only watched by the cloud copy. -> text or ''."""
+    try:
+        last = datetime.strptime(str((status or {}).get("last_check") or ""), "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return ""
+    now = now or datetime.now()
+    gap = (now - last).total_seconds()
+    if gap < PC_GAP_NOTICE_MIN * 60:
+        return ""
+    hours = gap / 3600
+    span = f"{gap / 60:.0f} minutes" if hours < 1 else (f"{hours:.1f} hours" if hours < 48 else f"{hours / 24:.1f} days")
+    return (f" It was off for **{span}** (last check {last:%a %d %b %I:%M %p}): restocks in that time were only "
+            f"watched by the cloud copy, which most Shopify shops refuse.")
+
+
+def _version_tuple(v):
+    return tuple(int(x) for x in re.findall(r"\d+", str(v or ""))[:3])
+
+
+def pc_behind_post(status, pc_on, now=None):
+    """v2.27, cloud copy: the PC copy (heard through its heartbeat) runs an older version than this one, which
+    is always the newest. Posts once per version pair, again a day later if it's still behind."""
+    pcv = str((status or {}).get("pc_version") or "")
+    if not pc_on or not pcv or not _version_tuple(pcv) or _version_tuple(pcv) >= _version_tuple(VERSION):
+        return None
+    now = now or time.time()
+    key = f"{pcv}->{VERSION}"
+    last = status.get("pc_behind_said") if isinstance(status.get("pc_behind_said"), dict) else {}
+    if last.get("key") == key and now - float(last.get("t") or 0) < 24 * 3600:
+        return None
+    status["pc_behind_said"] = {"key": key, "t": round(now)}
+    return (f"🧰 **The PC copy is on v{pcv}, but v{VERSION} is out**, so the PC is missing what's new since then. "
+            f"On the PC: double-click **update_bot.bat**, then **restart_bot.bat**.", AMBER)
 
 
 # ---------------------------------------------------------------- state + alerts
@@ -4564,6 +4701,11 @@ def run_once(cfg, args, drop=None):
         if PC_HEALTH["version"] and status.get("pc_version") != PC_HEALTH["version"]:
             status["pc_version"] = PC_HEALTH["version"]
     posts = shop_health(cfg, status)
+    posts += refused_shops(cfg, status)                 # v2.27
+    if role == "listen":
+        behind = pc_behind_post(status, pc_on)          # v2.27
+        if behind:
+            posts.append(behind)
     for name, saved in RESTORED:
         posts.append((f"🩹 **{name} was damaged**, so the bot loaded its last good copy (saved {saved:%d %b %I:%M %p}) "
                       f"and carried on. The damaged file is kept as {name}.damaged in case you want to look at it.",
@@ -5132,8 +5274,11 @@ def main():
     poke = ""
     if pokemon_watch and pokemon_watch.enabled(cfg):
         poke = f" Pokémon every {pokemon_watch.every_minutes(cfg):g} minutes."
+    gap_note = ""
+    if heartbeat_role(cfg) != "listen" and not IN_ACTIONS:
+        gap_note = off_gap_note(read_json(STATUS_PATH, {}) or {})       # v2.27
     post_status(cfg, f"🟢 **Bot online** ({'PC' if heartbeat_role(cfg) != 'listen' else 'cloud'}, v{VERSION}). "
-                     f"Checking every {every}.{poke}{nxt}", GREEN)
+                     f"Checking every {every}.{poke}{nxt}{gap_note}", GREEN)
     good_cfg, was_dropping, problem, warned, secrets_warned = cfg, None, None, "", None
     fetch_new_files()
     if auto_buy and not IN_ACTIONS and not IN_CONTAINER and heartbeat_role(cfg) != "listen":
