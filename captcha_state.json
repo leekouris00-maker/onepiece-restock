@@ -10,26 +10,6 @@
    "told": 1794700779,
    "url": "https://alphagaming.com.au/robots.txt"
   },
-  "cardbot.com.au": {
-   "count": 1,
-   "first": 1794859236,
-   "kind": "Cloudflare challenge",
-   "since": 1794859236,
-   "status": 429,
-   "told": null,
-   "until": 1794859836,
-   "url": "https://cardbot.com.au/search/suggest.json?q=Delta%20Reign%20box&resources[type]=product&resources[limit]=10"
-  },
-  "collectiblemadness.com.au": {
-   "count": 1,
-   "first": 1794859237,
-   "kind": "Cloudflare challenge",
-   "since": 1794859237,
-   "status": 429,
-   "told": null,
-   "until": 1794859837,
-   "url": "https://collectiblemadness.com.au/search/suggest.json?q=30th%20Celebration%20deck&resources[type]=product&resources[limit]=10"
-  },
   "dropstore.com.au": {
    "count": 3,
    "first": 1794857230,
@@ -61,16 +41,6 @@
    "until": 1794867410,
    "url": "https://gamesempire.com.au/robots.txt"
   },
-  "gamesportal.com.au": {
-   "count": 1,
-   "first": 1794859423,
-   "kind": "Cloudflare challenge",
-   "since": 1794859423,
-   "status": 429,
-   "told": null,
-   "until": 1794860023,
-   "url": "https://gamesportal.com.au/collections/one-piece-card-game/products.json?limit=250"
-  },
   "gbtoys.com.au": {
    "count": 6,
    "first": 1794833956,
@@ -91,16 +61,6 @@
    "told": 1794700779,
    "url": "https://goldfieldsgames.com.au/robots.txt"
   },
-  "grailborne.com.au": {
-   "count": 1,
-   "first": 1794859235,
-   "kind": "Cloudflare challenge",
-   "since": 1794859235,
-   "status": 429,
-   "told": null,
-   "until": 1794859835,
-   "url": "https://grailborne.com.au/search/suggest.json?q=30th%20Celebration%20blister&resources[type]=product&resources[limit]=10"
-  },
   "groovycollectables.com.au": {
    "count": 4,
    "first": 1794854020,
@@ -110,26 +70,6 @@
    "told": null,
    "until": 1794863395,
    "url": "https://groovycollectables.com.au/search/suggest.json?q=Delta%20Reign&resources[type]=product&resources[limit]=10"
-  },
-  "guf.com.au": {
-   "count": 1,
-   "first": 1794859423,
-   "kind": "Cloudflare challenge",
-   "since": 1794859423,
-   "status": 429,
-   "told": null,
-   "until": 1794860023,
-   "url": "https://guf.com.au/collections/one-piece-card-game/products.json?limit=250"
-  },
-  "lightofcards.com.au": {
-   "count": 1,
-   "first": 1794859236,
-   "kind": "Cloudflare challenge",
-   "since": 1794859236,
-   "status": 429,
-   "told": null,
-   "until": 1794859836,
-   "url": "https://lightofcards.com.au/search/suggest.json?q=30th%20Celebration%20collection&resources[type]=product&resources[limit]=10"
   },
   "lootable.com.au": {
    "count": 2,
@@ -191,16 +131,6 @@
    "until": 1794867410,
    "url": "https://thewanderingcollector.com.au/collections/one-piece-tcg-english-sealed-products/products.json?limit=250"
   },
-  "www.cherrycollectables.com.au": {
-   "count": 1,
-   "first": 1794859422,
-   "kind": "Cloudflare challenge",
-   "since": 1794859422,
-   "status": 429,
-   "told": null,
-   "until": 1794860022,
-   "url": "https://www.cherrycollectables.com.au/collections/one-piece/products.json?limit=250"
-  },
   "www.gameology.com.au": {
    "count": 2,
    "first": 1794858816,
@@ -241,16 +171,6 @@
    "told": 1794700778,
    "url": "https://www.gumnut.com.au/robots.txt"
   },
-  "www.irresistibleforce.com.au": {
-   "count": 1,
-   "first": 1794859239,
-   "kind": "Cloudflare challenge",
-   "since": 1794859239,
-   "status": 429,
-   "told": null,
-   "until": 1794859839,
-   "url": "https://www.irresistibleforce.com.au/search/suggest.json?q=one%20piece%20booster%20box&resources[type]=product&resources[limit]=10"
-  },
   "www.kaika.com.au": {
    "count": 1,
    "first": 1794835372,
@@ -270,6 +190,16 @@
    "status": 429,
    "told": 1794852605,
    "url": "https://www.kollecter.com.au/search/suggest.json?q=Delta%20Reign&resources[type]=product&resources[limit]=10"
+  },
+  "www.mayhemcollectables.com.au": {
+   "count": 1,
+   "first": 1794859827,
+   "kind": "Cloudflare challenge",
+   "since": 1794859827,
+   "status": 429,
+   "told": null,
+   "until": 1794860427,
+   "url": "https://www.mayhemcollectables.com.au/search/suggest.json?q=Stussy%20500%20Years%20in%20the%20Future&resources[type]=product&resources[limit]=10"
   },
   "www.monstermart.com.au": {
    "count": 8,
