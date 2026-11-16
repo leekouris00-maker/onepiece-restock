@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-17 06",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794865876,
+ "ebay_ts": 1794866852,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -48,7 +48,7 @@
   "The Wandering Collector": 99,
   "X-Playground": 99
  },
- "pc_on": true,
+ "pc_on": false,
  "pc_version": "2.28.0",
  "pokemon_intro": {
   "30th-celebration": 1792481167,
@@ -61,11 +61,11 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794866674,
+ "pokemon_ts": 1794867427,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
-   1794714521
+   1794866862
   ],
   "ebay|v1|158366644617|0": [
    265.8,
@@ -82,10 +82,6 @@
   "list|Dropstore|the-dominance-of-god-op-18-booster-box-one-piece-card-game": [
    399.95,
    1794784837
-  ],
-  "list|GUF|my-name-is-shirahoshi-extra-booster-one-piece-heroines-edition-vol-2": [
-   1.0,
-   1794545128
   ],
   "list|Games Portal|one-piece-card-game-the-dominance-of-god-op-18-booster": [
    15.0,
@@ -122,10 +118,6 @@
   "list|X-Playground|one-piece-card-game-the-dominance-of-god-op-18-booster-box-japanese": [
    189.95,
    1794786372
-  ],
-  "open|item|Gameology|one-piece-card-game-mini-case-set-vol-3-ts-03-random-select|498485": [
-   44.95,
-   1794547528
   ],
   "open|sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13|498551": [
    40.0,
@@ -179,10 +171,6 @@
    119.99,
    1794663164
   ],
-  "plist|delta-reign|Cherry Collectables|kyogre-117-pokemon-me-mega-evolution-promo": [
-   8.39,
-   1794560184
-  ],
   "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-box": [
    334.0,
    1794659546
@@ -191,10 +179,6 @@
    70.0,
    1794659546
   ],
-  "poke|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": [
-   159.0,
-   1794543770
-  ],
   "poke|delta-reign|JToys|90368": [
    29.99,
    1794638634
@@ -202,10 +186,6 @@
   "poke|delta-reign|JToys|90428": [
    59.99,
    1794796069
-  ],
-  "poke|delta-reign|M-G|137861": [
-   10.0,
-   1794552051
   ],
   "poke|delta-reign|X-Playground|pokemon-tcg-mega-evolution-delta-reign-booster-box": [
    359.95,
@@ -1469,7 +1449,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794765489.2766066
+   "t": 1794867414.2029085
   },
   "gamesportal.com.au": {
    "rules": [
@@ -7929,7 +7909,7 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794866674,
+ "sealed_ts": 1794867427,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7972,16 +7952,13 @@
   "x-playground.com": 0
  },
  "shop_locked": [],
- "shop_refused": {
-  "tcg.goodgames.com.au": 1794865888,
-  "www.mayhemcollectables.com.au": 1794864866
- },
+ "shop_refused": {},
  "shop_refused_said": [],
  "shop_retry": {},
- "singles_ts": 1794865876,
+ "singles_ts": 1794866852,
  "soft_alerts": {
   "box|Grailborne|one-piece-card-game-op-18-booster-box-english": 1794865066,
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
  },
- "sweep_ts": 1794865876
+ "sweep_ts": 1794866852
 }
