@@ -81,7 +81,7 @@ class OverMax(unittest.TestCase):
         cfg = {"restock_alerts": {"repeat_hours": 1, "max_times": 1.5}}
         self.assertEqual(self.go([l], hist_for(l), cfg=cfg), [])                              # 499.95 > 1.5 x 300
         self.assertEqual(len(self.go([listing(price=400.0)], hist_for(l), cfg=cfg)), 1)
-        self.assertEqual(tb.soft_settings({}), {"repeat_hours": 24.0, "max_times": 4.0})
+        self.assertEqual(tb.soft_settings({}), {"repeat_hours": 3.0, "max_times": 4.0})   # v2.27: was 24
         self.assertEqual(tb.soft_settings({"restock_alerts": {"repeat_hours": -1}}), tb.soft_settings({}))
         self.assertFalse([w for w in tb.check_config({"singles": {}, "sealed": {}, "restock_alerts": False}) if "restock" in w])
 
