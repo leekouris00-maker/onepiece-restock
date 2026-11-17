@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794914510,
+ "pokemon_ts": 1794915216,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -5192,7 +5192,7 @@
      "/*.atom"
     ]
    ],
-   "t": 1794827450.0335207
+   "t": 1794915581.6483383
   },
   "www.gameology.com.au": {
    "rules": [
@@ -7896,8 +7896,10 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794914893,
- "shop_down": [],
+ "sealed_ts": 1794915771,
+ "shop_down": [
+  "www.jtoys.com.au"
+ ],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -7929,7 +7931,7 @@
   "www.gumnut.com.au": 0,
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
-  "www.jtoys.com.au": 0,
+  "www.jtoys.com.au": 3,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -7945,7 +7947,9 @@
  "shop_refused_said": [
   "www.mayhemcollectables.com.au"
  ],
- "shop_retry": {},
+ "shop_retry": {
+  "www.jtoys.com.au": 1794916301
+ },
  "singles_ts": 1794914893,
  "soft_alerts": {
   "box|Grailborne|one-piece-card-game-op-18-booster-box-english": 1794865066,
