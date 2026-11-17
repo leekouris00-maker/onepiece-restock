@@ -369,3 +369,4 @@
 {"t": 1794878711, "event": "sold_out", "id": "poke|30th-celebration|TCGroup|pokemon-trading-card-game-30th-celebration-figure-collection-mew", "name": "Pokémon Trading Card Game - 30th Celebration - Figure Collection Mew", "shop": "TCGroup", "price": 134.99, "was": 82642}
 {"t": 1794882838, "event": "alert", "id": "ebay|v1|366683562606|0", "kind": "Single", "name": "Gomu Gomu DON!! card (Japanese) + Mera Mera DON!! card (Japanese) + Ope Ope DON!! card (Japanese)", "shop": "eBay (from Japan)", "url": "https://www.ebay.com.au/itm/366683562606", "price": 71.45, "copy": "cloud"}
 {"t": 1794883982, "event": "in_stock", "id": "poke|delta-reign|M-G|133258", "name": "Pokemon – Delta Reign – Build & Battle Box", "shop": "M-G", "price": 59.0, "was": 2464695}
+{"t": 1794888476, "event": "sold_out", "id": "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13", "name": "One Piece Card Game - Double Pack 13 (DP-13)", "shop": "Games Portal", "price": 40.0, "was": 101311}

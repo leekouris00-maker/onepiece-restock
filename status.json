@@ -7,8 +7,28 @@
  "drops_slot": "2026-11-17 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794887606,
- "held": {},
+ "ebay_ts": 1794888664,
+ "held": {
+  "list|Groovy Collectables|extra-booster-one-piece-heroines-edition-vol-2-booster-box-eb05-711385": {
+   "f": {
+    "available": true,
+    "box_id": "box|Groovy Collectables|extra-booster-one-piece-heroines-edition-vol-2-booster-box-eb05-711385",
+    "cart": "",
+    "group": "box",
+    "id": "list|Groovy Collectables|extra-booster-one-piece-heroines-edition-vol-2-booster-box-eb05-711385",
+    "kind": "New listing",
+    "max": 300.0,
+    "name": "One Piece Card Game: (EB05) Extra Booster: One Piece Heroines Edition Vol.2 - Booster Box",
+    "note": "in stock (over your $300.00 max)",
+    "page": 1,
+    "price": 440.0,
+    "shop": "Groovy Collectables",
+    "soft": true,
+    "url": "https://groovycollectables.com.au/products/extra-booster-one-piece-heroines-edition-vol-2-booster-box-eb05-711385"
+   },
+   "t": 1794888274
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -61,7 +81,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794887812,
+ "pokemon_ts": 1794888476,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7905,7 +7925,7 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794887812,
+ "sealed_ts": 1794888664,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7956,10 +7976,10 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {},
- "singles_ts": 1794887606,
+ "singles_ts": 1794888664,
  "soft_alerts": {
   "box|Grailborne|one-piece-card-game-op-18-booster-box-english": 1794865066,
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
  },
- "sweep_ts": 1794887606
+ "sweep_ts": 1794888664
 }
