@@ -8,7 +8,26 @@
  "ebay_fails": 0,
  "ebay_state": "ok",
  "ebay_ts": 1794901469,
- "held": {},
+ "held": {
+  "poke|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": {
+   "f": {
+    "cart": "",
+    "game": "pokemon",
+    "id": "poke|delta-reign|Grailborne|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box",
+    "kind": "Sealed",
+    "name": "Pok\u00e9mon TCG: Mega Evolution Delta Reign Elite Trainer Box (ETB)",
+    "note": "Elite Trainer Box",
+    "preorder": false,
+    "price": 149.0,
+    "ptype": "Elite Trainer Box",
+    "section": "delta-reign",
+    "section_name": "Delta Reign",
+    "shop": "Grailborne",
+    "url": "https://grailborne.com.au/products/pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box"
+   },
+   "t": 1794901674
+  }
+ },
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -61,7 +80,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794900904,
+ "pokemon_ts": 1794901674,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7905,7 +7924,7 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794901469,
+ "sealed_ts": 1794902225,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
