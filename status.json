@@ -7,27 +7,8 @@
  "drops_slot": "2026-11-17 12",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794890653,
- "held": {
-  "poke|delta-reign|Cherry Collectables|pokemon-tcg-me06-mega-evolution-delta-reign-build-battle-box": {
-   "f": {
-    "cart": "",
-    "game": "pokemon",
-    "id": "poke|delta-reign|Cherry Collectables|pokemon-tcg-me06-mega-evolution-delta-reign-build-battle-box",
-    "kind": "Sealed",
-    "name": "Pokemon TCG ME06 Mega Evolution Delta Reign Build & Battle Box",
-    "note": "Build & Battle",
-    "preorder": false,
-    "price": 45.99,
-    "ptype": "Build & Battle",
-    "section": "delta-reign",
-    "section_name": "Delta Reign",
-    "shop": "Cherry Collectables",
-    "url": "https://www.cherrycollectables.com.au/products/pokemon-tcg-me06-mega-evolution-delta-reign-build-battle-box"
-   },
-   "t": 1794891149
-  }
- },
+ "ebay_ts": 1794891711,
+ "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
  "last_found": 19,
@@ -80,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794891150,
+ "pokemon_ts": 1794891924,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7924,7 +7905,7 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794891520,
+ "sealed_ts": 1794892306,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7975,10 +7956,10 @@
   "tcg.goodgames.com.au"
  ],
  "shop_retry": {},
- "singles_ts": 1794890653,
+ "singles_ts": 1794891711,
  "soft_alerts": {
   "box|Grailborne|one-piece-card-game-op-18-booster-box-english": 1794865066,
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
  },
- "sweep_ts": 1794890653
+ "sweep_ts": 1794891711
 }
