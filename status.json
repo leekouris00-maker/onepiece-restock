@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-17 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794911998,
+ "ebay_ts": 1794912978,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -49,7 +49,7 @@
   "X-Playground": 99
  },
  "pc_on": true,
- "pc_version": "2.31.0",
+ "pc_version": "2.32.0",
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794912211,
+ "pokemon_ts": 1794912978,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -1007,7 +1007,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794825820.0460198
+   "t": 1794912947.0456567
   },
   "dropstore.com.au": {
    "rules": [
@@ -2489,7 +2489,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794825820.04078
+   "t": 1794912946.8590758
   },
   "groovycollectables.com.au": {
    "rules": [
@@ -4911,7 +4911,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1794825819.0372264
+   "t": 1794912946.4440832
   },
   "www.fpvfaster.com.au": {
    "rules": [
@@ -5449,7 +5449,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794825819.0338778
+   "t": 1794912946.434359
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -7896,7 +7896,7 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794912763,
+ "sealed_ts": 1794913538,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7948,10 +7948,10 @@
   "www.mayhemcollectables.com.au"
  ],
  "shop_retry": {},
- "singles_ts": 1794911998,
+ "singles_ts": 1794912978,
  "soft_alerts": {
   "box|Grailborne|one-piece-card-game-op-18-booster-box-english": 1794865066,
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
  },
- "sweep_ts": 1794911998
+ "sweep_ts": 1794912978
 }
