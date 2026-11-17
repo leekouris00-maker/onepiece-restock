@@ -49,7 +49,7 @@
   "X-Playground": 99
  },
  "pc_on": true,
- "pc_version": "2.28.0",
+ "pc_version": "2.30.0",
  "pokemon_intro": {
   "30th-celebration": 1792481167,
   "delta-reign": 1792481167
@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794884731,
+ "pokemon_ts": 1794885492,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7905,7 +7905,7 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794884731,
+ "sealed_ts": 1794885492,
  "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
