@@ -7,7 +7,7 @@
  "drops_slot": "2026-11-17 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794911105,
+ "ebay_ts": 1794911998,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -61,7 +61,7 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794911496,
+ "pokemon_ts": 1794912211,
  "recent_alerts": {
   "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
    0.3,
@@ -7896,10 +7896,8 @@
    "t": 1794852591.32175
   }
  },
- "sealed_ts": 1794911862,
- "shop_down": [
-  "www.jtoys.com.au"
- ],
+ "sealed_ts": 1794912763,
+ "shop_down": [],
  "shop_fails": {
   "alphagaming.com.au": 0,
   "cardbot.com.au": 0,
@@ -7931,7 +7929,7 @@
   "www.gumnut.com.au": 0,
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
-  "www.jtoys.com.au": 3,
+  "www.jtoys.com.au": 0,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -7946,15 +7944,14 @@
   "www.mayhemcollectables.com.au": 1794885692
  },
  "shop_refused_said": [
+  "tcg.goodgames.com.au",
   "www.mayhemcollectables.com.au"
  ],
- "shop_retry": {
-  "www.jtoys.com.au": 1794912200
- },
- "singles_ts": 1794911105,
+ "shop_retry": {},
+ "singles_ts": 1794911998,
  "soft_alerts": {
   "box|Grailborne|one-piece-card-game-op-18-booster-box-english": 1794865066,
   "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
  },
- "sweep_ts": 1794911105
+ "sweep_ts": 1794911998
 }
