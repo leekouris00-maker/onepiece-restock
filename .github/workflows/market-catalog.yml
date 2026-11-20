@@ -1,0 +1,48 @@
+# Refreshes TCGplayer's One Piece prices once a day for the market-data page (market_catalog.json).
+# Posts nothing to Discord and uses no secrets. Separate from the restock bot, so it keeps running
+# while the bot's workflows are switched off.
+name: Market data prices
+
+on:
+  schedule:
+    - cron: "17 21 * * *"     # 8:17am Melbourne in summer; TCGCSV updates around 20:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tcgplayer
+  cancel-in-progress: false
+
+jobs:
+  prices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Download today's TCGplayer prices
+        env:
+          TZ: Australia/Melbourne
+        run: python tcgplayer.py --no-post
+
+      - name: Build market_catalog.json
+        run: python market_catalog.py tcgplayer_prices.json market_catalog.json
+
+      - name: Save
+        run: |
+          git config user.name "market-data"
+          git config user.email "restock-bot@users.noreply.github.com"
+          git add tcgplayer_prices.json market_catalog.json
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -m "Update market data prices"
+          for i in 1 2 3 4 5; do
+            git pull --rebase && git push && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
