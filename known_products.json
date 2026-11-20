@@ -50,6 +50,7 @@
   "list|Alpha Gaming|preoder-eta-aug-2023-one-piece-yamato-st-09-starter-deck",
   "list|Alpha Gaming|preoder-june-2023-one-piece-monkey-d-luffy-st-08-starter-deck"
  ],
+ "Alpha Gaming (japanese)": [],
  "Alpha Gaming (pokemon:30th-celebration)": [],
  "Alpha Gaming (pokemon:delta-reign)": [],
  "Anime Kaika": [
@@ -135,6 +136,7 @@
   "list|Cherry Collectables|one-piece-card-game-op-15-booster-box",
   "list|Cherry Collectables|one-piece-card-game-op-16-booster-box",
   "list|Cherry Collectables|one-piece-card-game-op-17-booster-box",
+  "list|Cherry Collectables|one-piece-card-game-op-18-booster-box",
   "list|Cherry Collectables|one-piece-card-game-prb-01-premium-booster-box"
  ],
  "Cherry Collectables (all sealed)": [
@@ -159,6 +161,7 @@
  ],
  "Cherry Collectables (japanese)": [],
  "Cherry Collectables (other sealed)": [
+  "list|Cherry Collectables|one-piece-card-game-dp-13-op-18-the-dominance-of-god-double-pack",
   "list|Cherry Collectables|trafalgar-law-gift-collection-2023-st03-008-one-piece-one-piece-promotion-cards",
   "list|Cherry Collectables|yamato-gift-collection-2023-st09-012-one-piece-one-piece-promotion-cards"
  ],
@@ -189,6 +192,7 @@
  "Collectible Madness (all sealed)": [],
  "Collectible Madness (japanese)": [
   "list|Collectible Madness|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box-japanese",
+  "list|Collectible Madness|one-piece-card-game-op-18-the-dominance-of-god-booster-box-japanese",
   "list|Collectible Madness|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-japanese"
  ],
  "Collectible Madness (pokemon:30th-celebration)": [
@@ -564,6 +568,7 @@
   "list|Games Empire|one-piece-card-game-extra-booster-box-heroines-edition-eb-03",
   "list|Games Empire|one-piece-card-game-extra-booster-box-heroines-edition-vol-2-eb-05",
   "list|Games Empire|one-piece-card-game-the-azure-seas-seven-booster-box-op-14",
+  "list|Games Empire|one-piece-card-game-the-dominance-of-god-booster-box-op-18",
   "list|Games Empire|one-piece-card-game-the-time-of-battle-booster-box",
   "list|Games Empire|one-piece-card-game-the-worlds-strongest-warriors-booster-box-op-17-pre-order"
  ],
@@ -595,6 +600,9 @@
   "list|Games Empire|one-piece-card-game-the-worlds-strongest-warriors-double-pack-dp-12"
  ],
  "Games Empire (japanese)": [],
+ "Games Empire (other sealed)": [
+  "list|Games Empire|one-piece-card-game-the-dominance-of-god-double-pack-dp-13"
+ ],
  "Games Empire (pokemon:30th-celebration)": [
   "plist|30th-celebration|Games Empire|pokemon-tcg-30th-celebration-mini-tin-set-of-10"
  ],
@@ -760,6 +768,7 @@
   "list|Goldfields Games|one-piece-card-game-tin-pack-set-display-vol-1-ts-01",
   "list|Goldfields Games|one-piece-card-game-tin-pack-set-display-vol-2-ts-02"
  ],
+ "Goldfields Games (japanese)": [],
  "Goldfields Games (pokemon:30th-celebration)": [],
  "Goldfields Games (pokemon:delta-reign)": [],
  "Good Games (pokemon:30th-celebration)": [],
@@ -912,6 +921,7 @@
   "list|Grailborne|one-piece-card-game-dp-12-the-world-s-strongest-warriors-double-pack-set",
   "list|Grailborne|one-piece-card-game-illustration-box-vol-2-ib-02-english-sealed",
   "list|Grailborne|one-piece-card-game-illustration-box-vol-4-ib-04-english-sealed",
+  "list|Grailborne|one-piece-card-game-illustration-box-vol-5-ib-05-english-sealed",
   "list|Grailborne|one-piece-card-game-illustration-box-vol-7-ib-07-english-sealed",
   "list|Grailborne|one-piece-card-game-illustration-box-vol-8-ib-08-english-sealed",
   "list|Grailborne|one-piece-card-game-mini-case-set-display-vol-3-ts-03-english-preorder",
@@ -924,7 +934,9 @@
   "list|Grailborne|one-piece-card-game-the-worlds-strongest-warriors-op-17-booster-box-case-12-boxes-english",
   "list|Grailborne|one-piece-tcg-ace-luffy-starter-deck-ex-st-30"
  ],
- "Grailborne (japanese)": [],
+ "Grailborne (japanese)": [
+  "list|Grailborne|one-piece-card-game-op-17-booster-box-japanese"
+ ],
  "Grailborne (other sealed)": [
   "list|Grailborne|one-piece-card-game-double-pack-set-vol-13-dp-13",
   "list|Grailborne|one-piece-card-game-double-pack-set-vol-13-dp-13-display-8-double-packs",
@@ -1038,6 +1050,7 @@
   "list|Gumnut|one-piece-card-game-premium-card-collection-best-selection-vol-2",
   "list|Gumnut|one-piece-card-game-premium-card-collection-uta",
   "list|Gumnut|one-piece-card-game-royal-blood-booster-op-10",
+  "list|Gumnut|one-piece-card-game-set-sail-deck-set-sd-01",
   "list|Gumnut|one-piece-card-game-special-goods-set",
   "list|Gumnut|one-piece-card-game-special-goods-set-former-four-emperors",
   "list|Gumnut|one-piece-card-game-starter-deck-ace-and-newgate-st-22",
@@ -1053,6 +1066,7 @@
   "list|Gumnut|one-piece-card-game-wings-of-the-captain-booster-op-06",
   "list|Gumnut|one-piece-devils-fruit-capsule-wave-1-blind-box"
  ],
+ "Gumnut (japanese)": [],
  "Gumnut (pokemon:30th-celebration)": [],
  "Gumnut (pokemon:delta-reign)": [],
  "Irresistible Force": [],
@@ -1222,7 +1236,8 @@
   "list|Light of Cards|one-piece-op-13-carrying-on-his-will-booster-box",
   "list|Light of Cards|one-piece-op-15-adventure-on-kami-s-island-booster-box-jp",
   "list|Light of Cards|one-piece-op-16-the-time-of-battle-booster-box-jp",
-  "list|Light of Cards|one-piece-op-17-the-worlds-strongest-warriors-booster-box-jp"
+  "list|Light of Cards|one-piece-op-17-the-worlds-strongest-warriors-booster-box-jp",
+  "list|Light of Cards|pre-order-one-piece-op-18-the-dominance-of-god-booster-box-jp"
  ],
  "Light of Cards (pokemon:30th-celebration)": [
   "plist|30th-celebration|Light of Cards|pokemon-tcg-30th-celebration-elite-trainer-box",
@@ -1267,6 +1282,7 @@
   "list|Lootable|one-piece-card-game-dp-15-double-pack-set-english",
   "list|Lootable|one-piece-card-game-learn-together-deck-set-ld-01-english",
   "list|Lootable|one-piece-card-game-mini-case-set-vol-3-boa-hancock-ts-03-english",
+  "list|Lootable|one-piece-card-game-mini-case-set-vol-3-monkey-d-luffy-ts-03-english",
   "list|Lootable|one-piece-card-game-mini-case-set-vol-3-shanks-ts-03-english",
   "list|Lootable|one-piece-card-game-premium-booster-the-best-vol-2-sealed-case-prb-02-english",
   "list|Lootable|one-piece-card-game-premium-card-collection-uta-english",
@@ -1410,6 +1426,7 @@
   "plist|30th-celebration|More Than Meeples|186470",
   "plist|30th-celebration|More Than Meeples|186474",
   "plist|30th-celebration|More Than Meeples|186478",
+  "plist|30th-celebration|More Than Meeples|186482",
   "plist|30th-celebration|More Than Meeples|186485",
   "plist|30th-celebration|More Than Meeples|186489"
  ],
@@ -1588,7 +1605,8 @@
   "list|Rogue Online|one-piece-card-game-op-18-the-dominance-of-god-booster-box",
   "list|Rogue Online|pre-order-gundam-card-game-gd06-booster-box",
   "list|Rogue Online|pre-order-one-piece-card-game-eb-05-heroines-vol-2-booster-box-1",
-  "list|Rogue Online|pre-order-one-piece-card-game-op-17-the-worlds-strongest-warriors-booster-box"
+  "list|Rogue Online|pre-order-one-piece-card-game-op-17-the-worlds-strongest-warriors-booster-box",
+  "list|Rogue Online|pre-order-one-piece-card-game-the-dominance-of-god-op-18-booster-box"
  ],
  "Rogue Online (all sealed)": [
   "list|Rogue Online|pre-order-one-piece-card-game-tin-vol-2-ts-03-sealed-display-box-of-12-tins"

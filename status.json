@@ -4,10 +4,10 @@
   "Elemental Arcade": 1793451591,
   "Good Games": 1794914904
  },
- "drops_slot": "2026-11-17 18",
+ "drops_slot": "2026-11-20 18",
  "ebay_fails": 0,
  "ebay_state": "ok",
- "ebay_ts": 1794917047,
+ "ebay_ts": 1795177322,
  "held": {},
  "instore_state": "live",
  "last_check": "2026-10-18 20:31:51",
@@ -61,135 +61,91 @@
   "2026-11-06|eve": 1793872563
  },
  "pokemon_state": "live",
- "pokemon_ts": 1794916640,
+ "pokemon_ts": 1795177322,
  "recent_alerts": {
-  "card|Mayhem|OP05-021|revolutionary-army-hq-reprint-op05-021-premium-booster-the-best-vol-2": [
-   0.3,
-   1794866862
-  ],
-  "ebay|v1|366683562606|0": [
-   71.45,
-   1794882838
-  ],
-  "list|Dropstore|the-dominance-of-god-op-18-booster-box-one-piece-card-game": [
-   399.95,
-   1794784837
-  ],
-  "list|Games Portal|one-piece-card-game-the-dominance-of-god-op-18-booster": [
-   15.0,
-   1794791430
-  ],
-  "list|Gametraders Modbury Heights|one-piece-card-game-double-pack-display-tba-dp-13": [
-   39.99,
-   1794869758
-  ],
-  "list|Pocket Games|one-piece-tcg-op-12-legacy-of-master-booster-box-pack-jp": [
-   9.0,
-   1794784046
-  ],
-  "list|Pocket Games|one-piece-tcg-op-14-the-azure-sea-s-seven-booster-box-japanese": [
-   7.0,
-   1794784046
-  ],
-  "list|TCGroup|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box-japanese": [
-   184.99,
-   1794762926
-  ],
-  "list|TCGroup|one-piece-card-game-op-12-legacy-of-the-master-booster-box-japanese": [
-   234.99,
-   1794767995
-  ],
-  "list|TCGroup|one-piece-card-game-op-17-the-worlds-strongest-warriors-booster-box-japanese": [
-   149.99,
-   1794767995
-  ],
-  "list|TCGroup|one-piece-card-game-op-18-the-dominance-of-god-booster-box-japanese": [
-   164.99,
-   1794762926
-  ],
-  "list|TCGroup|one-piece-card-game-protagonist-of-the-new-generation-op-05-booster-box-japanese": [
-   799.99,
-   1794767995
-  ],
-  "list|X-Playground|one-piece-card-game-the-dominance-of-god-op-18-booster-box-japanese": [
-   189.95,
-   1794786372
-  ],
-  "open|sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13|498551": [
-   40.0,
-   1794787165
-  ],
-  "plist|30th-celebration|Light of Cards|pokemon-tcg-30th-celebration-poster-collection": [
-   84.99,
-   1794624726
-  ],
-  "plist|30th-celebration|Light of Cards|pre-order-pokemon-tcg-30th-celebration-tech-sticker-collection-assorted": [
-   69.99,
-   1794624726
-  ],
-  "plist|30th-celebration|Light of Cards|sealed-pokemon-tcg-30th-celebration-booster-bundle": [
-   134.99,
-   1794655262
-  ],
-  "plist|30th-celebration|Pokebox|usa-import-pokemon-tcg-30th-celebration-ultra-premium-collection-day-espeon": [
-   749.99,
-   1794625564
-  ],
-  "plist|30th-celebration|Pokebox|usa-import-pokemon-tcg-30th-celebration-ultra-premium-collection-night-umbreon": [
-   749.99,
-   1794625564
-  ],
-  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-5-booster-tin-greninja-ex": [
-   119.95,
-   1794784046
-  ],
-  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-5-booster-tin-sylveon-ex": [
-   119.95,
-   1794784046
-  ],
-  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-binder-collection": [
-   139.95,
-   1794784046
-  ],
-  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-mini-tin-sealed-display-of-10": [
-   549.95,
-   1794784046
-  ],
-  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-ultra-premium-collection-day": [
-   719.95,
-   1794784046
-  ],
-  "plist|30th-celebration|X-Playground|pokemon-tcg-30th-celebration-ultra-premium-collection-night": [
-   749.95,
-   1794784046
-  ],
-  "plist|delta-reign|Card Bot|pokemon-tcg-mega-evolution-delta-reign-elite-trainer-box": [
-   119.99,
-   1794663164
-  ],
-  "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-box": [
-   334.0,
-   1794659546
-  ],
-  "poke|delta-reign|Collectible Madness|pokemon-tcg-delta-reign-booster-bundle": [
-   70.0,
-   1794659546
-  ],
-  "poke|delta-reign|JToys|90368": [
+  "list|Cherry Collectables|one-piece-card-game-dp-13-op-18-the-dominance-of-god-double-pack": [
    29.99,
-   1794638634
+   1795177336
   ],
-  "poke|delta-reign|JToys|90428": [
-   59.99,
-   1794796069
+  "list|Cherry Collectables|one-piece-card-game-op-18-booster-box": [
+   279.99,
+   1795177336
   ],
-  "poke|delta-reign|X-Playground|pokemon-tcg-mega-evolution-delta-reign-booster-box": [
+  "list|Collectible Madness|one-piece-card-game-op-18-the-dominance-of-god-booster-box-japanese": [
+   185.0,
+   1795177336
+  ],
+  "list|Games Empire|one-piece-card-game-the-dominance-of-god-booster-box-op-18": [
+   379.99,
+   1795177336
+  ],
+  "list|Grailborne|one-piece-card-game-illustration-box-vol-5-ib-05-english-sealed": [
+   179.0,
+   1795177336
+  ],
+  "list|Grailborne|one-piece-card-game-op-17-booster-box-japanese": [
+   169.0,
+   1795177336
+  ],
+  "list|Gumnut|one-piece-card-game-set-sail-deck-set-sd-01": [
+   39.0,
+   1795177336
+  ],
+  "list|Light of Cards|pre-order-one-piece-op-18-the-dominance-of-god-booster-box-jp": [
+   149.0,
+   1795177336
+  ],
+  "list|Lootable|one-piece-card-game-mini-case-set-vol-3-monkey-d-luffy-ts-03-english": [
+   75.0,
+   1795177336
+  ],
+  "list|Rogue Online|pre-order-one-piece-card-game-the-dominance-of-god-op-18-booster-box": [
+   399.99,
+   1795177336
+  ],
+  "open|box|Collectible Madness|one-piece-card-game-tba-op-18-booster-box|498660": [
+   365.0,
+   1795177336
+  ],
+  "open|box|Games Portal|one-piece-card-game-op-16-booster-box|498660": [
+   445.0,
+   1795177336
+  ],
+  "open|box|Light of Cards|one-piece-op-17-the-worlds-strongest-warriors-booster-box|498660": [
+   529.99,
+   1795177336
+  ],
+  "open|box|TCGroup|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box-english|498660": [
+   499.99,
+   1795177336
+  ],
+  "open|item|Gameology|one-piece-card-game-ultra-deck-the-three-captains-st-10|498660": [
+   289.95,
+   1795177336
+  ],
+  "open|item|Games Portal|one-piece-card-game-the-dominance-of-god-op-18-booster|498660": [
+   18.0,
+   1795177336
+  ],
+  "open|item|Good Games (sealed)|one-piece-card-game-tin-pack-set-vol-3-ts-03|498660": [
+   46.0,
+   1795177336
+  ],
+  "open|sealed|GB Toys|one-piece-card-game-double-pack-dp-13|498660": [
+   40.0,
+   1795177336
+  ],
+  "open|sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13|498660": [
+   50.0,
+   1795177336
+  ],
+  "plist|30th-celebration|More Than Meeples|186482": [
+   159.95,
+   1795177336
+  ],
+  "poke|delta-reign|Overhauled Games TCG|21230": [
    359.95,
-   1794768783
-  ],
-  "sealed|Grailborne|one-piece-card-game-premium-card-collection-29th-anniversary-edition": [
-   99.0,
-   1794792246
+   1795177336
   ]
  },
  "robots": {
@@ -452,7 +408,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794656272.5071023
+   "t": 1795177288.3360312
   },
   "cardbot.com.au": {
    "rules": [
@@ -713,7 +669,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794836593.0864167
+   "t": 1795177291.0035093
   },
   "cardplustcg.com.au": {
    "rules": [
@@ -746,7 +702,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1794865431.634826
+   "t": 1795177290.2044818
   },
   "collectiblemadness.com.au": {
    "rules": [
@@ -1007,7 +963,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794912947.0456567
+   "t": 1795177290.7920122
   },
   "dropstore.com.au": {
    "rules": [
@@ -1184,7 +1140,7 @@
      "/*/collections/*/products/*-[a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]-remote"
     ]
    ],
-   "t": 1794854005.8986905
+   "t": 1795177288.367326
   },
   "gamesempire.com.au": {
    "rules": [
@@ -1445,7 +1401,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794867414.2029085
+   "t": 1795177288.3661602
   },
   "gamesportal.com.au": {
    "rules": [
@@ -1706,7 +1662,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794852591.313776
+   "t": 1795177289.0383024
   },
   "gbtoys.com.au": {
    "rules": [
@@ -1967,7 +1923,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794765489.2843215
+   "t": 1795177289.0515265
   },
   "goldfieldsgames.com.au": {
    "rules": [
@@ -2228,7 +2184,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794614628.6002202
+   "t": 1795177288.3629768
   },
   "grailborne.com.au": {
    "rules": [
@@ -2489,7 +2445,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794912946.8590758
+   "t": 1795177290.323859
   },
   "groovycollectables.com.au": {
    "rules": [
@@ -2750,7 +2706,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794815632.6206348
+   "t": 1795177291.223715
   },
   "guf.com.au": {
    "rules": [
@@ -3011,7 +2967,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794908453.257935
+   "t": 1795177288.3654015
   },
   "lightofcards.com.au": {
    "rules": [
@@ -3272,7 +3228,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794910711.2053573
+   "t": 1795177290.8376372
   },
   "lootable.com.au": {
    "rules": [
@@ -3533,7 +3489,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794852591.31422
+   "t": 1795177288.9694643
   },
   "morethanmeeples.com.au": {
    "rules": [
@@ -3594,11 +3550,11 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1794905858.192975
+   "t": 1795177290.2566268
   },
   "overhauledgames.com.au": {
    "rules": [],
-   "t": 1794870593.7563705
+   "t": 1795177290.1363242
   },
   "pocketgames.com.au": {
    "rules": [
@@ -3859,7 +3815,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794719035.5702581
+   "t": 1795177288.3293476
   },
   "rogueonline.com.au": {
    "rules": [
@@ -4120,7 +4076,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794719035.5751946
+   "t": 1795177288.3634367
   },
   "shop.goodgames.com.au": {
    "rules": [
@@ -4381,11 +4337,11 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794914491.4164324
+   "t": 1795177288.36508
   },
   "tcg.goodgames.com.au": {
    "rules": [],
-   "t": 1794865827.7311301
+   "t": 1795177288.4847426
   },
   "thewanderingcollector.com.au": {
    "rules": [
@@ -4646,7 +4602,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794787144.0960484
+   "t": 1795177288.3643944
   },
   "www.cherrycollectables.com.au": {
    "rules": [
@@ -4911,7 +4867,7 @@
      "/pages/gatsbytesting/"
     ]
    ],
-   "t": 1794912946.4440832
+   "t": 1795177288.3407269
   },
   "www.fpvfaster.com.au": {
    "rules": [
@@ -5192,7 +5148,7 @@
      "/*.atom"
     ]
    ],
-   "t": 1794915581.6483383
+   "t": 1795177289.5149968
   },
   "www.gameology.com.au": {
    "rules": [
@@ -5449,7 +5405,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794912946.434359
+   "t": 1795177288.3283753
   },
   "www.gametradersinglefarm.com.au": {
    "rules": [
@@ -5710,7 +5666,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794875697.3185618
+   "t": 1795177288.3625646
   },
   "www.gdgames.com.au": {
    "rules": [
@@ -6132,7 +6088,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794661361.359717
+   "t": 1795177288.3276365
   },
   "www.irresistibleforce.com.au": {
    "rules": [
@@ -6393,7 +6349,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794858589.7549062
+   "t": 1795177291.0236945
   },
   "www.jbhifi.com.au": {
    "rules": [
@@ -6610,11 +6566,11 @@
      "/apple-app-site-association"
     ]
    ],
-   "t": 1794915956.0667226
+   "t": 1795177291.301272
   },
   "www.jtoys.com.au": {
    "rules": [],
-   "t": 1794910340.5015767
+   "t": 1795177289.7159808
   },
   "www.kaika.com.au": {
    "rules": [
@@ -6651,7 +6607,7 @@
      "/_myacct"
     ]
    ],
-   "t": 1794750781.014036
+   "t": 1795177291.702325
   },
   "www.kollecter.com.au": {
    "rules": [
@@ -6945,7 +6901,7 @@
      "/wp-admin/admin-ajax.php"
     ]
    ],
-   "t": 1794910340.501895
+   "t": 1795177289.81834
   },
   "www.mayhemcollectables.com.au": {
    "rules": [
@@ -7206,7 +7162,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794836934.0055432
+   "t": 1795177288.4831758
   },
   "www.monstermart.com.au": {
    "rules": [],
@@ -7371,7 +7327,7 @@
      "/*/recommendations/products"
     ]
    ],
-   "t": 1794836933.8078604
+   "t": 1795177288.328968
   },
   "www.tcgroupau.com.au": {
    "rules": [
@@ -7632,7 +7588,7 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794842729.6604595
+   "t": 1795177288.3286378
   },
   "x-playground.com": {
    "rules": [
@@ -7893,12 +7849,13 @@
      "/*?*preview_script_id=*"
     ]
    ],
-   "t": 1794852591.32175
+   "t": 1795177288.3667364
   }
  },
- "sealed_ts": 1794917047,
+ "sealed_ts": 1795177891,
  "shop_down": [
-  "www.jtoys.com.au"
+  "www.jtoys.com.au",
+  "www.kaika.com.au"
  ],
  "shop_fails": {
   "alphagaming.com.au": 0,
@@ -7932,6 +7889,7 @@
   "www.irresistibleforce.com.au": 0,
   "www.jbhifi.com.au": 0,
   "www.jtoys.com.au": 3,
+  "www.kaika.com.au": 3,
   "www.kollecter.com.au": 0,
   "www.m-g.com.au": 0,
   "www.mayhemcollectables.com.au": 0,
@@ -7942,18 +7900,26 @@
  },
  "shop_locked": [],
  "shop_refused": {
+  "tcg.goodgames.com.au": 1795177334,
   "www.mayhemcollectables.com.au": 1794885692
  },
  "shop_refused_said": [
   "www.mayhemcollectables.com.au"
  ],
  "shop_retry": {
-  "www.jtoys.com.au": 1794917311
+  "www.jtoys.com.au": 1795178234,
+  "www.kaika.com.au": 1795178608
  },
- "singles_ts": 1794917047,
+ "singles_ts": 1795177322,
  "soft_alerts": {
+  "box|Collectible Madness|one-piece-card-game-tba-op-18-booster-box": 1795177322,
+  "box|Games Portal|one-piece-card-game-op-16-booster-box": 1795177322,
   "box|Grailborne|one-piece-card-game-op-18-booster-box-english": 1794865066,
-  "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1794787164
+  "box|Light of Cards|one-piece-op-17-the-worlds-strongest-warriors-booster-box": 1795177322,
+  "box|TCGroup|one-piece-card-game-eb-05-heroines-edition-vol-2-booster-box-english": 1795177322,
+  "item|Games Portal|one-piece-card-game-the-dominance-of-god-op-18-booster": 1795177322,
+  "sealed|GB Toys|one-piece-card-game-double-pack-dp-13": 1795177322,
+  "sealed|Games Portal|one-piece-card-game-double-pack-13-dp-13": 1795177322
  },
- "sweep_ts": 1794917047
+ "sweep_ts": 1795177322
 }

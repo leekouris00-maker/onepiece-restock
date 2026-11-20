@@ -1,6 +1,6 @@
 {
  "JB Hi-Fi": {
-  "bf_ts": 1794916595,
+  "bf_ts": 1795177291,
   "cache": {
    "finds": [],
    "listings": [
@@ -966,8 +966,8 @@
     }
    ]
   },
-  "cursor": 80,
-  "files": 110,
+  "cursor": 82,
+  "files": 111,
   "handles": {
    "5-minute-one-piece-board-game": {
     "ok": false
@@ -1455,6 +1455,13 @@
    "eiichiro-oda-one-piece-omnibus-edition-vol-3-book": {
     "ok": false
    },
+   "eiichiro-oda-one-piece-omnibus-edition-vol-31-book": {},
+   "eiichiro-oda-one-piece-omnibus-edition-vol-32-book": {},
+   "eiichiro-oda-one-piece-omnibus-edition-vol-33-book": {},
+   "eiichiro-oda-one-piece-omnibus-edition-vol-34-book": {},
+   "eiichiro-oda-one-piece-omnibus-edition-vol-35-book": {},
+   "eiichiro-oda-one-piece-omnibus-edition-vol-4-book": {},
+   "eiichiro-oda-one-piece-omnibus-edition-vol-5-book": {},
    "eiichiro-oda-one-piece-vol-1-book": {
     "ok": false
    },
@@ -1881,6 +1888,7 @@
    "one-piece-luffy-gear-5-pop-keychain-pop-vinyl": {
     "ok": false
    },
+   "one-piece-luffy-logo-corded-keyring-keyring": {},
    "one-piece-luffy-plush-plush": {
     "ok": false
    },
@@ -2013,6 +2021,7 @@
    "one-piece-straw-hat-posable-light-light": {
     "ok": false
    },
+   "one-piece-straw-hat-spinner-keyring-keyring": {},
    "one-piece-the-shukko-logia-borsalino-figure-figure": {
     "ok": false
    },
