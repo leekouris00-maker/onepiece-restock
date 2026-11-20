@@ -114,7 +114,7 @@ def main():
     budget = a.max if left is None else max(0, min(a.max, left - RESERVE))
     print(f"searches left this month: {left if left is not None else 'unknown'}; using up to {budget}")
     for w in due[:budget]:
-        params = {"q": w["q"][:300], "days": 90, "exclude": "junk"}
+        params = {"q": w["q"][:300], "days": 90, "exclude": "junk", "best_offer": 1}   # accepted-offer prices
         if w.get("lang") in ("ja", "zh", "ko"):      # "en" would drop titles that don't say English
             params["lang"] = w["lang"]
         if w.get("graded") in (True, False):
