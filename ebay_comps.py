@@ -79,6 +79,22 @@ def slim(resp):
             "sales": sales, "none": bool(resp.get("no_results"))}
 
 
+def supabase_watch():
+    """Tracked cards from the iPhone app's database (Supabase), if SUPABASE_URL and SUPABASE_SERVICE_KEY are set."""
+    url, key = os.environ.get("SUPABASE_URL", "").rstrip("/"), os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
+    if not (url and key):
+        return []
+    req = urllib.request.Request(f"{url}/rest/v1/watch?select=card,q,lang,graded",
+                                 headers={"apikey": key, "Authorization": f"Bearer {key}", "User-Agent": UA, "Accept": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            rows = json.loads(r.read().decode("utf-8"))
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! couldn't read tracked cards from the app's database: {e}")
+        return []
+    return [{"id": x["card"], "q": x["q"], "lang": x.get("lang"), "graded": x.get("graded")} for x in rows if x.get("card") and x.get("q")]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--max", type=int, default=3)
@@ -86,6 +102,8 @@ def main():
     a = ap.parse_args()
     key = os.environ.get("COMPSAPI_KEY", "").strip()
     watch = load(WATCH, [])
+    seen = {w.get("id") for w in watch}
+    watch += [w for w in supabase_watch() if w["id"] not in seen]   # the app's tracked cards
     out = load(OUT, {"items": {}})
     items = out.setdefault("items", {})
     ids = {w["id"] for w in watch if w.get("id") and w.get("q")}

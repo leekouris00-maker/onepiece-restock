@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "One Piece Market",
+    "slug": "onepiece-market",
+    "scheme": "opmarket",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#8e0d1f"
+    },
+    "ios": {
+      "bundleIdentifier": "com.leekouris.onepiecemarket",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.leekouris.onepiecemarket",
+      "adaptiveIcon": { "foregroundImage": "./assets/icon.png", "backgroundColor": "#8e0d1f" }
+    },
+    "web": { "bundler": "metro", "output": "single" },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      ["expo-image-picker", {
+        "photosPermission": "Choose photos of your cards to show in your collection.",
+        "cameraPermission": "Take photos of your cards to show in your collection."
+      }]
+    ]
+  }
+}

@@ -29,6 +29,8 @@ jobs:
       - name: Fetch eBay sold prices for tracked cards
         env:
           COMPSAPI_KEY: ${{ secrets.COMPSAPI_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}                  # optional: the iPhone app's database
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}  # optional: its service_role key (secret)
         run: python ebay_comps.py --max 3
 
       - name: Save
