@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { supabase, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { Button, Choice, Field, Section, T } from '../../src/ui';
+import { Screen } from '../../src/screen';
 
 export default function Account() {
   const d = useData(), c = useTheme();
@@ -17,16 +18,17 @@ export default function Account() {
     } catch (e) { setMsg(e.message || String(e)); } finally { setWait(false); }
   };
   return (
-    <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60, gap: 12, maxWidth: 820, width: '100%', alignSelf: 'center' }} keyboardShouldPersistTaps="handled">
+    <Screen max={820}><View style={{ gap: 12 }}>
+      <T w="bold" size={28}>Profile</T>
       {!d.configured ? <T mute>Saving isn’t set up in this build: the Supabase address and key haven’t been added yet. Prices still work.</T>
         : d.session ? <>
-            <T serif size={26}>Signed in</T>
+            <T w="bold" size={20}>Signed in</T>
             <T mute>{d.session.user.email}</T>
             <Button ghost onPress={() => supabase.auth.signOut()}>Sign out</Button>
           </> : <>
-            <T serif size={26}>Sign in</T>
+            <T w="bold" size={20}>Sign in</T>
             <T mute>Your collection, sales and photos are saved to your account, so they follow you to any device.</T>
-            {msg ? <T style={{ color: c.red }}>{msg}</T> : null}
+            {msg ? <T style={{ color: c.down }}>{msg}</T> : null}
             <Field label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" autoComplete="email" textContentType="emailAddress" style={{ flexBasis: 'auto' }} />
             <Field label="Password" value={pw} onChangeText={setPw} secureTextEntry autoComplete="password" textContentType="password" style={{ flexBasis: 'auto' }} />
             <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
@@ -44,6 +46,6 @@ export default function Account() {
       <Section title="Where prices come from">
         <T mute size={14}>TCGplayer market prices for every English set, refreshed each morning{d.cat ? ` (now ${d.cat.meta.updated}, US$1 = A$${d.cat.meta.fx})` : ''}. eBay sold prices for the cards you track. Card pictures are TCGplayer’s until you add your own photo.</T>
       </Section>
-    </ScrollView>
+    </View></Screen>
   );
 }

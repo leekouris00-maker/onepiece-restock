@@ -1,99 +1,94 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, View, useWindowDimensions } from 'react-native';
+import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { router } from 'expo-router';
 import { useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
-import { Button, CardArt, Chip, Empty, T } from '../../src/ui';
+import { AreaChart, Button, Change, Chip, Empty, RoundAction, T } from '../../src/ui';
+import { Heading, Screen } from '../../src/screen';
+import { CardTile, OwnedRow, OwnedTile } from '../../src/tiles';
 
-export default function Collection() {
+const RANGES = [['1D', 1, 'today'], ['7D', 7, 'in the last 7 days'], ['1M', 30, 'in the last 30 days']];
+
+export default function Home() {
   const d = useData(), c = useTheme();
   const { width } = useWindowDimensions();
-  const [filter, setFilter] = useState('all');
-  const pad = 18, gap = 14, cols = width >= 900 ? 5 : width >= 640 ? 4 : width >= 430 ? 3 : 2;
-  const tileW = Math.floor((Math.min(width, 1100) - pad * 2 - gap * (cols - 1)) / cols);
-
+  const [range, setRange] = useState(2);
+  const [chartW, setChartW] = useState(0);
   const live = d.owned.filter(o => o.status !== 'sold');
-  const tot = o => (d.ownVal(o).a || 0) * (Number(o.qty) || 1);
-  const stats = useMemo(() => {
-    let worth = 0, paid = 0, paidN = 0, priced = 0, units = 0;
-    for (const o of live) { const q = Number(o.qty) || 1, v = d.ownVal(o).a; units += q; if (v != null) { worth += v * q; priced++; } if (o.paid != null) { paid += Number(o.paid) * q; paidN++; } }
-    const sold = d.owned.filter(o => o.status === 'sold').reduce((n, o) => n + (Number(o.soldFor) || 0) * (Number(o.qty) || 1), 0);
-    return { worth, paid, paidN, priced, units, sold };
-  }, [d.owned, d.cat, d.comps, d.sales, d.watch]);
-  const groups = useMemo(() => {
-    const m = {}; for (const o of live) { const g = o.group || 'Other'; m[g] = (m[g] || 0) + tot(o); }
-    return Object.entries(m).sort((a, b) => b[1] - a[1]);
-  }, [d.owned, d.cat, d.comps, d.sales, d.watch]);
-  const gmax = Math.max(1, ...groups.map(g => g[1]));
+  const [, days, words] = RANGES[range];
+  const values = useMemo(() => (d.cat ? d.series(days) : []), [d.owned, d.cat, d.comps, d.sales, d.watch, days]);
+  const now = values[values.length - 1], then = values[0];
+  const tot = o => (d.unitAt(o, 0) || 0) * (Number(o.qty) || 1);
+  const top = useMemo(() => [...live].sort((a, b) => tot(b) - tot(a)).slice(0, 5), [d.owned, d.cat, d.comps, d.sales, d.watch]);
+  const movers = useMemo(() => live.map(o => ({ o, now: d.unitAt(o, 0), then: d.unitAt(o, 7) }))
+    .filter(x => x.now && x.then && Math.abs(x.now - x.then) / x.then >= 0.005)
+    .sort((a, b) => Math.abs(b.now - b.then) / b.then - Math.abs(a.now - a.then) / a.then).slice(0, 10), [d.owned, d.cat]);
+  const hot = useMemo(() => (d.cat ? d.cat.list.filter(x => x.t === 'card' && x.m >= 5 && d.move(x) != null && Math.abs(d.move(x)) <= 75).sort((a, b) => d.move(b) - d.move(a)).slice(0, 12) : []), [d.cat]);
+  const big = Math.min(54, width / 7.4);
 
-  if (!d.configured) return <Empty>Saving isn’t set up in this build yet. You can still browse prices in Market and Search.</Empty>;
-  if (d.authReady && !d.session) return (
-    <View style={{ padding: 24, gap: 14 }}>
-      <T serif size={30}>Your collection lives here</T>
-      <T mute>Sign in to see what you own, what it’s worth and your photos, on every device.</T>
-      <Button onPress={() => router.push('/account')}>Sign in</Button>
-    </View>
-  );
-
-  const list = filter === 'sold' ? d.owned.filter(o => o.status === 'sold') : live.filter(o => filter === 'all' || (o.group || 'Other') === filter);
-  const byG = {}; for (const o of list) (byG[filter === 'sold' ? 'Sold' : o.group || 'Other'] ??= []).push(o);
-  const order = filter === 'sold' ? ['Sold'] : groups.map(g => g[0]).filter(g => byG[g]);
+  const signedOut = !d.configured || (d.authReady && !d.session);
 
   return (
-    <ScrollView contentContainerStyle={{ padding: pad, paddingBottom: 60, maxWidth: 1100, width: '100%', alignSelf: 'center' }}
-      refreshControl={<RefreshControl refreshing={d.busy} onRefresh={() => { d.refresh(); d.loadCatalog(true); }} tintColor={c.mute} />}>
-      <T size={13} w="semi" style={{ color: c.gold }}>Worth now</T>
-      <T serif size={Math.min(64, width / 6.2)} style={{ letterSpacing: -1, marginTop: 2 }}>{d.cat ? d.aud(stats.worth) : '…'}</T>
-      <T mute size={14} style={{ marginTop: 8 }}>
-        <T w="semi" size={14}>{stats.units}</T> items · {stats.priced} of {live.length} priced
-        {stats.paidN ? <> · paid <T w="semi" size={14}>{d.aud(stats.paid)}</T></> : null}
-        {stats.sold ? <> · sold <T w="semi" size={14}>{d.aud(stats.sold)}</T></> : null}
-      </T>
-
-      <View style={{ gap: 9, marginTop: 22, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: c.line }}>
-        {groups.map(([g, w]) => (
-          <Pressable key={g} onPress={() => setFilter(filter === g ? 'all' : g)} accessibilityRole="button"
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <T size={13.5} numberOfLines={1} w={filter === g ? 'bold' : undefined} style={{ width: 118 }}>{g}</T>
-            <View style={{ flex: 1 }}><View style={{ height: 10, borderRadius: 999, backgroundColor: c.red, width: `${Math.max(1, (w / gmax) * 100)}%`, opacity: filter === 'all' || filter === g ? 1 : 0.35 }} /></View>
-            <T size={13.5} style={{ fontVariant: ['tabular-nums'] }}>{d.aud(w)}</T>
-          </Pressable>
-        ))}
+    <Screen onRefresh={() => { d.refresh(); d.loadCatalog(true); }} refreshing={d.busy}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <T w="bold" size={17}>One Piece Market</T>
+        <Pressable onPress={() => router.push('/account')} accessibilityLabel="Profile" hitSlop={10}>
+          <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: c.raise, alignItems: 'center', justifyContent: 'center' }}>
+            <T w="bold" size={15} style={{ color: c.accent }}>{(d.session?.user?.email || 'OP')[0].toUpperCase()}</T>
+          </View>
+        </Pressable>
       </View>
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center', marginTop: 16 }}>
-        <Chip on={filter === 'all'} onPress={() => setFilter('all')}>Everything</Chip>
-        <Chip on={filter === 'sold'} onPress={() => setFilter('sold')}>Sold</Chip>
-        {filter !== 'all' && filter !== 'sold' ? <Chip on onPress={() => setFilter('all')}>{filter} ✕</Chip> : null}
-        <View style={{ flex: 1 }} />
-        <Button onPress={() => router.push('/item/new')} style={{ minHeight: 40 }}>Add item</Button>
-      </View>
-
-      {!list.length ? <Empty>Nothing here yet. Open any card and tap “Add to my collection”, or use Add item for sealed product and anything else.</Empty> : null}
-      {order.map(g => (
-        <View key={g}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 28, marginBottom: 14 }}>
-            <T serif size={22}>{g}</T>
-            <T mute size={13.5}>{byG[g].length}{filter === 'sold' ? '' : ' · ' + d.aud(byG[g].reduce((n, o) => n + tot(o), 0))}</T>
-          </View>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap }}>
-            {byG[g].sort((a, b) => tot(b) - tot(a)).map(o => {
-              const v = d.ownVal(o), q = Number(o.qty) || 1, sold = o.status === 'sold', card = d.card(o.card);
-              return (
-                <Pressable key={o.id} onPress={() => router.push({ pathname: '/item/[id]', params: { id: o.id } })} style={{ width: tileW, gap: 7 }} accessibilityRole="button">
-                  <CardArt k={o.card} photo={d.ownPhoto(o)} num={card?.num || o.num || (o.kind === 'Sealed' ? 'Sealed' : '')} label={o.lang && o.lang !== 'EN' ? o.lang : ''} width={tileW} qty={q} />
-                  <T size={14} w="semi" numberOfLines={2}>{o.name}</T>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 6 }}>
-                    <T size={12} mute numberOfLines={1} style={{ flexShrink: 1 }}>{sold ? 'sold' : v.src}</T>
-                    <T serif size={16}>{sold ? d.aud((Number(o.soldFor) || 0) * q) : d.aud(v.a == null ? null : v.a * q)}</T>
-                  </View>
-                </Pressable>
-              );
-            })}
-          </View>
+      {signedOut ? (
+        <View style={{ marginTop: 28, gap: 12 }}>
+          <T w="bold" size={30}>Track what your One Piece cards are worth</T>
+          <T mute>{d.configured ? 'Sign in to see your portfolio, its value over time and your photos on every device.' : 'Saving isn’t set up in this build yet. You can still browse prices.'}</T>
+          {d.configured ? <Button onPress={() => router.push('/account')} style={{ alignSelf: 'flex-start' }}>Sign in</Button> : null}
         </View>
-      ))}
-      <T mute size={12.5} style={{ marginTop: 30 }}>Each item is valued by your own estimate if you set one, otherwise the automatic eBay median, then your logged sales, then TCGplayer. Pull down to refresh.</T>
-    </ScrollView>
+      ) : (
+        <>
+          <T mute size={15} style={{ marginTop: 26 }}>Portfolio value</T>
+          <T w="bold" size={big} style={{ letterSpacing: -1, marginTop: 2 }}>{d.cat ? d.aud(now ?? 0) : '…'}</T>
+          {now != null && then ? (
+            <View style={{ flexDirection: 'row', gap: 6, alignItems: 'baseline', flexWrap: 'wrap', marginTop: 2 }}>
+              <Change now={now} then={then} aud={d.aud} size={16} /><T mute size={16}>{words}</T>
+            </View>
+          ) : null}
+          <View onLayout={e => setChartW(e.nativeEvent.layout.width)} style={{ marginTop: 14, marginHorizontal: -18 }}>
+            <AreaChart values={values} width={chartW} height={Math.min(260, width * 0.55)} />
+          </View>
+          <View style={{ flexDirection: 'row', gap: 8, justifyContent: 'center', marginTop: 12 }}>
+            {RANGES.map(([l], i) => <Chip key={l} on={range === i} onPress={() => setRange(i)}>{l}</Chip>)}
+          </View>
+          <T mute size={12} style={{ textAlign: 'center', marginTop: 8 }}>TCGplayer price history covers about 5 weeks. Items valued by eBay, your sales or your own estimate stay flat.</T>
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 24 }}>
+            <RoundAction icon="trending-up" label="Movers" onPress={() => router.push('/movers')} />
+            <RoundAction icon="add" label="Add item" onPress={() => router.push('/item/new')} />
+            <RoundAction icon="create-outline" label="Add card" onPress={() => router.push('/addcard')} />
+            <RoundAction icon="albums-outline" label="Portfolio" onPress={() => router.push('/portfolio')} />
+          </View>
+
+          <Heading style={{ marginTop: 30 }} right={<Pressable onPress={() => router.push('/portfolio')} hitSlop={10}><T size={15} style={{ color: c.accent }}>View all</T></Pressable>}>Most valuable</Heading>
+          <View style={{ marginTop: 8 }}>
+            {top.length ? top.map((o, i) => <OwnedRow key={o.id} o={o} rank={i + 1} />) : <Empty>Nothing in your portfolio yet. Tap Add item, or open any card and add it.</Empty>}
+          </View>
+
+          {movers.length ? <>
+            <Heading style={{ marginTop: 26 }}>Your movers this week</Heading>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 14, paddingVertical: 12 }}>
+              {movers.map(({ o }) => <OwnedTile key={o.id} o={o} width={150} />)}
+            </ScrollView>
+          </> : null}
+        </>
+      )}
+
+      {hot.length ? <>
+        <Heading style={{ marginTop: 26 }} right={<Pressable onPress={() => router.push('/market')} hitSlop={10}><T size={15} style={{ color: c.accent }}>Market</T></Pressable>}>Rising this week</Heading>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 14, paddingVertical: 12 }}>
+          {hot.map(x => <CardTile key={x.k} card={x} />)}
+        </ScrollView>
+      </> : null}
+    </Screen>
   );
 }

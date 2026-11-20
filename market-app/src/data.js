@@ -169,10 +169,23 @@ export function DataProvider({ children }) {
   };
   const aud = a => (a == null ? '–' : money(a / fx));
   const move = c => { let o = null; for (const [ago, p] of c.h) if (ago >= 7) o = p; return o && c.m != null ? ((c.m - o) / o) * 100 : null; };
+  // TCGplayer price a given number of days ago (the last change on or before that day)
+  const priceAt = (c, a) => { if (!c || a <= 0 || !c.h.length) return c?.m ?? null; let v = null; for (const [ago, p] of c.h) if (ago >= a) v = p; return v ?? c.h[0][1] ?? c.m; };
+  // one item's A$ value each, a given number of days ago
+  const unitAt = (o, a) => {
+    const now = ownVal(o); if (!a || now.src !== 'TCGplayer') return now.a;
+    const p = priceAt(card(o.card), a); return p == null ? now.a : p * fx;
+  };
+  // total collection value (A$) for each of the last `days` days, oldest first
+  const series = days => {
+    const live = owned.filter(o => o.status !== 'sold'), out = [];
+    for (let a = days; a >= 0; a--) out.push(live.reduce((n, o) => n + (unitAt(o, a) || 0) * (Number(o.qty) || 1), 0));
+    return out;
+  };
 
   const value = {
     cat, catError, comps, loadCatalog, cur, setCur, session, authReady, configured: !!supabase, busy, refresh,
-    owned, sales, cards, watch, custom, card, fx, watchOf, compOf, salesOf, toUsd, photoOf, ownPhoto, ownVal, money, aud, move, ...api,
+    owned, sales, cards, watch, custom, card, fx, watchOf, compOf, salesOf, toUsd, photoOf, ownPhoto, ownVal, money, aud, move, priceAt, unitAt, series, ...api,
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

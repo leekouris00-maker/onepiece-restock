@@ -14,7 +14,7 @@ export default function AddCard() {
   return (
     <ScrollView contentContainerStyle={{ padding: 20, gap: 14, maxWidth: 820, width: '100%', alignSelf: 'center' }} keyboardShouldPersistTaps="handled">
       <T mute>For Japanese cards and promos TCGplayer doesn’t list. Give it the set it belongs to and it shows up under My cards in Market.</T>
-      {msg ? <T style={{ color: c.red }}>{msg}</T> : null}
+      {msg ? <T style={{ color: c.down }}>{msg}</T> : null}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
         <Choice label="Language" value={f.lang} onChange={v => set('lang', v)} options={['JP', 'EN', 'CN']} />
         <Field label="Card number" value={f.num} onChangeText={v => set('num', v)} placeholder="P-069" autoCapitalize="characters" />

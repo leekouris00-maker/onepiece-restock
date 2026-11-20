@@ -1,23 +1,19 @@
-import { useColorScheme } from 'react-native';
-
-const light = {
-  bg: '#ffffff', panel: '#ffffff', soft: '#f6f4f1', ink: '#151515', mute: '#6b6762', line: '#e8e4de',
-  gold: '#a8875a', red: '#8e0d1f', band: '#8e0d1f', link: '#7a1222', up: '#1d6b40', down: '#a3122a', hi: '#faf6ef',
-};
+// One dark look everywhere: black ground, soft grey surfaces, mint-teal accent, coral for drops.
 const dark = {
-  bg: '#121212', panel: '#1a1a1a', soft: '#1f1e1d', ink: '#efece6', mute: '#a39e96', line: '#2c2a28',
-  gold: '#c9a977', red: '#e0475b', band: '#8e0d1f', link: '#f08a97', up: '#6fcf97', down: '#f07a8a', hi: '#24211d',
+  bg: '#000000', panel: '#111113', soft: '#18181b', raise: '#1f1f23', ink: '#f4f4f5', mute: '#9b9ba1', line: '#2a2a2f',
+  accent: '#5fd1c1', accentDim: 'rgba(95,209,193,0.16)', gold: '#5fd1c1', red: '#5fd1c1', band: '#000000', link: '#5fd1c1',
+  up: '#5fd1c1', down: '#ff6f61', hi: '#18181b',
 };
 
 export const F = {
-  serif: 'BodoniModa_600SemiBold',
-  serifIt: 'BodoniModa_500Medium_Italic',
-  text: 'InterTight_400Regular',
-  medium: 'InterTight_500Medium',
-  semi: 'InterTight_600SemiBold',
-  bold: 'InterTight_700Bold',
+  serif: 'Lato_900Black',   // big figures and titles
+  serifIt: 'Lato_700Bold',
+  text: 'Lato_400Regular',
+  medium: 'Lato_400Regular',
+  semi: 'Lato_700Bold',
+  bold: 'Lato_900Black',
 };
 
 export function useTheme() {
-  return useColorScheme() === 'dark' ? dark : light;
+  return dark;
 }

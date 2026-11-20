@@ -53,7 +53,7 @@ export default function ItemScreen() {
           {card ? <Chip onPress={() => router.push({ pathname: '/card/[k]', params: { k: card.k } })} style={{ alignSelf: 'flex-start' }}>Card prices</Chip> : null}
         </View>
       </View>
-      {msg ? <T size={14} style={{ color: c.red }}>{msg}</T> : null}
+      {msg ? <T size={14} style={{ color: c.down }}>{msg}</T> : null}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
         <Field label="Name" value={f.name} onChangeText={x => set('name', x)} style={{ flexBasis: '100%' }} />
         <Field label="Quantity" value={f.qty} onChangeText={x => set('qty', x)} keyboardType="number-pad" />

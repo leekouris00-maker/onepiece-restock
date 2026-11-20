@@ -41,7 +41,7 @@ export default function CardScreen() {
           {n ? <T size={13.5} w="semi" style={{ color: c.gold }}>You own {n}</T> : null}
         </View>
       </View>
-      {msg ? <T size={14} style={{ marginTop: 12, color: c.red }}>{msg}</T> : null}
+      {msg ? <T size={14} style={{ marginTop: 12, color: c.down }}>{msg}</T> : null}
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 18 }}>
         {!card.mine && <Stat label="TCGplayer market" value={d.money(card.m)} />}
