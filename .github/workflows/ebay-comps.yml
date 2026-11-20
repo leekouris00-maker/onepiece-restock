@@ -1,0 +1,45 @@
+# eBay sold prices (CompsAPI, free tier) for the cards tracked on the One Piece Market page.
+# Started by the daily Claude task after it copies the tracked-card list here; the schedule is a
+# fallback. Needs the repo secret COMPSAPI_KEY (free key from app.compsapi.com). No Discord.
+name: eBay sold prices
+
+on:
+  schedule:
+    - cron: "47 21 * * *"     # 8:47am Melbourne in summer
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ebay-comps
+  cancel-in-progress: false
+
+jobs:
+  comps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Fetch eBay sold prices for tracked cards
+        env:
+          COMPSAPI_KEY: ${{ secrets.COMPSAPI_KEY }}
+        run: python ebay_comps.py --max 3
+
+      - name: Save
+        run: |
+          git config user.name "market-data"
+          git config user.email "restock-bot@users.noreply.github.com"
+          [ -f ebay_comps.json ] && git add ebay_comps.json
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -m "Update eBay sold prices"
+          for i in 1 2 3 4 5; do
+            git pull --rebase && git push && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
