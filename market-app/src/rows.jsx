@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useData, clean } from './data';
 import { useTheme } from './theme';
 import { CardArt, T } from './ui';
@@ -25,6 +26,23 @@ export function CardRow({ card, showSet }) {
         {mv != null && Math.abs(mv) >= 0.05 ? <T size={12} w="semi" style={{ color: mv > 0 ? c.up : c.down }}>{mv > 0 ? '+' : '-'}{Math.abs(mv).toFixed(2)}%</T>
           : !card.mine && ebay ? <T size={12} mute>eBay {ebay}</T> : null}
       </View>
+    </Pressable>
+  );
+}
+
+export function SetRow({ set, count }) {
+  const c = useTheme();
+  return (
+    <Pressable onPress={() => router.push({ pathname: '/set/[id]', params: { id: set.id } })} accessibilityRole="button"
+      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingHorizontal: 18, opacity: pressed ? 0.6 : 1 })}>
+      <View style={{ width: 54, height: 36, borderRadius: 10, backgroundColor: c.soft, alignItems: 'center', justifyContent: 'center' }}>
+        <T w="bold" size={11.5} style={{ color: c.accent }} numberOfLines={1}>{set.code}</T>
+      </View>
+      <View style={{ flex: 1 }}>
+        <T w="semi" size={14.5} numberOfLines={1}>{set.name}</T>
+        {set.date || count ? <T size={12} mute>{[set.date, count ? `${count} cards` : null].filter(Boolean).join(' · ')}</T> : null}
+      </View>
+      <Ionicons name="chevron-forward" size={16} color={c.mute} />
     </Pressable>
   );
 }
