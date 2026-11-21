@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0b1a2e"
+      "backgroundColor": "#0a0d0b"
     },
     "ios": {
       "bundleIdentifier": "com.leekouris.onepiecemarket",
@@ -21,7 +21,7 @@
     },
     "android": {
       "package": "com.leekouris.onepiecemarket",
-      "adaptiveIcon": { "foregroundImage": "./assets/icon.png", "backgroundColor": "#0b1a2e" }
+      "adaptiveIcon": { "foregroundImage": "./assets/icon.png", "backgroundColor": "#0a0d0b" }
     },
     "web": { "bundler": "metro", "output": "single" },
     "plugins": [
