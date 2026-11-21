@@ -8,10 +8,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { clean, useData } from '../src/data';
 import { F, useTheme } from '../src/theme';
 import { CardArt, T } from '../src/ui';
-import { findCodes, getReader, grab } from '../src/ocr';
+import { decide, findCodes, getReader, grab, nameIndex } from '../src/ocr';
 
 const CARD = 63 / 88;
-const NEED = 2; // the same number must be read this many times in the last few tries before it counts
 
 export default function Scan() {
   const d = useData(), c = useTheme(), ins = useSafeAreaInsets();
@@ -22,7 +21,7 @@ export default function Scan() {
   const [load, setLoad] = useState(0);
   const [readErr, setReadErr] = useState('');
   const [seen, setSeen] = useState('');                 // a number read once, waiting for a second read
-  const [found, setFound] = useState(null);             // { code, list }
+  const [found, setFound] = useState(null);             // { code (number or card name), codes, list, also }
   const [history, setHistory] = useState([]);           // numbers found this visit
   const [typing, setTyping] = useState(false);
   const [typed, setTyped] = useState('');
@@ -49,13 +48,21 @@ export default function Scan() {
   }, [d.cat, d.custom]);
   const byNumRef = useRef(byNum);
   byNumRef.current = byNum;
+  const names = useMemo(() => nameIndex(byNum), [byNum]);
+  const namesRef = useRef(names);
+  namesRef.current = names;
 
-  const show = useCallback((code, also = []) => {
-    const list = [...(byNumRef.current.get(code) || [])].sort((a, b) => (b.m ?? -1) - (a.m ?? -1));
-    setFound({ code, list, also });
+  // show the results for one number, or for several (a card name printed on more than one card)
+  const show = useCallback((codes, also = [], title = null) => {
+    codes = [].concat(codes);
+    const list = codes.flatMap(k => byNumRef.current.get(k) || []).sort((a, b) => (b.m ?? -1) - (a.m ?? -1));
+    const label = title || codes[0];
+    setFound({ code: label, codes, list, also });
     setSeen('');
-    setHistory(h => [code, ...h.filter(x => x !== code)].slice(0, 12));
+    picks.current[label] = codes;
+    setHistory(h => [label, ...h.filter(x => x !== label)].slice(0, 12));
   }, []);
+  const picks = useRef({});
 
   // camera on, camera off when leaving
   useEffect(() => {
@@ -85,8 +92,13 @@ export default function Scan() {
   // read loop: alternate the card's number corner and the whole outline (for close-ups)
   useEffect(() => {
     if (!reader || cam !== 'on') return undefined;
-    let alive = true, n = 0, lastRead = Date.now();
-    const recent = [];
+    let alive = true, n = 0, lastRead = Date.now(), wl = true;
+    const recent = [], texts = [];
+    const setWhitelist = async on => {                // numbers: capitals/digits only; names: anything
+      if (on === wl) return;
+      await reader.setParameters({ tessedit_char_whitelist: on ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-' : '' });
+      wl = on;
+    };
     const tick = async () => {
       if (!alive) return;
       const v = video.current;
@@ -96,28 +108,28 @@ export default function Scan() {
         const s = Math.max(cw / v.videoWidth, ch / v.videoHeight);    // video is shown "cover"
         const ox = (cw - v.videoWidth * s) / 2, oy = (ch - v.videoHeight * s) / 2;
         const vx = (x - ox) / s, vy = (y - oy) / s, vw = w / s, vh = h / s;
-        // mostly the tight number strip; every 3rd try the whole outline (for close-ups / a card held off-centre)
-        const whole = n++ % 3 === 2;
-        const canvas = whole
-          ? grab(v, vx - vw * 0.05, vy - vh * 0.03, vw * 1.1, vh * 1.06, 1500)
-          : grab(v, vx + vw * 0.45, vy + vh * 0.87, vw * 0.57, vh * 0.13, 300);
+        // a cycle of 4: the tight number strip, the name line (plain text), the whole outline (close-ups /
+        // a card held off-centre), and the lower half (name + number when the card sits small or high)
+        const mode = n++ % 4, plain = mode === 1 || mode === 3;
+        await setWhitelist(!plain);
+        const canvas = mode === 0 ? grab(v, vx + vw * 0.45, vy + vh * 0.87, vw * 0.57, vh * 0.13, 300)
+          : mode === 1 ? grab(v, vx + vw * 0.05, vy + vh * 0.82, vw * 0.9, vh * 0.18, 240)
+          : mode === 2 ? grab(v, vx - vw * 0.05, vy - vh * 0.03, vw * 1.1, vh * 1.06, 1500)
+          : grab(v, vx - vw * 0.04, vy + vh * 0.5, vw * 1.08, vh * 0.53, 700);
         const { data } = await reader.recognize(canvas);
         const codes = findCodes(data.text, byNumRef.current);
+        if (plain) { texts.push(data.text); while (texts.length > 2) texts.shift(); }
         if (codes.length) lastRead = Date.now();
         setStuck(Date.now() - lastRead > 6000);
         const dbg = typeof window !== 'undefined' && window.__scanDebug;   // test hook (see the scanner tests)
-        if (dbg) { dbg.reads.push(codes); if (dbg.noStop) { setTimeout(tick, 80); return; } }
+        if (dbg) { dbg.reads.push(codes); if (plain) dbg.texts = [...texts]; if (dbg.noStop) { setTimeout(tick, 80); return; } }
         recent.push(...(codes.length ? codes : ['']));
         while (recent.length > 6) recent.shift();
-        const count = k => recent.filter(r => r === k).length;
-        const hit = codes.filter(k => count(k) >= NEED).sort((a, b) => count(b) - count(a))[0];
-        if (hit && !paused.current) {
-          // other numbers read in the same moments: offered as "Not this one?" in case a digit was misread
-          const also = [...new Set(recent.filter(r => r && r !== hit))];
-          recent.length = 0;
-          show(hit, also);
-        }
-        else if (codes[0]) setSeen(codes[0]);
+        const got = decide(recent, texts, byNumRef.current, namesRef.current);
+        if (got && !paused.current) {
+          recent.length = 0; texts.length = 0;
+          show(got.hits, got.also, got.title);
+        } else if (codes[0]) setSeen(codes[0]);
       } catch {}
       setTimeout(tick, 80);
     };
@@ -165,7 +177,7 @@ export default function Scan() {
     : busyPhoto ? 'Reading your photo…'
     : seen ? `Reading… ${seen}?`
     : stuck ? 'Still looking. Move closer so the number in the dashed box is bigger, and tilt away from glare.'
-    : 'Fit the whole card in the frame. Hold still, good light.';
+    : 'Fill the outline with the card, number in the dashed box. Hold still.';
 
   const pill = { flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 16, height: 44, borderRadius: 22, backgroundColor: 'rgba(26,32,28,0.92)' };
 
@@ -200,7 +212,7 @@ export default function Scan() {
           <T size={13.5} w="semi" style={{ textAlign: 'center', color: readErr || cam === 'blocked' ? c.down : c.ink }}>{status}</T>
         </View>
         {history.length ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ maxWidth: '100%', flexGrow: 0 }}>
-          {history.map(h => <Pressable key={h} onPress={() => show(h)} style={{ paddingHorizontal: 12, height: 32, borderRadius: 16, justifyContent: 'center', backgroundColor: 'rgba(26,32,28,0.92)' }}>
+          {history.map(h => <Pressable key={h} onPress={() => show(picks.current[h] || h, [], picks.current[h] && picks.current[h].length > 1 ? h : null)} style={{ paddingHorizontal: 12, height: 32, borderRadius: 16, justifyContent: 'center', backgroundColor: 'rgba(26,32,28,0.92)' }}>
             <T size={12.5} w="semi">{h}</T></Pressable>)}
         </ScrollView> : null}
         <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -226,7 +238,7 @@ export default function Scan() {
       </Sheet> : null}
 
       {found ? <Sheet onClose={() => setFound(null)} ins={ins} tall>
-        <Results found={found} onAgain={() => setFound(null)} onType={() => { setFound(null); setTyping(true); }} onPick={k => show(k, [found.code, ...(found.also || [])].filter(x => x && x !== k))} />
+        <Results found={found} onAgain={() => setFound(null)} onType={() => { setFound(null); setTyping(true); }} onPick={k => show(k, [...(found.codes || [found.code]), ...(found.also || [])].filter(x => x && x !== k))} />
       </Sheet> : null}
     </View>
   );
@@ -248,6 +260,7 @@ function Sheet({ children, onClose, ins, tall }) {
 function Results({ found, onAgain, onType, onPick }) {
   const d = useData(), c = useTheme();
   const { code, list } = found;
+  const nameOf = k => { const x = [...(d.cat?.list || []), ...d.custom].find(y => String(y.num || '').toUpperCase() === k); return x ? clean(x.n).replace(/\s*\([^)]*\)/g, '') : ''; };
   const ownCount = k => d.owned.filter(o => o.card === k && o.status !== 'sold').reduce((n, o) => n + (Number(o.qty) || 1), 0);
   return (
     <>
@@ -260,7 +273,7 @@ function Results({ found, onAgain, onType, onPick }) {
         {found.also && found.also.length ? <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
           <T mute size={12.5}>Not this one? Also read:</T>
           {found.also.map(a => <Pressable key={a} onPress={() => onPick(a)} style={{ paddingHorizontal: 12, height: 30, borderRadius: 15, justifyContent: 'center', backgroundColor: c.soft }}>
-            <T w="semi" size={12.5}>{a}</T></Pressable>)}
+            <T w="semi" size={12.5}>{[a, nameOf(a)].filter(Boolean).join(' · ')}</T></Pressable>)}
         </View> : null}
         {list.map(x => {
           const own = ownCount(x.k), set = x.mine ? x.setName : d.cat?.byId[x.g]?.code;

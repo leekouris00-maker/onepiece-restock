@@ -53,7 +53,6 @@ const PREFIX = { '0P': 'OP', QP: 'OP', E8: 'EB', '5T': 'ST', PR8: 'PRB' };
 
 // The number with its letters half-lost ("P01-016", "801-023"): rebuilt only when exactly one real card fits
 const PART = new RegExp(`([A-Z0-9]?)(${D2})\\s?-\\s?(${D3})`, 'g');
-const LONE = new RegExp(`(?:^|[\\s-])-\\s?(${D3})`, 'g');
 const GUESS = { P: ['OP'], B: ['EB', 'PRB'], 8: ['EB', 'PRB'], T: ['ST'], 5: ['ST'] };
 
 // Every card number in a piece of read text: "0P13-12O" -> "OP13-120", "P-1O5" -> "P-105".
@@ -69,9 +68,6 @@ export function findCodes(text, known) {
       const fits = (GUESS[m[1]] || ['OP', 'EB', 'ST', 'PRB']).map(p => p + tail).filter(k => known.has(k));
       if (fits.length === 1) out.push(fits[0]);
     }
-  }
-  if (known && !out.length) {                       // last resort: "-105" with the P lost -> a promo, P-105
-    for (const m of t.matchAll(LONE)) if (known.has(`P-${digits(m[1])}`)) out.push(`P-${digits(m[1])}`);
   }
   return [...new Set(out)].filter(k => !known || known.has(k));
 }
@@ -121,4 +117,83 @@ function boxBlur(src, w, h, r) {
     for (let yy = 0; yy < h; yy++) { out[yy * w + x] = s / d; s += tmp[Math.min(h - 1, yy + r + 1) * w + x] - tmp[Math.max(0, yy - r) * w + x]; }
   }
   return out;
+}
+
+// ---- picking the right card when digits are shaky: check the card's NAME (big, easy-to-read text) ----
+
+const words = s => String(s || '').toUpperCase().replace(/[^A-Z]+/g, ' ').trim().split(' ').filter(w => w.length >= 3);
+const baseName = n => String(n || '').replace(/\s*\([^)]*\)/g, ' ');
+
+function lev1(a, b) {                      // true if a and b differ by at most one edit
+  if (a === b) return true;
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++edits > 1) return false;
+    if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; }
+  }
+  return edits + (a.length - i) + (b.length - j) <= 1;
+}
+
+// Does the read text contain this card name? Every word of 3+ letters must be there (one slip allowed in 5+ letter words)
+export function nameIn(textWords, name) {
+  const nw = words(baseName(name));
+  return nw.length > 0 && nw.every(w => textWords.some(t => t === w || (w.length >= 5 && lev1(t, w))));
+}
+
+// Real card numbers at most one digit away from a read number (OP18-080 -> OP18-089, OP13-066 -> OP13-065 …)
+export function neighbours(code, known) {
+  const out = [code];
+  for (let i = 0; i < code.length; i++) {
+    if (!/[0-9]/.test(code[i])) continue;
+    for (let dgt = 0; dgt <= 9; dgt++) {
+      const k = code.slice(0, i) + dgt + code.slice(i + 1);
+      if (k !== code && known.has(k)) out.push(k);
+    }
+  }
+  return out;
+}
+
+// Name lookup for every card: [{ k: number, w: name words }], built once per price list
+export function nameIndex(known) {
+  const out = [], seen = new Set();
+  for (const [k, items] of known) for (const x of items) {
+    const w = words(baseName(x.n));
+    const key = k + '|' + w.join(' ');
+    if (w.length && w.join('').length >= 4 && !seen.has(key)) { seen.add(key); out.push({ k, w }); }
+  }
+  return out;
+}
+const numsNamedIn = (text, index) => { const tw = words(text); return new Set(index.filter(e => nameIn(tw, e.w.join(' '))).map(e => e.k)); };
+
+// Decide from the last few reads. recent: numbers read (''=nothing), texts: the last two plain-text reads
+// (name line / lower half), known: Map number -> catalog items, index: nameIndex(known).
+// Returns { hits: [numbers], title, also } or null to keep looking.
+export function decide(recent, texts, known, index) {
+  const read = [...new Set(recent.filter(Boolean))];
+  const count = k => recent.filter(r => r === k).length;
+  const tw = words(texts.join(' '));
+  // 1) a number read (or one digit away from it) whose card name is also on the card: settled
+  const cands = [...new Set(read.flatMap(k => neighbours(k, known)))];
+  const named = tw.length ? cands.filter(k => (known.get(k) || []).some(x => nameIn(tw, x.n))) : [];
+  const also = k => [...new Set([...read, ...named])].filter(x => x !== k);
+  if (named.length === 1) return { hits: named, also: also(named[0]) };
+  // 2) the same card name read in both recent texts, and the numbers don't point to it: the name wins
+  //    (big print beats the tiny number); several cards with that name are all shown to pick from
+  if (index && texts.length >= 2) {
+    const [a, b] = texts.map(t => numsNamedIn(t, index));
+    const both = [...a].filter(k => b.has(k));
+    if (both.length && both.length <= 12) {
+      const title = (known.get(both[0]) || [])[0];
+      return { hits: both, title: both.length > 1 && title ? baseName(title.n).trim() : null, also: read.filter(k => !both.includes(k)) };
+    }
+  }
+  if (!read.length) return null;
+  // 3) numbers only (e.g. Japanese cards): 2 agreeing reads if nothing else was read, else a clear lead
+  const pool = named.length > 1 ? named : read;
+  const ranked = pool.map(k => [k, count(k)]).sort((x, y) => y[1] - x[1]);
+  const [top, n1] = ranked[0], n2 = ranked[1] ? ranked[1][1] : 0;
+  if (n1 >= 2 && (n2 === 0 || n1 - n2 >= 2)) return { hits: [top], also: also(top) };
+  return null;
 }
