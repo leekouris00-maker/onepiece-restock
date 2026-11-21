@@ -1,6 +1,9 @@
 #!/bin/sh
 # Builds the website version into ./web-dist, ready for GitHub Pages at /onepiece-restock/
 set -e
+# Public connection details (safe to publish: the publishable key only allows what the row rules allow)
+export EXPO_PUBLIC_SUPABASE_URL="${EXPO_PUBLIC_SUPABASE_URL:-https://drcrswtieglukyfgotgj.supabase.co}"
+export EXPO_PUBLIC_SUPABASE_ANON_KEY="${EXPO_PUBLIC_SUPABASE_ANON_KEY:-sb_publishable_QnzxIZSLZgBLS13xNo2png_JMYeP7FB}"
 rm -rf web-dist
 CI=1 npx expo export --platform web --output-dir web-dist
 python3 - <<'PY'
