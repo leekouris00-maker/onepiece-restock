@@ -6,12 +6,14 @@ import { StatusBar } from 'expo-status-bar';
 import { Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold } from '@expo-google-fonts/manrope';
 import { DataProvider } from '../src/data';
 import { F, useTheme } from '../src/theme';
+import { watchForUpdates } from '../src/update';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function Root() {
   const [loaded] = useFonts({ Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold });
   useEffect(() => { if (loaded) SplashScreen.hideAsync().catch(() => {}); }, [loaded]);
+  useEffect(() => watchForUpdates(), []);
   if (!loaded) return null;
   return <DataProvider><Nav /></DataProvider>;
 }
