@@ -33,6 +33,7 @@ function Nav() {
         <Stack.Screen name="item/[id]" options={{ title: '', presentation: 'modal' }} />
         <Stack.Screen name="addcard" options={{ title: 'Add a card', presentation: 'modal' }} />
         <Stack.Screen name="scan" options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'fade' }} />
+        <Stack.Screen name="spin" options={{ title: '' }} />
         <Stack.Screen name="movers" options={{ title: 'Market movers' }} />
       </Stack>
     </>

@@ -50,6 +50,10 @@ export default function Account() {
       <Section title="Where prices come from">
         <T mute size={14}>TCGplayer market prices for every English set, refreshed each morning{d.cat ? ` (now ${d.cat.meta.updated}, US$1 = A$${d.cat.meta.fx})` : ''}. eBay sold prices for the cards you track. Card pictures are TCGplayer’s until you add your own photo.</T>
       </Section>
+      <Section title="Ideas in progress">
+        <T mute size={14}>Try new features before they're real.</T>
+        <Button ghost icon="sync-circle-outline" onPress={() => router.push('/spin')}>Daily spin (preview)</Button>
+      </Section>
       <Section title="Privacy">
         <T mute size={14}>No ads, no tracking, nothing sold. Card scans are read on your phone and never uploaded.</T>
         <Button ghost icon="shield-checkmark-outline" onPress={() => Linking.openURL(siteBase() + 'privacy.html')}>Privacy policy</Button>
