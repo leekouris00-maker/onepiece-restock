@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { KINDS, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
-import { Empty, Panel, Select, T } from '../../src/ui';
+import { Chip, Empty, Panel, T } from '../../src/ui';
 import { Heading, Screen, Title } from '../../src/screen';
 import { CardTile } from '../../src/tiles';
 
@@ -36,8 +36,15 @@ export default function Market() {
     };
   }, [d.cat]);
   const kinds = useMemo(() => {
-    const k = d.cat ? KINDS.filter(([v]) => d.cat.sets.some(s => s.kind === v)) : [];
+    const order = ['booster', 'extra', 'premium', 'starter', 'promo', 'event', 'pre-release', 'other'];
+    const k = d.cat ? KINDS.filter(([v]) => d.cat.sets.some(s => s.kind === v)).sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0])) : [];
     return d.custom.length ? [...k, ['mine', 'My cards']] : k;
+  }, [d.cat, d.custom]);
+  const counts = useMemo(() => {
+    const n = {};
+    for (const st of d.cat ? d.cat.sets : []) n[st.kind] = (n[st.kind] || 0) + 1;
+    n.mine = new Set(d.custom.map(x => x.setName || 'Other')).size;
+    return n;
   }, [d.cat, d.custom]);
   const sets = !d.cat ? [] : kind === 'mine'
     ? [...new Set(d.custom.map(x => x.setName || 'Other'))].sort().map(n => ({ id: 'mine:' + n, code: '★', name: n }))
@@ -58,9 +65,13 @@ export default function Market() {
       <Rail title="Falling this week" cards={r.down} onMore={() => router.push('/movers')} />
       {r.newest ? <Rail title={`Newest: ${r.newest.code || r.newest.name}`} cards={r.newestTop} onMore={() => router.push({ pathname: '/set/[id]', params: { id: r.newest.id } })} /> : null}
 
-      <Panel style={{ marginTop: 24, gap: 0 }}>
-        <Heading right={<Select value={kind} onChange={setKind} options={kinds} label="Show sets" />}>Sets</Heading>
-        <View style={{ marginTop: 8 }}>
+      <Heading style={{ marginTop: 28 }}>Sets</Heading>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 12, paddingHorizontal: 18 }} style={{ marginHorizontal: -18 }}>
+        {kinds.map(([v, l]) => <Chip key={v} on={kind === v} onPress={() => setKind(v)}>{`${l} ${counts[v] || 0}`}</Chip>)}
+      </ScrollView>
+      <Panel style={{ gap: 0 }}>
+        <T mute size={12.5} w="semi">{(kinds.find(([v]) => v === kind) || [, 'Sets'])[1]} · {sets.length} {sets.length === 1 ? 'set' : 'sets'}</T>
+        <View style={{ marginTop: 4 }}>
           {sets.map(s => (
             <Pressable key={s.id} onPress={() => router.push({ pathname: '/set/[id]', params: { id: s.id } })} accessibilityRole="button"
               style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, opacity: pressed ? 0.6 : 1 })}>
