@@ -1,5 +1,6 @@
 import 'react-native-url-polyfill/auto';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
@@ -97,6 +98,8 @@ export function DataProvider({ children }) {
     if (data) setUrls(u => ({ ...u, ...Object.fromEntries(data.filter(d => d.signedUrl).map(d => [d.path, d.signedUrl])) }));
   }, []);
 
+  const lastLoad = useRef(0);
+  const [loadError, setLoadError] = useState('');
   const refresh = useCallback(async () => {
     if (!supabase || !session) return;
     setBusy(true);
@@ -105,14 +108,22 @@ export function DataProvider({ children }) {
         supabase.from('owned').select('*'), supabase.from('sales').select('*'), supabase.from('cards').select('*'),
         supabase.from('watch').select('*'), supabase.from('photos').select('*'),
       ]);
+      const bad = [o, s, c, w, p].find(r => r.error);
+      setLoadError(bad ? bad.error.message : '');
+      if (o.error) return;
       const ow = (o.data || []).map(fromOwned);
       setOwned(ow); setSales(s.data || []); setCards((c.data || []).map(fromCard)); setWatch(w.data || []);
       const pm = Object.fromEntries((p.data || []).map(r => [r.card, r.path]));
       setPhotos(pm);
       await signUrls([...Object.values(pm), ...ow.map(x => x.photo)]);
-    } finally { setBusy(false); }
+    } catch (e) { setLoadError(e.message || String(e)); } finally { setBusy(false); lastLoad.current = Date.now(); }
   }, [session, signUrls]);
-  useEffect(() => { if (session) refresh(); else { setOwned([]); setSales([]); setCards([]); setWatch([]); setPhotos({}); } }, [session, refresh]);
+  useEffect(() => { if (session) refresh(); else { setOwned([]); setSales([]); setCards([]); setWatch([]); setPhotos({}); setLoadError(''); } }, [session, refresh]);
+  // reload whenever the app comes back to the front (pull-to-refresh doesn't exist in the web version)
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', st => { if (st === 'active' && Date.now() - lastLoad.current > 5000) refresh(); });
+    return () => sub.remove();
+  }, [refresh]);
 
   const need = () => { if (!supabase) throw new Error('Saving is not set up in this build yet.'); if (!session) throw new Error('Sign in first (Account tab).'); };
   const check = r => { if (r.error) throw new Error(r.error.message); return r; };
@@ -184,7 +195,7 @@ export function DataProvider({ children }) {
   };
 
   const value = {
-    cat, catError, comps, loadCatalog, cur, setCur, session, authReady, configured: !!supabase, busy, refresh,
+    cat, catError, comps, loadCatalog, cur, setCur, session, authReady, configured: !!supabase, busy, refresh, loadError,
     owned, sales, cards, watch, custom, card, fx, watchOf, compOf, salesOf, toUsd, photoOf, ownPhoto, ownVal, money, aud, move, priceAt, unitAt, series, ...api,
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

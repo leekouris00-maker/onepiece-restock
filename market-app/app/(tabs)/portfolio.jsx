@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Pressable, View, useWindowDimensions } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useData, clean } from '../../src/data';
 import { useTheme } from '../../src/theme';
@@ -20,6 +20,7 @@ export default function Collection() {
   const [sort, setSort] = useState('value');
   const [shut, setShut] = useState({});
   const sold = show === 'sold';
+  useFocusEffect(useCallback(() => { if (d.session) d.refresh(); }, [d.session]));
   const cols = width >= 1000 ? 6 : width >= 760 ? 5 : width >= 540 ? 4 : 3, gap = 12;
   const tileW = Math.floor((Math.min(width, 1100) - 36 - 32 - gap * (cols - 1)) / cols);
 
@@ -50,6 +51,7 @@ export default function Collection() {
   return (
     <Screen onRefresh={() => { d.refresh(); d.loadCatalog(true); }} refreshing={d.busy}>
       <Title right={<View style={{ flexDirection: 'row', gap: 8 }}>
+        <IconBtn icon="refresh" label="Reload" onPress={() => { d.refresh(); d.loadCatalog(true); }} />
         <IconBtn icon={grid ? 'list' : 'grid-outline'} label={grid ? 'List view' : 'Grid view'} onPress={() => setGrid(!grid)} />
         <IconBtn icon="add" label="Add item" onPress={() => router.push('/item/new')} />
       </View>}>Collection</Title>
@@ -60,6 +62,10 @@ export default function Collection() {
       </View>
       <T mute size={13}>{units} items · change over 7 days</T>
 
+      {d.loadError ? <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: 'rgba(255,91,91,0.14)' }}>
+        <T w="semi" size={14} style={{ color: c.down }}>Couldn’t load your collection</T>
+        <T size={13} mute style={{ marginTop: 2 }}>{d.loadError}</T>
+      </View> : null}
       <View style={{ marginTop: 16 }}><SearchBar value={q} onChangeText={setQ} placeholder="Search your collection" /></View>
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
         <Select value={sort} onChange={setSort} options={SORTS} label="Sort by" />

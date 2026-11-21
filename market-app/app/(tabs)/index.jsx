@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
@@ -28,6 +28,7 @@ export default function Home() {
   const { width } = useWindowDimensions();
   const [days, setDays] = useState(30);
   const [chartW, setChartW] = useState(0);
+  useFocusEffect(useCallback(() => { if (d.session) d.refresh(); }, [d.session]));
   const live = d.owned.filter(o => o.status !== 'sold');
   const values = useMemo(() => (d.cat ? d.series(days) : []), [d.owned, d.cat, d.comps, d.sales, d.watch, days]);
   const tot = o => (d.unitAt(o, 0) || 0) * (Number(o.qty) || 1);
@@ -64,6 +65,10 @@ export default function Home() {
         </View>
       ) : (
         <>
+          {d.loadError ? <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: 'rgba(255,91,91,0.14)' }}>
+        <T w="semi" size={14} style={{ color: c.down }}>Couldn’t load your collection</T>
+        <T size={13} mute style={{ marginTop: 2 }}>{d.loadError}</T>
+      </View> : null}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 }}>
             <View><T size={12.5} mute>Paid</T><T w="bold" size={15}>{stats.paid ? d.aud(stats.paid) : '–'}</T></View>
             <View style={{ alignItems: 'flex-end' }}>
