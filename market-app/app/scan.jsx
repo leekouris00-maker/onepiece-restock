@@ -286,6 +286,7 @@ function Results({ found, onAgain, onType, onPick }) {
                   <T w="semi" size={14.5} numberOfLines={2}>{clean(x.n)}</T>
                   <T mute size={12} numberOfLines={1}>{[set, x.r, own ? `you own ${own}` : null].filter(Boolean).join(' · ')}</T>
                   <T w="bold" size={15}>{x.mine ? 'Your card' : d.money(x.m)}</T>
+                  {d.comps[x.k]?.sales?.[0] ? <T mute size={12}>eBay last sold {d.money(d.comps[x.k].sales[0].price)} · {d.comps[x.k].sales[0].sold}</T> : null}
                 </View>
               </Pressable>
               <Pressable onPress={() => router.push({ pathname: '/item/[id]', params: { id: 'new', card: x.k } })} accessibilityRole="button" accessibilityLabel={`Add ${clean(x.n)} to collection`}

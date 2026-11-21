@@ -15,6 +15,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -95,6 +96,59 @@ def supabase_watch():
     return [{"id": x["card"], "q": x["q"], "lang": x.get("lang"), "graded": x.get("graded")} for x in rows if x.get("card") and x.get("q")]
 
 
+AUTO_MAX = 15        # owned cards looked up automatically (most valuable first); the free plan covers ~20 a week
+
+
+def supabase_owned():
+    """Cards people own in the app (TCGplayer cards only), so their eBay sold prices are looked up without
+    anyone pressing Track. Needs the same SUPABASE_URL / SUPABASE_SERVICE_KEY secrets."""
+    url, key = os.environ.get("SUPABASE_URL", "").rstrip("/"), os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
+    if not (url and key):
+        return []
+    req = urllib.request.Request(f"{url}/rest/v1/owned?select=card,lang,qty&status=eq.owned&card=like.t%3A*",
+                                 headers={"apikey": key, "Authorization": f"Bearer {key}", "User-Agent": UA, "Accept": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! couldn't read owned cards from the app's database: {e}")
+        return []
+
+
+def auto_watch(owned, catalog, skip):
+    """[{id, q, lang, graded, auto}] for the most valuable owned cards nobody tracks yet."""
+    cards = {"t:" + str(c[0]): c for c in (catalog.get("cards") or [])}
+    sets = {}
+    for g in catalog.get("sets") or []:
+        if isinstance(g, dict):
+            sets[str(g.get("id"))] = g.get("name") or ""
+        elif isinstance(g, (list, tuple)) and len(g) > 1:
+            sets[str(g[0])] = str(g[1])
+    by = {}
+    for o in owned:
+        c = cards.get(o.get("card"))
+        if not c or o["card"] in skip:
+            continue
+        e = by.setdefault(o["card"], {"qty": 0, "langs": set(), "c": c})
+        e["qty"] += int(o.get("qty") or 1)
+        e["langs"].add((o.get("lang") or "EN").upper())
+    out = []
+    for k, e in by.items():
+        pid, _g, num, name, _r, kind, m = e["c"][:7]
+        if (m or 0) < 1:                      # under US$1: not worth a search
+            continue
+        name = re.sub(r"\s*\((?:\d{3})\)", "", name)
+        q = re.sub(r"[\[\]()!]", " ", f"one piece {num} {name}" if num else f"one piece {name}")
+        setname = sets.get(str(_g), "").lower()   # special printings share the number: say which one
+        for word, extra in (("pre-release", "pre-release"), ("release event", "release event"), ("treasure cup", "treasure cup")):
+            if word in setname and extra not in q.lower():
+                q += " " + extra
+        jp = e["langs"] == {"JP"}             # only Japanese copies owned: search Japanese sales
+        out.append({"id": k, "q": re.sub(r"\s+", " ", q).strip(), "lang": "ja" if jp else None,
+                    "graded": None if kind == "sealed" else False, "auto": True, "value": (m or 0) * e["qty"]})
+    return sorted(out, key=lambda w: -w["value"])[:AUTO_MAX]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--max", type=int, default=3)
@@ -104,6 +158,7 @@ def main():
     watch = load(WATCH, [])
     seen = {w.get("id") for w in watch}
     watch += [w for w in supabase_watch() if w["id"] not in seen]   # the app's tracked cards
+    watch += auto_watch(supabase_owned(), load("market_catalog.json", {}), {w["id"] for w in watch})
     out = load(OUT, {"items": {}})
     items = out.setdefault("items", {})
     ids = {w["id"] for w in watch if w.get("id") and w.get("q")}
@@ -119,8 +174,11 @@ def main():
             return 10 ** 6
         return (now.date() - dt.date.fromisoformat(at[:10])).days
 
-    due = sorted((w for w in watch if w.get("id") and w.get("q") and age(w) >= REFRESH_DAYS), key=age, reverse=True)
-    print(f"{len(ids)} tracked card(s), {len(due)} due for a refresh")
+    # cards someone pressed Track on come first, then owned cards (most valuable first), stalest first within each
+    due = sorted((w for w in watch if w.get("id") and w.get("q") and age(w) >= REFRESH_DAYS),
+                 key=lambda w: (bool(w.get("auto")), -min(age(w), 10 ** 5), -w.get("value", 0)))
+    n_auto = sum(1 for w in watch if w.get("auto"))
+    print(f"{len(ids)} card(s): {len(ids) - n_auto} tracked + {n_auto} owned (automatic); {len(due)} due for a refresh")
     if not key:
         print("::notice::COMPSAPI_KEY isn't set, so no eBay prices were fetched. Add it under Settings > Secrets > Actions.")
         return 0
@@ -144,7 +202,7 @@ def main():
         if not resp.get("ok", True):
             print(f"  ! {w['q']}: {resp.get('error')}")
             continue
-        items[w["id"]] = {"q": w["q"], "at": now.isoformat(timespec="minutes"), **slim(resp)}
+        items[w["id"]] = {"q": w["q"], "at": now.isoformat(timespec="minutes"), **({"auto": True} if w.get("auto") else {}), **slim(resp)}
         r = items[w["id"]]
         print(f"  {w['q']}: {r['count']} sales, median US${r['median']}")
         time.sleep(7)                         # free tier: 10 searches a minute

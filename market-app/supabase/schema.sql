@@ -96,3 +96,22 @@ create policy "own photos update" on storage.objects for update to authenticated
   using (bucket_id = 'photos' and (storage.foldername(name))[1] = auth.uid()::text);
 create policy "own photos delete" on storage.objects for delete to authenticated
   using (bucket_id = 'photos' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- ---- Account deletion (Profile > Delete account) ----
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare uid uuid := auth.uid();
+begin
+  if uid is null then
+    raise exception 'Not signed in';
+  end if;
+  delete from auth.users where id = uid;
+end;
+$$;
+
+revoke all on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;

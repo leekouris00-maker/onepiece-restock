@@ -136,6 +136,27 @@ export function DataProvider({ children }) {
     async addCard(c) { need(); const row = { id: newId(), lang: c.lang, num: c.num, name: c.name, set_name: c.set, rar: c.rar, note: c.note }; check(await supabase.from('cards').insert(row)); const card = fromCard(row); setCards(a => [...a, card]); return card; },
     async removeCard(id) { need(); check(await supabase.from('cards').delete().eq('id', id)); setCards(a => a.filter(x => x.id !== id)); },
     async setTrack(card, w) { need(); const row = { card, q: w.q, lang: w.lang || null, graded: w.graded ?? null, updated_at: new Date().toISOString() }; check(await supabase.from('watch').upsert(row, { onConflict: 'user_id,card' })); setWatch(a => [...a.filter(x => x.card !== card), row]); },
+    // Delete the account: photo files first (only the app can remove those), then the login, which takes
+    // every row with it (cascade). Needs supabase/delete-account.sql to have been run once.
+    async deleteAccount() {
+      need();
+      const uid = session.user.id;
+      for (;;) {
+        const { data, error } = await supabase.storage.from('photos').list(uid, { limit: 100 });
+        if (error || !data || !data.length) break;
+        const { error: e2 } = await supabase.storage.from('photos').remove(data.map(f => `${uid}/${f.name}`));
+        if (e2) throw new Error('Could not delete your photos: ' + e2.message);
+        if (data.length < 100) break;
+      }
+      const r = await supabase.rpc('delete_my_account');
+      if (r.error) {
+        if (/delete_my_account|function|schema cache/i.test(r.error.message)) throw new Error('Account deletion isn\'t switched on in the database yet (run supabase/delete-account.sql once).');
+        throw new Error(r.error.message);
+      }
+      await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+      for (const k of ['owned', 'sales', 'cards', 'watch', 'photos']) await AsyncStorage.removeItem(k).catch(() => {});
+      setOwned([]); setSales([]); setCards([]); setWatch([]); setPhotos({});
+    },
     async untrack(card) { need(); check(await supabase.from('watch').delete().eq('card', card)); setWatch(a => a.filter(x => x.card !== card)); },
     async addPhoto(target, uri) {
       need();

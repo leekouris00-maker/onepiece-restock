@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { router } from 'expo-router';
 import { supabase, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { Button, Choice, Field, Section, T } from '../../src/ui';
 import { Screen, Title } from '../../src/screen';
+import { siteBase } from '../../src/ocr';
 
 export default function Account() {
   const d = useData(), c = useTheme();
+  const [del, setDel] = useState(0); const [delMsg, setDelMsg] = useState('');
   const [email, setEmail] = useState(''); const [pw, setPw] = useState(''); const [msg, setMsg] = useState(''); const [wait, setWait] = useState(false);
   const go = async up => {
     setMsg(''); setWait(true);
@@ -48,7 +50,25 @@ export default function Account() {
       <Section title="Where prices come from">
         <T mute size={14}>TCGplayer market prices for every English set, refreshed each morning{d.cat ? ` (now ${d.cat.meta.updated}, US$1 = A$${d.cat.meta.fx})` : ''}. eBay sold prices for the cards you track. Card pictures are TCGplayer’s until you add your own photo.</T>
       </Section>
-      <T mute size={11.5} style={{ textAlign: 'center', marginTop: 10 }}>Version 21 Nov, 7:05 pm</T>
+      <Section title="Privacy">
+        <T mute size={14}>No ads, no tracking, nothing sold. Card scans are read on your phone and never uploaded.</T>
+        <Button ghost icon="shield-checkmark-outline" onPress={() => Linking.openURL(siteBase() + 'privacy.html')}>Privacy policy</Button>
+        {d.session ? <>
+          {del === 0 ? <Button ghost danger onPress={() => { setDel(1); setDelMsg(''); }}>Delete my account</Button> : <>
+            <T size={14}>This permanently deletes your login, your whole collection, logged sales, your own cards, tracked eBay searches and photos. It can't be undone.</T>
+            <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+              <Button danger disabled={del === 2} onPress={async () => {
+                setDel(2); setDelMsg('');
+                try { await d.deleteAccount(); setDel(0); setDelMsg('Your account and everything in it has been deleted.'); }
+                catch (e) { setDel(1); setDelMsg(e.message || String(e)); }
+              }}>{del === 2 ? 'Deleting…' : 'Delete everything'}</Button>
+              <Button ghost disabled={del === 2} onPress={() => { setDel(0); setDelMsg(''); }}>Keep my account</Button>
+            </View>
+          </>}
+        </> : null}
+        {delMsg ? <T size={13.5} style={{ color: /deleted/.test(delMsg) ? c.accent : c.down }}>{delMsg}</T> : null}
+      </Section>
+      <T mute size={11.5} style={{ textAlign: 'center', marginTop: 10 }}>Version 22 Nov</T>
     </View></Screen>
   );
 }

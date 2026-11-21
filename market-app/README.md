@@ -72,3 +72,5 @@ TestFlight is enough for you (and up to 100 people you invite). A public App Sto
 - `app/` screens (expo-router): `(tabs)/index` collection, `(tabs)/market` sets, `(tabs)/search`, `(tabs)/account`, `set/[id]`, `card/[k]`, `item/[id]`, `addcard`
 - `src/data.js` prices, account and database; `src/ui.jsx` shared pieces; `src/theme.js` colours and fonts
 - `supabase/schema.sql` database tables, security rules and photo storage
+- `supabase/delete-account.sql` lets people delete their own account in the app (Profile → Delete my account). Already inside schema.sql; if you set up the database before 22 Nov 2026, run this file once in the SQL Editor.
+- `public/privacy.html` the privacy policy (linked from Profile; served at …/onepiece-restock/privacy.html)

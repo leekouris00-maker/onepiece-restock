@@ -49,6 +49,7 @@ export default function CardScreen() {
         {!card.mine && <Stat label="7-day change" value={mv == null ? '–' : `${mv > 0 ? '▲' : mv < 0 ? '▼' : ''}${Math.abs(mv).toFixed(1)}%`} tone={mv > 0.05 ? c.up : mv < -0.05 ? c.down : null} />}
         <Stat label="Your logged sales, raw median" value={raw.length ? d.money(median(raw)) : '–'} />
       </View>
+      <LastSold card={card} cp={cp} w={w} search={search} onTrack={() => run(() => d.setTrack(card.k, { q: q.trim(), lang: lang || null, graded: graded === 'any' ? null : graded === 'true' }), 'Added. eBay sold prices arrive with the next morning update.')} />
       {!card.mine && <View style={{ marginTop: 14 }}>
         <Sparkline hist={card.h} now={card.m} width={Math.min(width, 820) - 40} label={card.m != null ? lab(card.m) : ''} />
         <T mute size={12.5}>TCGplayer market price, last 35 days</T>
@@ -69,8 +70,8 @@ export default function CardScreen() {
         </View>
       </Section>
 
-      <Section title="eBay sold, automatic">
-        {!w ? <T mute size={14}>Track this card and its eBay sold prices are fetched every morning, each card refreshed about weekly. The free plan covers about 20 cards ({d.watch.length} tracked now).</T>
+      <Section title="eBay sold prices: search settings">
+        {!w ? <T mute size={14}>Track this card and its eBay sold prices are fetched in the morning, then refreshed about weekly. Cards you own are looked up automatically, most valuable first. The free plan covers about 20 cards ({d.watch.length} tracked now).</T>
           : !cp || cp.q !== w.q ? <T mute size={14}>Tracking. Prices arrive with the next morning update.</T>
           : cp.none || cp.median == null ? <T mute size={14}>No eBay sales matched this search in the last 90 days (checked {String(cp.at).slice(0, 10)}). Try fewer words.</T>
           : <>
@@ -80,12 +81,6 @@ export default function CardScreen() {
                 <Stat label="Sales found" value={String(cp.count)} />
               </View>
               <T mute size={12.5}>Checked {String(cp.at).slice(0, 10)} · newest sale {cp.newest} · converted from US$</T>
-              {cp.sales.map((x, i) => (
-                <Pressable key={i} onPress={() => x.url && Linking.openURL(x.url)} style={{ flexDirection: 'row', gap: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: c.line }}>
-                  <T serif size={16} style={{ width: 92 }}>{d.money(x.price)}</T>
-                  <View style={{ flex: 1 }}><T size={13.5} numberOfLines={1}>{x.title}</T><T mute size={12}>{[x.sold, x.grade, x.offer && 'offer'].filter(Boolean).join(' · ')}</T></View>
-                </Pressable>
-              ))}
             </>}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Field label="eBay search used" value={q} onChangeText={setQ} autoCapitalize="none" style={{ flexBasis: '100%' }} />
@@ -127,5 +122,53 @@ export default function CardScreen() {
         <Button ghost onPress={() => run(async () => { await d.removeCard(card.id); router.back(); })}>Delete this card</Button>
       </Section> : null}
     </ScrollView>
+  );
+}
+
+const ago = day => {
+  if (!day) return '';
+  const n = Math.round((Date.now() - new Date(day + 'T12:00:00').getTime()) / 864e5);
+  return n <= 0 ? 'today' : n === 1 ? 'yesterday' : n < 31 ? `${n} days ago` : day;
+};
+
+// Most recent eBay sales for this card, right under the TCGplayer price
+function LastSold({ card, cp, w, search, onTrack }) {
+  const d = useData(), c = useTheme();
+  const has = cp && !cp.none && cp.sales && cp.sales.length;
+  const links = (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
+      <T size={13.5} w="semi" style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com.au/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>See sold on eBay AU</T>
+      <T size={13.5} w="semi" style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>eBay US</T>
+    </View>
+  );
+  return (
+    <View style={{ marginTop: 16, padding: 16, borderRadius: 16, backgroundColor: c.panel, gap: 10 }}>
+      <View style={{ gap: 2 }}>
+        <T w="bold" size={16}>Last sold on eBay</T>
+        {has && cp.median != null ? <T mute size={12.5}>Median {d.money(cp.median)} from {cp.count} sales in the last 90 days</T> : null}
+      </View>
+      {has && cp.median != null && card.m != null && card.m >= 3 && (cp.median < card.m / 4 || cp.median > card.m * 4)
+        ? <T size={13} style={{ color: c.down }}>Very different from TCGplayer ({d.money(card.m)}): the eBay search may be catching another version of this card. Adjust it under "eBay sold prices: search settings" below.</T> : null}
+      {has ? <>
+        {cp.sales.slice(0, 5).map((x, i) => (
+          <Pressable key={i} onPress={() => x.url && Linking.openURL(x.url)} accessibilityRole="link"
+            style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, opacity: pressed ? 0.6 : 1 })}>
+            <T w="bold" size={16} style={{ width: 96 }}>{d.money(x.price)}</T>
+            <View style={{ flex: 1 }}>
+              <T size={13} numberOfLines={1}>{x.title}</T>
+              <T mute size={12}>{[ago(x.sold), x.grade, x.offer && 'best offer'].filter(Boolean).join(' · ')}</T>
+            </View>
+          </Pressable>
+        ))}
+        <T mute size={12}>Checked {String(cp.at).slice(0, 10)}{w ? '' : ' · looked up automatically'} · tap a sale to open it</T>
+        {links}
+      </> : <>
+        <T mute size={13.5}>{cp && cp.none ? 'No eBay sales matched in the last 90 days.'
+          : w ? 'Being fetched: sold prices arrive with the next morning update.'
+          : 'No eBay sold prices fetched for this card yet.'}</T>
+        {!w && !card.mine && d.session ? <Button onPress={onTrack} icon="pricetags-outline">Get eBay sold prices</Button> : null}
+        {links}
+      </>}
+    </View>
   );
 }
