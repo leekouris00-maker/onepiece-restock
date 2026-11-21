@@ -85,7 +85,7 @@ def supabase_watch():
     url, key = os.environ.get("SUPABASE_URL", "").rstrip("/"), os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
     if not (url and key):
         return []
-    req = urllib.request.Request(f"{url}/rest/v1/watch?select=card,q,lang,graded",
+    req = urllib.request.Request(f"{url}/rest/v1/watch?select=card,q,lang,graded,updated_at",
                                  headers={"apikey": key, "Authorization": f"Bearer {key}", "User-Agent": UA, "Accept": "application/json"})
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
@@ -93,7 +93,8 @@ def supabase_watch():
     except Exception as e:  # noqa: BLE001
         print(f"  ! couldn't read tracked cards from the app's database: {e}")
         return []
-    return [{"id": x["card"], "q": x["q"], "lang": x.get("lang"), "graded": x.get("graded")} for x in rows if x.get("card") and x.get("q")]
+    return [{"id": x["card"], "q": x["q"], "lang": x.get("lang"), "graded": x.get("graded"), "asked": x.get("updated_at")}
+            for x in rows if x.get("card") and x.get("q")]
 
 
 AUTO_MAX = 15        # owned cards looked up automatically (most valuable first); the free plan covers ~20 a week
@@ -149,6 +150,15 @@ def auto_watch(owned, catalog, skip):
     return sorted(out, key=lambda w: -w["value"])[:AUTO_MAX]
 
 
+def when(t):
+    """ISO time from the app or this file -> aware datetime (bad values sort as long ago)."""
+    try:
+        d = dt.datetime.fromisoformat(str(t).replace("Z", "+00:00"))
+        return d if d.tzinfo else d.replace(tzinfo=dt.timezone.utc)
+    except ValueError:
+        return dt.datetime(2000, 1, 1, tzinfo=dt.timezone.utc)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--max", type=int, default=3)
@@ -171,6 +181,8 @@ def main():
         at = (items.get(w["id"]) or {}).get("at")
         q_changed = (items.get(w["id"]) or {}).get("q") != w["q"]
         if not at or q_changed:
+            return 10 ** 6
+        if w.get("asked") and when(w["asked"]) > when(at):   # "Refresh" pressed in the app since the last lookup
             return 10 ** 6
         return (now.date() - dt.date.fromisoformat(at[:10])).days
 

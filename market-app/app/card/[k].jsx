@@ -49,7 +49,8 @@ export default function CardScreen() {
         {!card.mine && <Stat label="7-day change" value={mv == null ? '–' : `${mv > 0 ? '▲' : mv < 0 ? '▼' : ''}${Math.abs(mv).toFixed(1)}%`} tone={mv > 0.05 ? c.up : mv < -0.05 ? c.down : null} />}
         <Stat label="Your logged sales, raw median" value={raw.length ? d.money(median(raw)) : '–'} />
       </View>
-      <LastSold card={card} cp={cp} w={w} search={search} onTrack={() => run(() => d.setTrack(card.k, { q: q.trim(), lang: lang || null, graded: graded === 'any' ? null : graded === 'true' }), 'Added. eBay sold prices arrive with the next morning update.')} />
+      <LastSold key={card.k} card={card} cp={cp} w={w} search={search}
+        onTrack={() => run(() => d.setTrack(card.k, { q: (w?.q || q).trim(), lang: w ? w.lang || null : lang || null, graded: w ? w.graded ?? null : graded === 'any' ? null : graded === 'true' }))} />
       {!card.mine && <View style={{ marginTop: 14 }}>
         <Sparkline hist={card.h} now={card.m} width={Math.min(width, 820) - 40} label={card.m != null ? lab(card.m) : ''} />
         <T mute size={12.5}>TCGplayer market price, last 35 days</T>
@@ -131,16 +132,22 @@ const ago = day => {
   return n <= 0 ? 'today' : n === 1 ? 'yesterday' : n < 31 ? `${n} days ago` : day;
 };
 
-// Most recent eBay sales for this card, right under the TCGplayer price
+// Most recent eBay sales for this card, right under the TCGplayer price. The button is always there:
+// get / refresh / queued / sign in. A refresh moves the card to the front of the next morning's lookups.
 function LastSold({ card, cp, w, search, onTrack }) {
   const d = useData(), c = useTheme();
+  const [asked, setAsked] = useState(false);
   const has = cp && !cp.none && cp.sales && cp.sales.length;
-  const links = (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
-      <T size={13.5} w="semi" style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com.au/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>See sold on eBay AU</T>
-      <T size={13.5} w="semi" style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>eBay US</T>
-    </View>
-  );
+  // queued = asked for since the last lookup (or a new search not looked up yet)
+  const queued = asked || (w && (!cp || cp.q !== w.q || (w.updated_at && cp.at && new Date(w.updated_at) > new Date(cp.at))));
+  const label = !d.session ? 'Sign in to get eBay sold prices'
+    : queued ? 'Queued for the next morning update'
+    : has || (cp && cp.none) ? 'Refresh eBay sold prices' : 'Get eBay sold prices';
+  const press = async () => {
+    if (!d.session) { router.push('/account'); return; }
+    if (queued) return;
+    await onTrack(); setAsked(true);
+  };
   return (
     <View style={{ marginTop: 16, padding: 16, borderRadius: 16, backgroundColor: c.panel, gap: 10 }}>
       <View style={{ gap: 2 }}>
@@ -161,14 +168,13 @@ function LastSold({ card, cp, w, search, onTrack }) {
           </Pressable>
         ))}
         <T mute size={12}>Checked {String(cp.at).slice(0, 10)}{w ? '' : ' · looked up automatically'} · tap a sale to open it</T>
-        {links}
-      </> : <>
-        <T mute size={13.5}>{cp && cp.none ? 'No eBay sales matched in the last 90 days.'
-          : w ? 'Being fetched: sold prices arrive with the next morning update.'
-          : 'No eBay sold prices fetched for this card yet.'}</T>
-        {!w && !card.mine && d.session ? <Button onPress={onTrack} icon="pricetags-outline">Get eBay sold prices</Button> : null}
-        {links}
-      </>}
+      </> : <T mute size={13.5}>{cp && cp.none ? `No eBay sales matched in the last 90 days (checked ${String(cp.at).slice(0, 10)}).` : 'No eBay sold prices fetched for this card yet.'}</T>}
+      <Button onPress={press} ghost={queued} disabled={queued && !!d.session} icon={queued ? 'time-outline' : has ? 'refresh' : 'pricetags-outline'}>{label}</Button>
+      {queued && d.session ? <T mute size={12}>Looked up each morning at 8:47am, 3 cards a day on the free plan; cards you asked for go first.</T> : null}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
+        <T size={13.5} w="semi" style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com.au/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>See sold on eBay AU now</T>
+        <T size={13.5} w="semi" style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>eBay US</T>
+      </View>
     </View>
   );
 }
