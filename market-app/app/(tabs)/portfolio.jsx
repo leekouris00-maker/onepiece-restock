@@ -1,87 +1,105 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, View, useWindowDimensions } from 'react-native';
+import { Pressable, View, useWindowDimensions } from 'react-native';
 import { router } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useData, clean } from '../../src/data';
 import { useTheme } from '../../src/theme';
-import { Button, Chip, Empty, RoundAction, SearchBar, T } from '../../src/ui';
-import { Screen } from '../../src/screen';
-import { OwnedTile } from '../../src/tiles';
+import { Bounty, Button, Chip, Empty, SearchBar, T } from '../../src/ui';
+import { Screen, Title } from '../../src/screen';
+import { OwnedRow, OwnedTile } from '../../src/tiles';
 
 const SORTS = [['value', 'Value'], ['move', 'Change'], ['name', 'Name'], ['new', 'Newest']];
 
-export default function Portfolio() {
+export default function Collection() {
   const d = useData(), c = useTheme();
   const { width } = useWindowDimensions();
   const [q, setQ] = useState('');
-  const [group, setGroup] = useState('all');
+  const [sold, setSold] = useState(false);
+  const [grid, setGrid] = useState(false);
   const [sort, setSort] = useState('value');
-  const pad = 18, gap = 16, cols = width >= 1000 ? 5 : width >= 760 ? 4 : width >= 540 ? 3 : 2;
-  const tileW = Math.floor((Math.min(width, 1100) - pad * 2 - gap * (cols - 1)) / cols);
+  const [shut, setShut] = useState({});
+  const pad = 18, gap = 14, cols = width >= 1000 ? 6 : width >= 760 ? 5 : width >= 540 ? 4 : 3;
 
   const live = d.owned.filter(o => o.status !== 'sold');
-  const unit = o => d.unitAt(o, 0) || 0, tot = o => unit(o) * (Number(o.qty) || 1);
-  const groups = useMemo(() => {
-    const m = {}; for (const o of live) { const g = o.group || 'Other'; m[g] = (m[g] || 0) + tot(o); }
-    return Object.entries(m).sort((a, b) => b[1] - a[1]).map(g => g[0]);
-  }, [d.owned, d.cat, d.comps]);
-  const stats = useMemo(() => {
-    let worth = 0, paid = 0, units = 0;
-    for (const o of live) { const n = Number(o.qty) || 1; units += n; worth += tot(o); if (o.paid != null && o.paid !== '') paid += Number(o.paid) * n; }
-    return { worth, paid, units };
-  }, [d.owned, d.cat, d.comps, d.sales, d.watch]);
+  const tot = o => (d.unitAt(o, 0) || 0) * (Number(o.qty) || 1);
+  const worth = useMemo(() => live.reduce((n, o) => n + tot(o), 0), [d.owned, d.cat, d.comps, d.sales, d.watch]);
+  const units = live.reduce((n, o) => n + (Number(o.qty) || 1), 0);
 
-  const list = useMemo(() => {
+  const groups = useMemo(() => {
     const s = q.trim().toLowerCase();
-    let l = group === 'sold' ? d.owned.filter(o => o.status === 'sold') : live.filter(o => group === 'all' || (o.group || 'Other') === group);
+    let l = sold ? d.owned.filter(o => o.status === 'sold') : live;
     if (s) l = l.filter(o => { const k = d.card(o.card); return (clean(o.name) + ' ' + (k?.num || o.num || '') + ' ' + (o.group || '')).toLowerCase().includes(s); });
     const chg = o => { const a = d.unitAt(o, 0), b = d.unitAt(o, 7); return a && b ? (a - b) / b : 0; };
     const by = { value: (a, b) => tot(b) - tot(a), move: (a, b) => Math.abs(chg(b)) - Math.abs(chg(a)), name: (a, b) => clean(a.name).localeCompare(clean(b.name)), new: (a, b) => String(b.added || '').localeCompare(String(a.added || '')) };
-    return [...l].sort(by[sort]);
-  }, [q, group, sort, d.owned, d.cat, d.comps]);
+    const m = {}; for (const o of l) (m[sold ? 'Sold' : o.group || 'Other'] ??= []).push(o);
+    return Object.entries(m).map(([g, items]) => ({ g, items: items.sort(by[sort]), total: items.reduce((n, o) => n + (sold ? (Number(o.soldFor) || 0) * (Number(o.qty) || 1) : tot(o)), 0) }))
+      .sort((a, b) => b.total - a.total);
+  }, [q, sold, sort, d.owned, d.cat, d.comps]);
 
   if (!d.configured || (d.authReady && !d.session)) return (
-    <Screen><View style={{ gap: 14, marginTop: 20 }}>
-      <T w="bold" size={28}>Portfolio</T>
+    <Screen><Title>Collection</Title><View style={{ gap: 14, marginTop: 16 }}>
       <T mute>{d.configured ? 'Sign in to see everything you own.' : 'Saving isn’t set up in this build yet.'}</T>
       {d.configured ? <Button onPress={() => router.push('/account')} style={{ alignSelf: 'flex-start' }}>Sign in</Button> : null}
     </View></Screen>
   );
 
+  const Toggle = ({ icon, on, onPress, label }) => (
+    <Pressable onPress={onPress} accessibilityLabel={label} accessibilityState={{ selected: on }} hitSlop={6}
+      style={{ width: 40, height: 36, borderRadius: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? c.accent : 'transparent', borderWidth: 1, borderColor: on ? c.accent : c.line }}>
+      <Ionicons name={icon} size={18} color={on ? c.bg : c.ink} />
+    </Pressable>
+  );
+
   return (
     <Screen onRefresh={() => { d.refresh(); d.loadCatalog(true); }} refreshing={d.busy}>
-      <T w="bold" size={28}>Portfolio</T>
-      <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginTop: 4 }}>
-        <T w="bold" size={22}>{d.cat ? d.aud(stats.worth) : '…'}</T>
-        <T mute size={14}>{stats.units} items{stats.paid ? ` · paid ${d.aud(stats.paid)}` : ''}</T>
+      <Title sub={`${units} items in ${groups.length} ${groups.length === 1 ? 'group' : 'groups'}`}
+        right={<Bounty size={20}>{d.cat ? d.aud(worth) : '…'}</Bounty>}>Collection</Title>
+
+      <View style={{ marginTop: 12 }}>
+        <SearchBar value={q} onChangeText={setQ} placeholder="Search your collection"
+          right={<Pressable onPress={() => router.push('/item/new')} accessibilityLabel="Add item"
+            style={{ width: 50, height: 50, borderRadius: 10, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="add" size={28} color={c.bg} /></Pressable>} />
       </View>
 
-      <View style={{ marginTop: 16 }}>
-        <SearchBar value={q} onChangeText={setQ} placeholder="Search your collection" />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+        {SORTS.map(([v, l]) => <Chip key={v} on={sort === v} onPress={() => setSort(v)} style={{ minHeight: 32, paddingHorizontal: 11 }}>{l}</Chip>)}
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 }}>
+        <Pressable onPress={() => setSold(!sold)} hitSlop={6} style={{ flex: 1 }} accessibilityRole="button">
+          <T size={13.5} style={{ color: c.accent }}>{sold ? '‹ Back to what you own' : 'Show what you’ve sold ›'}</T>
+        </Pressable>
+        <Toggle icon="list" on={!grid} onPress={() => setGrid(false)} label="List view" />
+        <Toggle icon="grid" on={grid} onPress={() => setGrid(true)} label="Grid view" />
       </View>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 18 }}>
-        <RoundAction icon="trending-up" label="Movers" onPress={() => router.push('/movers')} />
-        <RoundAction icon="add" label="Add item" onPress={() => router.push('/item/new')} />
-        <RoundAction icon="create-outline" label="Add card" onPress={() => router.push('/addcard')} />
-        <RoundAction icon="cash-outline" label={group === 'sold' ? 'Owned' : 'Sold'} ring={group === 'sold'} onPress={() => setGroup(group === 'sold' ? 'all' : 'sold')} />
-      </View>
-
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingTop: 20, paddingBottom: 6 }} style={{ marginHorizontal: -pad }}>
-        <View style={{ width: pad - 8 }} />
-        <Chip on={group === 'all'} onPress={() => setGroup('all')}>Everything</Chip>
-        {groups.map(g => <Chip key={g} on={group === g} onPress={() => setGroup(group === g ? 'all' : g)}>{g}</Chip>)}
-        <View style={{ width: pad - 8 }} />
-      </ScrollView>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
-        <T mute size={13.5}>Sort</T>
-        {SORTS.map(([v, l]) => <Chip key={v} on={sort === v} onPress={() => setSort(v)} style={{ minHeight: 30, paddingHorizontal: 12 }}>{l}</Chip>)}
-      </View>
-
-      {!list.length ? <Empty>{q ? `Nothing in your collection matches “${q}”.` : 'Nothing here yet. Tap Add item, or open any card and add it.'}</Empty> : null}
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap, rowGap: 26, marginTop: 18 }}>
-        {list.map(o => <OwnedTile key={o.id} o={o} width={tileW} />)}
-      </View>
-      <T mute size={12.5} style={{ marginTop: 30 }}>Each item is valued by your own estimate if you set one, otherwise the eBay median for cards you track, then your logged sales, then TCGplayer. Changes are over 7 days.</T>
+      {!groups.length ? <Empty>{q ? `Nothing in your collection matches “${q}”.` : sold ? 'Nothing sold yet.' : 'Nothing here yet. Tap + to add something, or open any card and add it.'}</Empty> : null}
+      {groups.map(({ g, items, total }) => {
+        const closed = shut[g] && !q;
+        return (
+          <View key={g} style={{ marginTop: 18, borderRadius: 12, borderWidth: 1, borderColor: c.line, backgroundColor: c.panel, overflow: 'hidden' }}>
+            <Pressable onPress={() => setShut(s => ({ ...s, [g]: !s[g] }))} accessibilityRole="button" accessibilityState={{ expanded: !closed }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12, backgroundColor: c.soft, borderLeftWidth: 3, borderLeftColor: c.accent }}>
+              <View style={{ flex: 1 }}>
+                <T head caps size={16} numberOfLines={1} style={{ letterSpacing: 1 }}>{g}</T>
+                <T size={12} mute>{items.length} {items.length === 1 ? 'entry' : 'entries'}</T>
+              </View>
+              <T head size={17} style={{ color: c.accent }}>{d.aud(total)}</T>
+              <Ionicons name={closed ? 'chevron-down' : 'chevron-up'} size={18} color={c.mute} />
+            </Pressable>
+            {closed ? null : grid ? (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap, rowGap: 18, padding: 12 }}>
+                {items.map(o => <OwnedTile key={o.id} o={o} width={Math.floor((Math.min(width, 1100) - pad * 2 - 26 - gap * (cols - 1)) / cols)} />)}
+              </View>
+            ) : (
+              <View style={{ paddingHorizontal: 12 }}>
+                {items.map((o, i) => <OwnedRow key={o.id} o={o} last={i === items.length - 1} />)}
+              </View>
+            )}
+          </View>
+        );
+      })}
+      <T mute size={12} style={{ marginTop: 24 }}>Each item is valued by your own estimate if you set one, otherwise the eBay median for cards you track, then your logged sales, then TCGplayer. Changes are over 7 days. Tap a group to fold it.</T>
     </Screen>
   );
 }

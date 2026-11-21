@@ -3,7 +3,7 @@ import { FlatList, View } from 'react-native';
 import { useData } from '../../src/data';
 import { CardRow } from '../../src/rows';
 import { Empty, SearchBar, T } from '../../src/ui';
-import { BAR_SPACE, useTop } from '../../src/screen';
+import { BAR_SPACE, Title, useTop } from '../../src/screen';
 
 export default function Search() {
   const d = useData(), top = useTop();
@@ -17,7 +17,7 @@ export default function Search() {
     <FlatList data={results} keyExtractor={x => x.k} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag"
       style={{ width: '100%', maxWidth: 900, alignSelf: 'center' }}
       ListHeaderComponent={<View style={{ paddingHorizontal: 18, paddingTop: top, paddingBottom: 8, gap: 10 }}>
-        <T w="bold" size={28}>Search</T>
+        <Title sub="Every set, promos and your own cards">Search</Title>
         <SearchBar value={q} onChangeText={setQ} placeholder="Name or number: Sabo, P-105, OP13-120" />
         {q.trim().length >= 2 ? <T mute size={13}>{results.length >= 300 ? 'First 300 matches, highest price first' : `${results.length} matches, highest price first`}</T> : null}
       </View>}

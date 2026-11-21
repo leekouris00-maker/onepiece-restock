@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { supabase, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { Button, Choice, Field, Section, T } from '../../src/ui';
-import { Screen } from '../../src/screen';
+import { Screen, Title } from '../../src/screen';
 
 export default function Account() {
   const d = useData(), c = useTheme();
@@ -19,7 +19,7 @@ export default function Account() {
   };
   return (
     <Screen max={820}><View style={{ gap: 12 }}>
-      <T w="bold" size={28}>Profile</T>
+      <Title>Profile</Title>
       {!d.configured ? <T mute>Saving isn’t set up in this build: the Supabase address and key haven’t been added yet. Prices still work.</T>
         : d.session ? <>
             <T w="bold" size={20}>Signed in</T>

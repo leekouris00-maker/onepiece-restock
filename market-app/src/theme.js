@@ -1,12 +1,15 @@
-// One dark look everywhere: black ground, soft grey surfaces, mint-teal accent, coral for drops.
-const dark = {
-  bg: '#000000', panel: '#111113', soft: '#18181b', raise: '#1f1f23', ink: '#f4f4f5', mute: '#9b9ba1', line: '#2a2a2f',
-  accent: '#5fd1c1', accentDim: 'rgba(95,209,193,0.16)', gold: '#5fd1c1', red: '#5fd1c1', band: '#000000', link: '#5fd1c1',
-  up: '#5fd1c1', down: '#ff6f61', hi: '#18181b',
+// Grand Line look: deep-sea navy, treasure gold, parchment "bounty" labels.
+const sea = {
+  bg: '#0b1a2e', panel: '#10233b', soft: '#142a47', raise: '#1b3658', ink: '#eef2f7', mute: '#8ea3bd', line: '#22405f',
+  accent: '#e0b04a', accentDim: 'rgba(224,176,74,0.16)', gold: '#e0b04a', red: '#e0b04a', band: '#0b1a2e', link: '#e0b04a',
+  paper: '#f1e4c3', paperInk: '#3a2812', paperMute: '#7a6440', paperLine: '#cdb98c',
+  up: '#5fd68a', down: '#ff7a6b', hi: '#142a47',
 };
 
 export const F = {
-  serif: 'Lato_900Black',   // big figures and titles
+  head: 'Oswald_700Bold',     // condensed caps headings and bounty figures
+  headMed: 'Oswald_500Medium',
+  serif: 'Oswald_700Bold',
   serifIt: 'Lato_700Bold',
   text: 'Lato_400Regular',
   medium: 'Lato_400Regular',
@@ -15,5 +18,5 @@ export const F = {
 };
 
 export function useTheme() {
-  return dark;
+  return sea;
 }
