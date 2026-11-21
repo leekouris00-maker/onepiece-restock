@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: "47 21 * * *"     # 8:47am Melbourne in summer
   workflow_dispatch:
+    inputs:
+      max:
+        description: "Cards to look up this run (free plan: 100 a month)"
+        default: "3"
 
 permissions:
   contents: write
@@ -31,7 +35,7 @@ jobs:
           COMPSAPI_KEY: ${{ secrets.COMPSAPI_KEY || secrets.COMPSAPI_API }}   # either name works
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}                  # optional: the iPhone app's database
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}  # optional: its service_role key (secret)
-        run: python ebay_comps.py --max 3
+        run: python ebay_comps.py --max "${{ inputs.max || '3' }}"
 
       - name: Save
         run: |
