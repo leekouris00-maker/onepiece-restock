@@ -24,6 +24,8 @@ export default function Account() {
         : d.session ? <>
             <T w="bold" size={20}>Signed in</T>
             <T mute>{d.session.user.email}</T>
+            <T mute size={13}>{d.busy ? 'Loading your collection…' : `${d.owned.length} collection entries loaded`}{d.loadError ? ` · error: ${d.loadError}` : ''}</T>
+            <Button onPress={() => { d.refresh(); d.loadCatalog(true); }} icon="refresh">Reload my collection</Button>
             <Button ghost onPress={() => supabase.auth.signOut()}>Sign out</Button>
           </> : <>
             <T w="bold" size={20}>Sign in</T>
@@ -46,6 +48,7 @@ export default function Account() {
       <Section title="Where prices come from">
         <T mute size={14}>TCGplayer market prices for every English set, refreshed each morning{d.cat ? ` (now ${d.cat.meta.updated}, US$1 = A$${d.cat.meta.fx})` : ''}. eBay sold prices for the cards you track. Card pictures are TCGplayer’s until you add your own photo.</T>
       </Section>
+      <T mute size={11.5} style={{ textAlign: 'center', marginTop: 10 }}>Version 21 Nov, 7:05 pm</T>
     </View></Screen>
   );
 }

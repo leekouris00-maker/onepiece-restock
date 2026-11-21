@@ -10,7 +10,7 @@ python3 - <<'PY'
 p='web-dist/index.html'; s=open(p).read()
 tags=('<meta name="apple-mobile-web-app-capable" content="yes">'
  '<meta name="mobile-web-app-capable" content="yes">'
- '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">'
+ '<meta name="apple-mobile-web-app-status-bar-style" content="black">'
  '<meta name="apple-mobile-web-app-title" content="OP Market">'
  '<meta name="theme-color" content="#0a0d0b">'
  '<link rel="apple-touch-icon" href="/onepiece-restock/apple-touch-icon.png">'
