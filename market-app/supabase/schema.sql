@@ -73,6 +73,10 @@ begin
     execute format('alter table public.%I enable row level security', t);
     execute format('drop policy if exists "own rows" on public.%I', t);
     execute format('create policy "own rows" on public.%I for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid())', t);
+    -- signed-in users may use the table (the policy above still limits them to their own rows);
+    -- needed when the project doesn't grant API access to new tables automatically
+    execute format('grant select, insert, update, delete on public.%I to authenticated', t);
+    execute format('grant all on public.%I to service_role', t);
   end loop;
 end $$;
 
