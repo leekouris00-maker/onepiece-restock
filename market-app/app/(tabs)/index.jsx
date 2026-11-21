@@ -59,7 +59,7 @@ export default function Home() {
       {signedOut ? (
         <View style={{ marginTop: 40, gap: 12, alignItems: 'center' }}>
           <T head size={30} style={{ textAlign: 'center' }}>Know what your cards are worth</T>
-          <T mute style={{ textAlign: 'center' }}>{d.configured ? 'Sign in to see your collection and how its value moves.' : 'Saving isn’t set up in this build yet. You can still browse prices.'}</T>
+          <T mute style={{ textAlign: 'center' }}>{d.configured ? 'Sign in to see your collection and how its value moves.' : 'Sign-in isn’t switched on yet, so for now you can browse prices.'}</T>
           {d.configured ? <Button onPress={() => router.push('/account')} style={{ alignSelf: 'stretch', marginTop: 8 }}>Sign in</Button> : null}
         </View>
       ) : (

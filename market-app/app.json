@@ -21,16 +21,33 @@
     },
     "android": {
       "package": "com.leekouris.onepiecemarket",
-      "adaptiveIcon": { "foregroundImage": "./assets/icon.png", "backgroundColor": "#0a0d0b" }
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0a0d0b"
+      }
     },
-    "web": { "bundler": "metro", "output": "single" },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "name": "One Piece Market",
+      "shortName": "OP Market",
+      "themeColor": "#0a0d0b",
+      "backgroundColor": "#0a0d0b",
+      "favicon": "./assets/icon.png"
+    },
     "plugins": [
       "expo-router",
       "expo-font",
-      ["expo-image-picker", {
-        "photosPermission": "Choose photos of your cards to show in your collection.",
-        "cameraPermission": "Take photos of your cards to show in your collection."
-      }]
-    ]
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choose photos of your cards to show in your collection.",
+          "cameraPermission": "Take photos of your cards to show in your collection."
+        }
+      ]
+    ],
+    "experiments": {
+      "baseUrl": "/onepiece-restock"
+    }
   }
 }

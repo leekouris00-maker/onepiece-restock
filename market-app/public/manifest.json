@@ -1,0 +1,3 @@
+{ "name": "One Piece Market", "short_name": "OP Market", "start_url": "/onepiece-restock/", "scope": "/onepiece-restock/",
+  "display": "standalone", "background_color": "#0a0d0b", "theme_color": "#0a0d0b",
+  "icons": [{ "src": "/onepiece-restock/icon-512.png", "sizes": "512x512", "type": "image/png" }, { "src": "/onepiece-restock/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }] }

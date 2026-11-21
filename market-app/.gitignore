@@ -6,3 +6,4 @@ web-build/
 .env
 .env.local
 my-data*.sql
+web-dist
