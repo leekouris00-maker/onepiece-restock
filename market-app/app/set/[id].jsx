@@ -1,16 +1,18 @@
 import React, { useMemo, useState } from 'react';
-import { FlatList, ScrollView, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useData, clean } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { CardRow } from '../../src/rows';
 import { Chip, Empty, T } from '../../src/ui';
+import { ChipRow } from '../../src/screen';
+import { useWide } from '../../src/layout';
 
 const SORTS = [['price', 'Highest price'], ['num', 'Card number'], ['move', 'Biggest move']];
 
 export default function SetScreen() {
   const { id } = useLocalSearchParams();
-  const d = useData(), c = useTheme();
+  const d = useData(), c = useTheme(), wide = useWide();
   const [type, setType] = useState('card');
   const [ebay, setEbay] = useState(false);
   const [sort, setSort] = useState('price');
@@ -29,20 +31,22 @@ export default function SetScreen() {
   return (
     <>
       <Stack.Screen options={{ title: set.code || 'My cards' }} />
-      <FlatList data={list} keyExtractor={x => x.k} initialNumToRender={20} windowSize={9}
-        ListHeaderComponent={<View style={{ padding: 18, gap: 10 }}>
+      <FlatList key={wide ? 'wide' : 'phone'} numColumns={wide ? 2 : 1} columnWrapperStyle={wide ? { paddingHorizontal: 14, gap: 12 } : undefined}
+        data={list} keyExtractor={x => x.k} initialNumToRender={20} windowSize={9}
+        style={{ width: '100%', maxWidth: wide ? 1100 : undefined, alignSelf: 'center' }}
+        ListHeaderComponent={<View style={{ padding: wide ? 32 : 18, paddingBottom: 18, gap: 10 }}>
           <T serif size={32} style={{ lineHeight: 36 }}>{set.name}</T>
           <T mute size={13.5}>{[set.date && 'released ' + set.date, `${list.length} ${type === 'sealed' ? 'products' : 'cards'}`, top && `top ${clean(top.n)} ${d.money(top.m)}`].filter(Boolean).join(' · ')}</T>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
+          <ChipRow style={{ paddingVertical: 4 }}>
             {!mine && [['card', 'Cards'], ['don', 'DON!!'], ['sealed', 'Sealed']].map(([v, l]) => <Chip key={v} on={!ebay && type === v} onPress={() => { setEbay(false); setType(v); }}>{l}</Chip>)}
             <Chip on={ebay} onPress={() => setEbay(!ebay)}>Has eBay prices</Chip>
-          </ScrollView>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          </ChipRow>
+          <ChipRow>
             {SORTS.map(([v, l]) => <Chip key={v} on={sort === v} onPress={() => setSort(v)} style={{ minHeight: 32 }}>{l}</Chip>)}
-          </ScrollView>
+          </ChipRow>
         </View>}
         ListEmptyComponent={<Empty>{ebay ? 'No eBay prices in this set yet. Open a card to track it or log a sale.' : 'Nothing of this type here.'}</Empty>}
-        renderItem={({ item }) => <CardRow card={item} />} contentContainerStyle={{ paddingBottom: 40, backgroundColor: c.bg }} />
+        renderItem={({ item }) => (wide ? <View style={{ flex: 1, maxWidth: '50%' }}><CardRow card={item} /></View> : <CardRow card={item} />)} contentContainerStyle={{ paddingBottom: 40, backgroundColor: c.bg }} />
     </>
   );
 }

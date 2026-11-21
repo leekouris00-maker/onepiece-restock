@@ -5,7 +5,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { Button, ChangePill, Empty, GlowChart, Panel, Select, T } from '../../src/ui';
-import { Heading, IconBtn, Screen } from '../../src/screen';
+import { Heading, IconBtn, Screen, TileRail } from '../../src/screen';
+import { useTiles } from '../../src/layout';
 import { CardTile, OwnedRow } from '../../src/tiles';
 
 const RANGES = [[1, '1 Day'], [7, '7 Days'], [30, '1 Month']];
@@ -28,6 +29,7 @@ export default function Home() {
   const { width } = useWindowDimensions();
   const [days, setDays] = useState(30);
   const [chartW, setChartW] = useState(0);
+  const tiles = useTiles(), wide = tiles.wide;
   useFocusEffect(useCallback(() => { if (d.session) d.refresh(); }, [d.session]));
   const live = d.owned.filter(o => o.status !== 'sold');
   const values = useMemo(() => (d.cat ? d.series(days) : []), [d.owned, d.cat, d.comps, d.sales, d.watch, days]);
@@ -47,7 +49,7 @@ export default function Home() {
 
   return (
     <Screen onRefresh={() => { d.refresh(); d.loadCatalog(true); }} refreshing={d.busy}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      {wide ? <T head size={28}>Home</T> : <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <View style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' }}>
             <Ionicons name="compass" size={18} color={c.onAccent} />
@@ -55,7 +57,7 @@ export default function Home() {
           <T head size={15} style={{ letterSpacing: 0.4 }}>ONE PIECE MARKET</T>
         </View>
         <IconBtn icon="person-outline" label="Profile" onPress={() => router.push('/account')} />
-      </View>
+      </View>}
 
       {signedOut ? (
         <View style={{ marginTop: 40, gap: 12, alignItems: 'center' }}>
@@ -69,6 +71,8 @@ export default function Home() {
         <T w="semi" size={14} style={{ color: c.down }}>Couldn’t load your collection</T>
         <T size={13} mute style={{ marginTop: 2 }}>{d.loadError}</T>
       </View> : null}
+          <View style={wide ? { flexDirection: 'row', gap: 28, alignItems: 'flex-start', marginTop: 8 } : null}>
+          <View style={wide ? { flex: 1.35, minWidth: 0 } : null}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 }}>
             <View><T size={12.5} mute>Paid</T><T w="bold" size={15}>{stats.paid ? d.aud(stats.paid) : '–'}</T></View>
             <View style={{ alignItems: 'flex-end' }}>
@@ -84,12 +88,14 @@ export default function Home() {
           </View>
 
           <View onLayout={e => setChartW(e.nativeEvent.layout.width)} style={{ marginTop: 6 }}>
-            <GlowChart values={values} width={chartW} height={Math.min(240, width * 0.58)} fmt={d.aud} />
+            <GlowChart values={values} width={chartW} height={wide ? 260 : Math.min(240, width * 0.58)} fmt={d.aud} />
           </View>
 
           <Button icon="add" onPress={() => router.push('/item/new')} style={{ marginTop: 18 }}>Add to collection</Button>
+          </View>
+          <View style={wide ? { flex: 1, minWidth: 0, marginTop: 18 } : null}>
 
-          <Panel style={{ marginTop: 22, gap: 4 }}>
+          <Panel style={{ marginTop: wide ? 0 : 22, gap: 4 }}>
             <Heading onMore={() => router.push('/portfolio')}>Most valuable</Heading>
             {top.length ? top.map((o, i) => <OwnedRow key={o.id} o={o} rank={i + 1} />) : <Empty>Nothing in your collection yet.</Empty>}
           </Panel>
@@ -98,14 +104,16 @@ export default function Home() {
             <Heading onMore={() => router.push('/movers')}>Moved this week</Heading>
             {movers.map(o => <OwnedRow key={o.id} o={o} />)}
           </Panel> : null}
+          </View>
+          </View>
         </>
       )}
 
       {hot.length ? <>
         <Heading style={{ marginTop: 26 }} onMore={() => router.push('/market')} more="Market">Rising this week</Heading>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 14, paddingVertical: 12, paddingHorizontal: 18 }} style={{ marginHorizontal: -18 }}>
-          {hot.map(x => <CardTile key={x.k} card={x} />)}
-        </ScrollView>
+        <TileRail>
+          {(wide ? hot.slice(0, tiles.cols * Math.max(1, Math.floor(hot.length / tiles.cols))) : hot).map(x => <CardTile key={x.k} card={x} width={tiles.width} />)}
+        </TileRail>
       </> : null}
     </Screen>
   );

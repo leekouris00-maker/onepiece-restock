@@ -4,16 +4,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from './theme';
 import { T } from './ui';
+import { useWide } from './layout';
 
 export const BAR_SPACE = 30;
 
-export function useTop() { const ins = useSafeAreaInsets(); return ins.top + 10; }
+export function useTop() { const ins = useSafeAreaInsets(), wide = useWide(); return ins.top + (wide ? 28 : 10); }
 
-export function Screen({ children, onRefresh, refreshing, max = 1100, pad = 18, ...p }) {
-  const c = useTheme(), top = useTop();
+export function Screen({ children, onRefresh, refreshing, max = 1100, pad, ...p }) {
+  const c = useTheme(), top = useTop(), wide = useWide();
+  pad ??= wide ? 32 : 18;
   return (
     <ScrollView keyboardShouldPersistTaps="handled" {...p}
-      contentContainerStyle={{ paddingTop: top, paddingHorizontal: pad, paddingBottom: BAR_SPACE, maxWidth: max, width: '100%', alignSelf: 'center' }}
+      contentContainerStyle={{ paddingTop: top, paddingHorizontal: pad, paddingBottom: wide ? 48 : BAR_SPACE, maxWidth: max, width: '100%', alignSelf: 'center' }}
       refreshControl={onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={c.accent} /> : undefined}>
       {children}
     </ScrollView>
@@ -49,5 +51,28 @@ export function IconBtn({ icon, onPress, label, on }) {
       style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed || on ? c.raise : c.soft })}>
       <Ionicons name={icon} size={20} color={on ? c.accent : c.ink} />
     </Pressable>
+  );
+}
+
+// Chips: one scrolling row on a phone; wrapped onto as many lines as needed on a computer, where sideways scrolling is awkward
+export function ChipRow({ children, pad = 0, style }) {
+  const wide = useWide();
+  if (wide) return <View style={[{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: pad }, style]}>{children}</View>;
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{ gap: 8, paddingHorizontal: pad }} style={style}>
+      {children}
+    </ScrollView>
+  );
+}
+
+// Card tiles: a sideways carousel on a phone; a wrapped grid on a computer
+export function TileRail({ children, pad = 18 }) {
+  const wide = useWide();
+  if (wide) return <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 18, rowGap: 22, paddingVertical: 14 }}>{children}</View>;
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 14, paddingVertical: 12, paddingHorizontal: pad }} style={{ marginHorizontal: -pad }}>
+      {children}
+    </ScrollView>
   );
 }

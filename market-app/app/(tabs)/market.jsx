@@ -5,21 +5,23 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { KINDS, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { Chip, Empty, Panel, T } from '../../src/ui';
-import { Heading, Screen, Title } from '../../src/screen';
+import { ChipRow, Heading, Screen, TileRail, Title } from '../../src/screen';
+import { useTiles } from '../../src/layout';
 import { CardTile } from '../../src/tiles';
 
 function Rail({ title, cards, onMore }) {
+  const t = useTiles();
   if (!cards.length) return null;
+  // computer: one full row of tiles (See all for more); phone: the sideways carousel
+  const shown = t.wide ? cards.slice(0, t.cols) : cards;
   return <>
-    <Heading style={{ marginTop: 24 }} onMore={onMore}>{title}</Heading>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 14, paddingVertical: 12, paddingHorizontal: 18 }} style={{ marginHorizontal: -18 }}>
-      {cards.map(x => <CardTile key={x.k} card={x} />)}
-    </ScrollView>
+    <Heading style={{ marginTop: t.wide ? 30 : 24 }} onMore={onMore}>{title}</Heading>
+    <TileRail>{shown.map(x => <CardTile key={x.k} card={x} width={t.width} />)}</TileRail>
   </>;
 }
 
 export default function Market() {
-  const d = useData(), c = useTheme();
+  const d = useData(), c = useTheme(), wide = useTiles().wide;
   const [kind, setKind] = useState('booster');
   const r = useMemo(() => {
     if (!d.cat) return null;
@@ -66,15 +68,15 @@ export default function Market() {
       {r.newest ? <Rail title={`Newest: ${r.newest.code || r.newest.name}`} cards={r.newestTop} onMore={() => router.push({ pathname: '/set/[id]', params: { id: r.newest.id } })} /> : null}
 
       <Heading style={{ marginTop: 28 }}>Sets</Heading>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 12, paddingHorizontal: 18 }} style={{ marginHorizontal: -18 }}>
+      <ChipRow pad={wide ? 0 : 18} style={wide ? { marginVertical: 12 } : { marginHorizontal: -18, paddingVertical: 12 }}>
         {kinds.map(([v, l]) => <Chip key={v} on={kind === v} onPress={() => setKind(v)}>{`${l} ${counts[v] || 0}`}</Chip>)}
-      </ScrollView>
+      </ChipRow>
       <Panel style={{ gap: 0 }}>
         <T mute size={12.5} w="semi">{(kinds.find(([v]) => v === kind) || [, 'Sets'])[1]} · {sets.length} {sets.length === 1 ? 'set' : 'sets'}</T>
-        <View style={{ marginTop: 4 }}>
+        <View style={[{ marginTop: 4 }, wide && { flexDirection: 'row', flexWrap: 'wrap', columnGap: 28 }]}>
           {sets.map(s => (
             <Pressable key={s.id} onPress={() => router.push({ pathname: '/set/[id]', params: { id: s.id } })} accessibilityRole="button"
-              style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, opacity: pressed ? 0.6 : 1 })}>
+              style={({ pressed, hovered }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, opacity: pressed ? 0.6 : hovered ? 0.8 : 1, ...(wide ? { flexBasis: '40%', flexGrow: 1, maxWidth: '50%' } : null) })}>
               <View style={{ width: 54, height: 36, borderRadius: 10, backgroundColor: c.soft, alignItems: 'center', justifyContent: 'center' }}>
                 <T w="bold" size={11.5} style={{ color: c.accent }} numberOfLines={1}>{s.code}</T>
               </View>

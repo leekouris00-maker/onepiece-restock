@@ -1,14 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import { FlatList, ScrollView, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { KINDS, useData } from '../../src/data';
 import { CardRow, SetRow } from '../../src/rows';
 import { Chip, Empty, SearchBar, T } from '../../src/ui';
-import { BAR_SPACE, Title, useTop } from '../../src/screen';
+import { BAR_SPACE, ChipRow, Title, useTop } from '../../src/screen';
+import { useWide } from '../../src/layout';
 
 const ORDER = ['all', 'booster', 'extra', 'premium', 'starter', 'promo', 'event', 'pre-release', 'other', 'mine'];
 
 export default function Search() {
-  const d = useData(), top = useTop();
+  const d = useData(), top = useTop(), wide = useWide(), px = wide ? 32 : 18;
   const [q, setQ] = useState('');
   const [kind, setKind] = useState('all');
   const s = q.trim().toLowerCase().replace(/\s+/g, ' ');
@@ -43,17 +44,18 @@ export default function Search() {
   const label = (chips.find(([v]) => v === kind) || [, ''])[1];
 
   return (
-    <FlatList data={searching ? results : sets} keyExtractor={x => (searching ? x.k : 'set:' + x.id)} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag"
-      style={{ width: '100%', maxWidth: 900, alignSelf: 'center' }}
+    <FlatList key={wide ? 'wide' : 'phone'} numColumns={wide ? 2 : 1} columnWrapperStyle={wide ? { paddingHorizontal: 14, gap: 12 } : undefined}
+      data={searching ? results : sets} keyExtractor={x => (searching ? x.k : 'set:' + x.id)} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag"
+      style={{ width: '100%', maxWidth: wide ? 1100 : 900, alignSelf: 'center' }}
       ListHeaderComponent={<View style={{ paddingTop: top, paddingBottom: 6, gap: 10 }}>
-        <View style={{ paddingHorizontal: 18, gap: 10 }}>
+        <View style={{ paddingHorizontal: px, gap: 10 }}>
           <Title>Search</Title>
           <SearchBar value={q} onChangeText={setQ} placeholder="Name or number: Sabo, P-105, OP13-120" />
         </View>
-        {d.cat ? <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 8, paddingHorizontal: 18 }}>
+        {d.cat ? <ChipRow pad={px}>
           {chips.map(([v, l]) => <Chip key={v} on={kind === v} onPress={() => setKind(v)}>{`${l} ${counts[v] || 0}`}</Chip>)}
-        </ScrollView> : null}
-        <T mute size={13} style={{ paddingHorizontal: 18 }}>
+        </ChipRow> : null}
+        <T mute size={13} style={{ paddingHorizontal: px }}>
           {searching
             ? `${results.length >= 300 ? 'First 300' : results.length} ${results.length === 1 ? 'match' : 'matches'}${kind === 'all' ? '' : ' in ' + label}, highest price first`
             : d.cat ? `${kind === 'all' ? 'Every set' : label} · ${sets.length} · tap a set to see its cards` : ''}
@@ -62,7 +64,10 @@ export default function Search() {
       ListEmptyComponent={!d.cat ? <Empty>{d.catError || 'Loading prices…'}</Empty>
         : searching ? <Empty>{kind === 'all' ? `Nothing matches “${q}”.` : `Nothing in ${label} matches “${q}”. Try All sets.`}</Empty>
         : <Empty>No sets here yet.</Empty>}
-      renderItem={({ item }) => (searching ? <CardRow card={item} showSet /> : <SetRow set={item} />)}
+      renderItem={({ item }) => {
+        const row = searching ? <CardRow card={item} showSet /> : <SetRow set={item} />;
+        return wide ? <View style={{ flex: 1, maxWidth: '50%' }}>{row}</View> : row;
+      }}
       contentContainerStyle={{ paddingBottom: BAR_SPACE }} />
   );
 }

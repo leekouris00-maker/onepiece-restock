@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Pressable, View, useWindowDimensions } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useData, clean } from '../../src/data';
@@ -7,13 +7,13 @@ import { useTheme } from '../../src/theme';
 import { Button, ChangePill, Empty, Panel, SearchBar, Select, T } from '../../src/ui';
 import { IconBtn, Screen, Title } from '../../src/screen';
 import { OwnedRow, OwnedTile } from '../../src/tiles';
+import { useLayout } from '../../src/layout';
 
 const SORTS = [['value', 'Highest value'], ['move', 'Biggest change'], ['name', 'Name'], ['new', 'Newest']];
 const SHOW = [['owned', 'Owned'], ['sold', 'Sold']];
 
 export default function Collection() {
   const d = useData(), c = useTheme();
-  const { width } = useWindowDimensions();
   const [q, setQ] = useState('');
   const [show, setShow] = useState('owned');
   const [grid, setGrid] = useState(false);
@@ -21,8 +21,10 @@ export default function Collection() {
   const [shut, setShut] = useState({});
   const sold = show === 'sold';
   useFocusEffect(useCallback(() => { if (d.session) d.refresh(); }, [d.session]));
-  const cols = width >= 1000 ? 6 : width >= 760 ? 5 : width >= 540 ? 4 : 3, gap = 12;
-  const tileW = Math.floor((Math.min(width, 1100) - 36 - 32 - gap * (cols - 1)) / cols);
+  // tiles fill the panel: about 130px each on a computer, 3–5 across on a phone
+  const { inner } = useLayout(), avail = inner - 32, gap = 12;
+  const cols = Math.max(3, Math.min(8, Math.floor((avail + gap) / (130 + gap))));
+  const tileW = Math.floor((avail - gap * (cols - 1)) / cols);
 
   const live = d.owned.filter(o => o.status !== 'sold');
   const tot = o => (d.unitAt(o, 0) || 0) * (Number(o.qty) || 1);
