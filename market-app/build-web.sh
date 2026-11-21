@@ -20,3 +20,10 @@ s=s.replace('</head>', tags+'</head>',1)
 s=s.replace('content="width=device-width, initial-scale=1, shrink-to-fit=no"','content="width=device-width, initial-scale=1, viewport-fit=cover"')
 open(p,'w').write(s); open('web-dist/404.html','w').write(s); open('web-dist/.nojekyll','w').write('')
 PY
+# Card scanner: the text reader (tesseract.js) runs on the phone; ship its files with the site so
+# nothing depends on another website. Only the LSTM engines are used (no legacy engine).
+mkdir -p web-dist/ocr
+cp node_modules/tesseract.js/dist/tesseract.min.js node_modules/tesseract.js/dist/worker.min.js web-dist/ocr/
+CORE=$(node -p "require('path').dirname(require.resolve('tesseract.js-core/package.json', { paths: [require('path').dirname(require.resolve('tesseract.js/package.json'))] }))")
+cp "$CORE"/tesseract-core-lstm.wasm.js "$CORE"/tesseract-core-simd-lstm.wasm.js "$CORE"/tesseract-core-relaxedsimd-lstm.wasm.js web-dist/ocr/
+cp node_modules/@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz web-dist/ocr/

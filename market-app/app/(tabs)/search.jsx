@@ -3,7 +3,8 @@ import { FlatList, View } from 'react-native';
 import { KINDS, useData } from '../../src/data';
 import { CardRow, SetRow } from '../../src/rows';
 import { Chip, Empty, SearchBar, T } from '../../src/ui';
-import { BAR_SPACE, ChipRow, Title, useTop } from '../../src/screen';
+import { BAR_SPACE, ChipRow, IconBtn, Title, useTop } from '../../src/screen';
+import { router } from 'expo-router';
 import { useWide } from '../../src/layout';
 
 const ORDER = ['all', 'booster', 'extra', 'premium', 'starter', 'promo', 'event', 'pre-release', 'other', 'mine'];
@@ -50,7 +51,8 @@ export default function Search() {
       ListHeaderComponent={<View style={{ paddingTop: top, paddingBottom: 6, gap: 10 }}>
         <View style={{ paddingHorizontal: px, gap: 10 }}>
           <Title>Search</Title>
-          <SearchBar value={q} onChangeText={setQ} placeholder="Name or number: Sabo, P-105, OP13-120" />
+          <SearchBar value={q} onChangeText={setQ} placeholder="Name or number: Sabo, P-105, OP13-120"
+            right={<IconBtn icon="scan" label="Scan a card" onPress={() => router.push('/scan')} />} />
         </View>
         {d.cat ? <ChipRow pad={px}>
           {chips.map(([v, l]) => <Chip key={v} on={kind === v} onPress={() => setKind(v)}>{`${l} ${counts[v] || 0}`}</Chip>)}

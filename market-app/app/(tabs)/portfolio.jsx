@@ -55,6 +55,7 @@ export default function Collection() {
       <Title right={<View style={{ flexDirection: 'row', gap: 8 }}>
         <IconBtn icon="refresh" label="Reload" onPress={() => { d.refresh(); d.loadCatalog(true); }} />
         <IconBtn icon={grid ? 'list' : 'grid-outline'} label={grid ? 'List view' : 'Grid view'} onPress={() => setGrid(!grid)} />
+        <IconBtn icon="scan" label="Scan a card" onPress={() => router.push('/scan')} />
         <IconBtn icon="add" label="Add item" onPress={() => router.push('/item/new')} />
       </View>}>Collection</Title>
 

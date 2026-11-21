@@ -56,7 +56,10 @@ export default function Home() {
           </View>
           <T head size={15} style={{ letterSpacing: 0.4 }}>ONE PIECE MARKET</T>
         </View>
-        <IconBtn icon="person-outline" label="Profile" onPress={() => router.push('/account')} />
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <IconBtn icon="scan" label="Scan a card" onPress={() => router.push('/scan')} />
+          <IconBtn icon="person-outline" label="Profile" onPress={() => router.push('/account')} />
+        </View>
       </View>}
 
       {signedOut ? (
