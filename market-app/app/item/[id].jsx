@@ -9,7 +9,7 @@ import { Button, CardArt, Chip, Choice, Empty, Field, T } from '../../src/ui';
 const num = v => (v === '' || v == null ? null : Number(String(v).replace(',', '.')));
 
 export default function ItemScreen() {
-  const { id, card: cardKey } = useLocalSearchParams();
+  const { id, card: cardKey, lang: langParam } = useLocalSearchParams();
   const d = useData(), c = useTheme();
   const { width } = useWindowDimensions();
   const existing = id !== 'new' ? d.owned.find(o => o.id === id) : null;
@@ -20,14 +20,14 @@ export default function ItemScreen() {
     return {
       name: o.name || (card ? clean(card.n) : ''), qty: String(o.qty || 1),
       kind: o.kind || (card ? (card.t === 'sealed' ? 'Sealed' : card.t === 'don' ? 'DON!!' : 'Card') : 'Sealed'),
-      cond: o.cond || (card && card.t !== 'sealed' ? 'Raw' : 'Sealed'), lang: o.lang || card?.lang || 'EN', group: o.group || '',
+      cond: o.cond || (card && card.t !== 'sealed' ? 'Raw' : 'Sealed'), lang: o.lang || langParam || card?.lang || 'EN', group: o.group || '',
       paid: o.paid ?? '', value: o.value ?? '', notes: o.notes || '', status: o.status || 'owned', soldFor: o.soldFor ?? '',
     };
   });
   const [msg, setMsg] = useState(''); const [confirm, setConfirm] = useState(false);
   if (id !== 'new' && !existing) return <Empty>{d.busy ? 'Loading…' : 'This item isn’t in your collection any more.'}</Empty>;
   const set = (k, v) => setF(x => ({ ...x, [k]: String(v) }));
-  const draft = { ...(existing || {}), card: card?.k || null, value: num(f.value) };
+  const draft = { ...(existing || {}), card: card?.k || null, value: num(f.value), lang: f.lang };
   const v = d.ownVal(draft), photo = existing ? d.ownPhoto(existing) : card ? d.photoOf(card.k) : null, artW = Math.min(150, width * 0.32);
   const run = async (fn, ok) => { try { setMsg(''); await fn(); if (ok) setMsg(ok); } catch (e) { setMsg(e.message || String(e)); } };
   const save = () => run(async () => {

@@ -167,10 +167,12 @@ export function DataProvider({ children }) {
   const ownVal = o => {
     if (o.value != null && o.value !== '') return { a: Number(o.value), src: 'your estimate' };
     const c = card(o.card); if (!c) return { a: null, src: 'no price yet' };
-    const cp = compOf(c.k); if (cp) return { a: cp.median * fx, src: 'eBay median' };
+    // TCGplayer only prices English cards; a Japanese copy uses Japanese-only eBay prices when the card is tracked that way
+    const jp = (o.lang || 'EN') !== 'EN' && !c.mine, w = watchOf(c.k), jpSearch = w?.lang === 'ja';
+    const cp = compOf(c.k); if (cp && jp === jpSearch) return { a: cp.median * fx, src: jp ? 'eBay median, Japanese' : 'eBay median' };
     const raw = salesOf(c.k).filter(s => (s.grade || 'Raw') === 'Raw').map(s => toUsd(s.price, s.cur));
     if (raw.length) return { a: median(raw) * fx, src: 'your logged sales' };
-    if (c.m != null) return { a: c.m * fx, src: 'TCGplayer' };
+    if (c.m != null) return { a: c.m * fx, src: jp ? 'TCGplayer English price, no Japanese price yet' : 'TCGplayer' };
     return { a: null, src: 'no price yet' };
   };
   const money = usd => {
@@ -184,7 +186,7 @@ export function DataProvider({ children }) {
   const priceAt = (c, a) => { if (!c || a <= 0 || !c.h.length) return c?.m ?? null; let v = null; for (const [ago, p] of c.h) if (ago >= a) v = p; return v ?? c.h[0][1] ?? c.m; };
   // one item's A$ value each, a given number of days ago
   const unitAt = (o, a) => {
-    const now = ownVal(o); if (!a || now.src !== 'TCGplayer') return now.a;
+    const now = ownVal(o); if (!a || !now.src.startsWith('TCGplayer')) return now.a;
     const p = priceAt(card(o.card), a); return p == null ? now.a : p * fx;
   };
   // total collection value (A$) for each of the last `days` days, oldest first

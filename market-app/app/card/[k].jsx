@@ -61,8 +61,11 @@ export default function CardScreen() {
 
       <Section title="My collection">
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          {mine.map(o => <Chip key={o.id} onPress={() => router.push({ pathname: '/item/[id]', params: { id: o.id } })}>{(o.group || 'Other') + ' ×' + (o.qty || 1)}</Chip>)}
-          <Chip on onPress={() => router.push({ pathname: '/item/[id]', params: { id: 'new', card: card.k } })}>{n ? 'Add more' : 'Add to my collection'}</Chip>
+          {mine.map(o => <Chip key={o.id} onPress={() => router.push({ pathname: '/item/[id]', params: { id: o.id } })}>{(o.group || 'Other') + ' ×' + (o.qty || 1) + ' · ' + (o.lang || 'EN')}</Chip>)}
+          {card.mine
+            ? <Chip on onPress={() => router.push({ pathname: '/item/[id]', params: { id: 'new', card: card.k } })}>{n ? 'Add more' : 'Add to my collection'}</Chip>
+            : [['EN', 'English'], ['JP', 'Japanese']].map(([v, l]) => (
+              <Chip key={v} on onPress={() => router.push({ pathname: '/item/[id]', params: { id: 'new', card: card.k, lang: v } })}>{`Add ${l} copy`}</Chip>))}
         </View>
       </Section>
 
@@ -84,9 +87,11 @@ export default function CardScreen() {
                 </Pressable>
               ))}
             </>}
-        <Field label="eBay search used" value={q} onChangeText={setQ} autoCapitalize="none" />
-        <Choice label="Language" value={lang} onChange={setLang} options={[['', 'Any'], ['ja', 'Japanese only']]} />
-        <Choice label="Condition" value={graded} onChange={setGraded} options={[['false', 'Raw only'], ['true', 'Graded only'], ['any', 'Any']]} />
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          <Field label="eBay search used" value={q} onChangeText={setQ} autoCapitalize="none" style={{ flexBasis: '100%' }} />
+          <Choice label="Language" value={lang} onChange={setLang} options={[['', 'Any'], ['ja', 'Japanese only']]} />
+          <Choice label="Condition" value={graded} onChange={setGraded} options={[['false', 'Raw only'], ['true', 'Graded only'], ['any', 'Any']]} />
+        </View>
         <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
           <Button onPress={() => run(() => d.setTrack(card.k, { q: q.trim(), lang: lang || null, graded: graded === 'any' ? null : graded === 'true' }), w ? 'Search saved' : 'Tracking this card')}>{w ? 'Save search' : 'Track eBay sold prices'}</Button>
           {w ? <Button ghost onPress={() => run(() => d.untrack(card.k), 'Stopped tracking')}>Stop tracking</Button> : null}
