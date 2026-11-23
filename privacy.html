@@ -23,7 +23,7 @@
 <main>
   <a class="back" href="./">← One Piece Market</a>
   <h1>Privacy policy</h1>
-  <p class="muted">Last updated 22 November 2026</p>
+  <p class="muted">Last updated 24 November 2026</p>
 
   <div class="box">
     <p><strong>In short:</strong> the app keeps only what you put into it, so your collection follows you between devices. There are no ads, no analytics or tracking, and nothing is sold or shared for marketing. Card scans are read on your phone and never uploaded. You can delete your account and everything in it from the app at any time.</p>
@@ -36,14 +36,17 @@
   <p>Only if you create an account:</p>
   <ul>
     <li><strong>Your email address and password.</strong> Used to sign you in. The password is stored hashed by our login provider; we can't see it.</li>
-    <li><strong>What you add to the app:</strong> collection items (names, quantities, prices you paid, your own values, groups and notes), sales you log, your own cards, the eBay searches you track, and photos you choose to add.</li>
+    <li><strong>What you add to the app:</strong> collection items (names, quantities, prices you paid, your own values, groups, notes, and the date you sold something), sales you log, your own cards, the eBay searches you track, your watchlist and price alerts, and photos you choose to add.</li>
+    <li><strong>Phone notifications, if you turn them on.</strong> Your browser gives the app a notification address for your device (a link to Apple's, Google's or Mozilla's notification service plus encryption keys) and we store it with the type of device (for example "iPhone"). It's used only to send your price alerts. Turning notifications off, or deleting your account, removes it.</li>
+    <li><strong>Links you share.</strong> If you share a group of your collection, anyone with that link can see the cards in that group (names, card numbers, versions, quantities, condition and language) with today's prices. They can't see what you paid, your notes, your other groups or who you are. Stopping sharing in the app switches the link off.</li>
   </ul>
-  <p>Without an account you can browse prices, search and scan; nothing about you is stored on our side.</p>
+  <p><strong>Feedback you send</strong> (signed in or not): your message, the page you were on, your device type and screen size, a screenshot if you attach one (signed-in only), and your email address if you're signed in. It's only used to fix problems and improve the app.</p>
+  <p>Without an account you can browse prices, search and scan; nothing about you is stored on our side unless you send feedback.</p>
 
   <h2>What stays on your phone</h2>
   <ul>
     <li><strong>The card scanner.</strong> The camera picture is read on your device to find the card number and name. Camera images are not saved or sent anywhere. The app only uses the camera while the scanner is open.</li>
-    <li><strong>Settings and cached prices,</strong> like your currency choice and today's price list, so the app opens quickly. Your sign-in is also remembered on the device until you sign out.</li>
+    <li><strong>Settings and saved copies,</strong> like your currency choice, today's price list, a copy of your collection (so it opens quickly and works without signal), recent searches, a card stack you haven't added yet, and calculator settings. Your sign-in is also remembered on the device until you sign out. Clearing the website's data in your browser removes all of these.</li>
   </ul>
 
   <h2>Who handles the data</h2>
@@ -51,14 +54,16 @@
     <li><strong>Supabase</strong> stores your account and data, in its Sydney (Australia) region. Each account's rows and photos can only be read by that account.</li>
     <li><strong>GitHub Pages</strong> hosts the app and the daily price files. Like any website host, it may keep standard server logs (such as IP addresses).</li>
     <li><strong>TCGplayer's image server</strong> supplies card pictures, so it sees requests for them from your device.</li>
-    <li><strong>CompsAPI</strong> receives the eBay search text for tracked cards (for example "one piece OP13-120 Sabo") to look up recent sold prices. It receives no personal details.</li>
+    <li><strong>CompsAPI</strong> receives the eBay search text for tracked cards and cards people own (for example "one piece OP13-120 Sabo") to look up recent sold prices. It receives no personal details.</li>
+    <li><strong>GitHub Actions</strong> runs the morning jobs: it reads tracked cards, watchlists, price alerts and notification addresses from the database to look up eBay prices and send alerts. Nothing is kept there after a job finishes, apart from the public price files.</li>
+    <li><strong>Apple, Google or Mozilla's notification services</strong> deliver phone notifications. The notification text (a card name and price) is encrypted on its way to your device.</li>
   </ul>
 
   <h2>How long it's kept</h2>
   <p>Your data is kept while you have an account. Items you remove are deleted straight away. Deleting your account removes everything.</p>
 
   <h2>Deleting your account</h2>
-  <p>In the app, go to <strong>Profile → Delete my account</strong>. This immediately and permanently deletes your login, collection, logged sales, own cards, tracked searches and photos. If you can't sign in, ask using the contact link below and it will be done by hand.</p>
+  <p>In the app, go to <strong>Profile → Delete my account</strong>. This immediately and permanently deletes your login, collection, logged sales, own cards, tracked searches, watchlist and alerts, notification sign-ups, shared links and photos. Feedback you sent is kept, but no longer linked to your account; ask if you'd like it removed too. If you can't sign in, ask using the contact options below and it will be done by hand.</p>
 
   <h2>Children</h2>
   <p>The app isn't directed at children under 13, and accounts shouldn't be created for them.</p>
@@ -67,7 +72,7 @@
   <p>If this policy changes, the date at the top changes too. Significant changes will be noted in the app.</p>
 
   <h2>Contact</h2>
-  <p>Questions or requests: <a href="https://github.com/leekouris00-maker/onepiece-restock/issues">open an issue on the project's GitHub page</a>.</p>
+  <p>Questions or requests: use <strong>Profile → Report a problem or idea</strong> in the app, or <a href="https://github.com/leekouris00-maker/onepiece-restock/issues">open an issue on the project's GitHub page</a>.</p>
 </main>
 </body>
 </html>
