@@ -114,11 +114,18 @@ def backfill(store, hist, keys, every=7, limit=200):
     for day in todo:
         name = f"prices-{day.isoformat()}.ppmd.7z"
         arc = os.path.join(tmp, name)
-        try:
-            fetch(f"https://tcgcsv.com/archive/tcgplayer/{name}", arc)
-        except Exception as e:  # noqa: BLE001
-            print(f"  ! {day}: {e}")
-            time.sleep(0.5)
+        ok = False
+        for wait in (0, 30, 90):                     # back off politely if the site says "too many requests"
+            time.sleep(wait)
+            try:
+                fetch(f"https://tcgcsv.com/archive/tcgplayer/{name}", arc)
+                ok = True
+                break
+            except Exception as e:  # noqa: BLE001
+                print(f"  ! {day}: {e}")
+                if "429" not in str(e):
+                    break
+        if not ok:
             continue
         out = os.path.join(tmp, "x")
         subprocess.run(["7z", "x", "-y", f"-o{out}", arc, f"-ir!*/{cat}/*"], check=False, capture_output=True)
@@ -149,7 +156,7 @@ def backfill(store, hist, keys, every=7, limit=200):
         done.add(day.isoformat())
         n += 1
         print(f"  {day}: {found} prices")
-        time.sleep(0.2)
+        time.sleep(1.5)
     shutil.rmtree(tmp, ignore_errors=True)
     os.makedirs(OUT, exist_ok=True)
     open(DONE, "w").write("\n".join(sorted(done)) + "\n")
