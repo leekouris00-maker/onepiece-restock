@@ -4,6 +4,7 @@ import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import { buildIndex } from './find';
 
 const RAW = 'https://raw.githubusercontent.com/leekouris00-maker/onepiece-restock/master/';
 const SB_URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -24,29 +25,34 @@ export const clean = n => String(n || '').replace(/\s*\((?:\d{3})\)/, '');
 export const tcgImage = (k, size = 200) => (k && k.startsWith('t:') ? `https://tcgplayer-cdn.tcgplayer.com/product/${k.slice(2)}_${size}w.jpg` : null);
 export const median = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
 
+// Prices: the saved copy shows at once (and offline); a fresh copy is fetched behind it.
+// Returns [data, failed] where failed = the network fetch didn't work and the saved copy was used.
 async function loadJSON(name, fresh) {
   const key = 'cache:' + name;
   if (!fresh) {
     const c = await AsyncStorage.getItem(key).catch(() => null);
-    if (c) { refreshLater(name); try { return JSON.parse(c); } catch {} }
+    if (c) { refreshLater(name); try { return [JSON.parse(c), false]; } catch {} }
   }
   try {
     const r = await fetch(RAW + name + '?h=' + Math.floor(Date.now() / 36e5));
     if (!r.ok) throw new Error(String(r.status));
     const txt = await r.text();
     AsyncStorage.setItem(key, txt).catch(() => {});
-    return JSON.parse(txt);
+    return [JSON.parse(txt), false];
   } catch (e) {
     const c = await AsyncStorage.getItem(key).catch(() => null);
-    return c ? JSON.parse(c) : null;
+    return [c ? JSON.parse(c) : null, true];
   }
 }
 const pending = {};
+let onFresh = null;                       // set by the provider: swap in newer prices when they arrive
 function refreshLater(name) {
   if (pending[name]) return;
   pending[name] = fetch(RAW + name + '?h=' + Math.floor(Date.now() / 36e5)).then(r => (r.ok ? r.text() : null))
-    .then(t => t && AsyncStorage.setItem('cache:' + name, t)).catch(() => {});
+    .then(t => { if (t) { AsyncStorage.setItem('cache:' + name, t); onFresh && onFresh(name, t); } }).catch(() => {});
 }
+
+const isOnline = () => (typeof navigator === 'undefined' || navigator.onLine !== false);
 
 // database rows <-> app objects
 const fromOwned = r => ({ id: r.id, card: r.card, name: r.name, qty: r.qty, kind: r.kind, cond: r.cond, lang: r.lang, group: r.grp || 'Other', paid: r.paid, value: r.value, notes: r.notes || '', status: r.status, soldFor: r.sold_for, added: r.added, num: r.num, photo: r.photo });
@@ -70,16 +76,35 @@ export function DataProvider({ children }) {
   const [photos, setPhotos] = useState({});   // card key -> storage path
   const [urls, setUrls] = useState({});       // storage path -> signed url
   const [busy, setBusy] = useState(false);
+  const [stale, setStale] = useState(false);        // prices came from the saved copy because the update failed
+  const [offline, setOffline] = useState(!isOnline());
+  const [cachedAt, setCachedAt] = useState(null);   // your collection is the saved copy from this time
+  const [favs, setFavs] = useState([]);             // watchlist: { card, below, above, created_at }
+  const [favLocal, setFavLocal] = useState(false);  // watchlist table not in the database yet: kept on this device
 
   // prices
-  const loadCatalog = useCallback(async fresh => {
-    const [c, e] = await Promise.all([loadJSON('market_catalog.json', fresh), loadJSON('ebay_comps.json', fresh)]);
-    if (!c) { setCatError('Prices could not load. Check your connection and pull down to try again.'); return; }
-    setCatError(null);
+  const applyCat = useCallback(c => {
     const list = c.cards.map(([id, g, num, n, r, t, m, l, h]) => ({ k: 't:' + id, g, num, n, r, t, m, l, h: h || [] }));
     setCat({ meta: c.meta, sets: c.sets, byId: Object.fromEntries(c.sets.map(s => [s.id, s])), list, byKey: Object.fromEntries(list.map(x => [x.k, x])) });
-    setComps((e && e.items) || {});
   }, []);
+  const loadCatalog = useCallback(async fresh => {
+    const [[c, f1], [e, f2]] = await Promise.all([loadJSON('market_catalog.json', fresh), loadJSON('ebay_comps.json', fresh)]);
+    setStale(f1 || f2);
+    if (!c) { setCatError('Prices could not load. Check your connection and pull down to try again.'); return; }
+    setCatError(null);
+    applyCat(c);
+    setComps((e && e.items) || {});
+  }, [applyCat]);
+  useEffect(() => {
+    onFresh = (name, t) => { try { const j = JSON.parse(t); if (name === 'market_catalog.json') applyCat(j); else setComps(j.items || {}); setStale(false); } catch {} };
+    return () => { onFresh = null; };
+  }, [applyCat]);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.addEventListener) return undefined;
+    const on = () => { setOffline(false); loadCatalog(true); }, off = () => setOffline(true);
+    window.addEventListener('online', on); window.addEventListener('offline', off);
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
+  }, [loadCatalog]);
   useEffect(() => { loadCatalog(false); AsyncStorage.getItem('cur').then(v => v && setCurState(v)).catch(() => {}); }, [loadCatalog]);
   const setCur = v => { setCurState(v); AsyncStorage.setItem('cur', v).catch(() => {}); };
 
@@ -100,10 +125,21 @@ export function DataProvider({ children }) {
 
   const lastLoad = useRef(0);
   const [loadError, setLoadError] = useState('');
+  const [loaded, setLoaded] = useState(false);        // first load of this account done (saved copy or fresh)
+  const uid = session?.user?.id;
+  const cacheKey = uid ? 'mine:' + uid : null;
+  const loadFavs = useCallback(async () => {
+    const local = async () => { setFavLocal(true); try { setFavs(JSON.parse(await AsyncStorage.getItem('favs:' + (uid || 'guest')) || '[]')); } catch { setFavs([]); } };
+    if (!supabase || !session) return local();
+    const r = await supabase.from('watchlist').select('*');
+    if (r.error) return local();                       // table not created yet (run supabase/watchlist.sql)
+    setFavLocal(false); setFavs(r.data || []);
+  }, [session, uid]);
   const refresh = useCallback(async () => {
     if (!supabase || !session) return;
     setBusy(true);
     try {
+      if (!isOnline()) throw new Error('offline');
       const [o, s, c, w, p] = await Promise.all([
         supabase.from('owned').select('*'), supabase.from('sales').select('*'), supabase.from('cards').select('*'),
         supabase.from('watch').select('*'), supabase.from('photos').select('*'),
@@ -114,23 +150,70 @@ export function DataProvider({ children }) {
       const ow = (o.data || []).map(fromOwned);
       setOwned(ow); setSales(s.data || []); setCards((c.data || []).map(fromCard)); setWatch(w.data || []);
       const pm = Object.fromEntries((p.data || []).map(r => [r.card, r.path]));
-      setPhotos(pm);
+      setPhotos(pm); setCachedAt(null); setLoaded(true);
+      AsyncStorage.setItem(cacheKey, JSON.stringify({ at: new Date().toISOString(), o: o.data || [], s: s.data || [], c: c.data || [], w: w.data || [], p: p.data || [] })).catch(() => {});
       await signUrls([...Object.values(pm), ...ow.map(x => x.photo)]);
-    } catch (e) { setLoadError(e.message || String(e)); } finally { setBusy(false); lastLoad.current = Date.now(); }
-  }, [session, signUrls]);
-  useEffect(() => { if (session) refresh(); else { setOwned([]); setSales([]); setCards([]); setWatch([]); setPhotos({}); setLoadError(''); } }, [session, refresh]);
+      loadFavs();
+    } catch (e) {
+      const msg = e.message || String(e);
+      if (msg === 'offline' || /fetch|network/i.test(msg)) { setOffline(!isOnline() || offline); setLoadError(''); }
+      else setLoadError(msg);
+    } finally { setBusy(false); lastLoad.current = Date.now(); }
+  }, [session, signUrls, cacheKey, loadFavs]);
+  // the saved copy first, so the collection shows instantly and works without signal
+  useEffect(() => {
+    if (!cacheKey) return;
+    AsyncStorage.getItem(cacheKey).then(t => {
+      if (!t) return;
+      const m = JSON.parse(t);
+      setOwned(cur => (cur.length ? cur : (m.o || []).map(fromOwned)));
+      setSales(cur => (cur.length ? cur : m.s || [])); setCards(cur => (cur.length ? cur : (m.c || []).map(fromCard)));
+      setWatch(cur => (cur.length ? cur : m.w || [])); setPhotos(cur => (Object.keys(cur).length ? cur : Object.fromEntries((m.p || []).map(r => [r.card, r.path]))));
+      setCachedAt(m.at); setLoaded(true);
+    }).catch(() => {});
+  }, [cacheKey]);
+  useEffect(() => { if (session) refresh(); else { setOwned([]); setSales([]); setCards([]); setWatch([]); setPhotos({}); setLoadError(''); setLoaded(false); loadFavs(); } }, [session, refresh]);
   // reload whenever the app comes back to the front (pull-to-refresh doesn't exist in the web version)
   useEffect(() => {
     const sub = AppState.addEventListener('change', st => { if (st === 'active' && Date.now() - lastLoad.current > 5000) refresh(); });
     return () => sub.remove();
   }, [refresh]);
 
-  const need = () => { if (!supabase) throw new Error('Saving is not set up in this build yet.'); if (!session) throw new Error('Sign in first (Account tab).'); };
+  const need = () => {
+    if (!supabase) throw new Error('Saving is not set up in this build yet.');
+    if (!session) throw new Error('Sign in first (Profile tab).');
+    if (!isOnline()) throw new Error('You’re offline. Changes can be saved once you have signal again.');
+  };
+  const saveCache = (o) => cacheKey && AsyncStorage.getItem(cacheKey).then(t => { const m = t ? JSON.parse(t) : {}; m.o = o.map(toOwned); return AsyncStorage.setItem(cacheKey, JSON.stringify(m)); }).catch(() => {});
+  useEffect(() => { if (loaded && cacheKey && !busy) saveCache(owned); }, [owned]);
   const check = r => { if (r.error) throw new Error(r.error.message); return r; };
 
   const api = {
     async saveOwned(o) { need(); const row = toOwned(o); check(await supabase.from('owned').upsert(row)); setOwned(a => [...a.filter(x => x.id !== o.id), fromOwned(row)]); },
+    // several at once (bulk edits, scanned stacks, imports): one request
+    async saveMany(list) {
+      need(); if (!list.length) return;
+      const rows = list.map(toOwned);
+      for (let i = 0; i < rows.length; i += 200) check(await supabase.from('owned').upsert(rows.slice(i, i + 200)));
+      const ids = new Set(rows.map(r => r.id));
+      setOwned(a => [...a.filter(x => !ids.has(x.id)), ...rows.map(fromOwned)]);
+    },
     async removeOwned(id) { need(); check(await supabase.from('owned').delete().eq('id', id)); setOwned(a => a.filter(x => x.id !== id)); },
+    async removeMany(ids) { need(); if (!ids.length) return; check(await supabase.from('owned').delete().in('id', ids)); const s = new Set(ids); setOwned(a => a.filter(x => !s.has(x.id))); },
+    // watchlist + price alerts (A$). Kept in the database when supabase/watchlist.sql has been run, else on this device.
+    async setFav(card, f) {
+      const row = { card, below: f?.below ?? null, above: f?.above ?? null, created_at: favs.find(x => x.card === card)?.created_at || new Date().toISOString() };
+      const next = [...favs.filter(x => x.card !== card), row];
+      if (!favLocal && supabase && session) { need(); check(await supabase.from('watchlist').upsert(row, { onConflict: 'user_id,card' })); }
+      else await AsyncStorage.setItem('favs:' + (uid || 'guest'), JSON.stringify(next));
+      setFavs(next);
+    },
+    async unFav(card) {
+      const next = favs.filter(x => x.card !== card);
+      if (!favLocal && supabase && session) { need(); check(await supabase.from('watchlist').delete().eq('card', card)); }
+      else await AsyncStorage.setItem('favs:' + (uid || 'guest'), JSON.stringify(next));
+      setFavs(next);
+    },
     async addSale(s) { need(); const row = { id: newId(), ...s }; check(await supabase.from('sales').insert(row)); setSales(a => [...a, row]); },
     async removeSale(id) { need(); check(await supabase.from('sales').delete().eq('id', id)); setSales(a => a.filter(x => x.id !== id)); },
     async addCard(c) { need(); const row = { id: newId(), lang: c.lang, num: c.num, name: c.name, set_name: c.set, rar: c.rar, note: c.note }; check(await supabase.from('cards').insert(row)); const card = fromCard(row); setCards(a => [...a, card]); return card; },
@@ -154,7 +237,7 @@ export function DataProvider({ children }) {
         throw new Error(r.error.message);
       }
       await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
-      for (const k of ['owned', 'sales', 'cards', 'watch', 'photos']) await AsyncStorage.removeItem(k).catch(() => {});
+      for (const k of ['owned', 'sales', 'cards', 'watch', 'photos', 'mine:' + uid, 'favs:' + uid]) await AsyncStorage.removeItem(k).catch(() => {});
       setOwned([]); setSales([]); setCards([]); setWatch([]); setPhotos({});
     },
     async untrack(card) { need(); check(await supabase.from('watch').delete().eq('card', card)); setWatch(a => a.filter(x => x.card !== card)); },
@@ -178,6 +261,13 @@ export function DataProvider({ children }) {
   // lookups
   const custom = useMemo(() => cards.map(c => ({ k: 'u:' + c.id, id: c.id, g: 'mine:' + (c.set || 'Other'), num: c.num || '', n: c.name || '', r: c.rar || '', t: 'card', m: null, l: null, h: [], lang: c.lang, note: c.note, mine: true, setName: c.set })), [cards]);
   const card = k => (k && k.startsWith('u:') ? custom.find(c => c.k === k) : cat?.byKey[k]) || null;
+  // card number -> every version (TCGplayer + your own cards), and the search index
+  const byNum = useMemo(() => {
+    const m = new Map();
+    for (const x of [...(cat?.list || []), ...custom]) { const n = String(x.num || '').toUpperCase(); if (n) (m.get(n) || m.set(n, []).get(n)).push(x); }
+    return m;
+  }, [cat, custom]);
+  const index = useMemo(() => (cat ? buildIndex([...custom, ...cat.list], cat) : []), [cat, custom]);
   const fx = cat?.meta?.fx || 1.5;
   const watchOf = k => watch.find(w => w.card === k) || null;
   const compOf = k => { const w = watchOf(k), c = comps[k]; return w && c && !c.none && c.median != null ? c : null; };
@@ -217,8 +307,38 @@ export function DataProvider({ children }) {
     return out;
   };
 
+  // Best price to compare against for a card (US$): eBay sold median when there are sales, else TCGplayer market
+  const refPrice = c => {
+    if (!c) return { usd: null, src: '', n: null };
+    const e = comps[c.k];
+    // an eBay median 4× away from TCGplayer is nearly always a search catching another version: don't trust it
+    const off = e && e.median != null && c.m != null && c.m >= 3 && (e.median < c.m / 4 || e.median > c.m * 4);
+    if (e && !e.none && e.median != null && e.count >= 3 && !off) return { usd: e.median, src: 'eBay sold median', n: e.count };
+    if (c.m != null) return { usd: c.m, src: 'TCGplayer market', n: null };
+    if (e && !e.none && e.median != null && !off) return { usd: e.median, src: 'eBay sold median', n: e.count };
+    return { usd: null, src: '', n: null };
+  };
+  // How many sales an owned item's value rests on (null = not from sales)
+  const valCount = o => {
+    const v = ownVal(o); const c = card(o.card);
+    if (!c) return null;
+    if (v.src.startsWith('eBay')) return comps[c.k]?.count ?? null;
+    if (v.src === 'your logged sales') return salesOf(c.k).filter(s => (s.grade || 'Raw') === 'Raw').length;
+    return null;
+  };
+  const isFav = k => favs.some(f => f.card === k);
+  // Watchlist cards whose price crossed an alert you set
+  const alerts = useMemo(() => favs.map(f => {
+    const c = card(f.card); const p = refPrice(c).usd; if (p == null) return null;
+    const a = p * fx;
+    if (f.below != null && a <= Number(f.below)) return { f, c, a, dir: 'below', at: Number(f.below) };
+    if (f.above != null && a >= Number(f.above)) return { f, c, a, dir: 'above', at: Number(f.above) };
+    return null;
+  }).filter(Boolean), [favs, cat, comps, cards, fx]);
+
   const value = {
-    cat, catError, comps, loadCatalog, cur, setCur, session, authReady, configured: !!supabase, busy, refresh, loadError,
+    cat, catError, comps, loadCatalog, cur, setCur, session, authReady, configured: !!supabase, busy, refresh, loadError, loaded,
+    stale, offline, cachedAt, byNum, index, favs, favLocal, isFav, alerts, refPrice, valCount,
     owned, sales, cards, watch, custom, card, fx, watchOf, compOf, salesOf, toUsd, photoOf, ownPhoto, ownVal, money, aud, move, priceAt, unitAt, series, ...api,
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -5,10 +5,14 @@ import { Platform, Pressable, ScrollView, TextInput, View, useWindowDimensions }
 import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { clean, useData } from '../src/data';
+import { clean, newId, today, useData } from '../src/data';
 import { F, useTheme } from '../src/theme';
-import { CardArt, T } from '../src/ui';
+import { CardArt, Choice, Field, T } from '../src/ui';
 import { decide, findCodes, getReader, grab, nameIndex } from '../src/ocr';
+import { versionTag } from '../src/find';
+import { haptic } from '../src/haptic';
+import { usePref, getPref, setPref } from '../src/prefs';
+import { toast } from '../src/toast';
 
 const CARD = 63 / 88;
 
@@ -27,8 +31,22 @@ export default function Scan() {
   const [typed, setTyped] = useState('');
   const [busyPhoto, setBusyPhoto] = useState(false);
   const [stuck, setStuck] = useState(false);            // nothing read for a while: show tips
+  const [stack, setStack] = usePref('scanStack', false);   // stack mode: keep scanning, collect cards in a tray
+  const [tray, setTray] = usePref('scanTray', []);         // [{ k, qty }]
+  const [review, setReview] = useState(false);
+  const [flash, setFlash] = useState(null);                // "Added …" banner in stack mode
+  const [torch, setTorch] = useState(null);                // null = no torch on this camera, else on/off
+  const stackRef = useRef(stack); stackRef.current = stack;
+  const lastAdd = useRef({ code: '', t: 0 });
   const paused = useRef(false);
-  paused.current = !!found || typing || busyPhoto;
+  paused.current = !!found || typing || busyPhoto || review;
+
+  const addToTray = useCallback((x, n = 1) => {
+    setTray(t => { const cur = t || [], i = cur.findIndex(y => y.k === x.k); return i >= 0 ? cur.map((y, j) => (j === i ? { ...y, qty: y.qty + n } : y)) : [...cur, { k: x.k, qty: n }]; });
+    haptic('success');
+    setFlash({ text: `${x.num} · ${versionTag(d.cat, x)}`, price: x.mine ? null : x.m, id: Date.now() });
+  }, [d.cat]);
+  useEffect(() => { if (!flash) return undefined; const t = setTimeout(() => setFlash(f => (f && f.id === flash.id ? null : f)), 1800); return () => clearTimeout(t); }, [flash]);
 
   // Where the card outline sits on screen (also used to know which part of the picture to read)
   const top = ins.top + 64, bottom = ins.bottom + 150;
@@ -53,15 +71,21 @@ export default function Scan() {
   namesRef.current = names;
 
   // show the results for one number, or for several (a card name printed on more than one card)
-  const show = useCallback((codes, also = [], title = null) => {
+  const show = useCallback((codes, also = [], title = null, auto = false) => {
     codes = [].concat(codes);
     const list = codes.flatMap(k => byNumRef.current.get(k) || []).sort((a, b) => (b.m ?? -1) - (a.m ?? -1));
     const label = title || codes[0];
+    if (auto && stackRef.current) {
+      if (lastAdd.current.code === label && Date.now() - lastAdd.current.t < 4000) return;   // same card still in view
+      lastAdd.current = { code: label, t: Date.now() };
+      if (list.length === 1) { addToTray(list[0]); setSeen(''); return; }
+    }
+    haptic(auto ? 'success' : 'light');
     setFound({ code: label, codes, list, also });
     setSeen('');
     picks.current[label] = codes;
     setHistory(h => [label, ...h.filter(x => x !== label)].slice(0, 12));
-  }, []);
+  }, [addToTray]);
   const picks = useRef({});
 
   // camera on, camera off when leaving
@@ -77,6 +101,7 @@ export default function Scan() {
         v.setAttribute('playsinline', ''); v.muted = true;
         await v.play().catch(() => {});
         try { await s.getVideoTracks()[0].applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch {}
+        try { const cap = s.getVideoTracks()[0].getCapabilities?.(); if (cap && cap.torch) setTorch(false); } catch {}
         setCam('on');
       })
       .catch(e => setCam(e && e.name === 'NotAllowedError' ? 'blocked' : 'none'));
@@ -128,7 +153,7 @@ export default function Scan() {
         const got = decide(recent, texts, byNumRef.current, namesRef.current);
         if (got && !paused.current) {
           recent.length = 0; texts.length = 0;
-          show(got.hits, got.also, got.title);
+          show(got.hits, got.also, got.title, true);
         } else if (codes[0]) setSeen(codes[0]);
       } catch {}
       setTimeout(tick, 80);
@@ -177,6 +202,7 @@ export default function Scan() {
     : busyPhoto ? 'Reading your photo…'
     : seen ? `Reading… ${seen}?`
     : stuck ? 'Still looking. Move closer so the number in the dashed box is bigger, and tilt away from glare.'
+    : stack ? 'Stack mode: hold each card in the outline. It’s added when read, then show the next.'
     : 'Fill the outline with the card, number in the dashed box. Hold still.';
 
   const pill = { flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 16, height: 44, borderRadius: 22, backgroundColor: 'rgba(26,32,28,0.92)' };
@@ -202,9 +228,26 @@ export default function Scan() {
           style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(26,32,28,0.92)' }}>
           <Ionicons name="close" size={24} color={c.ink} />
         </Pressable>
-        <T w="bold" size={16}>Scan a card</T>
-        <View style={{ width: 44 }} />
+        <T w="bold" size={16}>{stack ? 'Scan a stack' : 'Scan a card'}</T>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          {torch != null ? <Pressable onPress={async () => { try { await stream.current.getVideoTracks()[0].applyConstraints({ advanced: [{ torch: !torch }] }); setTorch(!torch); } catch {} }}
+            accessibilityLabel={torch ? 'Turn the light off' : 'Turn the light on'} hitSlop={6}
+            style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: torch ? c.accent : 'rgba(26,32,28,0.92)' }}>
+            <Ionicons name={torch ? 'flashlight' : 'flashlight-outline'} size={20} color={torch ? c.onAccent : c.ink} />
+          </Pressable> : null}
+          <Pressable onPress={() => { setStack(!stack); haptic(); }} accessibilityRole="switch" accessibilityState={{ checked: !!stack }} accessibilityLabel="Stack mode: scan many cards in a row"
+            style={{ height: 44, paddingHorizontal: 14, borderRadius: 22, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: stack ? c.accent : 'rgba(26,32,28,0.92)' }}>
+            <Ionicons name="layers-outline" size={18} color={stack ? c.onAccent : c.ink} />
+            <T w="bold" size={13.5} style={{ color: stack ? c.onAccent : c.ink }}>Stack</T>
+          </Pressable>
+        </View>
       </View>
+      {flash ? <View pointerEvents="none" style={{ position: 'absolute', top: fy + fh / 2 - 34, left: 0, right: 0, alignItems: 'center' }}>
+        <View style={{ paddingHorizontal: 18, paddingVertical: 10, borderRadius: 16, backgroundColor: c.accent, alignItems: 'center', maxWidth: '86%' }}>
+          <T w="bold" size={15} style={{ color: c.onAccent }} numberOfLines={1}>✓ {flash.text}</T>
+          {flash.price != null ? <T w="semi" size={13} style={{ color: c.onAccent }}>{d.money(flash.price)} · added to stack</T> : null}
+        </View>
+      </View> : null}
 
       {/* status + recent scans + buttons */}
       <View style={{ position: 'absolute', left: 0, right: 0, bottom: ins.bottom + 18, alignItems: 'center', gap: 12, paddingHorizontal: 16 }}>
@@ -215,6 +258,7 @@ export default function Scan() {
           {history.map(h => <Pressable key={h} onPress={() => show(picks.current[h] || h, [], picks.current[h] && picks.current[h].length > 1 ? h : null)} style={{ paddingHorizontal: 12, height: 32, borderRadius: 16, justifyContent: 'center', backgroundColor: 'rgba(26,32,28,0.92)' }}>
             <T size={12.5} w="semi">{h}</T></Pressable>)}
         </ScrollView> : null}
+        {tray && tray.length ? <TrayBar tray={tray} onOpen={() => setReview(true)} /> : null}
         <View style={{ flexDirection: 'row', gap: 10 }}>
           <Pressable onPress={() => fileIn.current && fileIn.current.click()} style={pill} accessibilityRole="button">
             <Ionicons name="image-outline" size={18} color={c.ink} /><T w="semi" size={14}>Photo</T>
@@ -238,7 +282,13 @@ export default function Scan() {
       </Sheet> : null}
 
       {found ? <Sheet onClose={() => setFound(null)} ins={ins} tall>
-        <Results found={found} onAgain={() => setFound(null)} onType={() => { setFound(null); setTyping(true); }} onPick={k => show(k, [...(found.codes || [found.code]), ...(found.also || [])].filter(x => x && x !== k))} />
+        <Results found={found} stack={stack} onAgain={() => setFound(null)} onType={() => { setFound(null); setTyping(true); }}
+          onPick={k => show(k, [...(found.codes || [found.code]), ...(found.also || [])].filter(x => x && x !== k))}
+          onStack={x => { addToTray(x); setFound(null); }} />
+      </Sheet> : null}
+
+      {review ? <Sheet onClose={() => setReview(false)} ins={ins} tall>
+        <Review tray={tray || []} setTray={setTray} onDone={() => { setReview(false); }} />
       </Sheet> : null}
     </View>
   );
@@ -257,11 +307,15 @@ function Sheet({ children, onClose, ins, tall }) {
   );
 }
 
-function Results({ found, onAgain, onType, onPick }) {
+function Results({ found, onAgain, onType, onPick, onStack, stack }) {
   const d = useData(), c = useTheme();
+  const { width } = useWindowDimensions();
   const { code, list } = found;
-  const nameOf = k => { const x = [...(d.cat?.list || []), ...d.custom].find(y => String(y.num || '').toUpperCase() === k); return x ? clean(x.n).replace(/\s*\([^)]*\)/g, '') : ''; };
+  const nameOf = k => { const x = (d.byNum.get(k) || [])[0]; return x ? clean(x.n).replace(/\s*\([^)]*\)/g, '') : ''; };
   const ownCount = k => d.owned.filter(o => o.card === k && o.status !== 'sold').reduce((n, o) => n + (Number(o.qty) || 1), 0);
+  // versions side by side, big enough to compare the art
+  const sheetW = Math.min(width, 640) - 36, cols = list.length >= 5 && sheetW > 420 ? 3 : list.length === 1 ? 1 : 2;
+  const tileW = cols === 1 ? Math.min(180, sheetW * 0.45) : Math.floor((sheetW - 12 * (cols - 1)) / cols);
   return (
     <>
       {code && list.length ? <>
@@ -269,38 +323,46 @@ function Results({ found, onAgain, onType, onPick }) {
           <T w="bold" size={22}>{code}</T>
           <T mute size={13}>{list.length === 1 ? '1 version' : `${list.length} versions · highest first`}</T>
         </View>
-        <T mute size={12.5}>Pick the one in your hand: check the art and the set.</T>
+        {list.length > 1 ? <T mute size={12.5}>Which one is in your hand? Compare the art and the label under each.</T> : null}
         {found.also && found.also.length ? <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
           <T mute size={12.5}>Not this one? Also read:</T>
-          {found.also.map(a => <Pressable key={a} onPress={() => onPick(a)} style={{ paddingHorizontal: 12, height: 30, borderRadius: 15, justifyContent: 'center', backgroundColor: c.soft }}>
+          {found.also.map(a => <Pressable key={a} onPress={() => onPick(a)} style={{ paddingHorizontal: 12, height: 32, borderRadius: 16, justifyContent: 'center', backgroundColor: c.soft }}>
             <T w="semi" size={12.5}>{[a, nameOf(a)].filter(Boolean).join(' · ')}</T></Pressable>)}
         </View> : null}
-        {list.map(x => {
-          const own = ownCount(x.k), set = x.mine ? x.setName : d.cat?.byId[x.g]?.code;
-          return (
-            <View key={x.k} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <Pressable onPress={() => router.push({ pathname: '/card/[k]', params: { k: x.k } })} accessibilityRole="button"
-                style={({ pressed }) => ({ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, opacity: pressed ? 0.6 : 1 })}>
-                <CardArt k={x.k} photo={d.photoOf(x.k)} num={x.num} width={52} />
-                <View style={{ flex: 1, gap: 2 }}>
-                  <T w="semi" size={14.5} numberOfLines={2}>{clean(x.n)}</T>
+        <View style={{ flexDirection: cols === 1 ? 'row' : 'row', flexWrap: 'wrap', gap: 12, rowGap: 18 }}>
+          {list.map(x => {
+            const own = ownCount(x.k), set = x.mine ? x.setName : d.cat?.byId[x.g]?.code, sold = d.comps[x.k]?.sales?.[0];
+            const add = () => (stack ? onStack(x) : router.push({ pathname: '/item/[id]', params: { id: 'new', card: x.k } }));
+            return (
+              <View key={x.k} style={cols === 1 ? { flexDirection: 'row', gap: 14, flex: 1 } : { width: tileW, gap: 6 }}>
+                <Pressable onPress={add} accessibilityRole="button" accessibilityLabel={`${stack ? 'Add to stack' : 'Add'}: ${clean(x.n)}, ${versionTag(d.cat, x)}`}
+                  style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+                  <CardArt k={x.k} photo={d.photoOf(x.k)} num={x.num} width={tileW} big />
+                </Pressable>
+                <View style={{ gap: 3, flex: cols === 1 ? 1 : undefined }}>
+                  <T w="bold" size={13.5} numberOfLines={2} style={{ color: c.accent }}>{versionTag(d.cat, x)}</T>
                   <T mute size={12} numberOfLines={1}>{[set, x.r, own ? `you own ${own}` : null].filter(Boolean).join(' · ')}</T>
-                  <T w="bold" size={15}>{x.mine ? 'Your card' : d.money(x.m)}</T>
-                  {d.comps[x.k]?.sales?.[0] ? <T mute size={12}>eBay last sold {d.money(d.comps[x.k].sales[0].price)} · {d.comps[x.k].sales[0].sold}</T> : null}
+                  <T w="bold" size={16}>{x.mine ? 'Your card' : d.money(x.m)}</T>
+                  {sold ? <T mute size={11.5} numberOfLines={1}>eBay sold {d.money(sold.price)} · {sold.sold}</T> : null}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 }}>
+                    <Pressable onPress={add} accessibilityRole="button"
+                      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 4, height: 38, paddingHorizontal: 12, borderRadius: 19, backgroundColor: pressed ? c.raise : c.accent })}>
+                      <Ionicons name="add" size={18} color={c.onAccent} /><T w="bold" size={13} style={{ color: c.onAccent }}>{stack ? 'Stack' : 'Add'}</T>
+                    </Pressable>
+                    <Pressable onPress={() => router.push({ pathname: '/card/[k]', params: { k: x.k } })} hitSlop={8} accessibilityRole="link">
+                      <T w="semi" size={13} style={{ color: c.link }}>Prices</T>
+                    </Pressable>
+                  </View>
                 </View>
-              </Pressable>
-              <Pressable onPress={() => router.push({ pathname: '/item/[id]', params: { id: 'new', card: x.k } })} accessibilityRole="button" accessibilityLabel={`Add ${clean(x.n)} to collection`}
-                style={({ pressed }) => ({ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? c.raise : c.accent })}>
-                <Ionicons name="add" size={24} color={c.onAccent} />
-              </Pressable>
-            </View>
-          );
-        })}
+              </View>
+            );
+          })}
+        </View>
       </> : <>
         <T w="bold" size={18}>{code ? `${code} isn't in the price list` : "Couldn't find a card number"}</T>
         <T mute size={13.5}>{code
-          ? 'Check the number, or add it as your own card from Collection → + → Add a card.'
-          : 'Try again closer, with less glare, so the number in the bottom-right corner is sharp. Or type it.'}</T>
+          ? 'Check the number, or add it as your own card from Profile → Your own cards.'
+          : 'Try again closer, with less glare (or the light on), so the number in the bottom-right corner is sharp. Or type it.'}</T>
       </>}
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 4 }}>
         <Pressable onPress={onAgain} style={{ flex: 1, height: 48, borderRadius: 24, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' }}>
@@ -311,5 +373,98 @@ function Results({ found, onAgain, onType, onPick }) {
         </Pressable>
       </View>
     </>
+  );
+}
+
+// "5 cards · A$123 · Review" above the scanner buttons
+function TrayBar({ tray, onOpen }) {
+  const d = useData(), c = useTheme();
+  const n = tray.reduce((a, t) => a + t.qty, 0);
+  const tot = tray.reduce((a, t) => a + (d.card(t.k)?.m || 0) * t.qty, 0);
+  return (
+    <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Stack: ${n} cards. Review and add`}
+      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 10, height: 50, paddingLeft: 16, paddingRight: 6, borderRadius: 25, backgroundColor: c.accent, opacity: pressed ? 0.85 : 1 })}>
+      <Ionicons name="layers" size={18} color={c.onAccent} />
+      <T w="bold" size={14.5} style={{ color: c.onAccent }}>{n} {n === 1 ? 'card' : 'cards'} · {d.money(tot)}</T>
+      <View style={{ height: 38, paddingHorizontal: 14, borderRadius: 19, backgroundColor: c.onAccent, justifyContent: 'center' }}>
+        <T w="bold" size={13.5} style={{ color: c.accent }}>Review & add</T>
+      </View>
+    </Pressable>
+  );
+}
+
+// Check the stack, set condition / language / group once, add everything in one go
+function Review({ tray, setTray, onDone }) {
+  const d = useData(), c = useTheme();
+  const [cond, setCond] = useState('Raw'), [lang, setLang] = useState('EN'), [group, setGroup] = useState(''), [paid, setPaid] = useState('');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { getPref('lastAdd', null).then(l => { if (l) { if (l.group) setGroup(l.group); if (l.lang) setLang(l.lang); if (l.cond && !['Sealed', 'Opened'].includes(l.cond)) setCond(l.cond); } }); }, []);
+  const groups = [...new Set(d.owned.map(o => o.group || 'Other'))].sort();
+  const n = tray.reduce((a, t) => a + t.qty, 0);
+  const bump = (k, by) => setTray(t => t.map(x => (x.k === k ? { ...x, qty: x.qty + by } : x)).filter(x => x.qty > 0));
+  const add = async () => {
+    setBusy(true);
+    try {
+      const g = group.trim() || 'Other', p = parseFloat(String(paid).replace(',', '.'));
+      const out = [];
+      for (const t of tray) {
+        const x = d.card(t.k); if (!x) continue;
+        const old = d.owned.find(o => o.card === t.k && o.status !== 'sold' && (o.lang || 'EN') === lang && o.cond === cond && (o.group || 'Other') === g);
+        if (old) out.push({ ...old, qty: (Number(old.qty) || 1) + t.qty });
+        else out.push({ id: newId(), card: t.k, name: clean(x.n), qty: t.qty, kind: x.t === 'sealed' ? 'Sealed' : x.t === 'don' ? 'DON!!' : 'Card', cond, lang, group: g,
+          paid: isNaN(p) ? null : p, value: null, notes: '', status: 'owned', soldFor: null, added: today() });
+      }
+      await d.saveMany(out);
+      setPref('lastAdd', { group: g, cond, lang });
+      haptic('success');
+      toast(`Added ${n} ${n === 1 ? 'card' : 'cards'} to ${g}`);
+      setTray([]); onDone();
+    } catch (e) { toast(e.message || String(e)); } finally { setBusy(false); }
+  };
+  return (
+    <>
+      <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <T w="bold" size={20}>Your stack</T>
+        <Pressable onPress={() => setTray([])} hitSlop={8}><T mute size={13}>Clear</T></Pressable>
+      </View>
+      {tray.map(t => {
+        const x = d.card(t.k); if (!x) return null;
+        return (
+          <View key={t.k} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <CardArt k={x.k} photo={d.photoOf(x.k)} num={x.num} width={36} />
+            <View style={{ flex: 1 }}>
+              <T w="semi" size={14} numberOfLines={1}>{clean(x.n)}</T>
+              <T mute size={12} numberOfLines={1}>{x.num} · {versionTag(d.cat, x)} · {x.mine ? 'your card' : d.money(x.m)}</T>
+            </View>
+            <Step icon="remove" onPress={() => bump(t.k, -1)} label="One fewer" />
+            <T w="bold" size={15} style={{ width: 22, textAlign: 'center' }}>{t.qty}</T>
+            <Step icon="add" onPress={() => bump(t.k, 1)} label="One more" />
+          </View>
+        );
+      })}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 6 }}>
+        <Choice label="Condition" value={cond} onChange={setCond} options={['Raw', 'PSA 10', 'PSA 9', 'Other graded']} />
+        <Choice label="Language" value={lang} onChange={setLang} options={['EN', 'JP']} />
+        {groups.length ? <Choice label="Group" value={group} onChange={setGroup} options={groups} /> : null}
+        <Field label={groups.length ? 'Or a new group' : 'Group'} value={group} onChangeText={setGroup} placeholder="Binder" />
+        <Field label="Paid each, A$ (optional)" value={paid} onChangeText={setPaid} keyboardType="decimal-pad" />
+      </View>
+      {!d.session ? <Pressable onPress={() => router.push({ pathname: '/account', params: { back: '1' } })} style={{ height: 50, borderRadius: 25, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' }}>
+          <T w="bold" size={15} style={{ color: c.onAccent }}>Sign in to save your stack</T></Pressable>
+        : <Pressable onPress={add} disabled={busy || !n} style={{ height: 50, borderRadius: 25, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center', opacity: busy || !n ? 0.5 : 1 }}>
+          <T w="bold" size={15} style={{ color: c.onAccent }}>{busy ? 'Adding…' : `Add ${n} to my collection`}</T>
+        </Pressable>}
+      <T mute size={12}>Your stack is kept on this phone until you add it, even if you close the scanner.</T>
+    </>
+  );
+}
+
+function Step({ icon, onPress, label }) {
+  const c = useTheme();
+  return (
+    <Pressable onPress={() => { haptic(); onPress(); }} accessibilityRole="button" accessibilityLabel={label} hitSlop={4}
+      style={({ pressed }) => ({ width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? c.raise : c.soft })}>
+      <Ionicons name={icon} size={18} color={c.ink} />
+    </Pressable>
   );
 }

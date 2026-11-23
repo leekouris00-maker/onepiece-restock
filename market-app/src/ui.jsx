@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Modal, Pressable, Text, TextInput, View, StyleSheet } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Modal, Pressable, ScrollView, Text, TextInput, View, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Svg, { Path, Circle, Line, Defs, LinearGradient, RadialGradient, Stop, Rect } from 'react-native-svg';
@@ -18,7 +18,7 @@ export function Chip({ on, onPress, children, style }) {
   const c = useTheme();
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}
-      style={({ pressed }) => [{ minHeight: 36, paddingHorizontal: 14, borderRadius: 999, justifyContent: 'center',
+      hitSlop={4} style={({ pressed }) => [{ minHeight: 38, paddingHorizontal: 14, borderRadius: 999, justifyContent: 'center',
         backgroundColor: on ? c.accent : pressed ? c.raise : c.soft }, style]}>
       <Text style={{ color: on ? c.onAccent : c.ink, fontFamily: F.semi, fontSize: 14 }}>{children}</Text>
     </Pressable>
@@ -44,20 +44,20 @@ export function Field({ label, style, ...p }) {
   return (
     <View style={[{ gap: 6, flexGrow: 1, flexBasis: 140 }, style]}>
       <T size={12.5} mute>{label}</T>
-      <TextInput placeholderTextColor={c.mute} keyboardAppearance="dark" {...p} onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
+      <TextInput placeholderTextColor={c.mute} keyboardAppearance="dark" accessibilityLabel={label} {...p} onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
         style={{ minHeight: 48, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, borderColor: focus ? c.accent : 'transparent',
           backgroundColor: c.soft, color: c.ink, fontFamily: F.medium, fontSize: 16, outlineStyle: 'none' }} />
     </View>
   );
 }
 
-export function SearchBar({ value, onChangeText, placeholder, right, autoFocus }) {
+export function SearchBar({ value, onChangeText, placeholder, right, autoFocus, inputRef, onSubmitEditing }) {
   const c = useTheme();
   return (
     <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
       <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48, borderRadius: 14, backgroundColor: c.soft, paddingHorizontal: 14 }}>
         <Ionicons name="search" size={19} color={c.mute} />
-        <TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={c.mute} autoFocus={autoFocus}
+        <TextInput ref={inputRef} value={value} onChangeText={onChangeText} onSubmitEditing={onSubmitEditing} placeholder={placeholder} placeholderTextColor={c.mute} autoFocus={autoFocus}
           autoCorrect={false} autoCapitalize="none" returnKeyType="search" keyboardAppearance="dark"
           style={{ flex: 1, color: c.ink, fontFamily: F.medium, fontSize: 15.5, minHeight: 46, outlineStyle: 'none' }} />
         {value ? <Pressable onPress={() => onChangeText('')} hitSlop={12} accessibilityLabel="Clear search"><Ionicons name="close-circle" size={20} color={c.mute} /></Pressable> : null}
@@ -155,7 +155,8 @@ export function Change({ now, then, aud, size = 14, pctOnly }) {
   const d = now - then, p = (d / then) * 100;
   if (Math.abs(p) < 0.05) return null;
   const col = d > 0 ? c.up : c.down;
-  return <T size={size} w="semi" style={{ color: col }}>{pctOnly ? `${d > 0 ? '+' : '-'}${Math.abs(p).toFixed(2)}%` : `${d > 0 ? '+' : '-'}${aud(Math.abs(d))} (${d > 0 ? '+' : '-'}${Math.abs(p).toFixed(2)}%)`}</T>;
+  const ar = d > 0 ? '▲ ' : '▼ ';
+  return <T size={size} w="semi" style={{ color: col }} accessibilityLabel={`${d > 0 ? 'up' : 'down'} ${Math.abs(p).toFixed(2)} percent`}>{pctOnly ? `${ar}${Math.abs(p).toFixed(2)}%` : `${ar}${aud(Math.abs(d))} (${Math.abs(p).toFixed(2)}%)`}</T>;
 }
 
 const DAY = 86400000;
@@ -259,4 +260,99 @@ export function Stat({ label, value, tone }) {
 
 export function Empty({ children }) {
   return <T mute style={{ textAlign: 'center', paddingVertical: 36, paddingHorizontal: 20 }}>{children}</T>;
+}
+
+// Grey placeholder shapes that gently pulse while something loads
+export function Skel({ w = '100%', h = 14, r = 8, style }) {
+  const c = useTheme();
+  const a = useRef(new Animated.Value(0.5)).current;
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(a, { toValue: 1, duration: 700, useNativeDriver: false }), Animated.timing(a, { toValue: 0.5, duration: 700, useNativeDriver: false })]));
+    loop.start(); return () => loop.stop();
+  }, []);
+  return <Animated.View style={[{ width: w, height: h, borderRadius: r, backgroundColor: c.raise, opacity: a }, style]} />;
+}
+
+export function SkelRows({ n = 5, art = 40 }) {
+  return <View style={{ gap: 14, paddingVertical: 8 }}>{Array.from({ length: n }, (_, i) => (
+    <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      <Skel w={art} h={art / (63 / 88)} r={5} />
+      <View style={{ flex: 1, gap: 7 }}><Skel w="70%" h={13} /><Skel w="40%" h={11} /></View>
+      <Skel w={58} h={14} />
+    </View>))}</View>;
+}
+
+// Bottom sheet for menus and small forms
+export function Sheet({ open, onClose, title, children, maxWidth = 560 }) {
+  const c = useTheme();
+  // ignore touches for a moment after opening, so the finger that long-pressed to open it can't tap an item by lifting
+  const [armed, setArmed] = useState(false);
+  useEffect(() => { if (!open) { setArmed(false); return undefined; } const t = setTimeout(() => setArmed(true), 450); return () => clearTimeout(t); }, [open]);
+  return (
+    <Modal visible={!!open} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable onPress={() => armed && onClose()} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' }} accessibilityLabel="Close">
+        <Pressable style={{ backgroundColor: c.panel, borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: 12, paddingBottom: 30, width: '100%', maxWidth, alignSelf: 'center', maxHeight: '88%' }}>
+          <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: c.raise, alignSelf: 'center', marginBottom: 10 }} />
+          <ScrollView contentContainerStyle={{ paddingHorizontal: 18, gap: 10 }} keyboardShouldPersistTaps="handled" pointerEvents={armed ? 'auto' : 'none'}>
+            {title ? <T w="bold" size={17} style={{ marginBottom: 2 }}>{title}</T> : null}
+            {children}
+          </ScrollView>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+// One line in a menu sheet
+export function MenuItem({ icon, label, sub, onPress, danger }) {
+  const c = useTheme();
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button"
+      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, minHeight: 52, paddingHorizontal: 6, borderRadius: 12, backgroundColor: pressed ? c.soft : 'transparent' })}>
+      {icon ? <Ionicons name={icon} size={21} color={danger ? c.down : c.ink} /> : null}
+      <View style={{ flex: 1 }}>
+        <T w="semi" size={15.5} style={danger ? { color: c.down } : null}>{label}</T>
+        {sub ? <T mute size={12.5}>{sub}</T> : null}
+      </View>
+    </Pressable>
+  );
+}
+
+// Coloured note: 'warn' (red), 'info' (lime) or plain
+export function Note({ tone, title, children, action, onAction, style }) {
+  const c = useTheme();
+  const bg = tone === 'warn' ? 'rgba(255,91,91,0.14)' : tone === 'info' ? c.accentDim : c.soft;
+  const fg = tone === 'warn' ? c.down : tone === 'info' ? c.accent : c.ink;
+  return (
+    <View style={[{ padding: 14, borderRadius: 14, backgroundColor: bg, flexDirection: 'row', alignItems: 'center', gap: 12 }, style]}>
+      <View style={{ flex: 1 }}>
+        {title ? <T w="semi" size={14} style={{ color: fg }}>{title}</T> : null}
+        {children ? <T size={13} mute style={{ marginTop: title ? 2 : 0 }}>{children}</T> : null}
+      </View>
+      {action ? <Pressable onPress={onAction} hitSlop={8} accessibilityRole="button"><T w="bold" size={13.5} style={{ color: fg }}>{action}</T></Pressable> : null}
+    </View>
+  );
+}
+
+// How sure a price is, from how many sales it rests on
+export function Confidence({ n }) {
+  const c = useTheme();
+  if (n == null) return null;
+  const [label, col] = n >= 10 ? ['Solid', c.up] : n >= 3 ? ['Fair', '#f2c94c'] : ['Few sales', c.down];
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999, backgroundColor: c.soft }}>
+      <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: col }} />
+      <T size={11.5} w="semi">{label} · {n} {n === 1 ? 'sale' : 'sales'}</T>
+    </View>
+  );
+}
+
+// "today", "yesterday", "3 days ago", else the date
+export function ago(day) {
+  if (!day) return '';
+  const t = new Date(String(day).length <= 10 ? day + 'T12:00:00' : day).getTime();
+  if (isNaN(t)) return String(day);
+  const n = Math.round((Date.now() - t) / 864e5);
+  return n <= 0 ? 'today' : n === 1 ? 'yesterday' : n < 31 ? `${n} days ago` : new Date(t).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
 }

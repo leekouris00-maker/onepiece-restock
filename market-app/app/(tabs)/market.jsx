@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { KINDS, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
-import { Chip, Empty, Panel, T } from '../../src/ui';
+import { Chip, Empty, Panel, Skel, T } from '../../src/ui';
 import { ChipRow, Heading, Screen, TileRail, Title } from '../../src/screen';
 import { useTiles } from '../../src/layout';
 import { CardTile } from '../../src/tiles';
@@ -52,7 +52,10 @@ export default function Market() {
     ? [...new Set(d.custom.map(x => x.setName || 'Other'))].sort().map(n => ({ id: 'mine:' + n, code: '★', name: n }))
     : d.cat.sets.filter(s => s.kind === kind).sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
 
-  if (!d.cat) return <Screen><Title>Market</Title><Empty>{d.catError || 'Loading prices…'}</Empty></Screen>;
+  if (!d.cat) return <Screen><Title>Market</Title>{d.catError ? <Empty>{d.catError}</Empty> : <View style={{ gap: 14, marginTop: 10 }}>
+    <Skel h={48} r={14} />{[0, 1].map(i => <View key={i} style={{ gap: 10, marginTop: 14 }}><Skel w={140} h={16} />
+      <View style={{ flexDirection: 'row', gap: 14 }}>{[0, 1, 2].map(j => <Skel key={j} w={120} h={168} r={8} />)}</View></View>)}</View>}</Screen>;
+  const favCards = d.favs.map(f => d.card(f.card)).filter(Boolean);
   return (
     <Screen onRefresh={() => d.loadCatalog(true)}>
       <Title sub={`TCGplayer prices of ${d.cat.meta.updated} · US$1 = A$${d.cat.meta.fx}`}>Market</Title>
@@ -62,6 +65,7 @@ export default function Market() {
         <T mute size={15.5} w="medium">Search {d.cat.list.length.toLocaleString()} cards</T>
       </Pressable>
 
+      <Rail title="Your watchlist" cards={favCards} onMore={() => router.push('/watchlist')} />
       <Rail title="Top promos" cards={r.promos} />
       <Rail title="Rising this week" cards={r.up} onMore={() => router.push('/movers')} />
       <Rail title="Falling this week" cards={r.down} onMore={() => router.push('/movers')} />

@@ -4,7 +4,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { pickPhoto } from '../../src/photo';
 import { clean, median, today, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
-import { Button, CardArt, Chip, Choice, Empty, Field, Section, Sparkline, Stat, T } from '../../src/ui';
+import { Button, CardArt, Chip, Choice, Confidence, Empty, Field, Section, Sparkline, Stat, T, ago as agoDay } from '../../src/ui';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { ChipRow } from '../../src/screen';
+import { versionTag } from '../../src/find';
+import { OfferPrices, SellCalc } from '../../src/money';
+import { toast } from '../../src/toast';
+import { haptic } from '../../src/haptic';
 
 export default function CardScreen() {
   const { k } = useLocalSearchParams();
@@ -18,6 +24,9 @@ export default function CardScreen() {
   const [graded, setGraded] = useState(w ? (w.graded == null ? 'any' : String(w.graded)) : 'false');
   const [sale, setSale] = useState({ price: '', cur: d.cur, date: today(), grade: 'Raw', link: '', note: '' });
   if (!card) return <Empty>{d.cat ? 'Card not found.' : 'Loading…'}</Empty>;
+  const versions = (d.byNum.get(String(card.num || '').toUpperCase()) || []).filter(x => x.k !== card.k).sort((a, b) => (b.m ?? -1) - (a.m ?? -1));
+  const ref = d.refPrice(card), fav = d.favs.find(f => f.card === card.k);
+  const star = () => run(async () => { if (fav) { await d.unFav(card.k); toast('Removed from watchlist'); } else { await d.setFav(card.k, {}); haptic(); toast('Added to watchlist'); } });
 
   const set = card.mine ? card.setName : d.cat?.byId[card.g]?.name || '';
   const sl = d.salesOf(card.k), raw = sl.filter(s => (s.grade || 'Raw') === 'Raw').map(s => d.toUsd(s.price, s.cur));
@@ -38,10 +47,28 @@ export default function CardScreen() {
         <View style={{ flex: 1, gap: 6 }}>
           <T mute size={13}>{[card.num, set, card.r, card.lang].filter(Boolean).join(' · ')}</T>
           <T serif size={clean(card.n).length > 38 ? 21 : 27} style={{ lineHeight: clean(card.n).length > 38 ? 25 : 31 }}>{clean(card.n)}</T>
+          <T size={13} w="semi" style={{ color: c.accent }}>{versionTag(d.cat, card)}</T>
           {n ? <T size={13.5} w="semi" style={{ color: c.gold }}>You own {n}</T> : null}
+          <Chip onPress={star} on={!!fav} style={{ alignSelf: 'flex-start', marginTop: 4 }}>{fav ? '★ On your watchlist' : '☆ Watch this card'}</Chip>
         </View>
       </View>
       {msg ? <T size={14} style={{ marginTop: 12, color: c.down }}>{msg}</T> : null}
+
+      {versions.length ? <View style={{ marginTop: 16, gap: 8 }}>
+        <T mute size={12.5} w="semi">{`Other versions of ${card.num} (${versions.length})`}</T>
+        <ChipRow>
+          {versions.map(x => (
+            <Pressable key={x.k} onPress={() => router.replace({ pathname: '/card/[k]', params: { k: x.k } })} accessibilityRole="button"
+              style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 6, paddingRight: 12, borderRadius: 12, backgroundColor: pressed ? c.raise : c.soft, maxWidth: 260 })}>
+              <CardArt k={x.k} photo={d.photoOf(x.k)} num={x.num} width={28} />
+              <View style={{ flexShrink: 1 }}>
+                <T size={12.5} w="semi" numberOfLines={1}>{versionTag(d.cat, x)}</T>
+                <T size={12} mute>{x.mine ? 'Your card' : d.money(x.m)}</T>
+              </View>
+            </Pressable>
+          ))}
+        </ChipRow>
+      </View> : null}
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 18 }}>
         {!card.mine && <Stat label="TCGplayer market" value={d.money(card.m)} />}
@@ -49,6 +76,7 @@ export default function CardScreen() {
         {!card.mine && <Stat label="7-day change" value={mv == null ? '–' : `${mv > 0 ? '▲' : mv < 0 ? '▼' : ''}${Math.abs(mv).toFixed(1)}%`} tone={mv > 0.05 ? c.up : mv < -0.05 ? c.down : null} />}
         <Stat label="Your logged sales, raw median" value={raw.length ? d.money(median(raw)) : '–'} />
       </View>
+      {!card.mine && d.cat ? <T mute size={12} style={{ marginTop: 8 }}>{`TCGplayer prices updated ${agoDay(d.cat.meta.updated)} (${d.cat.meta.updated}) · US$1 = A$${d.cat.meta.fx}`}</T> : null}
       <LastSold key={card.k} card={card} cp={cp} w={w} search={search}
         onTrack={() => run(() => d.setTrack(card.k, { q: (w?.q || q).trim(), lang: w ? w.lang || null : lang || null, graded: w ? w.graded ?? null : graded === 'any' ? null : graded === 'true' }))} />
       {!card.mine && <View style={{ marginTop: 14 }}>
@@ -60,6 +88,12 @@ export default function CardScreen() {
         <T style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com.au/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>eBay AU sold</T>
         <T style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>eBay US sold</T>
       </View>
+
+      {ref.usd != null ? <View style={{ marginTop: 14, gap: 14 }}>
+        <OfferPrices a={ref.usd * d.fx} src={ref.src} />
+        <SellCalc value={ref.usd * d.fx} paid={null} title="If you sold one" />
+      </View> : null}
+      <AlertBox card={card} fav={fav} refA={ref.usd == null ? null : ref.usd * d.fx} src={ref.src} run={run} />
 
       <Section title="My collection">
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -101,7 +135,7 @@ export default function CardScreen() {
             <T size={13.5}>{s.grade || 'Raw'}</T><T mute size={13}>{String(s.date)}</T>
             {s.link ? <T size={13} style={{ color: c.link }} onPress={() => Linking.openURL(s.link)}>listing</T> : null}
             <View style={{ flex: 1 }} />
-            <T mute size={13} onPress={() => run(() => d.removeSale(s.id), 'Sale deleted')}>Delete</T>
+            <T mute size={13} onPress={() => run(async () => { await d.removeSale(s.id); const { id, ...rest } = s; toast('Sale deleted', { action: { label: 'Undo', onPress: () => d.addSale(rest).catch(e => toast(e.message)) } }); })}>Delete</T>
           </View>
         ))}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
@@ -152,7 +186,8 @@ function LastSold({ card, cp, w, search, onTrack }) {
     <View style={{ marginTop: 16, padding: 16, borderRadius: 16, backgroundColor: c.panel, gap: 10 }}>
       <View style={{ gap: 2 }}>
         <T w="bold" size={16}>Last sold on eBay</T>
-        {has && cp.median != null ? <T mute size={12.5}>Median {d.money(cp.median)} from {cp.count} sales in the last 90 days</T> : null}
+        {has && cp.median != null ? <T mute size={12.5}>Median {d.money(cp.median)} from {cp.count} sales in the last 90 days · checked {agoDay(String(cp.at).slice(0, 10))}</T> : null}
+        {has && cp.median != null ? <View style={{ marginTop: 4 }}><Confidence n={cp.count} /></View> : null}
       </View>
       {has && cp.median != null && card.m != null && card.m >= 3 && (cp.median < card.m / 4 || cp.median > card.m * 4)
         ? <T size={13} style={{ color: c.down }}>Very different from TCGplayer ({d.money(card.m)}): the eBay search may be catching another version of this card. Adjust it under "eBay sold prices: search settings" below.</T> : null}
@@ -176,5 +211,29 @@ function LastSold({ card, cp, w, search, onTrack }) {
         <T size={13.5} w="semi" style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>eBay US</T>
       </View>
     </View>
+  );
+}
+
+// Price alert for this card: tell me when it drops below / rises above an A$ price
+function AlertBox({ card, fav, refA, src, run }) {
+  const d = useData(), c = useTheme();
+  const [below, setBelow] = useState(fav?.below != null ? String(fav.below) : '');
+  const [above, setAbove] = useState(fav?.above != null ? String(fav.above) : '');
+  if (refA == null) return null;
+  const num = v => { const x = parseFloat(String(v).replace(',', '.')); return isNaN(x) ? null : x; };
+  const has = fav && (fav.below != null || fav.above != null);
+  return (
+    <Section title="Price alert" right={<Ionicons name={has ? 'notifications' : 'notifications-outline'} size={18} color={has ? c.accent : c.mute} />}>
+      <T mute size={13.5}>Now {d.aud(refA)} ({src}). When it passes your price, it shows at the top of Home and in your watchlist.</T>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+        <Field label="Tell me if it drops to (A$)" value={below} onChangeText={setBelow} keyboardType="decimal-pad" placeholder={(refA * 0.85).toFixed(0)} />
+        <Field label="Or rises to (A$)" value={above} onChangeText={setAbove} keyboardType="decimal-pad" placeholder={(refA * 1.2).toFixed(0)} />
+      </View>
+      <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+        <Button onPress={() => run(async () => { await d.setFav(card.k, { below: num(below), above: num(above) }); haptic('success'); toast('Alert saved'); })}>{has ? 'Update alert' : 'Set alert'}</Button>
+        {has ? <Button ghost onPress={() => run(async () => { await d.setFav(card.k, {}); setBelow(''); setAbove(''); toast('Alert removed'); })}>Remove alert</Button> : null}
+      </View>
+      {d.favLocal ? <T mute size={12}>Saved on this device only for now.</T> : null}
+    </Section>
   );
 }

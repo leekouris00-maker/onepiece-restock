@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Linking, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import { exportCollection } from '../../src/csv';
+import { useWide } from '../../src/layout';
 import { supabase, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { Button, Choice, Field, Section, T } from '../../src/ui';
@@ -8,7 +10,8 @@ import { Screen, Title } from '../../src/screen';
 import { siteBase } from '../../src/ocr';
 
 export default function Account() {
-  const d = useData(), c = useTheme();
+  const d = useData(), c = useTheme(), wide = useWide();
+  const { back } = useLocalSearchParams();
   const [del, setDel] = useState(0); const [delMsg, setDelMsg] = useState('');
   const [email, setEmail] = useState(''); const [pw, setPw] = useState(''); const [msg, setMsg] = useState(''); const [wait, setWait] = useState(false);
   const go = async up => {
@@ -17,6 +20,7 @@ export default function Account() {
       const r = up ? await supabase.auth.signUp({ email: email.trim(), password: pw }) : await supabase.auth.signInWithPassword({ email: email.trim(), password: pw });
       if (r.error) throw r.error;
       if (up && !r.data.session) setMsg('Account made. Check your email for the confirmation link, then sign in here.');
+      else if (back && router.canGoBack()) router.back();
     } catch (e) { setMsg(e.message || String(e)); } finally { setWait(false); }
   };
   return (
@@ -40,6 +44,17 @@ export default function Account() {
               <Button disabled={wait} ghost onPress={() => go(true)}>Create account</Button>
             </View>
           </>}
+      {d.session ? <Section title="Your data">
+        <T mute size={14}>Bring in a collection from Collectr, TCGplayer or a spreadsheet, or take a copy of yours.</T>
+        <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+          <Button ghost icon="cloud-upload-outline" onPress={() => router.push('/import')}>Import CSV</Button>
+          <Button ghost icon="download-outline" onPress={() => exportCollection(d)}>Export CSV</Button>
+        </View>
+      </Section> : null}
+      <Section title="Watchlist and price alerts">
+        <T mute size={14}>Star cards to follow them and get told in the app when they pass a price you set.{d.favLocal && d.session ? ' Kept on this device for now (run supabase/watchlist.sql to save it to your account).' : ''}</T>
+        <Button ghost icon="star-outline" onPress={() => router.push('/watchlist')}>{`Open watchlist${d.favs.length ? ` (${d.favs.length})` : ''}`}</Button>
+      </Section>
       <Section title="Display">
         <Choice label="Currency" value={d.cur} onChange={d.setCur} options={['AUD', 'USD']} />
       </Section>
@@ -72,7 +87,10 @@ export default function Account() {
         </> : null}
         {delMsg ? <T size={13.5} style={{ color: /deleted/.test(delMsg) ? c.accent : c.down }}>{delMsg}</T> : null}
       </Section>
-      <T mute size={11.5} style={{ textAlign: 'center', marginTop: 10 }}>Version 22 Nov</T>
+      {wide ? <Section title="Keyboard shortcuts">
+        <T mute size={14}>/ search · N add an item · S scan · Esc close or go back. In the Collection table, click a quantity or price to change it.</T>
+      </Section> : null}
+      <T mute size={11.5} style={{ textAlign: 'center', marginTop: 10 }}>Version 23 Nov</T>
     </View></Screen>
   );
 }

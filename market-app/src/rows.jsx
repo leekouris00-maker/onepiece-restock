@@ -6,12 +6,12 @@ import { useData, clean } from './data';
 import { useTheme } from './theme';
 import { CardArt, T } from './ui';
 
-export function CardRow({ card, showSet }) {
+export function CardRow({ card, showSet, onOpen }) {
   const d = useData(), c = useTheme();
   const sl = d.salesOf(card.k), last = sl[0], cp = d.compOf(card.k), mv = d.move(card), own = d.owned.filter(o => o.card === card.k && o.status !== 'sold').reduce((n, o) => n + (Number(o.qty) || 1), 0);
   const ebay = last ? d.money(d.toUsd(last.price, last.cur)) : cp ? d.money(cp.median) : null;
   return (
-    <Pressable onPress={() => router.push({ pathname: '/card/[k]', params: { k: card.k } })} accessibilityRole="button"
+    <Pressable onPress={() => { onOpen && onOpen(); router.push({ pathname: '/card/[k]', params: { k: card.k } }); }} accessibilityRole="button"
       style={({ pressed }) => ({ flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 9, paddingHorizontal: 18, opacity: pressed ? 0.6 : 1 })}>
       <CardArt k={card.k} photo={d.photoOf(card.k)} num={card.num} width={40} />
       <View style={{ flex: 1, gap: 2 }}>
@@ -23,7 +23,7 @@ export function CardRow({ card, showSet }) {
       </View>
       <View style={{ alignItems: 'flex-end', gap: 2 }}>
         <T w="bold" size={14.5}>{card.mine ? (ebay || '–') : d.money(card.m)}</T>
-        {mv != null && Math.abs(mv) >= 0.05 ? <T size={12} w="semi" style={{ color: mv > 0 ? c.up : c.down }}>{mv > 0 ? '+' : '-'}{Math.abs(mv).toFixed(2)}%</T>
+        {mv != null && Math.abs(mv) >= 0.05 ? <T size={12} w="semi" style={{ color: mv > 0 ? c.up : c.down }}>{mv > 0 ? '▲ ' : '▼ '}{Math.abs(mv).toFixed(2)}%</T>
           : !card.mine && ebay ? <T size={12} mute>eBay {ebay}</T> : null}
       </View>
     </Pressable>

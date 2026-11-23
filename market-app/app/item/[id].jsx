@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { clean, newId, today, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { pickPhoto } from '../../src/photo';
-import { Button, CardArt, Chip, Choice, Empty, Field, T } from '../../src/ui';
+import { Button, CardArt, Chip, Choice, Confidence, Empty, Field, Note, T } from '../../src/ui';
+import { getPref, setPref } from '../../src/prefs';
+import { useOwnedActions } from '../../src/ownact';
+import { SellCalc } from '../../src/money';
+import { PL, plOf } from '../../src/tiles';
+import { haptic } from '../../src/haptic';
+import { toast } from '../../src/toast';
+import { versionTag } from '../../src/find';
 
 const num = v => (v === '' || v == null ? null : Number(String(v).replace(',', '.')));
 
@@ -24,7 +31,17 @@ export default function ItemScreen() {
       paid: o.paid ?? '', value: o.value ?? '', notes: o.notes || '', status: o.status || 'owned', soldFor: o.soldFor ?? '',
     };
   });
-  const [msg, setMsg] = useState(''); const [confirm, setConfirm] = useState(false);
+  const [msg, setMsg] = useState('');
+  const act = useOwnedActions();
+  // new items start from your last choices (group, condition, language)
+  useEffect(() => {
+    if (existing) return;
+    getPref('lastAdd', null).then(l => {
+      if (!l) return;
+      setF(x => ({ ...x, group: x.group || l.group || '', lang: langParam || card?.lang || l.lang || x.lang,
+        cond: card ? (card.t === 'sealed' ? 'Sealed' : l.cond && !['Sealed', 'Opened'].includes(l.cond) ? l.cond : x.cond) : x.cond }));
+    });
+  }, []);
   if (id !== 'new' && !existing) return <Empty>{d.busy ? 'Loading…' : 'This item isn’t in your collection any more.'}</Empty>;
   const set = (k, v) => setF(x => ({ ...x, [k]: String(v) }));
   const draft = { ...(existing || {}), card: card?.k || null, value: num(f.value), lang: f.lang };
@@ -35,7 +52,10 @@ export default function ItemScreen() {
     await d.saveOwned({ ...(existing || {}), id: existing?.id || newId(), card: card?.k || existing?.card || null, name: f.name.trim(), qty: Math.max(1, parseInt(f.qty, 10) || 1),
       kind: f.kind, cond: f.cond, lang: f.lang, group: f.group.trim() || 'Other', paid: num(f.paid), value: num(f.value), notes: f.notes.trim(),
       status: f.status, soldFor: num(f.soldFor), added: existing?.added || today() });
-    router.back();
+    if (!existing) setPref('lastAdd', { group: f.group.trim(), cond: f.cond, lang: f.lang });
+    haptic('success');
+    toast(existing ? 'Saved' : `Added ${f.name.trim()}${parseInt(f.qty, 10) > 1 ? ' ×' + parseInt(f.qty, 10) : ''}`);
+    if (router.canGoBack()) router.back(); else router.replace('/portfolio');
   });
   return (
     <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60, maxWidth: 820, width: '100%', alignSelf: 'center', gap: 14 }} keyboardShouldPersistTaps="handled">
@@ -49,7 +69,10 @@ export default function ItemScreen() {
         <View style={{ flex: 1, gap: 6 }}>
           <T mute size={13}>{existing ? 'In your collection' : 'Add to my collection'}</T>
           <T serif size={f.name.length > 38 ? 20 : 25} style={{ lineHeight: f.name.length > 38 ? 24 : 29 }}>{f.name || 'New item'}</T>
+          {card ? <T size={12.5} mute>{[card.num, versionTag(d.cat, card)].filter(Boolean).join(' · ')}</T> : null}
           <T size={13.5} mute>Worth <T w="semi" size={13.5}>{d.aud(v.a)}</T> each · {v.src}</T>
+          {existing ? <Confidence n={d.valCount(draft)} /> : null}
+          {existing && plOf(d, existing) ? <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}><T size={13} mute>Since you bought it</T><PL v={plOf(d, existing)} size={13} /></View> : null}
           {card ? <Chip onPress={() => router.push({ pathname: '/card/[k]', params: { k: card.k } })} style={{ alignSelf: 'flex-start' }}>Card prices</Chip> : null}
         </View>
       </View>
@@ -68,8 +91,11 @@ export default function ItemScreen() {
         <Choice label="Status" value={f.status} onChange={x => set('status', x)} options={[['owned', 'Own it'], ['sold', 'Sold']]} />
         {f.status === 'sold' ? <Field label="Sold for each (A$)" value={String(f.soldFor)} onChangeText={x => set('soldFor', x)} keyboardType="decimal-pad" /> : null}
       </View>
-      <Button onPress={save}>{existing ? 'Save' : 'Add to my collection'}</Button>
-      {existing ? <Button ghost danger={confirm} onPress={() => (confirm ? run(async () => { await d.removeOwned(existing.id); router.back(); }) : setConfirm(true))}>{confirm ? 'Tap again to remove' : 'Remove from collection'}</Button> : null}
+      {d.configured && d.authReady && !d.session
+        ? <Note tone="info" title="Sign in to save this" action="Sign in" onAction={() => router.push({ pathname: '/account', params: { back: '1' } })}>Your collection is saved to your account so it’s on your phone and computer. Your details here stay filled in.</Note>
+        : <Button onPress={save}>{existing ? 'Save' : 'Add to my collection'}</Button>}
+      {existing ? <Button ghost onPress={() => { if (router.canGoBack()) router.back(); else router.replace('/portfolio'); act.remove(existing); }}>Remove from collection</Button> : null}
+      {existing && existing.status !== 'sold' && v.a != null ? <SellCalc value={v.a} paid={existing.paid} qty={existing.qty} /> : null}
     </ScrollView>
   );
 }

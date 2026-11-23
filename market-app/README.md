@@ -63,6 +63,17 @@ In GitHub: **Settings → Secrets and variables → Actions → New repository s
 
 The "eBay sold prices" workflow then reads the cards you track in the app each morning.
 
+## 5. Watchlist and price alerts (one-time database step)
+Supabase → SQL Editor → New query → paste `supabase/watchlist.sql` → Run. Until then the watchlist is kept on each device separately.
+
+## What's in the app (23 Nov 2026)
+- **Scanner:** versions side by side with their label (Release Event, Alternate Art…); **Stack** mode keeps scanning and collects cards in a tray, then adds them all with one condition / language / group; light button where the phone allows it; a tick you can feel when a card is read.
+- **Collection:** swipe a row left for −1 / +1 / Sold; hold a row for the full menu; select several to move, set the price paid, mark sold or remove; everything has Undo. Sort by profit / loss. On a computer it's a table: click a quantity or price to change it.
+- **Prices:** every card page says where its price comes from and how fresh it is, with a confidence badge for eBay prices; other versions of the same number; what to offer (70/80/90%); what you'd take home after eBay fees and postage; a price alert.
+- **Search:** forgiving ("op17 84", "chopper re", one typo is fine) with recent searches.
+- **Your data:** import a CSV (Collectr, TCGplayer or any spreadsheet) with a preview; export to CSV.
+- **Speed:** works without signal (saved prices and collection; the app itself is kept on the phone), loading placeholders, pull down to refresh, keyboard shortcuts on a computer (/ search, N add, S scan, Esc back).
+
 ## Publishing on the App Store for everyone (later)
 
 TestFlight is enough for you (and up to 100 people you invite). A public App Store listing also needs App Review, screenshots, a privacy policy page, and the rights to show the card pictures: they're TCGplayer's photos of Bandai's card art. For a public release, switch the pictures to your own photos only (`tcgImage` in `src/data.js`).

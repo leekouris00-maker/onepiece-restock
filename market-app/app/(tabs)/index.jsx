@@ -4,10 +4,14 @@ import { router, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
-import { Button, ChangePill, Empty, GlowChart, Panel, Select, T } from '../../src/ui';
+import { Button, ChangePill, Empty, GlowChart, Note, Panel, Select, Skel, SkelRows, T } from '../../src/ui';
+import { AlertList } from '../../src/alerts';
 import { Heading, IconBtn, Screen, TileRail } from '../../src/screen';
 import { useTiles } from '../../src/layout';
 import { CardTile, OwnedRow } from '../../src/tiles';
+import { CardRow } from '../../src/rows';
+
+const CardRowLite = ({ card }) => <View style={{ marginHorizontal: -16 }}><CardRow card={card} /></View>;
 
 const RANGES = [[1, '1 Day'], [7, '7 Days'], [30, '1 Month']];
 
@@ -65,15 +69,22 @@ export default function Home() {
       {signedOut ? (
         <View style={{ marginTop: 40, gap: 12, alignItems: 'center' }}>
           <T head size={30} style={{ textAlign: 'center' }}>Know what your cards are worth</T>
-          <T mute style={{ textAlign: 'center' }}>{d.configured ? 'Sign in to see your collection and how its value moves.' : 'Sign-in isn’t switched on yet, so for now you can browse prices.'}</T>
-          {d.configured ? <Button onPress={() => router.push('/account')} style={{ alignSelf: 'stretch', marginTop: 8 }}>Sign in</Button> : null}
+          <T mute style={{ textAlign: 'center' }}>Prices for every One Piece set and promo. No account needed to look around.</T>
+          <Button icon="scan" onPress={() => router.push('/scan')} style={{ alignSelf: 'stretch', marginTop: 8 }}>Scan a card</Button>
+          <Button ghost icon="search" onPress={() => router.push('/search')} style={{ alignSelf: 'stretch' }}>Search prices</Button>
+          {d.configured ? <T size={13.5} mute style={{ textAlign: 'center', marginTop: 6 }}>Want to track your own cards? <T size={13.5} w="semi" style={{ color: c.accent }} onPress={() => router.push('/account')}>Sign in or create an account</T></T> : null}
+          {d.alerts.length ? <View style={{ alignSelf: 'stretch', marginTop: 12 }}><AlertList max={4} /></View> : null}
+        </View>
+      ) : !d.loaded && d.busy ? (
+        <View style={{ marginTop: 22, gap: 16, alignItems: 'center' }}>
+          <Skel w={110} h={30} r={15} /><Skel w={220} h={52} /><Skel w={90} h={22} r={11} />
+          <Skel h={200} r={16} />
+          <View style={{ alignSelf: 'stretch' }}><SkelRows n={4} art={38} /></View>
         </View>
       ) : (
         <>
-          {d.loadError ? <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: 'rgba(255,91,91,0.14)' }}>
-        <T w="semi" size={14} style={{ color: c.down }}>Couldn’t load your collection</T>
-        <T size={13} mute style={{ marginTop: 2 }}>{d.loadError}</T>
-      </View> : null}
+          {d.loadError ? <Note tone="warn" title="Couldn’t load your collection" style={{ marginTop: 14 }} action="Retry" onAction={() => d.refresh()}>{d.loadError}</Note> : null}
+          {d.alerts.length ? <View style={{ marginTop: 14 }}><AlertList max={4} /></View> : null}
           <View style={wide ? { flexDirection: 'row', gap: 28, alignItems: 'flex-start', marginTop: 8 } : null}>
           <View style={wide ? { flex: 1.35, minWidth: 0 } : null}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 }}>
@@ -100,8 +111,17 @@ export default function Home() {
 
           <Panel style={{ marginTop: wide ? 0 : 22, gap: 4 }}>
             <Heading onMore={() => router.push('/portfolio')}>Most valuable</Heading>
-            {top.length ? top.map((o, i) => <OwnedRow key={o.id} o={o} rank={i + 1} />) : <Empty>Nothing in your collection yet.</Empty>}
+            {top.length ? top.map((o, i) => <OwnedRow key={o.id} o={o} rank={i + 1} />) : <View style={{ gap: 10, paddingVertical: 8 }}>
+              <T mute size={14}>Nothing in your collection yet.</T>
+              <Button icon="scan" onPress={() => router.push('/scan')}>Scan your first card</Button>
+              <Button ghost icon="cloud-upload-outline" onPress={() => router.push('/import')}>Import from Collectr or a CSV</Button>
+            </View>}
           </Panel>
+
+          {d.favs.length ? <Panel style={{ marginTop: 14, gap: 4 }}>
+            <Heading onMore={() => router.push('/watchlist')}>Watchlist</Heading>
+            {d.favs.map(f => d.card(f.card)).filter(Boolean).slice(0, 4).map(x => <CardRowLite key={x.k} card={x} />)}
+          </Panel> : null}
 
           {movers.length ? <Panel style={{ marginTop: 14, gap: 4 }}>
             <Heading onMore={() => router.push('/movers')}>Moved this week</Heading>
