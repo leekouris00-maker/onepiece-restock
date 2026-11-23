@@ -67,6 +67,12 @@ def main():
         print("::notice::no database secrets")
         return 0
     try:
+        tok = token(cid, secret)
+        print("eBay keys OK")
+    except urllib.error.HTTPError as e:
+        print(f"::warning::eBay didn't accept the keys ({e.code}): {e.read().decode()[:200]}")
+        return 1
+    try:
         rows = P.sb("GET", "watchlist?select=user_id,card,deal_below&deal_below=not.is.null") or []
     except RuntimeError as e:
         print(f"::notice::deal alerts not set up in the database yet (run market-app/supabase/2026-11-24b.sql): {e}")
@@ -77,7 +83,6 @@ def main():
     cat = json.load(open(os.path.join(HERE, "market_catalog.json")))
     sets = {s["id"]: s for s in cat["sets"]}
     cards = {"t:" + c[0]: c for c in cat["cards"]}
-    tok = token(cid, secret)
     campaign = os.environ.get("EBAY_CAMPAIGN_ID", "").strip() or None
     pem, _ = P.keys()
     subs = P.sb("GET", "push_subs?select=endpoint,user_id,sub") or []
