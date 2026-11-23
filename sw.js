@@ -1,7 +1,7 @@
 // One Piece Market: lets the home-screen app open without signal.
 // Pages: network first (so updates arrive), saved copy when offline. Built files (names change every build): saved copy first.
 // Prices, your collection and card pictures come from other sites and are not touched here.
-const CACHE = 'opm-v1';
+const CACHE = 'opm-v1';   // change to clear every phone's saved copy
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
@@ -34,5 +34,24 @@ self.addEventListener('fetch', e => {
     const res = await fetch(r);
     if (res.ok && (u.pathname.includes('/_expo/') || u.pathname.includes('/assets/') || u.pathname.includes('/ocr/') || /\.(png|json|ttf|woff2?)$/.test(u.pathname))) c.put(r, res.clone());
     return res;
+  })());
+});
+
+// Price-alert notifications (sent by push_alerts.py on GitHub each morning)
+self.addEventListener('push', e => {
+  let m = {};
+  try { m = e.data ? e.data.json() : {}; } catch { m = { title: 'One Piece Market', body: e.data ? e.data.text() : '' }; }
+  const base = new URL(self.registration.scope).href;
+  e.waitUntil(self.registration.showNotification(m.title || 'One Piece Market', {
+    body: m.body || '', icon: base + 'apple-touch-icon.png', badge: base + 'apple-touch-icon.png', tag: m.tag, data: { url: m.url || base },
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || self.registration.scope;
+  e.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of all) if ('focus' in c) { await c.focus(); if ('navigate' in c) return c.navigate(url); return; }
+    return self.clients.openWindow(url);
   })());
 });
