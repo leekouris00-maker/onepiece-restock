@@ -10,6 +10,7 @@ const RAW = 'https://raw.githubusercontent.com/leekouris00-maker/onepiece-restoc
 const SB_URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const SB_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
+export const RAW_BASE = RAW;
 export const supabase = SB_URL && SB_KEY
   ? createClient(SB_URL, SB_KEY, { auth: { storage: AsyncStorage, autoRefreshToken: true, persistSession: true, detectSessionInUrl: false } })
   : null;
@@ -55,8 +56,16 @@ function refreshLater(name) {
 const isOnline = () => (typeof navigator === 'undefined' || navigator.onLine !== false);
 
 // database rows <-> app objects
-const fromOwned = r => ({ id: r.id, card: r.card, name: r.name, qty: r.qty, kind: r.kind, cond: r.cond, lang: r.lang, group: r.grp || 'Other', paid: r.paid, value: r.value, notes: r.notes || '', status: r.status, soldFor: r.sold_for, added: r.added, num: r.num, photo: r.photo });
-const toOwned = o => ({ id: o.id, card: o.card || null, name: o.name, qty: o.qty || 1, kind: o.kind, cond: o.cond, lang: o.lang || 'EN', grp: o.group || 'Other', paid: o.paid ?? null, value: o.value ?? null, notes: o.notes || '', status: o.status || 'owned', sold_for: o.soldFor ?? null, added: o.added || today(), num: o.num || null, photo: o.photo || null, updated_at: new Date().toISOString() });
+// Columns added by later database updates: only sent once the database has them (supabase/2026-11-24.sql)
+export const cols = { soldAt: false, notified: false };
+const fromOwned = r => ({ id: r.id, card: r.card, name: r.name, qty: r.qty, kind: r.kind, cond: r.cond, lang: r.lang, group: r.grp || 'Other', paid: r.paid, value: r.value, notes: r.notes || '', status: r.status, soldFor: r.sold_for, added: r.added, num: r.num, photo: r.photo,
+  soldAt: r.sold_at || null, updated: r.updated_at ? String(r.updated_at).slice(0, 10) : null });
+const toOwned = o => {
+  const row = { id: o.id, card: o.card || null, name: o.name, qty: o.qty || 1, kind: o.kind, cond: o.cond, lang: o.lang || 'EN', grp: o.group || 'Other', paid: o.paid ?? null, value: o.value ?? null, notes: o.notes || '', status: o.status || 'owned', sold_for: o.soldFor ?? null, added: o.added || today(), num: o.num || null, photo: o.photo || null, updated_at: new Date().toISOString() };
+  // the day it was sold: kept when it has one, today when it's newly marked sold
+  if (cols.soldAt) row.sold_at = row.status === 'sold' ? o.soldAt || today() : null;
+  return row;
+};
 const fromCard = r => ({ id: r.id, lang: r.lang, num: r.num, name: r.name, set: r.set_name, rar: r.rar, note: r.note });
 
 const Ctx = createContext(null);
@@ -133,6 +142,7 @@ export function DataProvider({ children }) {
     if (!supabase || !session) return local();
     const r = await supabase.from('watchlist').select('*');
     if (r.error) return local();                       // table not created yet (run supabase/watchlist.sql)
+    if (r.data && r.data[0]) cols.notified = 'notified' in r.data[0];
     setFavLocal(false); setFavs(r.data || []);
   }, [session, uid]);
   const refresh = useCallback(async () => {
@@ -147,6 +157,7 @@ export function DataProvider({ children }) {
       const bad = [o, s, c, w, p].find(r => r.error);
       setLoadError(bad ? bad.error.message : '');
       if (o.error) return;
+      if (o.data && o.data[0]) cols.soldAt = 'sold_at' in o.data[0];
       const ow = (o.data || []).map(fromOwned);
       setOwned(ow); setSales(s.data || []); setCards((c.data || []).map(fromCard)); setWatch(w.data || []);
       const pm = Object.fromEntries((p.data || []).map(r => [r.card, r.path]));
@@ -203,6 +214,7 @@ export function DataProvider({ children }) {
     // watchlist + price alerts (A$). Kept in the database when supabase/watchlist.sql has been run, else on this device.
     async setFav(card, f) {
       const row = { card, below: f?.below ?? null, above: f?.above ?? null, created_at: favs.find(x => x.card === card)?.created_at || new Date().toISOString() };
+      if (cols.notified) { row.notified = null; row.notified_at = null; }   // a new price = a new alert
       const next = [...favs.filter(x => x.card !== card), row];
       if (!favLocal && supabase && session) { need(); check(await supabase.from('watchlist').upsert(row, { onConflict: 'user_id,card' })); }
       else await AsyncStorage.setItem('favs:' + (uid || 'guest'), JSON.stringify(next));
@@ -240,6 +252,37 @@ export function DataProvider({ children }) {
       for (const k of ['owned', 'sales', 'cards', 'watch', 'photos', 'mine:' + uid, 'favs:' + uid]) await AsyncStorage.removeItem(k).catch(() => {});
       setOwned([]); setSales([]); setCards([]); setWatch([]); setPhotos({});
     },
+    // Tester feedback: anyone can send; a picture only when signed in (it goes in your photo folder)
+    async sendFeedback({ note, page, uri, device }) {
+      if (!supabase) throw new Error('Feedback isn’t set up in this build.');
+      if (!isOnline()) throw new Error('You’re offline. Try again when you have signal.');
+      let photo = null;
+      if (uri && session) {
+        const small = await manipulateAsync(uri, [{ resize: { width: 1000 } }], { compress: 0.8, format: SaveFormat.JPEG });
+        const body = await (await fetch(small.uri)).arrayBuffer();
+        photo = `${session.user.id}/feedback-${newId()}.jpg`;
+        const up = await supabase.storage.from('photos').upload(photo, body, { contentType: 'image/jpeg' });
+        if (up.error) photo = null;
+      }
+      const r = await supabase.from('feedback').insert({ note, page, device, photo, email: session?.user?.email || null, user_id: session?.user?.id || null });
+      if (r.error) {
+        if (/feedback|schema cache|relation/i.test(r.error.message)) throw new Error('NOT_SET_UP');
+        throw new Error(r.error.message);
+      }
+    },
+    // Read-only links to one group of your collection
+    async listShares() { if (!supabase || !session) return []; const r = await supabase.from('shares').select('*'); if (r.error) throw new Error(/shares|schema cache/i.test(r.error.message) ? 'NOT_SET_UP' : r.error.message); return r.data || []; },
+    async createShare(grp, title) {
+      need();
+      const id = Array.from({ length: 10 }, () => 'abcdefghijkmnpqrstuvwxyz23456789'[Math.floor(Math.random() * 32)]).join('');
+      const r = await supabase.from('shares').insert({ id, grp, title: title || grp });
+      if (r.error) throw new Error(/shares|schema cache/i.test(r.error.message) ? 'NOT_SET_UP' : r.error.message);
+      return id;
+    },
+    async removeShare(id) { need(); check(await supabase.from('shares').delete().eq('id', id)); },
+    // Phone notifications
+    async savePushSub(sub, device) { need(); const j = sub.toJSON ? sub.toJSON() : sub; const r = await supabase.from('push_subs').upsert({ endpoint: j.endpoint, sub: j, device }); if (r.error) throw new Error(/push_subs|schema cache/i.test(r.error.message) ? 'NOT_SET_UP' : r.error.message); },
+    async removePushSub(endpoint) { if (supabase && session) await supabase.from('push_subs').delete().eq('endpoint', endpoint); },
     async untrack(card) { need(); check(await supabase.from('watch').delete().eq('card', card)); setWatch(a => a.filter(x => x.card !== card)); },
     async addPhoto(target, uri) {
       need();

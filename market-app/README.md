@@ -74,6 +74,19 @@ Supabase → SQL Editor → New query → paste `supabase/watchlist.sql` → Run
 - **Your data:** import a CSV (Collectr, TCGplayer or any spreadsheet) with a preview; export to CSV.
 - **Speed:** works without signal (saved prices and collection; the app itself is kept on the phone), loading placeholders, pull down to refresh, keyboard shortcuts on a computer (/ search, N add, S scan, Esc back).
 
+## 6. Database update of 24 Nov (one-time)
+Supabase → SQL Editor → New query → paste `supabase/2026-11-24.sql` → Run. Switches on: tester feedback (read it in Table Editor → feedback), shared links, exact sale dates for the sales report, and phone notifications.
+
+## Added 24 Nov 2026
+- **Feedback button** (round button bottom-left; hide it in Profile) and a **3-screen intro** for new users.
+- **Set progress:** each set page shows "84 of 120", a Missing filter and the cost to finish; Profile → Tools → Set progress lists every set you've started. "Count every version" = master set.
+- **Trade calculator** (Profile → Tools, Collection ⋯, Market): your cards vs theirs, value theirs at 100/90/80/70%, then optionally do the trade in your collection (with Undo).
+- **Card page tools:** Buying (offer prices), Selling (take-home), Grading (worth grading?), Open or keep (booster boxes), Price alert.
+- **Open or keep sealed:** expected value of a booster box's cards vs the sealed price, with editable hits-per-box (community estimates).
+- **Sales report:** sold items by Australian financial year or calendar year, profit, CSV export.
+- **Share a group:** read-only link (Collection ⋯ → Share a group) showing cards and today's prices, never what you paid.
+- **Phone notifications** for price alerts (Profile → Phone notifications; iPhone: home-screen app only). Sent each morning by `push_alerts.py` (workflow "Price alert notifications"); its key is made on the first run and kept in the database.
+
 ## Publishing on the App Store for everyone (later)
 
 TestFlight is enough for you (and up to 100 people you invite). A public App Store listing also needs App Review, screenshots, a privacy policy page, and the rights to show the card pictures: they're TCGplayer's photos of Bandai's card art. For a public release, switch the pictures to your own photos only (`tcgImage` in `src/data.js`).

@@ -65,6 +65,11 @@ export default function Market() {
         <T mute size={15.5} w="medium">Search {d.cat.list.length.toLocaleString()} cards</T>
       </Pressable>
 
+      <ChipRow pad={wide ? 0 : 18} style={wide ? { marginTop: 12 } : { marginHorizontal: -18, marginTop: 12 }}>
+        <Chip onPress={() => router.push('/trade')}>⇄ Trade calculator</Chip>
+        <Chip onPress={() => router.push('/sets')}>Set progress</Chip>
+        <Chip onPress={() => router.push('/watchlist')}>☆ Watchlist</Chip>
+      </ChipRow>
       <Rail title="Your watchlist" cards={favCards} onMore={() => router.push('/watchlist')} />
       <Rail title="Top promos" cards={r.promos} />
       <Rail title="Rising this week" cards={r.up} onMore={() => router.push('/movers')} />

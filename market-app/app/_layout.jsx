@@ -9,6 +9,7 @@ import { DataProvider } from '../src/data';
 import { F, useTheme } from '../src/theme';
 import { watchForUpdates } from '../src/update';
 import { ToastHost } from '../src/toast';
+import { FeedbackButton, Tour, useTourStart } from '../src/feedback';
 import { emit } from '../src/bus';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -51,6 +52,7 @@ function useShortcuts() {
 function Nav() {
   const c = useTheme();
   useShortcuts();
+  useTourStart();
   return (
     <View style={{ flex: 1 }}>
       <StatusBar style="light" />
@@ -68,7 +70,13 @@ function Nav() {
         <Stack.Screen name="movers" options={{ title: 'Market movers' }} />
         <Stack.Screen name="import" options={{ title: 'Import a collection', presentation: 'modal' }} />
         <Stack.Screen name="watchlist" options={{ title: 'Watchlist' }} />
+        <Stack.Screen name="trade" options={{ title: 'Trade calculator' }} />
+        <Stack.Screen name="sales" options={{ title: 'Sales report' }} />
+        <Stack.Screen name="sets" options={{ title: 'Set progress' }} />
+        <Stack.Screen name="share/[id]" options={{ title: '' }} />
       </Stack>
+      <FeedbackButton />
+      <Tour />
       <ToastHost />
     </View>
   );

@@ -9,8 +9,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { ChipRow } from '../../src/screen';
 import { versionTag } from '../../src/find';
 import { OfferPrices, SellCalc } from '../../src/money';
+import { GradeCalc } from '../../src/grade';
+import { BoxEV } from '../../src/ev';
 import { toast } from '../../src/toast';
 import { haptic } from '../../src/haptic';
+import { usePref } from '../../src/prefs';
 
 export default function CardScreen() {
   const { k } = useLocalSearchParams();
@@ -89,11 +92,7 @@ export default function CardScreen() {
         <T style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>eBay US sold</T>
       </View>
 
-      {ref.usd != null ? <View style={{ marginTop: 14, gap: 14 }}>
-        <OfferPrices a={ref.usd * d.fx} src={ref.src} />
-        <SellCalc value={ref.usd * d.fx} paid={null} title="If you sold one" />
-      </View> : null}
-      <AlertBox card={card} fav={fav} refA={ref.usd == null ? null : ref.usd * d.fx} src={ref.src} run={run} />
+      <Tools card={card} ref_={ref} fav={fav} run={run} />
 
       <Section title="My collection">
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -235,5 +234,26 @@ function AlertBox({ card, fav, refA, src, run }) {
       </View>
       {d.favLocal ? <T mute size={12}>Saved on this device only for now.</T> : null}
     </Section>
+  );
+}
+
+// Buying / selling / grading / opening / alert tools: one at a time so the page stays short
+function Tools({ card, ref_: ref, fav, run }) {
+  const d = useData(), c = useTheme();
+  const box = card.t === 'sealed' && /booster box$/i.test(clean(card.n));
+  const list = ref.usd == null ? [] : [['buy', 'Buying'], ['sell', 'Selling'], ...(box ? [['open', 'Open or keep']] : []), ...(card.t === 'card' ? [['grade', 'Grading']] : []), ['alert', 'Price alert']];
+  const [tool, setTool] = usePref('cardTool', 'buy');
+  if (!list.length) return null;
+  const t = list.some(([k]) => k === tool) ? tool : box ? 'open' : 'buy';
+  const a = ref.usd * d.fx;
+  return (
+    <View style={{ marginTop: 16, gap: 10 }}>
+      <ChipRow>{list.map(([k, l]) => <Chip key={k} on={t === k} onPress={() => setTool(k)}>{l}</Chip>)}</ChipRow>
+      {t === 'buy' ? <OfferPrices a={a} src={ref.src} />
+        : t === 'sell' ? <SellCalc value={a} paid={null} title="If you sold one" />
+        : t === 'open' ? <BoxEV setId={card.g} />
+        : t === 'grade' ? <GradeCalc card={card} raw={a} />
+        : <AlertBox card={card} fav={fav} refA={a} src={ref.src} run={run} />}
+    </View>
   );
 }

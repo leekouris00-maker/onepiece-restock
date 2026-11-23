@@ -12,6 +12,7 @@ import { ItemMenu, MoveTo, SetPaid, useOwnedActions } from '../../src/ownact';
 import { usePref } from '../../src/prefs';
 import { exportCollection } from '../../src/csv';
 import { setToastLift, toast } from '../../src/toast';
+import { ShareSheet } from '../../src/share';
 
 const SORTS = [['value', 'Highest value'], ['profit', 'Profit / loss'], ['move', 'Biggest change'], ['name', 'Name'], ['new', 'Newest']];
 const SHOW = [['owned', 'Owned'], ['sold', 'Sold']];
@@ -25,6 +26,7 @@ export default function Collection() {
   const [shut, setShut] = useState({});
   const [menu, setMenu] = useState(null);          // entry whose long-press menu is open
   const [more, setMore] = useState(false);
+  const [share, setShare] = useState(false);
   const [sel, setSel] = useState(null);            // Set of ids when selecting, else null
   const [bulk, setBulk] = useState(null);          // 'move' | 'paid'
   const sold = show === 'sold';
@@ -158,7 +160,12 @@ export default function Collection() {
         <MenuItem icon="cloud-upload-outline" label="Import a CSV" sub="From Collectr, TCGplayer or a spreadsheet" onPress={() => { setMore(false); router.push('/import'); }} />
         <MenuItem icon="download-outline" label="Export as CSV" sub="Opens in Excel or Google Sheets" onPress={() => { setMore(false); exportCollection(d); }} />
         <MenuItem icon="star-outline" label="Watchlist and price alerts" onPress={() => { setMore(false); router.push('/watchlist'); }} />
+        <MenuItem icon="grid-outline" label="Set progress" sub="What’s missing from each set" onPress={() => { setMore(false); router.push('/sets'); }} />
+        <MenuItem icon="share-outline" label="Share a group" sub="A read-only link for a buyer or a friend" onPress={() => { setMore(false); setShare(true); }} />
+        <MenuItem icon="swap-horizontal" label="Trade calculator" onPress={() => { setMore(false); router.push('/trade'); }} />
+        <MenuItem icon="receipt-outline" label="Sales report" sub="Sold items and profit by year" onPress={() => { setMore(false); router.push('/sales'); }} />
       </Sheet>
+      <ShareSheet open={share} onClose={() => setShare(false)} />
       <Sheet open={!!bulk} onClose={() => setBulk(null)} title={bulk === 'move' ? `Move ${chosen.length} to a group` : 'Price paid'}>
         {bulk === 'move' ? <MoveTo list={chosen} onDone={() => { setBulk(null); setSel(null); }} /> : bulk === 'paid' ? <SetPaid list={chosen} onDone={() => { setBulk(null); setSel(null); }} /> : null}
       </Sheet>

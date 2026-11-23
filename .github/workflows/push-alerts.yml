@@ -1,0 +1,53 @@
+# Price-alert phone notifications for the One Piece Market app (push_alerts.py).
+# Runs after the morning price updates; can also be started by hand (tick "test" to send a test message).
+name: Price alert notifications
+
+on:
+  schedule:
+    - cron: "7 22 * * *"      # 9:07am Melbourne in summer, after both price jobs
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "Send a test message to every phone instead"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: push-alerts
+  cancel-in-progress: false
+
+jobs:
+  alerts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - run: pip install --quiet pywebpush cryptography
+
+      - name: Send price alerts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python push_alerts.py ${{ inputs.test && '--test' || '' }}
+
+      - name: Save the public key for the app
+        run: |
+          [ -f push_public_key.txt ] || exit 0
+          git config user.name "market-data"
+          git config user.email "restock-bot@users.noreply.github.com"
+          git add push_public_key.txt
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -m "Notification public key"
+          for i in 1 2 3 4 5; do
+            git pull --rebase && git push && exit 0
+            sleep $((i * 5))
+          done
+          exit 1

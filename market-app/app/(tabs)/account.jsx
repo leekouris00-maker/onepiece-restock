@@ -3,6 +3,10 @@ import { Linking, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { exportCollection } from '../../src/csv';
 import { useWide } from '../../src/layout';
+import { PushSection } from '../../src/pushui';
+import { FeedbackSheet } from '../../src/feedback';
+import { usePref } from '../../src/prefs';
+import { MenuItem } from '../../src/ui';
 import { supabase, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { Button, Choice, Field, Section, T } from '../../src/ui';
@@ -12,6 +16,9 @@ import { siteBase } from '../../src/ocr';
 export default function Account() {
   const d = useData(), c = useTheme(), wide = useWide();
   const { back } = useLocalSearchParams();
+  const [fb, setFb] = useState(false);
+  const [fbBtn, setFbBtn] = usePref('fbButton', true);
+  const [, setToured] = usePref('toured', null);
   const [del, setDel] = useState(0); const [delMsg, setDelMsg] = useState('');
   const [email, setEmail] = useState(''); const [pw, setPw] = useState(''); const [msg, setMsg] = useState(''); const [wait, setWait] = useState(false);
   const go = async up => {
@@ -51,10 +58,22 @@ export default function Account() {
           <Button ghost icon="download-outline" onPress={() => exportCollection(d)}>Export CSV</Button>
         </View>
       </Section> : null}
+      <Section title="Tools">
+        <MenuItem icon="swap-horizontal" label="Trade calculator" sub="Your cards against theirs, at today’s prices" onPress={() => router.push('/trade')} />
+        <MenuItem icon="grid-outline" label="Set progress" sub="How close you are to finishing each set" onPress={() => router.push('/sets')} />
+        {d.session ? <MenuItem icon="receipt-outline" label="Sales report" sub="What you sold each year, with profit" onPress={() => router.push('/sales')} /> : null}
+      </Section>
+      <PushSection />
       <Section title="Watchlist and price alerts">
         <T mute size={14}>Star cards to follow them and get told in the app when they pass a price you set.{d.favLocal && d.session ? ' Kept on this device for now (run supabase/watchlist.sql to save it to your account).' : ''}</T>
         <Button ghost icon="star-outline" onPress={() => router.push('/watchlist')}>{`Open watchlist${d.favs.length ? ` (${d.favs.length})` : ''}`}</Button>
       </Section>
+      <Section title="Help and feedback">
+        <MenuItem icon="chatbubble-ellipses-outline" label="Report a problem or idea" onPress={() => setFb(true)} />
+        <MenuItem icon="eye-outline" label={fbBtn ? 'Hide the feedback button' : 'Show the feedback button'} sub="The small round button in the corner" onPress={() => setFbBtn(!fbBtn)} />
+        <MenuItem icon="play-circle-outline" label="Show the intro again" onPress={() => setToured(false)} />
+      </Section>
+      <FeedbackSheet open={fb} onClose={() => setFb(false)} />
       <Section title="Display">
         <Choice label="Currency" value={d.cur} onChange={d.setCur} options={['AUD', 'USD']} />
       </Section>
@@ -90,7 +109,7 @@ export default function Account() {
       {wide ? <Section title="Keyboard shortcuts">
         <T mute size={14}>/ search · N add an item · S scan · Esc close or go back. In the Collection table, click a quantity or price to change it.</T>
       </Section> : null}
-      <T mute size={11.5} style={{ textAlign: 'center', marginTop: 10 }}>Version 23 Nov</T>
+      <T mute size={11.5} style={{ textAlign: 'center', marginTop: 10 }}>Version 24 Nov</T>
     </View></Screen>
   );
 }
