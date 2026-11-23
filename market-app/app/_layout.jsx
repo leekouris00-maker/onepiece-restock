@@ -71,6 +71,8 @@ function Nav() {
         <Stack.Screen name="import" options={{ title: 'Import a collection', presentation: 'modal' }} />
         <Stack.Screen name="watchlist" options={{ title: 'Watchlist' }} />
         <Stack.Screen name="trade" options={{ title: 'Trade calculator' }} />
+        <Stack.Screen name="deck" options={{ title: 'Deck price' }} />
+        <Stack.Screen name="deals" options={{ title: 'Deal alerts' }} />
         <Stack.Screen name="sales" options={{ title: 'Sales report' }} />
         <Stack.Screen name="sets" options={{ title: 'Set progress' }} />
         <Stack.Screen name="share/[id]" options={{ title: '' }} />

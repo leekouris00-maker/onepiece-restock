@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Linking, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { pickPhoto } from '../../src/photo';
-import { clean, median, today, useData } from '../../src/data';
+import { clean, cols, median, today, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { Button, CardArt, Chip, Choice, Confidence, Empty, Field, Section, Sparkline, Stat, T, ago as agoDay } from '../../src/ui';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -10,6 +10,7 @@ import { ChipRow } from '../../src/screen';
 import { versionTag } from '../../src/find';
 import { OfferPrices, SellCalc } from '../../src/money';
 import { GradeCalc } from '../../src/grade';
+import { PriceHistory, SignalLine } from '../../src/history';
 import { BoxEV } from '../../src/ev';
 import { toast } from '../../src/toast';
 import { haptic } from '../../src/haptic';
@@ -82,10 +83,10 @@ export default function CardScreen() {
       {!card.mine && d.cat ? <T mute size={12} style={{ marginTop: 8 }}>{`TCGplayer prices updated ${agoDay(d.cat.meta.updated)} (${d.cat.meta.updated}) · US$1 = A$${d.cat.meta.fx}`}</T> : null}
       <LastSold key={card.k} card={card} cp={cp} w={w} search={search}
         onTrack={() => run(() => d.setTrack(card.k, { q: (w?.q || q).trim(), lang: w ? w.lang || null : lang || null, graded: w ? w.graded ?? null : graded === 'any' ? null : graded === 'true' }))} />
-      {!card.mine && <View style={{ marginTop: 14 }}>
-        <Sparkline hist={card.h} now={card.m} width={Math.min(width, 820) - 40} label={card.m != null ? lab(card.m) : ''} />
-        <T mute size={12.5}>TCGplayer market price, last 35 days</T>
-      </View>}
+      {!card.mine ? <>
+        <SignalLine card={card} />
+        <PriceHistory card={card} width={Math.min(width, 820) - 40} />
+      </> : null}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 18, marginTop: 12 }}>
         {!card.mine && <T style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.tcgplayer.com/product/${card.k.slice(2)}`)}>Open on TCGplayer</T>}
         <T style={{ color: c.link }} onPress={() => Linking.openURL(`https://www.ebay.com.au/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`)}>eBay AU sold</T>
@@ -218,19 +219,22 @@ function AlertBox({ card, fav, refA, src, run }) {
   const d = useData(), c = useTheme();
   const [below, setBelow] = useState(fav?.below != null ? String(fav.below) : '');
   const [above, setAbove] = useState(fav?.above != null ? String(fav.above) : '');
+  const [deal, setDeal] = useState(fav?.deal_below != null ? String(fav.deal_below) : '');
   if (refA == null) return null;
   const num = v => { const x = parseFloat(String(v).replace(',', '.')); return isNaN(x) ? null : x; };
-  const has = fav && (fav.below != null || fav.above != null);
+  const has = fav && (fav.below != null || fav.above != null || fav.deal_below != null);
   return (
     <Section title="Price alert" right={<Ionicons name={has ? 'notifications' : 'notifications-outline'} size={18} color={has ? c.accent : c.mute} />}>
       <T mute size={13.5}>Now {d.aud(refA)} ({src}). When it passes your price, it shows at the top of Home and in your watchlist.</T>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
         <Field label="Tell me if it drops to (A$)" value={below} onChangeText={setBelow} keyboardType="decimal-pad" placeholder={(refA * 0.85).toFixed(0)} />
         <Field label="Or rises to (A$)" value={above} onChangeText={setAbove} keyboardType="decimal-pad" placeholder={(refA * 1.2).toFixed(0)} />
+        {!card.mine ? <Field label="Deal alert: someone lists it on eBay AU for (A$, with postage) or less" value={deal} onChangeText={setDeal} keyboardType="decimal-pad" placeholder={(refA * 0.8).toFixed(0)} style={{ flexBasis: '100%' }} /> : null}
       </View>
+      {!card.mine ? <T mute size={12}>{cols.deal ? 'Deal alerts check eBay AU Buy It Now listings every 2 hours (raw cards, matching this card number).' : 'Deal alerts switch on once eBay is connected (see Profile → Deal alerts).'}</T> : null}
       <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
-        <Button onPress={() => run(async () => { await d.setFav(card.k, { below: num(below), above: num(above) }); haptic('success'); toast('Alert saved'); })}>{has ? 'Update alert' : 'Set alert'}</Button>
-        {has ? <Button ghost onPress={() => run(async () => { await d.setFav(card.k, {}); setBelow(''); setAbove(''); toast('Alert removed'); })}>Remove alert</Button> : null}
+        <Button onPress={() => run(async () => { await d.setFav(card.k, { below: num(below), above: num(above), ...(cols.deal ? { deal_below: num(deal) } : {}) }); haptic('success'); toast('Alert saved'); })}>{has ? 'Update alert' : 'Set alert'}</Button>
+        {has ? <Button ghost onPress={() => run(async () => { await d.setFav(card.k, { below: null, above: null, ...(cols.deal ? { deal_below: null } : {}) }); setBelow(''); setAbove(''); setDeal(''); toast('Alert removed'); })}>Remove alert</Button> : null}
       </View>
       {d.favLocal ? <T mute size={12}>Saved on this device only for now.</T> : null}
     </Section>

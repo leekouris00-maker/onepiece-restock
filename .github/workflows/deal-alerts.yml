@@ -1,0 +1,38 @@
+# eBay deal alerts for the One Piece Market app (deal_alerts.py): live eBay AU listings at or below the
+# deal price people set on their watchlist. Needs EBAY_CLIENT_ID / EBAY_CLIENT_SECRET (free eBay developer
+# keys); does nothing until they're added.
+name: eBay deal alerts
+
+on:
+  schedule:
+    - cron: "23 */2 * * *"    # every 2 hours
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deal-alerts
+  cancel-in-progress: false
+
+jobs:
+  deals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - run: pip install --quiet pywebpush cryptography
+
+      - name: Look for deals
+        env:
+          EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}
+          EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
+          EBAY_CAMPAIGN_ID: ${{ secrets.EBAY_CAMPAIGN_ID }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python deal_alerts.py

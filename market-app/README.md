@@ -87,6 +87,16 @@ Supabase → SQL Editor → New query → paste `supabase/2026-11-24.sql` → Ru
 - **Share a group:** read-only link (Collection ⋯ → Share a group) showing cards and today's prices, never what you paid.
 - **Phone notifications** for price alerts (Profile → Phone notifications; iPhone: home-screen app only). Sent each morning by `push_alerts.py` (workflow "Price alert notifications"); its key is made on the first run and kept in the database.
 
+## 7. eBay deal alerts (one-time setup)
+1. Supabase → SQL Editor → paste `supabase/2026-11-24b.sql` → Run.
+2. Make a free eBay developer account (developer.ebay.com), create a **Production** keyset, and add its App ID and Cert ID to GitHub → Settings → Secrets → Actions as `EBAY_CLIENT_ID` and `EBAY_CLIENT_SECRET`. Optional: an eBay Partner Network campaign id as `EBAY_CAMPAIGN_ID` for affiliate links.
+3. On any card: Price alert → "Deal alert" price. The "eBay deal alerts" workflow checks every 2 hours.
+
+## Added 24 Nov 2026 (night)
+- **Deck price** (Market, Profile → Tools): paste a decklist → whole-deck cost, what you own, cost to finish, copy a shopping list.
+- **Long price history:** card charts 1M / 3M / 6M / 1Y / All, back to Feb 2024 once the "Long price history" workflow has been run with backfill; 90-day high/low signals on card pages and "Price signals" on Home.
+- **eBay deal alerts:** see step 7; deals show on Home, in Profile → Tools → eBay deals, and as notifications.
+
 ## Publishing on the App Store for everyone (later)
 
 TestFlight is enough for you (and up to 100 people you invite). A public App Store listing also needs App Review, screenshots, a privacy policy page, and the rights to show the card pictures: they're TCGplayer's photos of Bandai's card art. For a public release, switch the pictures to your own photos only (`tcgImage` in `src/data.js`).

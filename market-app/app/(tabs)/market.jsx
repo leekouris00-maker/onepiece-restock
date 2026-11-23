@@ -66,6 +66,7 @@ export default function Market() {
       </Pressable>
 
       <ChipRow pad={wide ? 0 : 18} style={wide ? { marginTop: 12 } : { marginHorizontal: -18, marginTop: 12 }}>
+        <Chip onPress={() => router.push('/deck')}>Deck price</Chip>
         <Chip onPress={() => router.push('/trade')}>⇄ Trade calculator</Chip>
         <Chip onPress={() => router.push('/sets')}>Set progress</Chip>
         <Chip onPress={() => router.push('/watchlist')}>☆ Watchlist</Chip>

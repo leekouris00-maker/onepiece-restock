@@ -57,7 +57,7 @@ const isOnline = () => (typeof navigator === 'undefined' || navigator.onLine !==
 
 // database rows <-> app objects
 // Columns added by later database updates: only sent once the database has them (supabase/2026-11-24.sql)
-export const cols = { soldAt: false, notified: false };
+export const cols = { soldAt: false, notified: false, deal: false };
 const fromOwned = r => ({ id: r.id, card: r.card, name: r.name, qty: r.qty, kind: r.kind, cond: r.cond, lang: r.lang, group: r.grp || 'Other', paid: r.paid, value: r.value, notes: r.notes || '', status: r.status, soldFor: r.sold_for, added: r.added, num: r.num, photo: r.photo,
   soldAt: r.sold_at || null, updated: r.updated_at ? String(r.updated_at).slice(0, 10) : null });
 const toOwned = o => {
@@ -142,7 +142,8 @@ export function DataProvider({ children }) {
     if (!supabase || !session) return local();
     const r = await supabase.from('watchlist').select('*');
     if (r.error) return local();                       // table not created yet (run supabase/watchlist.sql)
-    if (r.data && r.data[0]) cols.notified = 'notified' in r.data[0];
+    if (r.data && r.data[0]) { cols.notified = 'notified' in r.data[0]; cols.deal = 'deal_below' in r.data[0]; }
+    else if (!r.error) { const t = await supabase.from('watchlist').select('deal_below').limit(1); cols.deal = !t.error; const t2 = await supabase.from('watchlist').select('notified').limit(1); cols.notified = !t2.error; }
     setFavLocal(false); setFavs(r.data || []);
   }, [session, uid]);
   const refresh = useCallback(async () => {
@@ -213,7 +214,11 @@ export function DataProvider({ children }) {
     async removeMany(ids) { need(); if (!ids.length) return; check(await supabase.from('owned').delete().in('id', ids)); const s = new Set(ids); setOwned(a => a.filter(x => !s.has(x.id))); },
     // watchlist + price alerts (A$). Kept in the database when supabase/watchlist.sql has been run, else on this device.
     async setFav(card, f) {
-      const row = { card, below: f?.below ?? null, above: f?.above ?? null, created_at: favs.find(x => x.card === card)?.created_at || new Date().toISOString() };
+      // fields left out keep their current value; pass null to clear one
+      const old = favs.find(x => x.card === card) || {};
+      const pick = k => (f && k in f ? f[k] : old[k] ?? null);
+      const row = { card, below: pick('below'), above: pick('above'), created_at: old.created_at || new Date().toISOString() };
+      if (cols.deal) row.deal_below = pick('deal_below');
       if (cols.notified) { row.notified = null; row.notified_at = null; }   // a new price = a new alert
       const next = [...favs.filter(x => x.card !== card), row];
       if (!favLocal && supabase && session) { need(); check(await supabase.from('watchlist').upsert(row, { onConflict: 'user_id,card' })); }
@@ -282,6 +287,8 @@ export function DataProvider({ children }) {
     async removeShare(id) { need(); check(await supabase.from('shares').delete().eq('id', id)); },
     // Phone notifications
     async savePushSub(sub, device) { need(); const j = sub.toJSON ? sub.toJSON() : sub; const r = await supabase.from('push_subs').upsert({ endpoint: j.endpoint, sub: j, device }); if (r.error) throw new Error(/push_subs|schema cache/i.test(r.error.message) ? 'NOT_SET_UP' : r.error.message); },
+    async listDeals() { if (!supabase || !session) return []; const r = await supabase.from('deals').select('*').order('found_at', { ascending: false }).limit(100); if (r.error) throw new Error(/deals|schema cache/i.test(r.error.message) ? 'NOT_SET_UP' : r.error.message); return r.data || []; },
+    async dismissDeal(item) { need(); check(await supabase.from('deals').delete().eq('item_id', item)); },
     async removePushSub(endpoint) { if (supabase && session) await supabase.from('push_subs').delete().eq('endpoint', endpoint); },
     async untrack(card) { need(); check(await supabase.from('watch').delete().eq('card', card)); setWatch(a => a.filter(x => x.card !== card)); },
     async addPhoto(target, uri) {

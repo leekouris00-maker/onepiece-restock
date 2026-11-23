@@ -6,6 +6,8 @@ import { useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
 import { Button, ChangePill, Empty, GlowChart, Note, Panel, Select, Skel, SkelRows, T } from '../../src/ui';
 import { AlertList } from '../../src/alerts';
+import { SignalsPanel } from '../../src/history';
+import { DealsPanel } from '../../src/deals';
 import { Heading, IconBtn, Screen, TileRail } from '../../src/screen';
 import { useTiles } from '../../src/layout';
 import { CardTile, OwnedRow } from '../../src/tiles';
@@ -85,6 +87,8 @@ export default function Home() {
         <>
           {d.loadError ? <Note tone="warn" title="Couldn’t load your collection" style={{ marginTop: 14 }} action="Retry" onAction={() => d.refresh()}>{d.loadError}</Note> : null}
           {d.alerts.length ? <View style={{ marginTop: 14 }}><AlertList max={4} /></View> : null}
+          <DealsPanel />
+          <SignalsPanel />
           <View style={wide ? { flexDirection: 'row', gap: 28, alignItems: 'flex-start', marginTop: 8 } : null}>
           <View style={wide ? { flex: 1.35, minWidth: 0 } : null}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 }}>

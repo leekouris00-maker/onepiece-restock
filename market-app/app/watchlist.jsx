@@ -35,7 +35,7 @@ export default function Watchlist() {
                   <View style={{ flex: 1, gap: 2 }}>
                     <T w="semi" size={14.5} numberOfLines={1}>{clean(card.n)}</T>
                     <T size={12.5} mute numberOfLines={1}>{[card.num, versionTag(d.cat, card)].filter(Boolean).join(' · ')}</T>
-                    {f.below != null || f.above != null ? <T size={12} style={{ color: c.accent }}>{[f.below != null && `alert below ${d.aud(Number(f.below))}`, f.above != null && `above ${d.aud(Number(f.above))}`].filter(Boolean).join(' · ')}</T> : null}
+                    {f.below != null || f.above != null || f.deal_below != null ? <T size={12} style={{ color: c.accent }}>{[f.below != null && `alert below ${d.aud(Number(f.below))}`, f.above != null && `above ${d.aud(Number(f.above))}`, f.deal_below != null && `deals under A$${Number(f.deal_below)}`].filter(Boolean).join(' · ')}</T> : null}
                   </View>
                   <View style={{ alignItems: 'flex-end', gap: 2 }}>
                     <T w="bold" size={14.5}>{d.money(r.usd)}</T>

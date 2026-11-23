@@ -1,0 +1,50 @@
+# Long price history for the One Piece Market app (charts beyond 35 days, 90-day highs/lows).
+# Daily after "Market data prices"; run by hand with "backfill" once to read tcgcsv.com's archives.
+name: Long price history
+
+on:
+  schedule:
+    - cron: "37 21 * * *"     # after Market data prices (21:17 UTC)
+  workflow_dispatch:
+    inputs:
+      backfill:
+        description: "Read tcgcsv.com's daily archives back to Feb 2024 (only needed once)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tcgplayer
+  cancel-in-progress: false
+
+jobs:
+  history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Make sure 7z is there
+        run: which 7z || (sudo apt-get update && sudo apt-get install -y p7zip-full)
+
+      - name: Update the price history
+        run: python long_history.py ${{ inputs.backfill && '--backfill' || '' }}
+
+      - name: Save
+        run: |
+          git config user.name "market-data"
+          git config user.email "restock-bot@users.noreply.github.com"
+          git add price_history price_signals.json
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -m "Update long price history"
+          for i in 1 2 3 4 5; do
+            git pull --rebase && git push && exit 0
+            sleep $((i * 5))
+          done
+          exit 1

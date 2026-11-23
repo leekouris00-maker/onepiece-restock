@@ -59,6 +59,8 @@ export default function Account() {
         </View>
       </Section> : null}
       <Section title="Tools">
+        <MenuItem icon="layers-outline" label="Deck price" sub="Paste a decklist: cost, what you own, what’s missing" onPress={() => router.push('/deck')} />
+        {d.session ? <MenuItem icon="pricetag-outline" label="eBay deals" sub="Listings under the deal prices you set" onPress={() => router.push('/deals')} /> : null}
         <MenuItem icon="swap-horizontal" label="Trade calculator" sub="Your cards against theirs, at today’s prices" onPress={() => router.push('/trade')} />
         <MenuItem icon="grid-outline" label="Set progress" sub="How close you are to finishing each set" onPress={() => router.push('/sets')} />
         {d.session ? <MenuItem icon="receipt-outline" label="Sales report" sub="What you sold each year, with profit" onPress={() => router.push('/sales')} /> : null}
