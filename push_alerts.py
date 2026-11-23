@@ -25,10 +25,28 @@ SITE = "https://leekouris00-maker.github.io/onepiece-restock/"
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
+def key_kind(key):
+    """What sort of Supabase key the secret holds (never prints the key itself)."""
+    if key.startswith("sb_secret_"):
+        return "secret key"
+    if key.startswith("sb_publishable_"):
+        return "PUBLISHABLE key (public, can't read other people's rows)"
+    if key.count(".") == 2:
+        try:
+            part = key.split(".")[1]
+            role = json.loads(base64.urlsafe_b64decode(part + "=" * (-len(part) % 4))).get("role")
+            return f"legacy JWT key, role={role}"
+        except Exception:  # noqa: BLE001
+            return "unreadable JWT"
+    return "unknown format"
+
+
 def sb(method, path, body=None, prefer=None):
     url = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/" + path
     key = os.environ["SUPABASE_SERVICE_KEY"].strip()
-    h = {"apikey": key, "Authorization": "Bearer " + key, "Content-Type": "application/json"}
+    h = {"apikey": key, "Content-Type": "application/json"}
+    if key.count(".") == 2:          # legacy JWT keys also go in Authorization; new sb_secret_ keys only in apikey
+        h["Authorization"] = "Bearer " + key
     if prefer:
         h["Prefer"] = prefer
     req = urllib.request.Request(url, data=None if body is None else json.dumps(body).encode(), headers=h, method=method)
@@ -98,6 +116,7 @@ def main():
     if not os.environ.get("SUPABASE_URL") or not os.environ.get("SUPABASE_SERVICE_KEY"):
         print("::notice::SUPABASE_URL / SUPABASE_SERVICE_KEY not set: no notifications sent")
         return 0
+    print("database key:", key_kind(os.environ["SUPABASE_SERVICE_KEY"].strip()))
     try:
         pem, pub = keys()
     except RuntimeError as e:
