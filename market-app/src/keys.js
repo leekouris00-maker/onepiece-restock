@@ -42,6 +42,8 @@ export const COMMANDS = [
   { id: 'swipe', group: 'Your collection', label: 'Quick changes', sub: 'Swipe a row left for −1 / +1 / Sold; hold it for the full menu', icon: 'hand-left-outline', where: 'Collection on a phone', info: true },
   { id: 'reload', group: 'Your collection', label: 'Reload', sub: 'Latest prices and your saved items', icon: 'refresh', keys: ['r'], run: d => { d.refresh(); d.loadCatalog(true); toast('Reloading prices and your collection…'); } },
 
+  { id: 'meta', group: 'Prices and alerts', label: 'Ban & Meta Radar', sub: 'Ban list changes and winning decks, checked against your cards', icon: 'shield-half-outline', keys: ['g b'], run: page('/meta'), tile: true },
+  { id: 'promos', group: 'Prices and alerts', label: 'Promos & prize events', sub: 'Official events on now, their prize cards and every promo by price', icon: 'trophy-outline', keys: ['g x'], run: page('/promos'), tile: true },
   { id: 'watchlist', group: 'Prices and alerts', label: 'Watchlist', sub: 'Cards you follow, with your price alerts', icon: 'star-outline', keys: ['g w'], run: page('/watchlist'), tile: true },
   { id: 'movers', group: 'Prices and alerts', label: 'Market movers', sub: 'Biggest risers and fallers this week', icon: 'trending-up-outline', run: page('/movers'), tile: true },
   { id: 'deals', group: 'Prices and alerts', label: 'eBay deals', sub: 'Listings under the deal prices you set', icon: 'pricetag-outline', keys: ['g e'], run: page('/deals'), need: 'session', tile: true },

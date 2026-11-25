@@ -23,7 +23,7 @@ import urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 API = "https://play.limitlesstcg.com/api"
 OUT = os.path.join(HERE, "meta.json")
-CARD = re.compile(r"\b((?:OP|ST|EB|PRB)\d{2}-\d{3}|P-\d{3})\b", re.I)
+CARD = re.compile(r"(?<![A-Z0-9])((?:OP|ST|EB|PRB)\d{2}-\d{3}|P-\d{3})(?![0-9])", re.I)
 MIN_PLAYERS, TOP, WINDOW, MAX_EVENTS = 16, 8, 14, 30
 
 
@@ -43,6 +43,11 @@ def cards_in(decklist):
     def walk(x, count=None):
         if isinstance(x, dict):
             n = x.get("count") or x.get("amount") or x.get("qty")
+            st, nu = x.get("set") or x.get("set_code"), x.get("number") or x.get("num")
+            if isinstance(st, str) and nu is not None and not CARD.search(str(nu)):
+                k = f"{st.upper()}-{str(nu).zfill(3)}" if re.match(r"^(OP|ST|EB|PRB)\d{2}$", st, re.I) else None
+                if k:
+                    found[k] = max(found.get(k, 0), n if isinstance(n, int) else 1)
             for v in x.values():
                 walk(v, n if isinstance(n, int) else count)
         elif isinstance(x, list):
@@ -86,6 +91,7 @@ def main():
     print(f"{len(use)} events with {MIN_PLAYERS}+ players in the last {WINDOW * 2} days")
 
     windows = {"now": [], "before": []}
+    shown = [False]
     leader_names = {}
     for t in use:
         try:
@@ -101,6 +107,9 @@ def main():
             deck = s.get("deck") or {}
             lead = deck.get("name") or deck.get("id") or "Unknown"
             cs = cards_in(s["decklist"])
+            if not cs and not shown[0]:
+                print("  sample decklist (no card numbers found):", json.dumps(s["decklist"])[:600])
+                shown[0] = True
             windows[w].append({"leader": lead, "cards": cs})
             leader_names[lead] = lead
             n += 1

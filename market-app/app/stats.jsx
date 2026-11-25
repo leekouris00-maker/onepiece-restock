@@ -12,7 +12,7 @@ import { POINT_AUD } from '../src/points';
 
 const FEATURE = { open: 'Opened the app', checkin: 'Daily check-in', search: 'Searched', card_add: 'Added to collection', scan_add: 'Scanned and added', alert_set: 'Set a price alert',
   import: 'Imported a CSV', export: 'Exported a CSV', trade: 'Trade calculator', deck: 'Deck price', sets: 'Set progress', sales: 'Sales report', watchlist: 'Watchlist',
-  rewards: 'Rewards page', shop: 'Points shop', share: 'Shared a group' };
+  rewards: 'Rewards page', shop: 'Points shop', share: 'Shared a group', meta: 'Ban & Meta Radar', promos: 'Promos & prize events' };
 const pct = ([r, e]) => (e ? `${Math.round((r / e) * 100)}%` : '–');
 
 export default function Stats() {

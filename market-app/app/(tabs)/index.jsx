@@ -24,11 +24,11 @@ function CheckInCard() {
       style={({ pressed, hovered }) => ({ marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, paddingRight: 14, borderRadius: 16,
         backgroundColor: pressed || hovered ? c.raise : c.panel, borderWidth: 1, borderColor: c.accentDim })}>
       <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: c.accentDim, alignItems: 'center', justifyContent: 'center' }}>
-        <Ionicons name="gift-outline" size={19} color={c.accent} />
+        <Ionicons name="newspaper-outline" size={19} color={c.accent} />
       </View>
       <View style={{ flex: 1 }}>
-        <T w="semi" size={14.5}>Daily check-in</T>
-        <T mute size={12.5}>{pts.streak ? `${pts.streak}-day streak · ` : ''}See today’s movers for +{CHECKIN} points</T>
+        <T w="semi" size={14.5}>Today’s Morning Log</T>
+        <T mute size={12.5}>{pts.streak ? `${pts.streak}-day streak · ` : ''}Your movers, ban news and events · +{CHECKIN} points</T>
       </View>
       <Ionicons name="chevron-forward" size={17} color={c.mute} />
     </Pressable>

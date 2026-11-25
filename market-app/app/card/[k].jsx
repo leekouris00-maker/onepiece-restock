@@ -16,6 +16,7 @@ import { toast } from '../../src/toast';
 import { haptic } from '../../src/haptic';
 import { usePref } from '../../src/prefs';
 import { useKeys } from '../../src/keys';
+import { banInfo, banText, useGame } from '../../src/game';
 import { on, emit } from '../../src/bus';
 
 export default function CardScreen() {
@@ -31,6 +32,7 @@ export default function CardScreen() {
   const [graded, setGraded] = useState(w ? (w.graded == null ? 'any' : String(w.graded)) : 'false');
   const [sale, setSale] = useState({ price: '', cur: d.cur, date: today(), grade: 'Raw', link: '', note: '' });
   const kb = useRef({});
+  const { game } = useGame();
   const call = name => () => kb.current[name] && kb.current[name]();
   useKeys([
     { keys: ['w'], label: 'Watch / unwatch', run: call('star') },
@@ -76,6 +78,9 @@ export default function CardScreen() {
           <T mute size={13}>{[card.num, set, card.r, card.lang].filter(Boolean).join(' · ')}</T>
           <T serif size={clean(card.n).length > 38 ? 21 : 27} style={{ lineHeight: clean(card.n).length > 38 ? 25 : 31 }}>{clean(card.n)}</T>
           <T size={13} w="semi" style={{ color: c.accent }}>{versionTag(d.cat, card)}</T>
+          {banInfo(game, card.num) ? <Pressable onPress={() => router.push('/meta')} style={{ alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, backgroundColor: 'rgba(255,91,91,0.12)' }}>
+            <T size={12.5} w="semi" style={{ color: c.down }}>{banText(banInfo(game, card.num))} ›</T>
+          </Pressable> : null}
           {n ? <T size={13.5} w="semi" style={{ color: c.gold }}>You own {n}</T> : null}
           <Chip onPress={star} on={!!fav} style={{ alignSelf: 'flex-start', marginTop: 4 }}>{(fav ? '★ On your watchlist' : '☆ Watch this card') + (wide ? '  · W' : '')}</Chip>
         </View>

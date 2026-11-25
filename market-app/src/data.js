@@ -40,7 +40,7 @@ export const median = a => { if (!a.length) return null; const s = [...a].sort((
 
 // Prices: the saved copy shows at once (and offline); a fresh copy is fetched behind it.
 // Returns [data, failed] where failed = the network fetch didn't work and the saved copy was used.
-async function loadJSON(name, fresh) {
+export async function loadJSON(name, fresh) {
   const key = 'cache:' + name;
   if (!fresh) {
     const c = await AsyncStorage.getItem(key).catch(() => null);
