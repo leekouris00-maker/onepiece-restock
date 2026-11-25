@@ -3,7 +3,7 @@ import React from 'react';
 import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { clean, useData } from '../src/data';
+import { clean, useData, useTrack } from '../src/data';
 import { useTheme } from '../src/theme';
 import { Button, CardArt, Change, Empty, Note, Panel, T } from '../src/ui';
 import { Screen } from '../src/screen';
@@ -12,6 +12,7 @@ import { toast } from '../src/toast';
 import { AlertList } from '../src/alerts';
 
 export default function Watchlist() {
+  useTrack('watchlist');
   const d = useData(), c = useTheme();
   const list = d.favs.map(f => ({ f, card: d.card(f.card) })).filter(x => x.card)
     .sort((a, b) => (d.refPrice(b.card).usd ?? -1) - (d.refPrice(a.card).usd ?? -1));

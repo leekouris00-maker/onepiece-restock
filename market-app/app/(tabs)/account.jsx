@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Linking, Pressable, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -20,6 +20,8 @@ export default function Account() {
   const { back } = useLocalSearchParams();
   const [fbBtn, setFbBtn] = usePref('fbButton', true);
   const [del, setDel] = useState(0); const [delMsg, setDelMsg] = useState('');
+  const [owner, setOwner] = useState(null);   // { owner, claimable } once the rewards SQL is in
+  useEffect(() => { setOwner(null); if (supabase && d.session) supabase.rpc('am_owner').then(r => setOwner(r.error ? null : r.data), () => {}); }, [d.session]);
   const [email, setEmail] = useState(''); const [pw, setPw] = useState(''); const [msg, setMsg] = useState(''); const [wait, setWait] = useState(false);
   const go = async up => {
     setMsg(''); setWait(true);
@@ -100,8 +102,11 @@ export default function Account() {
       </Section>
 
       <Section title="Settings">
-        <Choice label="Currency" value={d.cur} onChange={d.setCur} options={[['AUD', 'A$ Australian'], ['USD', 'US$ American']]} />
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          <Choice label="Currency" value={d.cur} onChange={d.setCur} options={[['AUD', 'A$ Australian'], ['USD', 'US$ American']]} />
+        </View>
         <MenuItem icon="eye-outline" label={fbBtn ? 'Hide the feedback button' : 'Show the feedback button'} sub="The small round button in the corner" onPress={() => setFbBtn(!fbBtn)} />
+        {owner && (owner.owner || owner.claimable) ? <MenuItem icon="stats-chart-outline" label="Owner stats" sub={owner.owner ? 'Sign-ups, who comes back, points owed, swaps to send' : 'No owner yet: open to make this account the owner'} onPress={() => router.push('/stats')} /> : null}
         <MenuItem icon="refresh-circle-outline" label="Reset this device’s settings" sub="Sort orders, views, recent searches, calculator setups. Your collection isn’t touched; Undo for a few seconds." onPress={reset} />
       </Section>
 

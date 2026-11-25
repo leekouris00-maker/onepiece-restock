@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
-import { useData } from '../src/data';
+import { useData, useTrack } from '../src/data';
 import { useTheme } from '../src/theme';
 import { Chip, Empty, Panel, T } from '../src/ui';
 import { Screen } from '../src/screen';
@@ -11,6 +11,7 @@ import { usePref } from '../src/prefs';
 import { Progress } from '../src/progress';
 
 export default function Sets() {
+  useTrack('sets');
   const d = useData(), c = useTheme();
   const [master, setMaster] = usePref('masterSet', false);
   const list = useMemo(() => (d.cat ? startedSets(d).map(s => ({ s, p: setProgress(d, s.id, master) })).filter(x => x.p.total)

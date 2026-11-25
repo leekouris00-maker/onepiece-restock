@@ -1,7 +1,7 @@
 // Collection in and out as CSV (opens in Excel / Google Sheets). Import understands this app's own export,
 // Collectr and TCGplayer exports, and most hand-made sheets: columns are matched by their headings.
 import { Platform } from 'react-native';
-import { clean, newId, today } from './data';
+import { clean, newId, today, track } from './data';
 import { versionTag } from './find';
 import { toast } from './toast';
 
@@ -145,6 +145,7 @@ export function pickFile(accept = '.csv,text/csv,text/plain') {
 }
 
 export async function exportCollection(d) {
+  track('export');
   try {
     if (!d.owned.length) { toast('Nothing in your collection to export yet'); return; }
     const ok = await saveFile(`one-piece-collection-${new Date().toISOString().slice(0, 10)}.csv`, toCSV(exportRows(d)));

@@ -20,6 +20,18 @@ export const KINDS = [
   ['premium', 'Premium boosters'], ['pre-release', 'Pre-release'], ['starter', 'Starter decks'], ['other', 'Deck sets'],
 ];
 
+// Count one use of a key feature for the owner's stats page (see supabase/2026-11-25-rewards.sql).
+// Only for signed-in people; only the names the database accepts; the same name at most every 15 s; errors ignored.
+const lastTrack = {};
+export function track(what) {
+  if (!supabase) return;
+  const now = Date.now();
+  if (lastTrack[what] && now - lastTrack[what] < 15000) return;
+  lastTrack[what] = now;
+  supabase.auth.getSession().then(({ data }) => { if (data && data.session) supabase.rpc('track', { what }).then(() => {}, () => {}); }).catch(() => {});
+}
+export function useTrack(what) { useEffect(() => { track(what); }, []); }
+
 export const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 export const today = () => new Date().toISOString().slice(0, 10);
 export const clean = n => String(n || '').replace(/\s*\((?:\d{3})\)/, '');
@@ -184,10 +196,11 @@ export function DataProvider({ children }) {
       setCachedAt(m.at); setLoaded(true);
     }).catch(() => {});
   }, [cacheKey]);
+  useEffect(() => { if (session) track('open'); }, [session]);
   useEffect(() => { if (session) refresh(); else { setOwned([]); setSales([]); setCards([]); setWatch([]); setPhotos({}); setLoadError(''); setLoaded(false); loadFavs(); } }, [session, refresh]);
   // reload whenever the app comes back to the front (pull-to-refresh doesn't exist in the web version)
   useEffect(() => {
-    const sub = AppState.addEventListener('change', st => { if (st === 'active' && Date.now() - lastLoad.current > 5000) refresh(); });
+    const sub = AppState.addEventListener('change', st => { if (st === 'active') track('open'); if (st === 'active' && Date.now() - lastLoad.current > 5000) refresh(); });
     return () => sub.remove();
   }, [refresh]);
 
@@ -201,12 +214,13 @@ export function DataProvider({ children }) {
   const check = r => { if (r.error) throw new Error(r.error.message); return r; };
 
   const api = {
-    async saveOwned(o) { need(); const row = toOwned(o); check(await supabase.from('owned').upsert(row)); setOwned(a => [...a.filter(x => x.id !== o.id), fromOwned(row)]); },
+    async saveOwned(o) { need(); const row = toOwned(o); const isNew = !owned.some(x => x.id === o.id); check(await supabase.from('owned').upsert(row)); if (isNew) track('card_add'); setOwned(a => [...a.filter(x => x.id !== o.id), fromOwned(row)]); },
     // several at once (bulk edits, scanned stacks, imports): one request
     async saveMany(list) {
       need(); if (!list.length) return;
       const rows = list.map(toOwned);
       for (let i = 0; i < rows.length; i += 200) check(await supabase.from('owned').upsert(rows.slice(i, i + 200)));
+      if (rows.some(r => !owned.some(x => x.id === r.id))) track('card_add');
       const ids = new Set(rows.map(r => r.id));
       setOwned(a => [...a.filter(x => !ids.has(x.id)), ...rows.map(fromOwned)]);
     },
@@ -221,7 +235,7 @@ export function DataProvider({ children }) {
       if (cols.deal) row.deal_below = pick('deal_below');
       if (cols.notified) { row.notified = null; row.notified_at = null; }   // a new price = a new alert
       const next = [...favs.filter(x => x.card !== card), row];
-      if (!favLocal && supabase && session) { need(); check(await supabase.from('watchlist').upsert(row, { onConflict: 'user_id,card' })); }
+      if (!favLocal && supabase && session) { need(); check(await supabase.from('watchlist').upsert(row, { onConflict: 'user_id,card' })); if (row.below != null || row.above != null) track('alert_set'); }
       else await AsyncStorage.setItem('favs:' + (uid || 'guest'), JSON.stringify(next));
       setFavs(next);
     },

@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { clean, newId, today, useData } from '../src/data';
+import { clean, newId, today, useData, useTrack } from '../src/data';
 import { F, useTheme } from '../src/theme';
 import { Button, CardArt, Chip, Panel, SearchBar, T } from '../src/ui';
 import { Screen } from '../src/screen';
@@ -17,6 +17,7 @@ import { Progress } from '../src/progress';
 const EMPTY = { give: [], get: [], pct: 100 };
 
 export default function Trade() {
+  useTrack('trade');
   const d = useData(), c = useTheme();
   const [t, setT] = usePref('trade', EMPTY);
   const tr = t || EMPTY;

@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 import { router } from 'expo-router';
-import { clean, useData } from '../src/data';
+import { clean, useData, useTrack } from '../src/data';
 import { useTheme } from '../src/theme';
 import { Button, CardArt, Empty, Field, Panel, T } from '../src/ui';
 import { Screen } from '../src/screen';
@@ -29,6 +29,7 @@ export function parseDeck(text) {
 }
 
 export default function Deck() {
+  useTrack('deck');
   const d = useData(), c = useTheme();
   const [text, setText] = usePref('deckText', '');
   const lines = useMemo(() => parseDeck(text), [text]);

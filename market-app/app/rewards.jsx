@@ -1,11 +1,11 @@
-// Rewards (PREVIEW, 25 Nov 2026): earn points by using the app, swap them in the points shop.
+// Rewards (test phase, 25 Nov 2026): earn points by using the app, swap them in the points shop.
 // Fixed rewards only, nothing left to chance: a daily check-in (opens today's movers), streak bonuses,
-// and one-off milestones for building your collection. Points live on this device in the preview.
-import React, { useMemo, useState } from 'react';
+// and one-off milestones for building your collection. Points are saved to your account (src/points.js).
+import React, { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useData } from '../src/data';
+import { useData, useTrack } from '../src/data';
 import { useTheme } from '../src/theme';
 import { Button, Panel, T } from '../src/ui';
 import { CardRow } from '../src/rows';
@@ -20,6 +20,10 @@ const WEEKDAY = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 export default function Rewards() {
   const d = useData(), c = useTheme();
   const pts = usePoints();
+  useTrack('rewards');
+  useFocusEffect(useCallback(() => { pts.reload(); }, [pts.reload]));
+  const [busy, setBusy] = useState(false);
+  const can = pts.mode === 'server' || pts.mode === 'device';
   const [scanned] = usePref('didScan', false);
   const [imported] = usePref('didImport', false);
   const [owner, setOwner] = useState(false);
@@ -40,12 +44,15 @@ export default function Rewards() {
   const state = { items: live.length, scanned: !!scanned, imported: !!imported, alert: (d.favs || []).some(f => f.below != null || f.above != null) };
   const claimable = MILESTONES.filter(m => !pts.ms[m.id] && m.done(state));
 
-  const checkIn = () => {
-    const r = pts.checkIn();
-    if (!r || r.already) return;
+  const run = async fn => { if (busy) return; setBusy(true); try { await fn(); } catch (e) { toast(e.message || String(e)); } finally { setBusy(false); } };
+  const checkIn = () => run(async () => {
+    const r = await pts.checkIn();
+    if (!r || r.already) { toast('Already checked in today'); return; }
     haptic('success');
     toast(r.bonus ? `Checked in: +${CHECKIN} points, and +${r.bonus} for ${r.streak} days in a row` : `Checked in: +${CHECKIN} points · ${r.streak}-day streak`);
-  };
+  });
+  const claim = m => run(async () => { if (await pts.claim(m)) { haptic('success'); toast(`+${m.pts} points: ${m.label}`); } });
+  const claimAll = () => run(async () => { let n = 0; for (const m of claimable) { try { if (await pts.claim(m)) n += m.pts; } catch {} } toast(n ? `+${n} points from milestones` : 'Nothing new to claim yet'); });
 
   // the last 7 days: checked in / covered by the monthly freeze / missed / today
   const week = Array.from({ length: 7 }, (_, i) => { const t = new Date(); t.setDate(t.getDate() - (6 - i)); return t; });
@@ -53,13 +60,23 @@ export default function Rewards() {
   return (
     <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 18, paddingBottom: 60, gap: 16, width: '100%', maxWidth: 680, alignSelf: 'center' }}>
       <View style={{ alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, backgroundColor: c.soft }}>
-        <T size={12} w="semi" style={{ color: c.accent }}>PREVIEW · points on this device only · nothing is sent</T>
+        <T size={12} w="semi" style={{ color: c.accent }}>{pts.mode === 'device' ? 'PREVIEW · points on this device only · nothing is sent' : 'TEST PHASE · swaps are recorded · nothing ships yet'}</T>
       </View>
       <View style={{ gap: 4 }}>
         <T w="bold" size={30}>Rewards</T>
         <T mute size={14.5}>Earn points for using the app and swap them in the points shop. Every reward is fixed: no chance, no purchase.</T>
       </View>
 
+      {pts.mode === 'signedout' ? <Panel>
+        <T w="bold" size={18}>Sign in to earn points</T>
+        <T mute size={14}>Points are saved to your account, so they follow you to any device.</T>
+        <Button onPress={() => router.push({ pathname: '/account', params: { back: '1' } })}>Sign in or create an account</Button>
+      </Panel> : null}
+      {pts.mode === 'loading' ? <T mute>Loading your points…</T> : null}
+      {pts.mode === 'error' ? <Panel><T w="semi">Couldn’t load your points</T><T mute size={13.5}>{pts.error}</T><Button ghost onPress={pts.reload}>Try again</Button></Panel> : null}
+      {pts.mode === 'device' ? <T size={12.5} style={{ color: c.mute }}>Points are on this device for now: the rewards database update (supabase/2026-11-25-rewards.sql) hasn’t been run yet.</T> : null}
+
+      {can ? <>
       {/* balance */}
       <Pressable onPress={() => router.push('/shop')} accessibilityRole="button" accessibilityLabel="Points shop"
         style={({ pressed, hovered }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 18, backgroundColor: pressed || hovered ? c.raise : c.panel, borderWidth: 1, borderColor: c.line })}>
@@ -101,7 +118,7 @@ export default function Rewards() {
             <Ionicons name="checkmark-circle" size={20} color={c.accent} />
             <T w="semi" size={14.5}>Checked in today. Come back tomorrow for +{CHECKIN}.</T>
           </View>
-          : <Button icon="trending-up" onPress={checkIn}>{`See today’s movers · +${CHECKIN} points`}</Button>}
+          : <Button icon="trending-up" disabled={busy} onPress={checkIn}>{`See today’s movers · +${CHECKIN} points`}</Button>}
       </Panel>
 
       {/* what the check-in opens */}
@@ -131,7 +148,7 @@ export default function Rewards() {
                 <T mute size={12}>{got ? 'Done' : m.sub}</T>
               </View>
               {got ? <T w="semi" size={13.5} mute>+{m.pts}</T>
-                : ready ? <Pressable onPress={() => { if (pts.claim(m)) { haptic('success'); toast(`+${m.pts} points: ${m.label}`); } }} accessibilityRole="button" accessibilityLabel={`Claim ${m.pts} points`}
+                : ready ? <Pressable disabled={busy} onPress={() => claim(m)} accessibilityRole="button" accessibilityLabel={`Claim ${m.pts} points`}
                     style={({ pressed }) => ({ paddingHorizontal: 14, minHeight: 36, borderRadius: 18, justifyContent: 'center', backgroundColor: pressed ? c.accentDim : c.accent })}>
                     <T w="bold" size={13.5} style={{ color: c.onAccent }}>Claim +{m.pts}</T>
                   </Pressable>
@@ -142,7 +159,7 @@ export default function Rewards() {
             </View>
           );
         })}
-        {claimable.length > 1 ? <Button ghost onPress={() => { let n = 0; claimable.forEach(m => { if (pts.claim(m)) n += m.pts; }); if (n) toast(`+${n} points from milestones`); }}>{`Claim all (+${claimable.reduce((s, m) => s + m.pts, 0)})`}</Button> : null}
+        {claimable.length > 1 ? <Button ghost disabled={busy} onPress={claimAll}>{`Claim all (+${claimable.reduce((s, m) => s + m.pts, 0)})`}</Button> : null}
       </Panel>
 
       {/* history */}
@@ -156,9 +173,11 @@ export default function Rewards() {
         ))}
       </Panel> : null}
 
+      </> : null}
+
       <Panel title="How points work (draft)">
         <T size={13.5} mute>{`Check in once a day for +${CHECKIN}. Every 7th day in a row adds +${WEEK_BONUS}, and day 30 adds +${MONTH_BONUS}. One missed day a month doesn’t break your streak. Milestones pay once each.`}</T>
-        <T size={13.5} mute>Points are free and fixed: nothing is left to chance and nothing can be bought. They have no cash value, can’t be sold or moved to another account, and paid members earn exactly the same. One account per person; points from extra accounts or automation are removed. Changes to how points work get at least 30 days’ notice, with a chance to use your points first. Points expire after 12 months without signing in.</T>
+        <T size={13.5} mute>Points are free and fixed: nothing is left to chance and nothing can be bought. They have no cash value, can’t be sold or moved to another account, and paid members earn exactly the same. One account per person; points from extra accounts or automation are removed. Changes to how points work get at least 30 days’ notice, with a chance to use your points first. Points expire after 12 months without signing in. To run Rewards, the app records your check-ins, points and swaps, plus a daily count of a few things you do in the app (see the privacy policy).</T>
       </Panel>
 
       {/* owner numbers */}

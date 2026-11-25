@@ -18,7 +18,7 @@ import { CHECKIN, usePoints } from '../../src/points';
 // Rewards preview: a one-line nudge until today's check-in is done
 function CheckInCard() {
   const c = useTheme(), pts = usePoints();
-  if (pts.checkedIn) return null;
+  if (pts.checkedIn || !(pts.mode === 'server' || pts.mode === 'device')) return null;
   return (
     <Pressable onPress={() => router.push('/rewards')} accessibilityRole="button" accessibilityLabel="Daily check-in"
       style={({ pressed, hovered }) => ({ marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, paddingRight: 14, borderRadius: 16,

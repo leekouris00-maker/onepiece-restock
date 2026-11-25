@@ -5,7 +5,7 @@ import { searchCards } from '../../src/find';
 import { usePref } from '../../src/prefs';
 import { on } from '../../src/bus';
 import { useTheme } from '../../src/theme';
-import { KINDS, useData } from '../../src/data';
+import { KINDS, track, useData } from '../../src/data';
 import { CardRow, SetRow } from '../../src/rows';
 import { Chip, Empty, SearchBar, SkelRows, T } from '../../src/ui';
 import { BAR_SPACE, ChipRow, IconBtn, Title, useTop } from '../../src/screen';
@@ -25,7 +25,7 @@ export default function Search() {
   const [hi, setHi] = useState(-1);                 // highlighted result (keyboard)
   useEffect(() => on('focus-search', () => input.current && input.current.focus()), []);
   useEffect(() => on('search-for', v => { setQ(v); setKind('all'); }), []);
-  const remember = () => { const t = q.trim(); if (t.length >= 2) setRecent(r => [t, ...(r || []).filter(x => x.toLowerCase() !== t.toLowerCase())].slice(0, 8)); };
+  const remember = () => { const t = q.trim(); if (t.length >= 2) track('search'); if (t.length >= 2) setRecent(r => [t, ...(r || []).filter(x => x.toLowerCase() !== t.toLowerCase())].slice(0, 8)); };
   const dq = useDeferredValue(q);
   const s = dq.trim().toLowerCase().replace(/\s+/g, ' ');
   const searching = s.length >= 2;

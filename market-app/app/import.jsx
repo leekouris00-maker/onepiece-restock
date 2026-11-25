@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { router } from 'expo-router';
-import { clean, useData } from '../src/data';
+import { clean, track, useData } from '../src/data';
 import { useTheme } from '../src/theme';
 import { Button, CardArt, Choice, Field, Note, Panel, T } from '../src/ui';
 import { mapHeader, matchRows, parseCSV, pickFile } from '../src/csv';
@@ -63,6 +63,7 @@ export default function Import() {
       const byId = new Map(out.map(o => [o.id, o]));
       await d.saveMany([...byId.values()]);
       setPref('didImport', true);
+      track('import');
       haptic('success');
       toast(`Imported ${preview.length - skipped} rows${merged ? ` (${merged} added to cards you had)` : ''}${skipped ? `, skipped ${skipped}` : ''}`);
       router.back();

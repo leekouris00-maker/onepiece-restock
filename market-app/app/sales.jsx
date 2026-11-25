@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import { clean, cols, useData } from '../src/data';
+import { clean, cols, useData, useTrack } from '../src/data';
 import { useTheme } from '../src/theme';
 import { Button, CardArt, Chip, Empty, Note, Panel, T } from '../src/ui';
 import { Screen } from '../src/screen';
@@ -15,6 +15,7 @@ const soldDay = o => o.soldAt || o.updated || o.added || '';
 const fyOf = day => { const y = Number(day.slice(0, 4)), m = Number(day.slice(5, 7)); return m >= 7 ? y + 1 : y; };   // FY2027 = Jul 2026 – Jun 2027
 
 export default function Sales() {
+  useTrack('sales');
   const d = useData(), c = useTheme();
   const [mode, setMode] = useState('fy');
   const sold = d.owned.filter(o => o.status === 'sold');
