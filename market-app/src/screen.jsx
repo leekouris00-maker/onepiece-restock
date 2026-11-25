@@ -7,6 +7,7 @@ import { T } from './ui';
 import { useWide } from './layout';
 import { haptic } from './haptic';
 import { useData } from './data';
+import { keyParts } from './keys';
 
 export const BAR_SPACE = 30;
 
@@ -91,14 +92,24 @@ export function Heading({ children, right, style, onMore, more = 'See all' }) {
   );
 }
 
-// Plain round icon button for headers
-export function IconBtn({ icon, onPress, label, on }) {
-  const c = useTheme();
+// Plain round icon button for headers. On a computer, hovering shows its name and shortcut.
+export function IconBtn({ icon, onPress, label, on, keys }) {
+  const c = useTheme(), wide = useWide();
+  const [tip, setTip] = useState(false);
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} hitSlop={6}
-      style={({ pressed }) => ({ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed || on ? c.raise : c.soft })}>
-      <Ionicons name={icon} size={20} color={on ? c.accent : c.ink} />
-    </Pressable>
+    <View style={{ zIndex: tip ? 60 : undefined }}>
+      <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} hitSlop={6}
+        onHoverIn={wide ? () => setTip(true) : undefined} onHoverOut={wide ? () => setTip(false) : undefined}
+        style={({ pressed, hovered }) => ({ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed || on ? c.raise : hovered ? c.raise : c.soft })}>
+        <Ionicons name={icon} size={20} color={on ? c.accent : c.ink} />
+      </Pressable>
+      {tip && label ? <View pointerEvents="none" style={{ position: 'absolute', top: 50, right: 0, zIndex: 60 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: c.paper }}>
+          <T w="semi" size={12} style={{ color: c.paperInk }} numberOfLines={1}>{label}</T>
+          {keys ? <T w="bold" size={11.5} style={{ color: c.paperMute }}>{keyParts(keys).join(' then ')}</T> : null}
+        </View>
+      </View> : null}
+    </View>
   );
 }
 

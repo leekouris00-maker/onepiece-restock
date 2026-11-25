@@ -26,15 +26,16 @@ export function plOf(d, o) {
   return { d: now - paid, p: paid ? ((now - paid) / paid) * 100 : null };
 }
 
+// in the currency you've chosen (paid prices are kept in A$ and converted)
 export function PL({ v, size = 12 }) {
-  const c = useTheme();
+  const c = useTheme(), d = useData();
   if (!v) return null;
-  return <T size={size} w="semi" style={{ color: v.d >= 0 ? c.up : c.down }}>{v.d >= 0 ? '▲ +' : '▼ -'}A${Math.abs(v.d).toLocaleString('en-AU', { maximumFractionDigits: Math.abs(v.d) >= 100 ? 0 : 2 })}{v.p != null ? ` (${Math.abs(v.p).toFixed(0)}%)` : ''}</T>;
+  return <T size={size} w="semi" style={{ color: v.d >= 0 ? c.up : c.down }}>{v.d >= 0 ? '▲ +' : '▼ -'}{d.aud(Math.abs(v.d))}{v.p != null ? ` (${Math.abs(v.p).toFixed(0)}%)` : ''}</T>;
 }
 
 // One owned item as a quiet list row: picture, name, number and set, value and weekly change.
 // swipe: drag left for −1 / +1 / Sold. Long-press opens the item menu. selecting: tap ticks it.
-export function OwnedRow({ o, rank, swipe, actions, selecting, selected, onSelect, onLong, showPL }) {
+export function OwnedRow({ o, rank, swipe, actions, selecting, selected, onSelect, onLong, showPL, active }) {
   const d = useData(), c = useTheme();
   const card = d.card(o.card), q = Number(o.qty) || 1, sold = o.status === 'sold';
   const now = d.unitAt(o, 0), then = d.unitAt(o, 7);
@@ -60,13 +61,13 @@ export function OwnedRow({ o, rank, swipe, actions, selecting, selected, onSelec
   const act = f => () => { close(); f(o); };
   const right = sold ? <T size={12} mute>Sold</T> : showPL ? (plOf(d, o) ? <PL v={plOf(d, o)} /> : <T size={12} mute>no price paid</T>) : <Change now={now} then={then} aud={d.aud} size={12} pctOnly />;
   return (
-    <View style={{ overflow: 'hidden', borderRadius: 12 }}>
+    <View nativeID={'own-' + o.id} style={{ overflow: 'hidden', borderRadius: 12, borderLeftWidth: active ? 3 : 0, borderLeftColor: c.accent }}>
       {swipe && !selecting && shown ? <View style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: W, flexDirection: 'row' }}>
         <SwipeBtn icon="remove" label={q > 1 ? '−1' : 'Remove'} bg={c.raise} onPress={act(actions.minus)} />
         <SwipeBtn icon="add" label="+1" bg={c.soft} onPress={act(actions.plus)} />
         {!sold ? <SwipeBtn icon="cash-outline" label="Sold" bg={c.accent} fg={c.onAccent} onPress={act(actions.sold)} /> : null}
       </View> : null}
-      <Animated.View {...pan.panHandlers} style={{ transform: [{ translateX: tx }], backgroundColor: c.panel, touchAction: 'pan-y' }}>
+      <Animated.View {...pan.panHandlers} style={{ transform: [{ translateX: tx }], backgroundColor: active ? c.soft : c.panel, paddingHorizontal: active ? 8 : 0, touchAction: 'pan-y' }}>
         <Pressable onPress={() => (open.current ? close() : selecting ? onSelect(o) : openItem(o))} onLongPress={onLong ? () => { haptic(); onLong(o); } : undefined} delayLongPress={380}
           accessibilityRole="button" accessibilityLabel={`${clean(o.name)}${selecting ? (selected ? ', selected' : ', not selected') : ''}`}
           accessibilityActions={swipe ? [{ name: 'increment', label: 'Add one' }, { name: 'decrement', label: 'Remove one' }] : undefined}
@@ -101,13 +102,13 @@ function SwipeBtn({ icon, label, bg, fg, onPress }) {
 }
 
 // Card-first tile for the grid view
-export function OwnedTile({ o, width, selecting, selected, onSelect, onLong }) {
+export function OwnedTile({ o, width, selecting, selected, onSelect, onLong, active }) {
   const d = useData(), c = useTheme();
   const card = d.card(o.card), q = Number(o.qty) || 1, now = d.unitAt(o, 0), then = d.unitAt(o, 7);
   return (
     <Pressable onPress={() => (selecting ? onSelect(o) : openItem(o))} onLongPress={onLong ? () => { haptic(); onLong(o); } : undefined} delayLongPress={380}
-      accessibilityRole="button" style={({ pressed }) => ({ width, gap: 3, opacity: pressed ? 0.7 : 1 })}>
-      <View>
+      nativeID={'own-' + o.id} accessibilityRole="button" style={({ pressed }) => ({ width, gap: 3, opacity: pressed ? 0.7 : 1 })}>
+      <View style={active ? { borderRadius: Math.max(4, width / 20) + 3, borderWidth: 3, borderColor: c.accent, margin: -3 } : null}>
         <CardArt k={o.card} photo={d.ownPhoto(o)} num={card?.num || o.num || (o.kind === 'Sealed' ? 'Sealed' : '')} width={width} qty={q} big />
         {selecting ? <View style={{ position: 'absolute', top: 6, left: 6, borderRadius: 14, backgroundColor: 'rgba(10,13,11,0.7)' }}>
           <Ionicons name={selected ? 'checkmark-circle' : 'ellipse-outline'} size={26} color={selected ? c.accent : c.ink} /></View> : null}

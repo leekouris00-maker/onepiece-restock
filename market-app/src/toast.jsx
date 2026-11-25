@@ -7,10 +7,25 @@ import { T } from './ui';
 import { useWide } from './layout';
 
 let push = null;
+const MAC = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
 let lift = 0, relift = null;
 // a page with its own bottom bar (selection bar, floating buttons) moves toasts above it
 export function setToastLift(px) { lift = px; relift && relift(px); }
-export function toast(text, opts = {}) { if (push) push({ text, ...opts, id: Date.now() + Math.random() }); }
+// the last Undo offered, for Ctrl/⌘ Z (good for 30 seconds, once)
+let undoRec = null;
+export function lastUndo() {
+  if (!undoRec || Date.now() - undoRec.at > 30000) return null;
+  const u = undoRec;
+  return { text: u.text, run: () => { if (undoRec === u) undoRec = null; u.run(); } };
+}
+export function toast(text, opts = {}) {
+  if (opts.action && /undo/i.test(opts.action.label)) {
+    const rec = { run: opts.action.onPress, at: Date.now(), text };
+    undoRec = rec;
+    opts = { ...opts, action: { ...opts.action, onPress: () => { if (undoRec === rec) undoRec = null; rec.run(); } } };
+  }
+  if (push) push({ text, ...opts, id: Date.now() + Math.random() });
+}
 
 export function ToastHost() {
   const c = useTheme(), ins = useSafeAreaInsets(), wide = useWide();
@@ -39,7 +54,7 @@ export function ToastHost() {
         <T w="semi" size={14} style={{ flex: 1, color: c.paperInk }} numberOfLines={2}>{t.text}</T>
         {t.action ? <Pressable onPress={() => { close(); t.action.onPress(); }} accessibilityRole="button" hitSlop={6}
           style={({ pressed }) => ({ minHeight: 40, paddingHorizontal: 14, borderRadius: 12, justifyContent: 'center', backgroundColor: pressed ? c.paperLine : 'transparent' })}>
-          <T w="bold" size={14} style={{ color: '#4b7a00' }}>{t.action.label}</T>
+          <T w="bold" size={14} style={{ color: '#4b7a00' }}>{t.action.label}{wide && /undo/i.test(t.action.label) ? <T size={11.5} style={{ color: c.paperMute }}>{MAC ? '  ⌘Z' : '  Ctrl Z'}</T> : null}</T>
         </Pressable> : null}
       </Animated.View>
     </View>

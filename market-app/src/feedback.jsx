@@ -69,7 +69,7 @@ export function FeedbackButton() {
   return (
     <>
       <Pressable onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel="Report a problem"
-        style={({ pressed }) => ({ position: 'absolute', left: wide ? 18 : 12, bottom: wide ? 18 : ins.bottom + (tabs ? 74 : 16), width: 40, height: 40, borderRadius: 20,
+        style={({ pressed }) => ({ position: 'absolute', ...(wide ? { right: 22 } : { left: 12 }), bottom: wide ? 22 : ins.bottom + (tabs ? 74 : 16), width: 40, height: 40, borderRadius: 20,
           alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? c.raise : 'rgba(35,42,37,0.92)', borderWidth: 1, borderColor: c.line, zIndex: 900 })}>
         <Ionicons name="chatbubble-ellipses-outline" size={19} color={c.mute} />
       </Pressable>

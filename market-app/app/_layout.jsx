@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Platform, View } from 'react-native';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -10,7 +10,7 @@ import { F, useTheme } from '../src/theme';
 import { watchForUpdates } from '../src/update';
 import { ToastHost } from '../src/toast';
 import { FeedbackButton, Tour, useTourStart } from '../src/feedback';
-import { emit } from '../src/bus';
+import { KeyHost } from '../src/palette';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -32,26 +32,8 @@ function registerOffline() {
   navigator.serviceWorker.register(base + 'sw.js', { scope: base }).catch(() => {});
 }
 
-// Computer keyboard: / search · N add · S scan · Esc back
-function useShortcuts() {
-  useEffect(() => {
-    if (Platform.OS !== 'web' || typeof window === 'undefined') return undefined;
-    const on = e => {
-      const t = e.target, typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
-      if (e.key === 'Escape') { if (typing) t.blur(); else if (router.canGoBack()) router.back(); return; }
-      if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key === '/') { e.preventDefault(); emit('focus-search'); router.navigate('/search'); }
-      else if (e.key === 'n' || e.key === 'N') router.push('/item/new');
-      else if (e.key === 's' || e.key === 'S') router.push('/scan');
-    };
-    window.addEventListener('keydown', on);
-    return () => window.removeEventListener('keydown', on);
-  }, []);
-}
-
 function Nav() {
   const c = useTheme();
-  useShortcuts();
   useTourStart();
   return (
     <View style={{ flex: 1 }}>
@@ -76,9 +58,11 @@ function Nav() {
         <Stack.Screen name="sales" options={{ title: 'Sales report' }} />
         <Stack.Screen name="sets" options={{ title: 'Set progress' }} />
         <Stack.Screen name="share/[id]" options={{ title: '' }} />
+        <Stack.Screen name="help" options={{ title: 'All functions' }} />
       </Stack>
       <FeedbackButton />
       <Tour />
+      <KeyHost />
       <ToastHost />
     </View>
   );

@@ -5,6 +5,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Svg, { Path, Circle, Line, Defs, LinearGradient, RadialGradient, Stop, Rect } from 'react-native-svg';
 import { F, useTheme } from './theme';
 import { tcgImage } from './data';
+import { useModalPause } from './modal';
 
 // Text. head = extra-bold for titles and big figures.
 export function T({ style, serif, head, caps, w, mute, size, children, ...p }) {
@@ -51,16 +52,17 @@ export function Field({ label, style, ...p }) {
   );
 }
 
-export function SearchBar({ value, onChangeText, placeholder, right, autoFocus, inputRef, onSubmitEditing }) {
+export function SearchBar({ value, onChangeText, placeholder, right, autoFocus, inputRef, onSubmitEditing, onKeyPress, hint }) {
   const c = useTheme();
   return (
     <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
       <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48, borderRadius: 14, backgroundColor: c.soft, paddingHorizontal: 14 }}>
         <Ionicons name="search" size={19} color={c.mute} />
-        <TextInput ref={inputRef} value={value} onChangeText={onChangeText} onSubmitEditing={onSubmitEditing} placeholder={placeholder} placeholderTextColor={c.mute} autoFocus={autoFocus}
+        <TextInput ref={inputRef} value={value} onChangeText={onChangeText} onSubmitEditing={onSubmitEditing} onKeyPress={onKeyPress} placeholder={placeholder} placeholderTextColor={c.mute} autoFocus={autoFocus}
           autoCorrect={false} autoCapitalize="none" returnKeyType="search" keyboardAppearance="dark"
           style={{ flex: 1, color: c.ink, fontFamily: F.medium, fontSize: 15.5, minHeight: 46, outlineStyle: 'none' }} />
-        {value ? <Pressable onPress={() => onChangeText('')} hitSlop={12} accessibilityLabel="Clear search"><Ionicons name="close-circle" size={20} color={c.mute} /></Pressable> : null}
+        {value ? <Pressable onPress={() => onChangeText('')} hitSlop={12} accessibilityLabel="Clear search"><Ionicons name="close-circle" size={20} color={c.mute} /></Pressable>
+          : hint ? <View style={{ paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, borderWidth: 1, borderColor: c.raise }}><T size={11.5} mute w="semi">{hint}</T></View> : null}
       </View>
       {right}
     </View>
@@ -72,6 +74,7 @@ export function Select({ value, options, onChange, label, style }) {
   const c = useTheme();
   const [open, setOpen] = useState(false);
   const cur = options.find(o => o[0] === value);
+  useModalPause(open);
   return (
     <>
       <Pressable onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel={`${label || 'Choose'}: ${cur?.[1]}`}
@@ -288,6 +291,7 @@ export function Sheet({ open, onClose, title, children, maxWidth = 560 }) {
   const c = useTheme();
   // ignore touches for a moment after opening, so the finger that long-pressed to open it can't tap an item by lifting
   const [armed, setArmed] = useState(false);
+  useModalPause(!!open);
   useEffect(() => { if (!open) { setArmed(false); return undefined; } const t = setTimeout(() => setArmed(true), 450); return () => clearTimeout(t); }, [open]);
   return (
     <Modal visible={!!open} transparent animationType="fade" onRequestClose={onClose}>
@@ -305,7 +309,7 @@ export function Sheet({ open, onClose, title, children, maxWidth = 560 }) {
 }
 
 // One line in a menu sheet
-export function MenuItem({ icon, label, sub, onPress, danger }) {
+export function MenuItem({ icon, label, sub, onPress, danger, right }) {
   const c = useTheme();
   return (
     <Pressable onPress={onPress} accessibilityRole="button"
@@ -315,6 +319,7 @@ export function MenuItem({ icon, label, sub, onPress, danger }) {
         <T w="semi" size={15.5} style={danger ? { color: c.down } : null}>{label}</T>
         {sub ? <T mute size={12.5}>{sub}</T> : null}
       </View>
+      {right}
     </Pressable>
   );
 }

@@ -6,6 +6,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { F, useTheme } from '../../src/theme';
 import { T } from '../../src/ui';
 import { SIDE, useWide } from '../../src/layout';
+import { emit } from '../../src/bus';
+import { keyParts } from '../../src/keys';
 
 const ICONS = { index: 'home', search: 'search', market: 'compass', portfolio: 'albums', account: 'person' };
 
@@ -22,6 +24,13 @@ function Side({ state, descriptors }) {
         </View>
         <T head size={14} style={{ letterSpacing: 0.4 }}>ONE PIECE MARKET</T>
       </View>
+      <Pressable onPress={() => emit('palette')} accessibilityRole="button" accessibilityLabel="Search all functions and cards"
+        style={({ hovered }) => ({ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 42, paddingHorizontal: 12, borderRadius: 12, marginBottom: 14,
+          backgroundColor: hovered ? c.raise : c.soft, borderWidth: 1, borderColor: c.line })}>
+        <Ionicons name="flash-outline" size={17} color={c.mute} />
+        <T mute size={13.5} style={{ flex: 1 }}>Find anything</T>
+        <View style={{ paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6, borderWidth: 1, borderColor: c.raise }}><T mute w="semi" size={11.5}>{keyParts('mod+k')[0]}</T></View>
+      </Pressable>
       {state.routes.map((r, i) => {
         const on = state.index === i, label = descriptors[r.key].options.title ?? r.name;
         return (
@@ -29,11 +38,29 @@ function Side({ state, descriptors }) {
             style={({ pressed, hovered }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingHorizontal: 12, borderRadius: 12,
               backgroundColor: on ? c.accentDim : pressed || hovered ? c.soft : 'transparent' })}>
             <Ionicons name={ICONS[r.name] + (on ? '' : '-outline')} size={20} color={on ? c.accent : c.mute} />
-            <T w={on ? 'bold' : 'medium'} size={15} style={{ color: on ? c.accent : c.ink }}>{label}</T>
+            <T w={on ? 'bold' : 'medium'} size={15} style={{ color: on ? c.accent : c.ink, flex: 1 }}>{label}</T>
+            <T size={11.5} w="semi" style={{ color: c.mute, opacity: 0.6 }}>{i + 1}</T>
           </Pressable>
         );
       })}
+      <View style={{ flex: 1 }} />
+      <View style={{ gap: 2, paddingBottom: 18 }}>
+        <SideLink icon="apps-outline" label="All functions" onPress={() => router.push('/help')} />
+        <SideLink icon="keypad-outline" label="Keyboard shortcuts" hint="?" onPress={() => emit('cheatsheet')} />
+      </View>
     </View>
+  );
+}
+
+function SideLink({ icon, label, hint, onPress }) {
+  const c = useTheme();
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button"
+      style={({ hovered }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10, backgroundColor: hovered ? c.soft : 'transparent' })}>
+      <Ionicons name={icon} size={17} color={c.mute} />
+      <T size={13.5} mute style={{ flex: 1 }}>{label}</T>
+      {hint ? <T size={11.5} w="semi" style={{ color: c.mute, opacity: 0.6 }}>{hint}</T> : null}
+    </Pressable>
   );
 }
 

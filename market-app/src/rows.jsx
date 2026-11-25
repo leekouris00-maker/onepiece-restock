@@ -6,13 +6,14 @@ import { useData, clean } from './data';
 import { useTheme } from './theme';
 import { CardArt, T } from './ui';
 
-export function CardRow({ card, showSet, onOpen }) {
+export function CardRow({ card, showSet, onOpen, active }) {
   const d = useData(), c = useTheme();
   const sl = d.salesOf(card.k), last = sl[0], cp = d.compOf(card.k), mv = d.move(card), own = d.owned.filter(o => o.card === card.k && o.status !== 'sold').reduce((n, o) => n + (Number(o.qty) || 1), 0);
   const ebay = last ? d.money(d.toUsd(last.price, last.cur)) : cp ? d.money(cp.median) : null;
   return (
     <Pressable onPress={() => { onOpen && onOpen(); router.push({ pathname: '/card/[k]', params: { k: card.k } }); }} accessibilityRole="button"
-      style={({ pressed }) => ({ flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 9, paddingHorizontal: 18, opacity: pressed ? 0.6 : 1 })}>
+      style={({ pressed, hovered }) => ({ flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 9, paddingHorizontal: 18, opacity: pressed ? 0.6 : 1,
+        borderRadius: 12, backgroundColor: active ? c.soft : hovered ? 'rgba(255,255,255,0.03)' : 'transparent', borderLeftWidth: 3, borderLeftColor: active ? c.accent : 'transparent' })}>
       <CardArt k={card.k} photo={d.photoOf(card.k)} num={card.num} width={40} />
       <View style={{ flex: 1, gap: 2 }}>
         <T size={14.5} w="semi" numberOfLines={1}>{clean(card.n)}</T>
@@ -30,11 +31,12 @@ export function CardRow({ card, showSet, onOpen }) {
   );
 }
 
-export function SetRow({ set, count }) {
+export function SetRow({ set, count, active }) {
   const c = useTheme();
   return (
     <Pressable onPress={() => router.push({ pathname: '/set/[id]', params: { id: set.id } })} accessibilityRole="button"
-      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingHorizontal: 18, opacity: pressed ? 0.6 : 1 })}>
+      style={({ pressed, hovered }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingHorizontal: 18, opacity: pressed ? 0.6 : 1,
+        borderRadius: 12, backgroundColor: active ? c.soft : hovered ? 'rgba(255,255,255,0.03)' : 'transparent', borderLeftWidth: 3, borderLeftColor: active ? c.accent : 'transparent' })}>
       <View style={{ width: 54, height: 36, borderRadius: 10, backgroundColor: c.soft, alignItems: 'center', justifyContent: 'center' }}>
         <T w="bold" size={11.5} style={{ color: c.accent }} numberOfLines={1}>{set.code}</T>
       </View>

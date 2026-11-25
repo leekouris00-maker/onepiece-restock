@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { clean, newId, today, useData } from '../../src/data';
@@ -12,6 +12,7 @@ import { PL, plOf } from '../../src/tiles';
 import { haptic } from '../../src/haptic';
 import { toast } from '../../src/toast';
 import { versionTag } from '../../src/find';
+import { useKeys, mac } from '../../src/keys';
 
 const num = v => (v === '' || v == null ? null : Number(String(v).replace(',', '.')));
 
@@ -42,6 +43,8 @@ export default function ItemScreen() {
         cond: card ? (card.t === 'sealed' ? 'Sealed' : l.cond && !['Sealed', 'Opened'].includes(l.cond) ? l.cond : x.cond) : x.cond }));
     });
   }, []);
+  const saveRef = useRef(null);
+  useKeys([{ keys: ['mod+s', 'mod+enter'], label: 'Save', typing: true, when: () => !!saveRef.current, run: () => saveRef.current() }]);
   if (id !== 'new' && !existing) return <Empty>{d.busy ? 'Loading…' : 'This item isn’t in your collection any more.'}</Empty>;
   const set = (k, v) => setF(x => ({ ...x, [k]: String(v) }));
   const draft = { ...(existing || {}), card: card?.k || null, value: num(f.value), lang: f.lang };
@@ -57,6 +60,7 @@ export default function ItemScreen() {
     toast(existing ? 'Saved' : `Added ${f.name.trim()}${parseInt(f.qty, 10) > 1 ? ' ×' + parseInt(f.qty, 10) : ''}`);
     if (router.canGoBack()) router.back(); else router.replace('/portfolio');
   });
+  saveRef.current = save;
   return (
     <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60, maxWidth: 820, width: '100%', alignSelf: 'center', gap: 14 }} keyboardShouldPersistTaps="handled">
       <Stack.Screen options={{ title: existing ? 'Edit item' : 'Add to collection' }} />
@@ -93,7 +97,7 @@ export default function ItemScreen() {
       </View>
       {d.configured && d.authReady && !d.session
         ? <Note tone="info" title="Sign in to save this" action="Sign in" onAction={() => router.push({ pathname: '/account', params: { back: '1' } })}>Your collection is saved to your account so it’s on your phone and computer. Your details here stay filled in.</Note>
-        : <Button onPress={save}>{existing ? 'Save' : 'Add to my collection'}</Button>}
+        : <Button onPress={save}>{(existing ? 'Save' : 'Add to my collection') + (width >= 1000 ? (mac ? '  ⌘S' : '  Ctrl S') : '')}</Button>}
       {existing ? <Button ghost onPress={() => { if (router.canGoBack()) router.back(); else router.replace('/portfolio'); act.remove(existing); }}>Remove from collection</Button> : null}
       {existing && existing.status !== 'sold' && v.a != null ? <SellCalc value={v.a} paid={existing.paid} qty={existing.qty} /> : null}
     </ScrollView>

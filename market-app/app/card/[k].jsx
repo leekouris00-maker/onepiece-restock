@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Linking, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { pickPhoto } from '../../src/photo';
@@ -15,11 +15,14 @@ import { BoxEV } from '../../src/ev';
 import { toast } from '../../src/toast';
 import { haptic } from '../../src/haptic';
 import { usePref } from '../../src/prefs';
+import { useKeys } from '../../src/keys';
+import { on, emit } from '../../src/bus';
 
 export default function CardScreen() {
   const { k } = useLocalSearchParams();
   const d = useData(), c = useTheme();
   const { width } = useWindowDimensions();
+  const wide = width >= 1000;
   const card = d.card(k);
   const [msg, setMsg] = useState('');
   const w = d.watchOf(k), cp = d.comps[k];
@@ -27,6 +30,19 @@ export default function CardScreen() {
   const [lang, setLang] = useState(w ? w.lang || '' : card?.lang === 'JP' ? 'ja' : '');
   const [graded, setGraded] = useState(w ? (w.graded == null ? 'any' : String(w.graded)) : 'false');
   const [sale, setSale] = useState({ price: '', cur: d.cur, date: today(), grade: 'Raw', link: '', note: '' });
+  const kb = useRef({});
+  const call = name => () => kb.current[name] && kb.current[name]();
+  useKeys([
+    { keys: ['w'], label: 'Watch / unwatch', run: call('star') },
+    { keys: ['a'], label: 'Add an English copy', run: call('addEN') },
+    { keys: ['j'], label: 'Add a Japanese copy', run: call('addJP') },
+    { keys: ['arrowright'], label: 'Next version of this card', run: call('next') },
+    { keys: ['arrowleft'], label: 'Previous version', run: call('prev') },
+    { keys: [']'], label: 'Next tool (Buying, Selling…)', run: () => emit('card-tool', 1) },
+    { keys: ['['], label: 'Previous tool', run: () => emit('card-tool', -1) },
+    { keys: ['t'], label: 'Open on TCGplayer', run: call('tcg') },
+    { keys: ['e'], label: 'eBay AU sold listings', run: call('ebay') },
+  ]);
   if (!card) return <Empty>{d.cat ? 'Card not found.' : 'Loading…'}</Empty>;
   const versions = (d.byNum.get(String(card.num || '').toUpperCase()) || []).filter(x => x.k !== card.k).sort((a, b) => (b.m ?? -1) - (a.m ?? -1));
   const ref = d.refPrice(card), fav = d.favs.find(f => f.card === card.k);
@@ -40,6 +56,14 @@ export default function CardScreen() {
   const run = async (f, ok) => { try { setMsg(''); await f(); if (ok) setMsg(ok); } catch (e) { setMsg(e.message || String(e)); } };
   const fx = d.fx;
   const lab = v => (d.cur === 'AUD' ? 'A$' + Math.round(v * fx).toLocaleString() : 'US$' + Math.round(v).toLocaleString());
+  const add = lang => router.push({ pathname: '/item/[id]', params: { id: 'new', card: card.k, ...(card.mine ? {} : { lang }) } });
+  const ring = [card, ...versions].sort((a, b) => (b.m ?? -1) - (a.m ?? -1));
+  const step = by => { if (ring.length < 2) return; const i = ring.findIndex(x => x.k === card.k); const x = ring[(i + by + ring.length) % ring.length]; router.replace({ pathname: '/card/[k]', params: { k: x.k } }); };
+  kb.current = {
+    star, addEN: () => add('EN'), addJP: () => add('JP'), next: () => step(1), prev: () => step(-1),
+    tcg: () => !card.mine && Linking.openURL(`https://www.tcgplayer.com/product/${card.k.slice(2)}`),
+    ebay: () => Linking.openURL(`https://www.ebay.com.au/sch/i.html?_nkw=${search}&LH_Sold=1&LH_Complete=1`),
+  };
 
   return (
     <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60, maxWidth: 820, width: '100%', alignSelf: 'center' }} keyboardShouldPersistTaps="handled">
@@ -53,13 +77,13 @@ export default function CardScreen() {
           <T serif size={clean(card.n).length > 38 ? 21 : 27} style={{ lineHeight: clean(card.n).length > 38 ? 25 : 31 }}>{clean(card.n)}</T>
           <T size={13} w="semi" style={{ color: c.accent }}>{versionTag(d.cat, card)}</T>
           {n ? <T size={13.5} w="semi" style={{ color: c.gold }}>You own {n}</T> : null}
-          <Chip onPress={star} on={!!fav} style={{ alignSelf: 'flex-start', marginTop: 4 }}>{fav ? '★ On your watchlist' : '☆ Watch this card'}</Chip>
+          <Chip onPress={star} on={!!fav} style={{ alignSelf: 'flex-start', marginTop: 4 }}>{(fav ? '★ On your watchlist' : '☆ Watch this card') + (wide ? '  · W' : '')}</Chip>
         </View>
       </View>
       {msg ? <T size={14} style={{ marginTop: 12, color: c.down }}>{msg}</T> : null}
 
       {versions.length ? <View style={{ marginTop: 16, gap: 8 }}>
-        <T mute size={12.5} w="semi">{`Other versions of ${card.num} (${versions.length})`}</T>
+        <T mute size={12.5} w="semi">{`Other versions of ${card.num} (${versions.length})`}{wide ? '  ·  ← → to flip through' : ''}</T>
         <ChipRow>
           {versions.map(x => (
             <Pressable key={x.k} onPress={() => router.replace({ pathname: '/card/[k]', params: { k: x.k } })} accessibilityRole="button"
@@ -101,7 +125,7 @@ export default function CardScreen() {
           {card.mine
             ? <Chip on onPress={() => router.push({ pathname: '/item/[id]', params: { id: 'new', card: card.k } })}>{n ? 'Add more' : 'Add to my collection'}</Chip>
             : [['EN', 'English'], ['JP', 'Japanese']].map(([v, l]) => (
-              <Chip key={v} on onPress={() => router.push({ pathname: '/item/[id]', params: { id: 'new', card: card.k, lang: v } })}>{`Add ${l} copy`}</Chip>))}
+              <Chip key={v} on onPress={() => router.push({ pathname: '/item/[id]', params: { id: 'new', card: card.k, lang: v } })}>{`Add ${l} copy${wide ? (v === 'EN' ? '  · A' : '  · J') : ''}`}</Chip>))}
         </View>
       </Section>
 
@@ -247,12 +271,16 @@ function Tools({ card, ref_: ref, fav, run }) {
   const box = card.t === 'sealed' && /booster box$/i.test(clean(card.n));
   const list = ref.usd == null ? [] : [['buy', 'Buying'], ['sell', 'Selling'], ...(box ? [['open', 'Open or keep']] : []), ...(card.t === 'card' ? [['grade', 'Grading']] : []), ['alert', 'Price alert']];
   const [tool, setTool] = usePref('cardTool', 'buy');
-  if (!list.length) return null;
+  const wideT = useWindowDimensions().width >= 1000;
   const t = list.some(([k]) => k === tool) ? tool : box ? 'open' : 'buy';
+  const tRef = useRef(null); tRef.current = { list, t };
+  useEffect(() => on('card-tool', by => { const { list: l, t: cur } = tRef.current; if (!l.length) return; const i = l.findIndex(([k]) => k === cur); setTool(l[(i + by + l.length) % l.length][0]); }), []);
+  if (!list.length) return null;
   const a = ref.usd * d.fx;
   return (
     <View style={{ marginTop: 16, gap: 10 }}>
       <ChipRow>{list.map(([k, l]) => <Chip key={k} on={t === k} onPress={() => setTool(k)}>{l}</Chip>)}</ChipRow>
+      {wideT ? <T mute size={12}>[ and ] switch tools</T> : null}
       {t === 'buy' ? <OfferPrices a={a} src={ref.src} />
         : t === 'sell' ? <SellCalc value={a} paid={null} title="If you sold one" />
         : t === 'open' ? <BoxEV setId={card.g} />

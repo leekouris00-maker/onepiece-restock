@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -13,6 +13,8 @@ import { usePref } from '../../src/prefs';
 import { exportCollection } from '../../src/csv';
 import { setToastLift, toast } from '../../src/toast';
 import { ShareSheet } from '../../src/share';
+import { useKeys, web } from '../../src/keys';
+import { on } from '../../src/bus';
 
 const SORTS = [['value', 'Highest value'], ['profit', 'Profit / loss'], ['move', 'Biggest change'], ['name', 'Name'], ['new', 'Newest']];
 const SHOW = [['owned', 'Owned'], ['sold', 'Sold']];
@@ -29,6 +31,9 @@ export default function Collection() {
   const [share, setShare] = useState(false);
   const [sel, setSel] = useState(null);            // Set of ids when selecting, else null
   const [bulk, setBulk] = useState(null);          // 'move' | 'paid'
+  const [hi, setHi] = useState(null);              // id of the row the keyboard is on
+  const searchRef = useRef(null);
+  useEffect(() => on('collection-share', () => setShare(true)), []);
   const sold = show === 'sold';
   useFocusEffect(useCallback(() => { if (d.session) d.refresh(); }, [d.session]));
   const { inner, wide } = useLayout(), avail = inner - 32, gap = 12;
@@ -64,6 +69,39 @@ export default function Collection() {
   const startSel = o => setSel(new Set(o ? [o.id] : []));
   const chosen = sel ? d.owned.filter(o => sel.has(o.id)) : [];
   const shown = groups.flatMap(g => g.items);
+  const filtered = !!q || sold;
+  const clearAll = () => { setQ(''); setShow('owned'); setSel(null); setHi(null); };
+
+  // keyboard: move through rows, open, +/−, tick, bulk actions
+  const cur = () => shown.find(o => o.id === hi);
+  const scrollTo = id => { if (web) setTimeout(() => { const el = [...document.querySelectorAll('[id="own-' + id + '"]')].find(x => x.offsetParent); el && el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 0); };
+  const moveHi = by => {
+    if (!shown.length) return;
+    const i = shown.findIndex(o => o.id === hi);
+    const j = i < 0 ? (by > 0 ? 0 : shown.length - 1) : Math.max(0, Math.min(shown.length - 1, i + by));
+    setShut({}); setHi(shown[j].id); scrollTo(shown[j].id);
+  };
+  const searchFocused = () => web && searchRef.current && document.activeElement === searchRef.current;
+  useKeys([
+    { keys: ['j', 'arrowdown'], label: 'Next item', run: () => moveHi(1) },
+    { keys: ['k', 'arrowup'], label: 'Previous item', run: () => moveHi(-1) },
+    { keys: ['arrowdown'], typing: true, when: searchFocused, run: () => { searchRef.current.blur(); moveHi(1); } },
+    { keys: ['enter'], label: 'Open the highlighted item', when: () => !!cur(), run: () => { const o = cur(); sel ? toggle(o) : router.push({ pathname: '/item/[id]', params: { id: o.id } }); } },
+    { keys: ['+'], label: 'One more of it', when: () => !!cur() && !sold, run: () => act.plus(cur()) },
+    { keys: ['-'], label: 'One less of it', when: () => !!cur() && !sold, run: () => act.minus(cur()) },
+    { keys: ['x'], label: 'Tick it', when: () => !!cur(), run: () => (sel ? toggle(cur()) : startSel(cur())) },
+    { keys: ['e'], label: 'Select several on / off', run: () => (sel ? setSel(null) : startSel()) },
+    { keys: ['a'], label: 'Select all (while selecting)', when: () => !!sel, run: () => setSel(new Set(shown.map(o => o.id))) },
+    { keys: ['m'], label: 'Move ticked items to a group', when: () => chosen.length > 0, run: () => setBulk('move') },
+    { keys: ['p'], label: 'Set price paid on ticked items', when: () => chosen.length > 0, run: () => setBulk('paid') },
+    { keys: ['delete'], label: 'Remove ticked or highlighted (Undo)', when: () => chosen.length > 0 || !!cur(), run: () => { if (chosen.length) { act.removeMany(chosen); setSel(null); } else { const o = cur(); moveHi(1); act.remove(o); } } },
+    { keys: ['/'], label: 'Search your collection', run: () => searchRef.current && searchRef.current.focus() },
+    { keys: ['v'], label: 'Grid / list', run: () => setGrid(!grid) },
+    { keys: ['o'], label: 'Owned / sold', run: () => { setShow(sold ? 'owned' : 'sold'); setSel(null); } },
+    { keys: ['shift+x'], label: 'Clear search and filters', run: clearAll },
+    { keys: ['escape'], typing: true, label: 'Stop selecting / clear search', when: () => !!sel || (!!q && (searchFocused() || !web || !document.activeElement || document.activeElement === document.body)),
+      run: () => { if (sel) setSel(null); else { setQ(''); searchRef.current && searchRef.current.blur(); } } },
+  ]);
 
   if (!d.configured || (d.authReady && !d.session)) return (
     <Screen><Title>Collection</Title><View style={{ gap: 14, marginTop: 10 }}>
@@ -76,7 +114,7 @@ export default function Collection() {
 
   const firstLoad = !d.loaded && d.busy;
   const empty = !firstLoad && !d.owned.length;
-  const rowProps = o => ({ swipe: !sold && !wide, actions: act, selecting: !!sel, selected: !!sel?.has(o.id), onSelect: toggle, onLong: sel ? toggle : setMenu, showPL: sort === 'profit' });
+  const rowProps = o => ({ active: hi === o.id, swipe: !sold && !wide, actions: act, selecting: !!sel, selected: !!sel?.has(o.id), onSelect: toggle, onLong: sel ? toggle : setMenu, showPL: sort === 'profit' });
 
   // phone: Scan / Add within thumb reach, or the selection bar while selecting
   const bottom = sel ? <SelBar n={chosen.length} all={shown.length} onAll={() => setSel(new Set(shown.map(o => o.id)))} onDone={() => setSel(null)}
@@ -90,11 +128,11 @@ export default function Collection() {
   return (
     <Screen onRefresh={async () => { d.loadCatalog(true); await d.refresh(); }} refreshing={d.busy} after={bottom}>
       <Title right={<View style={{ flexDirection: 'row', gap: 8 }}>
-        {wide ? <IconBtn icon="refresh" label="Reload" onPress={() => { d.refresh(); d.loadCatalog(true); }} /> : null}
-        <IconBtn icon={grid ? 'list' : 'grid-outline'} label={grid ? 'List view' : 'Grid view'} onPress={() => setGrid(!grid)} />
-        <IconBtn icon={sel ? 'close' : 'checkmark-circle-outline'} label={sel ? 'Stop selecting' : 'Select several'} on={!!sel} onPress={() => (sel ? setSel(null) : startSel())} />
-        {wide ? <IconBtn icon="scan" label="Scan a card" onPress={() => router.push('/scan')} /> : null}
-        {wide ? <IconBtn icon="add" label="Add item" onPress={() => router.push('/item/new')} /> : null}
+        {wide ? <IconBtn icon="refresh" label="Reload" keys="r" onPress={() => { d.refresh(); d.loadCatalog(true); }} /> : null}
+        <IconBtn icon={grid ? 'list' : 'grid-outline'} label={grid ? 'List view' : 'Grid view'} keys="v" onPress={() => setGrid(!grid)} />
+        <IconBtn icon={sel ? 'close' : 'checkmark-circle-outline'} label={sel ? 'Stop selecting' : 'Select several'} keys="e" on={!!sel} onPress={() => (sel ? setSel(null) : startSel())} />
+        {wide ? <IconBtn icon="scan" label="Scan a card" keys="s" onPress={() => router.push('/scan')} /> : null}
+        {wide ? <IconBtn icon="add" label="Add item" keys="n" onPress={() => router.push('/item/new')} /> : null}
         <IconBtn icon="ellipsis-horizontal" label="More" onPress={() => setMore(true)} />
       </View>}>Collection</Title>
 
@@ -119,17 +157,22 @@ export default function Collection() {
         <Button ghost icon="search" onPress={() => router.push('/search')}>Search and add</Button>
         <Button ghost icon="cloud-upload-outline" onPress={() => router.push('/import')}>Import a CSV</Button>
       </Panel> : <>
-        <View style={{ marginTop: 16 }}><SearchBar value={q} onChangeText={setQ} placeholder="Search your collection" /></View>
+        <View style={{ marginTop: 16 }}><SearchBar value={q} onChangeText={setQ} placeholder="Search your collection" inputRef={searchRef} hint={wide && !q ? '/' : null} /></View>
         <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap', alignItems: 'center' }}>
           <Select value={sort} onChange={setSort} options={SORTS} label="Sort by" />
           <Select value={show} onChange={v => { setShow(v); setSel(null); }} options={SHOW} label="Show" />
+          {filtered ? <Pressable onPress={clearAll} accessibilityRole="button" accessibilityLabel="Clear search and filters"
+            style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 34, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1, borderColor: c.raise, backgroundColor: pressed ? c.raise : 'transparent' })}>
+            <Ionicons name="close" size={14} color={c.ink} /><T w="semi" size={13}>Clear</T>
+          </Pressable> : null}
+          {wide ? <T size={12} mute style={{ marginLeft: 'auto' }}>J / K to move · Enter to open · ? for all keys</T> : null}
           {!wide && !sel && !grid && !sold ? <T size={12} mute style={{ marginLeft: 4 }}>Swipe a row left for quick changes, hold for more</T> : null}
         </View>
       </>}
 
       {firstLoad ? <Panel style={{ marginTop: 14 }}><SkelRows n={6} art={38} /></Panel> : null}
       {!empty && !firstLoad && !groups.length ? <Empty>{q ? `Nothing in your collection matches “${q}”.` : sold ? 'Nothing sold yet.' : 'Nothing here yet.'}</Empty> : null}
-      {wide && !grid && !firstLoad && groups.length ? <Table groups={groups} sel={sel} toggle={toggle} onMenu={setMenu} sold={sold} /> : groups.map(({ g, items, total }) => {
+      {wide && !grid && !firstLoad && groups.length ? <Table groups={groups} sel={sel} toggle={toggle} onMenu={setMenu} sold={sold} hi={hi} /> : groups.map(({ g, items, total }) => {
         const closed = shut[g] && !q;
         return (
           <Panel key={g} style={{ marginTop: 14, gap: closed ? 0 : 4 }}>
@@ -146,7 +189,7 @@ export default function Collection() {
             </Pressable>
             {closed ? null : grid ? (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap, rowGap: 16, marginTop: 6 }}>
-                {items.map(o => <OwnedTile key={o.id} o={o} width={tileW} selecting={!!sel} selected={!!sel?.has(o.id)} onSelect={toggle} onLong={sel ? toggle : setMenu} />)}
+                {items.map(o => <OwnedTile key={o.id} o={o} active={hi === o.id} width={tileW} selecting={!!sel} selected={!!sel?.has(o.id)} onSelect={toggle} onLong={sel ? toggle : setMenu} />)}
               </View>
             ) : items.map(o => <OwnedRow key={o.id} o={o} {...rowProps(o)} />)}
           </Panel>
@@ -216,7 +259,7 @@ function SelBar({ n, all, onAll, onDone, onMove, onPaid, onSold, onRemove }) {
 }
 
 // Computer: a table you can edit in place (quantity and price paid save when you leave the box)
-function Table({ groups, sel, toggle, onMenu, sold }) {
+function Table({ groups, sel, toggle, onMenu, sold, hi }) {
   const d = useData(), c = useTheme();
   const H = ({ children, w, right }) => <T mute size={12} w="semi" style={{ width: w, flex: w ? undefined : 1, textAlign: right ? 'right' : 'left' }}>{children}</T>;
   return groups.map(({ g, items, total }) => (
@@ -229,7 +272,7 @@ function Table({ groups, sel, toggle, onMenu, sold }) {
         {sel ? <View style={{ width: 24 }} /> : null}
         <H>Card</H><H w={64} right>Qty</H><H w={96} right>Paid each</H><H w={96} right>Value each</H><H w={104} right>Total</H><H w={140} right>{sold ? 'Sold for' : 'Profit / loss'}</H><H w={78} right>7 days</H><View style={{ width: 32 }} />
       </View>
-      {items.map(o => <TableRow key={o.id} o={o} sel={sel} toggle={toggle} onMenu={onMenu} />)}
+      {items.map(o => <TableRow key={o.id} o={o} sel={sel} toggle={toggle} onMenu={onMenu} active={hi === o.id} />)}
     </Panel>
   ));
 }
@@ -250,13 +293,14 @@ function Cell({ value, onSave, w, prefix }) {
   );
 }
 
-function TableRow({ o, sel, toggle, onMenu }) {
+function TableRow({ o, sel, toggle, onMenu, active }) {
   const d = useData(), c = useTheme(), act = useOwnedActions();
   const card = d.card(o.card), q = Number(o.qty) || 1, each = d.unitAt(o, 0), soldIt = o.status === 'sold';
   const save = ch => d.saveOwned({ ...o, ...ch }).then(() => toast('Saved'), e => toast(e.message || String(e)));
   const num = s => { const n = parseFloat(String(s).replace(',', '.')); return isNaN(n) ? null : n; };
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: c.line }}>
+    <View nativeID={'own-' + o.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: c.line,
+      backgroundColor: active ? c.soft : 'transparent', borderRadius: active ? 10 : 0, marginHorizontal: -8, paddingHorizontal: 8, borderLeftWidth: 3, borderLeftColor: active ? c.accent : 'transparent' }}>
       {sel ? <Pressable onPress={() => toggle(o)} hitSlop={6} accessibilityRole="checkbox" accessibilityState={{ checked: sel.has(o.id) }}>
         <Ionicons name={sel.has(o.id) ? 'checkmark-circle' : 'ellipse-outline'} size={22} color={sel.has(o.id) ? c.accent : c.mute} /></Pressable> : null}
       <Pressable onPress={() => (sel ? toggle(o) : router.push({ pathname: '/item/[id]', params: { id: o.id } }))} accessibilityRole="link"

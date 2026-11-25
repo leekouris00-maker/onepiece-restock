@@ -12,6 +12,7 @@ import { Heading, IconBtn, Screen, TileRail } from '../../src/screen';
 import { useTiles } from '../../src/layout';
 import { CardTile, OwnedRow } from '../../src/tiles';
 import { CardRow } from '../../src/rows';
+import { emit } from '../../src/bus';
 
 const CardRowLite = ({ card }) => <View style={{ marginHorizontal: -16 }}><CardRow card={card} /></View>;
 
@@ -55,7 +56,14 @@ export default function Home() {
 
   return (
     <Screen onRefresh={() => { d.refresh(); d.loadCatalog(true); }} refreshing={d.busy}>
-      {wide ? <T head size={28}>Home</T> : <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      {wide ? <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', zIndex: 5 }}>
+        <T head size={28}>Home</T>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <IconBtn icon="scan" label="Scan a card" keys="s" onPress={() => router.push('/scan')} />
+          {!signedOut ? <IconBtn icon="add" label="Add an item" keys="n" onPress={() => router.push('/item/new')} /> : null}
+          <IconBtn icon="refresh" label="Reload prices" keys="r" onPress={() => { d.refresh(); d.loadCatalog(true); }} />
+        </View>
+      </View> : <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <View style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' }}>
             <Ionicons name="compass" size={18} color={c.onAccent} />
@@ -63,6 +71,7 @@ export default function Home() {
           <T head size={15} style={{ letterSpacing: 0.4 }}>ONE PIECE MARKET</T>
         </View>
         <View style={{ flexDirection: 'row', gap: 8 }}>
+          <IconBtn icon="flash-outline" label="Find anything" onPress={() => emit('palette')} />
           <IconBtn icon="scan" label="Scan a card" onPress={() => router.push('/scan')} />
           <IconBtn icon="person-outline" label="Profile" onPress={() => router.push('/account')} />
         </View>
