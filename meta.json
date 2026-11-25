@@ -1,0 +1,51 @@
+{
+ "updated": "2026-11-25T12:11:11+00:00",
+ "source": "Limitless TCG",
+ "source_url": "https://play.limitlesstcg.com/tournaments?game=OP",
+ "window_days": 14,
+ "top": 8,
+ "min_players": 16,
+ "events": 21,
+ "decks_now": 16,
+ "decks_before": 32,
+ "leaders": [
+  {
+   "name": "Rocks.D.Xebec",
+   "share": 0.312,
+   "prev": 0.125
+  },
+  {
+   "name": "Monkey.D.Luffy",
+   "share": 0.188,
+   "prev": 0.219
+  },
+  {
+   "name": "Saint Gunko",
+   "share": 0.125,
+   "prev": 0
+  },
+  {
+   "name": "Buggy",
+   "share": 0.125,
+   "prev": 0
+  },
+  {
+   "name": "Koala",
+   "share": 0.125,
+   "prev": 0
+  },
+  {
+   "name": "Nico Robin",
+   "share": 0.062,
+   "prev": 0.094
+  },
+  {
+   "name": "Spandam",
+   "share": 0.062,
+   "prev": 0
+  }
+ ],
+ "rising": [],
+ "falling": [],
+ "note": "Online community tournaments on Limitless; official paper events aren't included."
+}
