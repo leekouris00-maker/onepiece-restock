@@ -17,7 +17,7 @@ const tab = p => () => router.navigate(p);
 const page = p => () => router.push(p);
 
 // group order on the All functions page
-export const GROUPS = ['Go to', 'Add cards', 'Your collection', 'Prices and alerts', 'Money tools', 'Settings', 'Help'];
+export const GROUPS = ['Go to', 'Add cards', 'Your collection', 'Prices and alerts', 'Money tools', 'Rewards', 'Settings', 'Help'];
 
 // keys: shortcut ('n', 'g h', 'mod+k'); where: how to find it by tapping; need: 'session' = signed in only;
 // tile: shown in the Profile tools grid; info: explains a function that lives on a page (no direct action)
@@ -61,7 +61,8 @@ export const COMMANDS = [
   { id: 'feedback', group: 'Settings', label: 'Report a problem or idea', sub: 'Sends the page you’re on and your device', icon: 'chatbubble-ellipses-outline', run: () => emit('feedback') },
   { id: 'reset', group: 'Settings', label: 'Reset this device’s settings', sub: 'Sort orders, views, recent searches, calculator setups (your collection is untouched)', icon: 'refresh-circle-outline', where: 'Profile → Settings', run: tab('/account') },
   { id: 'privacy', group: 'Settings', label: 'Privacy policy', sub: 'What’s saved and how to delete it', icon: 'shield-checkmark-outline', run: () => web && window.open(siteBase() + 'privacy.html', '_blank') },
-  { id: 'spin', group: 'Settings', label: 'Daily spin (preview)', sub: 'Idea in progress', icon: 'sync-circle-outline', run: page('/spin') },
+  { id: 'spin', group: 'Rewards', label: 'Daily spin (preview)', sub: 'One free spin a day: win points or a card', icon: 'sync-circle-outline', keys: ['g y'], run: page('/spin'), tile: true },
+  { id: 'shop', group: 'Rewards', label: 'Points shop (preview)', sub: 'Swap spin points for store credit, packs and singles', icon: 'sparkles-outline', keys: ['g o'], run: page('/shop'), tile: true },
 
   { id: 'palette', group: 'Help', label: 'Search all functions', sub: 'Type what you want to do, or a card name', icon: 'flash-outline', keys: ['mod+k'], run: () => emit('palette') },
   { id: 'keys', group: 'Help', label: 'Keyboard shortcuts', sub: 'Every key for this page and the whole app', icon: 'keypad-outline', keys: ['?'], run: () => emit('cheatsheet') },

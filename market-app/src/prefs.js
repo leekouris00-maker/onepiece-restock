@@ -32,7 +32,7 @@ export function usePref(key, fallback) {
 
 // Clear this device's settings (sort orders, views, recent searches, calculator setups…). Returns what was
 // there so it can be put back with restorePrefs. Your collection lives in your account and isn't touched.
-export async function resetPrefs(keep = ['toured']) {
+export async function resetPrefs(keep = ['toured', 'spinPoints']) {
   const keys = (await AsyncStorage.getAllKeys()).filter(k => k.startsWith('pref:') && !keep.includes(k.slice(5)));
   const pairs = keys.length ? await AsyncStorage.multiGet(keys) : [];
   if (keys.length) await AsyncStorage.multiRemove(keys);

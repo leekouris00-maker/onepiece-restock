@@ -122,7 +122,10 @@ export default function Account() {
 
       <Section title="Ideas in progress">
         <T mute size={14}>Try new features before they're real.</T>
-        <Button ghost icon="sync-circle-outline" onPress={() => router.push('/spin')}>Daily spin (preview)</Button>
+        <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+          <Button ghost icon="sync-circle-outline" style={{ flexGrow: 1 }} onPress={() => router.push('/spin')}>Daily spin</Button>
+          <Button ghost icon="sparkles-outline" style={{ flexGrow: 1 }} onPress={() => router.push('/shop')}>Points shop</Button>
+        </View>
       </Section>
 
       <Section title="Privacy">
