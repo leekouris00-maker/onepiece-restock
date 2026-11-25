@@ -1,0 +1,41 @@
+# Meta Radar for the One Piece Market app (meta_radar.py): what's winning on Limitless TCG, weekly.
+name: Meta radar
+
+on:
+  schedule:
+    - cron: "41 20 * * 1"      # Tuesday ~7:41am Melbourne
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: meta-radar
+  cancel-in-progress: false
+
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Read Limitless tournaments
+        env:
+          LIMITLESS_KEY: ${{ secrets.LIMITLESS_KEY }}
+        run: python meta_radar.py
+      - name: Save meta.json
+        run: |
+          [ -f meta.json ] || exit 0
+          git config user.name "market-data"
+          git config user.email "restock-bot@users.noreply.github.com"
+          git add meta.json
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -m "Meta radar"
+          for i in 1 2 3 4 5; do
+            git pull --rebase && git push && exit 0
+            sleep $((i * 5))
+          done
+          exit 1

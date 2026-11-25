@@ -176,7 +176,52 @@ def main():
         elif not hit and w.get("notified"):
             sb("PATCH", q, {"notified": None, "notified_at": None})
     print(f"sent {sent} notifications")
+    sent_ban = ban_alerts(cards, deliver, by_user)
+    print(f"sent {sent_ban} ban-list notifications")
     return 0
+
+
+def ban_alerts(cards, deliver, by_user):
+    """Ban-list news from game.json, sent once to phones of people who own an affected card."""
+    try:
+        game = json.load(open(os.path.join(HERE, "game.json")))
+    except Exception as e:
+        print(f"::notice::game.json not read: {e}")
+        return 0
+    path = os.path.join(HERE, "game_alerts_sent.json")
+    done = json.load(open(path)) if os.path.exists(path) else []
+    today = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=11))).date().isoformat()
+    todo = [n for n in game.get("news", []) if n.get("kind") == "ban" and n["id"] not in done
+            and n.get("announced", "") <= today and n.get("effective", "9999") >= today]
+    if not todo:
+        return 0
+    owned = sb("GET", "owned?select=user_id,card,num,status") or []
+    def num_of(o):
+        if o.get("num"):
+            return o["num"].upper()
+        c = cards.get(o.get("card") or "", {})
+        return (c.get("num") or "").upper()
+    mine = {}
+    for o in owned:
+        if o.get("status") == "sold":
+            continue
+        mine.setdefault(o["user_id"], set()).add(num_of(o))
+    sent = 0
+    for n in todo:
+        hit = set(c.upper() for c in n.get("cards", []))
+        for uid, nums in mine.items():
+            have = sorted(hit & nums)
+            if not have or uid not in by_user:
+                continue
+            payload = {"title": "Ban list: " + n["title"],
+                       "body": f"From {datetime.date.fromisoformat(n['effective']).strftime('%-d %b')}. You own {', '.join(have)}. Check your decks.",
+                       "url": SITE + "meta", "tag": n["id"]}
+            k = deliver(uid, payload)
+            sent += k
+            print(f"{n['id']} → user with {have}: {k} phones")
+        done.append(n["id"])
+    json.dump(done, open(path, "w"), indent=1)
+    return sent
 
 
 if __name__ == "__main__":

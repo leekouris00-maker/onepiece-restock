@@ -1,0 +1,104 @@
+{
+  "updated": "2026-11-25",
+  "about": "Hand-kept from Bandai's official pages (en.onepiece-cardgame.com). The One Piece Market app reads this file; push_alerts.py sends ban-list news to people who own affected cards. Add new entries to the top of 'news' and give each a new id.",
+  "banlist_url": "https://en.onepiece-cardgame.com/rules/restriction.html",
+  "banned": [
+    { "num": "OP14-020", "name": "Dracule Mihawk", "since": "2026-10-12" },
+    { "num": "OP06-047", "name": "Charlotte Pudding" },
+    { "num": "OP03-040", "name": "Nami" },
+    { "num": "OP06-086", "name": "Gecko Moria" },
+    { "num": "ST10-001", "name": "Trafalgar Law" },
+    { "num": "OP06-116", "name": "Reject" }
+  ],
+  "restricted": [],
+  "pairs": [
+    { "a": { "num": "EB05-001", "name": "Jewelry Bonney" }, "b": [{ "num": "OP13-001", "name": "Monkey.D.Luffy" }, { "num": "OP01-002", "name": "Trafalgar Law" }], "since": "2026-11-27" },
+    { "a": { "num": "OP07-115", "name": "I Re-Quasar Helllp!!" }, "b": [{ "num": "EB04-058", "name": "Borsalino" }] },
+    { "a": { "num": "OP11-040", "name": "Monkey.D.Luffy" }, "b": [{ "num": "OP11-067", "name": "Charlotte Katakuri" }, { "num": "OP08-069", "name": "Charlotte Linlin" }] }
+  ],
+  "news": [
+    {
+      "id": "ban-2026-11-27",
+      "kind": "ban",
+      "announced": "2026-11-17",
+      "effective": "2026-11-27",
+      "title": "Jewelry Bonney can't share a deck with Luffy (OP13-001) or Law (OP01-002)",
+      "body": "New banned pairs from 27 November 2026: EB05-001 Jewelry Bonney cannot be in the same deck as OP13-001 Monkey.D.Luffy or OP01-002 Trafalgar Law (alt arts included). Bonney herself isn't banned.",
+      "cards": ["EB05-001", "OP13-001", "OP01-002"],
+      "url": "https://en.onepiece-cardgame.com/news/restriction-2611.html"
+    },
+    {
+      "id": "ban-2026-10-12",
+      "kind": "ban",
+      "announced": "2026-09-24",
+      "effective": "2026-10-12",
+      "title": "Dracule Mihawk (OP14-020) banned",
+      "body": "OP14-020 Dracule Mihawk can't be used in official tournaments from 12 October 2026.",
+      "cards": ["OP14-020"],
+      "url": "https://en.onepiece-cardgame.com/rules/restriction.html"
+    }
+  ],
+  "events": [
+    {
+      "id": "op18-release",
+      "name": "4th Anniversary Event (OP-18 Release Event)",
+      "kind": "Store event",
+      "start": "2026-11-20",
+      "end": "2026-12-17",
+      "where": "Local game stores (find one on Bandai TCG+)",
+      "prizes": [
+        { "who": "Everyone", "what": "P-161 Monkey.D.Luffy + 4th Anniversary Tournament Pack (2 cards, 75 types)", "cards": ["P-161"] },
+        { "who": "Winner", "what": "P-161 Monkey.D.Luffy (silver foil + gold stamp)", "cards": ["P-161"] }
+      ],
+      "url": "https://en.onepiece-cardgame.com/events/store-tournament-op18.html"
+    },
+    {
+      "id": "store-2026-vol4",
+      "name": "Store Tournament 2026 Vol. 4",
+      "kind": "Store tournament",
+      "start": "2026-10-01",
+      "end": "2026-12-31",
+      "where": "Local game stores (find one on Bandai TCG+)",
+      "prizes": [
+        { "who": "Everyone", "what": "Tournament Pack 2026 Vol. 4 (1 card, 4 types)" },
+        { "who": "Winner", "what": "Winner Pack 2026 Vol. 4 (1 card, 4 types)" }
+      ],
+      "url": "https://en.onepiece-cardgame.com/events/02_452.html"
+    },
+    {
+      "id": "store-treasure-cup-2026-12",
+      "name": "Store Treasure Cup 2026 December",
+      "kind": "Store Treasure Cup",
+      "start": "2026-12-04",
+      "end": "2026-12-20",
+      "where": "Selected stores, Oceania included (Silver/Gold/Platinum member stores)",
+      "prizes": [
+        { "who": "Everyone", "what": "Event Pack Vol. 8" },
+        { "who": "Top 8", "what": "Event Pack Vol. 8" },
+        { "who": "Top 4", "what": "Event Pack Vol. 9" },
+        { "who": "Champion", "what": "Store Treasure Cup December 2026 alt-art OP17-027 Benn.Beckman", "cards": ["OP17-027"] }
+      ],
+      "url": "https://en.onepiece-cardgame.com/events/02_553.html"
+    },
+    {
+      "id": "pirates-party-2026-vol4",
+      "name": "Pirates Party 2026 Vol. 4",
+      "kind": "Casual event",
+      "start": "2026-11-01",
+      "end": "2026-12-31",
+      "where": "Local game stores; the store picks the format",
+      "prizes": [{ "who": "Everyone", "what": "Participation prize (see the event page)" }],
+      "url": "https://en.onepiece-cardgame.com/events/pirates-party-vol4-2026.html"
+    },
+    {
+      "id": "st37-38-release",
+      "name": "ST-37 & ST-38 Release Event",
+      "kind": "Store event (Starter Decks only)",
+      "start": "2026-12-18",
+      "end": "2027-01-10",
+      "where": "Local game stores; player sign-ups on TCG+ from 4 December",
+      "prizes": [{ "who": "Everyone", "what": "Prize cards that fit the ST-37/ST-38 decks (see the event page)" }],
+      "url": "https://en.onepiece-cardgame.com/events/store-tournament-st37-38.html"
+    }
+  ]
+}

@@ -40,12 +40,12 @@ jobs:
 
       - name: Save the public key for the app
         run: |
-          [ -f push_public_key.txt ] || exit 0
+          [ -f push_public_key.txt ] || [ -f game_alerts_sent.json ] || exit 0
           git config user.name "market-data"
           git config user.email "restock-bot@users.noreply.github.com"
-          git add push_public_key.txt
+          git add push_public_key.txt game_alerts_sent.json 2>/dev/null || git add push_public_key.txt
           if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
-          git commit -m "Notification public key"
+          git commit -m "Notification key / ban alerts sent"
           for i in 1 2 3 4 5; do
             git pull --rebase && git push && exit 0
             sleep $((i * 5))
