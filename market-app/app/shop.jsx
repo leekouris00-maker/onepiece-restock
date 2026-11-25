@@ -1,4 +1,5 @@
-// Points shop: swap points won on the daily spin for store credit, packs and singles.
+// Points shop: swap points earned in Rewards for store credit, packs and singles.
+// Fixed points prices (100 points = A$1), no mystery or random items.
 // PREVIEW (25 Nov 2026): points live on this device only and nothing is sent.
 import React, { useState } from 'react';
 import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
@@ -8,7 +9,7 @@ import { useData } from '../src/data';
 import { useTheme } from '../src/theme';
 import { useWide } from '../src/layout';
 import { Button, CardArt, Panel, Sheet, T } from '../src/ui';
-import { SHOP, POINT_AUD, costOf, nextBonus, usePoints } from '../src/points';
+import { SHOP, POINT_AUD, PRICES_SET, nextBonus, usePoints } from '../src/points';
 import { toast } from '../src/toast';
 
 const ago = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
@@ -17,12 +18,7 @@ export default function Shop() {
   const d = useData(), c = useTheme(), wide = useWide(), { width } = useWindowDimensions();
   const pts = usePoints();
   const [pick, setPick] = useState(null);
-  const fx = d.cat?.meta?.fx || 1.5;
-  const items = SHOP.map(x => {
-    const card = x.k && d.card ? d.card(x.k) : null;
-    const aud = x.aud ?? (card?.m ? card.m * fx : null);
-    return { ...x, card, aud, cost: costOf(aud) };
-  }).filter(x => x.cost);
+  const items = SHOP.map(x => ({ ...x, card: x.k && d.card ? d.card(x.k) : null }));
   const nb = nextBonus(pts.streak);
   const cols = wide ? 3 : 2, gap = 10, w = Math.floor((Math.min(width, 760) - 36 - gap * (cols - 1)) / cols);
 
@@ -39,7 +35,7 @@ export default function Shop() {
       </View>
       <View style={{ gap: 4 }}>
         <T w="bold" size={30}>Points shop</T>
-        <T mute size={14.5}>Swap the points you win on the daily spin. Points can only be won, never bought.</T>
+        <T mute size={14.5}>Swap the points you earn in Rewards. Points are earned, never bought.</T>
       </View>
 
       {/* balance */}
@@ -57,7 +53,7 @@ export default function Shop() {
           <Ionicons name="flame-outline" size={17} color={pts.streak ? c.accent : c.mute} />
           <T size={13.5} style={{ flex: 1 }}>{pts.streak ? `${pts.streak}-day streak. ` : 'No streak yet. '}{`${nb.inDays} more ${nb.inDays === 1 ? 'day' : 'days'} in a row for +${nb.pts} points.`}</T>
         </View>
-        <Button icon="sync-circle-outline" onPress={() => router.navigate('/spin')}>Spin to earn points</Button>
+        <Button icon="gift-outline" onPress={() => router.navigate('/rewards')}>Earn points</Button>
       </Panel>
 
       {/* rewards */}
@@ -89,7 +85,7 @@ export default function Shop() {
           );
         })}
       </View>
-      <T mute size={12}>Costs follow today’s prices: 100 points for every A$1 of value. Packs and boxes are sealed and ship free.</T>
+      <T mute size={12}>{`Fixed prices: 100 points = A$1 of value (set ${PRICES_SET}). Packs and boxes are sealed and ship free. Price changes get 30 days’ notice.`}</T>
 
       {/* history */}
       {pts.log.length ? <Panel title="Your points">
@@ -103,7 +99,7 @@ export default function Shop() {
       </Panel> : null}
 
       <Panel title="How points work (draft)">
-        <T size={13.5} mute>Every free daily spin wins 10 to 100 points (or a card). Spin days in a row for bonuses: +100 every 7th day, +500 on day 30. Points can’t be bought, sold or moved to another account, have no cash value, and members earn exactly the same as everyone else. Swapping is free, postage included.</T>
+        <T size={13.5} mute>Earn points with the daily check-in, streak bonuses and milestones in Rewards. Every reward is fixed: nothing is left to chance. Points can’t be bought, sold or moved to another account, have no cash value, and members earn exactly the same as everyone else. Swapping is free, postage included.</T>
       </Panel>
 
       <Sheet open={!!pick} onClose={() => setPick(null)} title={pick ? pick.label : ''}>

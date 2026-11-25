@@ -62,6 +62,7 @@ export default function Import() {
       // the same entry may appear twice in out after merging: keep the last
       const byId = new Map(out.map(o => [o.id, o]));
       await d.saveMany([...byId.values()]);
+      setPref('didImport', true);
       haptic('success');
       toast(`Imported ${preview.length - skipped} rows${merged ? ` (${merged} added to cards you had)` : ''}${skipped ? `, skipped ${skipped}` : ''}`);
       router.back();

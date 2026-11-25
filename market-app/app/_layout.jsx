@@ -50,6 +50,7 @@ function Nav() {
         <Stack.Screen name="scan" options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'fade' }} />
         <Stack.Screen name="spin" options={{ title: '' }} />
         <Stack.Screen name="shop" options={{ title: '' }} />
+        <Stack.Screen name="rewards" options={{ title: '' }} />
         <Stack.Screen name="movers" options={{ title: 'Market movers' }} />
         <Stack.Screen name="import" options={{ title: 'Import a collection', presentation: 'modal' }} />
         <Stack.Screen name="watchlist" options={{ title: 'Watchlist' }} />

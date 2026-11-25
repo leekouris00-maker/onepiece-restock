@@ -332,7 +332,7 @@ function Results({ found, onAgain, onType, onPick, onStack, stack }) {
         <View style={{ flexDirection: cols === 1 ? 'row' : 'row', flexWrap: 'wrap', gap: 12, rowGap: 18 }}>
           {list.map(x => {
             const own = ownCount(x.k), set = x.mine ? x.setName : d.cat?.byId[x.g]?.code, sold = d.comps[x.k]?.sales?.[0];
-            const add = () => (stack ? onStack(x) : router.push({ pathname: '/item/[id]', params: { id: 'new', card: x.k } }));
+            const add = () => { setPref('didScan', true); return stack ? onStack(x) : router.push({ pathname: '/item/[id]', params: { id: 'new', card: x.k } }); };
             return (
               <View key={x.k} style={cols === 1 ? { flexDirection: 'row', gap: 14, flex: 1 } : { width: tileW, gap: 6 }}>
                 <Pressable onPress={add} accessibilityRole="button" accessibilityLabel={`${stack ? 'Add to stack' : 'Add'}: ${clean(x.n)}, ${versionTag(d.cat, x)}`}
@@ -416,6 +416,7 @@ function Review({ tray, setTray, onDone }) {
       }
       await d.saveMany(out);
       setPref('lastAdd', { group: g, cond, lang });
+      setPref('didScan', true);
       haptic('success');
       toast(`Added ${n} ${n === 1 ? 'card' : 'cards'} to ${g}`);
       setTray([]); onDone();

@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { ScrollView, View, useWindowDimensions } from 'react-native';
+import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useData } from '../../src/data';
@@ -13,6 +13,27 @@ import { useTiles } from '../../src/layout';
 import { CardTile, OwnedRow } from '../../src/tiles';
 import { CardRow } from '../../src/rows';
 import { emit } from '../../src/bus';
+import { CHECKIN, usePoints } from '../../src/points';
+
+// Rewards preview: a one-line nudge until today's check-in is done
+function CheckInCard() {
+  const c = useTheme(), pts = usePoints();
+  if (pts.checkedIn) return null;
+  return (
+    <Pressable onPress={() => router.push('/rewards')} accessibilityRole="button" accessibilityLabel="Daily check-in"
+      style={({ pressed, hovered }) => ({ marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, paddingRight: 14, borderRadius: 16,
+        backgroundColor: pressed || hovered ? c.raise : c.panel, borderWidth: 1, borderColor: c.accentDim })}>
+      <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: c.accentDim, alignItems: 'center', justifyContent: 'center' }}>
+        <Ionicons name="gift-outline" size={19} color={c.accent} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <T w="semi" size={14.5}>Daily check-in</T>
+        <T mute size={12.5}>{pts.streak ? `${pts.streak}-day streak · ` : ''}See today’s movers for +{CHECKIN} points</T>
+      </View>
+      <Ionicons name="chevron-forward" size={17} color={c.mute} />
+    </Pressable>
+  );
+}
 
 const CardRowLite = ({ card }) => <View style={{ marginHorizontal: -16 }}><CardRow card={card} /></View>;
 
@@ -95,6 +116,7 @@ export default function Home() {
       ) : (
         <>
           {d.loadError ? <Note tone="warn" title="Couldn’t load your collection" style={{ marginTop: 14 }} action="Retry" onAction={() => d.refresh()}>{d.loadError}</Note> : null}
+          <CheckInCard />
           {d.alerts.length ? <View style={{ marginTop: 14 }}><AlertList max={4} /></View> : null}
           <DealsPanel />
           <SignalsPanel />
