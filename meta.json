@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-25T12:11:11+00:00",
+ "updated": "2026-11-25T12:16:04+00:00",
  "source": "Limitless TCG",
  "source_url": "https://play.limitlesstcg.com/tournaments?game=OP",
  "window_days": 14,
@@ -45,7 +45,159 @@
    "prev": 0
   }
  ],
- "rising": [],
- "falling": [],
+ "rising": [
+  {
+   "num": "OP17-050",
+   "rate": 0.312,
+   "prev": 0.062,
+   "delta": 0.25
+  },
+  {
+   "num": "OP08-051",
+   "rate": 0.312,
+   "prev": 0.094,
+   "delta": 0.219
+  },
+  {
+   "num": "OP17-042",
+   "rate": 0.312,
+   "prev": 0.094,
+   "delta": 0.219
+  },
+  {
+   "num": "OP17-052",
+   "rate": 0.312,
+   "prev": 0.094,
+   "delta": 0.219
+  },
+  {
+   "num": "OP17-054",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  },
+  {
+   "num": "OP17-055",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  },
+  {
+   "num": "OP17-049",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  },
+  {
+   "num": "OP17-048",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  },
+  {
+   "num": "OP17-118",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  },
+  {
+   "num": "OP17-045",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  },
+  {
+   "num": "OP17-056",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  },
+  {
+   "num": "OP17-039",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  },
+  {
+   "num": "OP17-040",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  },
+  {
+   "num": "OP17-046",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  },
+  {
+   "num": "OP17-044",
+   "rate": 0.312,
+   "prev": 0.125,
+   "delta": 0.188
+  }
+ ],
+ "falling": [
+  {
+   "num": "OP17-114",
+   "rate": 0.062,
+   "prev": 0.281,
+   "delta": -0.219
+  },
+  {
+   "num": "OP17-112",
+   "rate": 0,
+   "prev": 0.188,
+   "delta": -0.188
+  },
+  {
+   "num": "OP17-107",
+   "rate": 0,
+   "prev": 0.188,
+   "delta": -0.188
+  },
+  {
+   "num": "OP17-102",
+   "rate": 0,
+   "prev": 0.188,
+   "delta": -0.188
+  },
+  {
+   "num": "OP09-077",
+   "rate": 0,
+   "prev": 0.156,
+   "delta": -0.156
+  },
+  {
+   "num": "OP11-106",
+   "rate": 0,
+   "prev": 0.156,
+   "delta": -0.156
+  },
+  {
+   "num": "OP17-109",
+   "rate": 0.125,
+   "prev": 0.281,
+   "delta": -0.156
+  },
+  {
+   "num": "OP17-113",
+   "rate": 0,
+   "prev": 0.156,
+   "delta": -0.156
+  },
+  {
+   "num": "OP06-115",
+   "rate": 0.062,
+   "prev": 0.219,
+   "delta": -0.156
+  },
+  {
+   "num": "OP05-098",
+   "rate": 0,
+   "prev": 0.156,
+   "delta": -0.156
+  }
+ ],
  "note": "Online community tournaments on Limitless; official paper events aren't included."
 }
