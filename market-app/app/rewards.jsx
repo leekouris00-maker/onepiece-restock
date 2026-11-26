@@ -127,48 +127,41 @@ export default function Rewards() {
             <T w="semi" size={14.5}>Today’s log is open below. Come back tomorrow for +{CHECKIN}.</T>
           </View>
           : <Button icon="newspaper-outline" disabled={busy} onPress={checkIn}>{`Open today’s Morning Log · +${CHECKIN} points`}</Button>}
-        {!pts.checkedIn ? <T mute size={12.5}>Your cards’ overnight moves, ban and meta news, prize events on now, and the market’s top movers.</T> : null}
+        {!pts.checkedIn ? <T mute size={12.5}>Your cards’ moves, anything that affects you, and what’s on this week.</T> : null}
       </Panel>
 
       {/* what the check-in opens */}
       {pts.checkedIn ? <>
-        <Panel title={`Your collection ${mine.span}`} right={mine.list.length ? <T w="semi" size={14} style={{ color: mine.change >= 0 ? c.up : c.down }}>{mine.change >= 0 ? '▲ +' : '▼ -'}{d.aud(Math.abs(mine.change))}</T> : null}>
+        <Panel title="Your cards" right={mine.list.length ? <T w="semi" size={14} style={{ color: mine.change >= 0 ? c.up : c.down }}>{mine.change >= 0 ? '▲ +' : '▼ -'}{d.aud(Math.abs(mine.change))}</T> : null}>
           {!d.session ? <T mute size={13.5}>Sign in and add cards to see your own movers here.</T>
-            : !mine.list.length ? <T mute size={13.5}>Nothing you own moved this week.</T>
-            : mine.list.map(o => <OwnedRow key={o.id} o={o} />)}
+            : mine.list.length ? <>
+                <T mute size={12}>{`Biggest moves ${mine.span}`}</T>
+                {mine.list.slice(0, 3).map(o => <OwnedRow key={o.id} o={o} />)}
+              </>
+            : watchMoves.length ? watchMoves.map(({ f, x }) => (
+                <Pressable key={f.card} onPress={() => router.push({ pathname: '/card/[k]', params: { k: x.k } })} style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
+                  <T size={13.5} style={{ flex: 1 }} numberOfLines={1}>{`☆ ${x.num} ${clean(x.n)}`}</T>
+                  <T size={13} w="semi" style={{ color: d.move(x) >= 0 ? c.up : c.down }}>{`${d.move(x) >= 0 ? '▲' : '▼'}${Math.abs(d.move(x)).toFixed(1)}%`}</T>
+                </Pressable>))
+            : <T mute size={13.5}>Nothing you own or watch moved this week.</T>}
         </Panel>
-        <Panel title="In the game" right={<Pressable onPress={() => router.push('/meta')} hitSlop={8}><T w="semi" size={13.5} style={{ color: c.accent }}>Ban & Meta</T></Pressable>}>
-          {hits.some(h => h.clash) ? <T size={13.5} style={{ color: c.down }}>{`Your saved deck breaks the ban list (${hits.filter(h => h.clash).map(h => h.num).join(', ')}). Open Ban & Meta.`}</T> : null}
-          {news.length ? news.map(n => (
-            <Pressable key={n.id} onPress={() => router.push('/meta')} style={{ gap: 2 }}>
-              <T w="semi" size={14}>{n.title}</T>
-              <T mute size={12.5}>{`${n.effective > dayKey() ? 'From' : 'Since'} ${niceDate(n.effective)}${hits.some(h => (n.cards || []).includes(h.num)) ? ' · affects cards you have' : ''}`}</T>
-            </Pressable>
-          )) : <T mute size={13.5}>No ban list changes in the last two weeks.</T>}
-          {meta && meta.rising.length ? <T size={13}>{'Showing up more in winning decks: ' + meta.rising.slice(0, 3).map(r => r.num).join(', ')}</T> : null}
-        </Panel>
-        {onNow.length ? <Panel title="Prize events on now" right={<Pressable onPress={() => router.push('/promos')} hitSlop={8}><T w="semi" size={13.5} style={{ color: c.accent }}>All</T></Pressable>}>
-          {onNow.slice(0, 3).map(e => {
-            const top = (e.prizes || []).flatMap(p => p.cards || []).map(num => cardsFor(d, num)[0]).filter(Boolean)[0];
-            return (
-              <Pressable key={e.id} onPress={() => router.push('/promos')} style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-                <View style={{ flex: 1 }}><T w="semi" size={14} numberOfLines={1}>{e.name}</T><T mute size={12}>{`until ${niceDate(e.end)}`}</T></View>
-                {top && top.m ? <T size={12.5} w="semi">{`${top.num} ${d.money(top.m)}`}</T> : null}
-              </Pressable>
-            );
-          })}
-        </Panel> : null}
-        {watchMoves.length ? <Panel title="Your watchlist this week">
-          {watchMoves.map(({ f, x }) => (
-            <Pressable key={f.card} onPress={() => router.push({ pathname: '/card/[k]', params: { k: x.k } })} style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
-              <T size={13.5} style={{ flex: 1 }} numberOfLines={1}>{`${x.num} ${clean(x.n)}`}</T>
-              <T size={13} w="semi" style={{ color: d.move(x) >= 0 ? c.up : c.down }}>{`${d.move(x) >= 0 ? '▲' : '▼'}${Math.abs(d.move(x)).toFixed(1)}%  ${d.money(x.m)}`}</T>
+        <Panel title="Affects you" right={<Pressable onPress={() => router.navigate({ pathname: '/market', params: { tab: 'meta' } })} hitSlop={8}><T w="semi" size={13.5} style={{ color: c.accent }}>Meta ›</T></Pressable>}>
+          {hits.some(h => h.clash) ? <T size={13.5} style={{ color: c.down }}>{`Your saved deck breaks the ban list (${hits.filter(h => h.clash).map(h => h.num).join(', ')}).`}</T> : null}
+          {news.slice(0, 2).map(n => (
+            <Pressable key={n.id} onPress={() => router.navigate({ pathname: '/market', params: { tab: 'meta' } })}>
+              <T size={13.5} numberOfLines={2}>{n.title}</T>
+              <T mute size={12}>{`${n.effective > dayKey() ? 'From' : 'Since'} ${niceDate(n.effective)}${hits.some(h => (n.cards || []).includes(h.num)) ? ' · you have these cards' : ''}`}</T>
             </Pressable>
           ))}
-        </Panel> : null}
-        <Panel title="Top of the market this week" right={<Pressable onPress={() => router.push('/movers')} hitSlop={8}><T w="semi" size={13.5} style={{ color: c.accent }}>See all</T></Pressable>}>
-          <View style={{ marginHorizontal: -16 }}>{market.map(x => <CardRow key={x.k} card={x} showSet />)}</View>
+          {!news.length && !hits.some(h => h.clash) ? <T mute size={13.5}>No ban list changes in the last two weeks.</T> : null}
         </Panel>
+        {onNow.length || (meta && meta.rising.length) ? <Panel title="On this week" right={<Pressable onPress={() => router.navigate({ pathname: '/market', params: { tab: 'promos' } })} hitSlop={8}><T w="semi" size={13.5} style={{ color: c.accent }}>Promos ›</T></Pressable>}>
+          {onNow.slice(0, 1).map(e => {
+            const top = (e.prizes || []).flatMap(p => p.cards || []).map(num => cardsFor(d, num)[0]).filter(Boolean)[0];
+            return <T key={e.id} size={13.5} numberOfLines={2}>{`${e.name}, until ${niceDate(e.end)}${top && top.m ? ` · ${top.num} ${d.money(top.m)}` : ''}`}</T>;
+          })}
+          {meta && meta.rising.length ? <T size={13.5} numberOfLines={2}>{`Showing up more in winning decks: ${meta.rising.slice(0, 3).map(r => r.num).join(', ')}`}</T> : null}
+        </Panel> : null}
       </> : null}
 
       {/* milestones */}

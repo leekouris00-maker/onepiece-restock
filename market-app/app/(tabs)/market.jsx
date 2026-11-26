@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { KINDS, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
@@ -8,6 +8,25 @@ import { Chip, Empty, Panel, Skel, T } from '../../src/ui';
 import { ChipRow, Heading, Screen, TileRail, Title } from '../../src/screen';
 import { useTiles } from '../../src/layout';
 import { CardTile } from '../../src/tiles';
+import { PromosView } from '../../src/promosview';
+import { MetaView } from '../../src/metaview';
+
+const TABS = [['prices', 'Prices'], ['promos', 'Promos'], ['meta', 'Meta']];
+
+// Prices | Promos | Meta at the top of Market
+function Tabs({ tab, setTab }) {
+  const c = useTheme();
+  return (
+    <View style={{ flexDirection: 'row', backgroundColor: c.soft, borderRadius: 999, padding: 3, marginTop: 12 }} accessibilityRole="tablist">
+      {TABS.map(([v, l]) => (
+        <Pressable key={v} onPress={() => setTab(v)} accessibilityRole="tab" accessibilityState={{ selected: tab === v }}
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 38, borderRadius: 999, backgroundColor: tab === v ? c.raise : 'transparent' }}>
+          <T w={tab === v ? 'bold' : 'medium'} size={14} style={{ color: tab === v ? c.ink : c.mute }}>{l}</T>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
 
 function Rail({ title, cards, onMore }) {
   const t = useTiles();
@@ -22,6 +41,10 @@ function Rail({ title, cards, onMore }) {
 
 export default function Market() {
   const d = useData(), c = useTheme(), wide = useTiles().wide;
+  const { tab: tabParam } = useLocalSearchParams();
+  const [tab, setTabState] = useState(TABS.some(([v]) => v === tabParam) ? tabParam : 'prices');
+  React.useEffect(() => { if (TABS.some(([v]) => v === tabParam)) setTabState(tabParam); }, [tabParam]);
+  const setTab = v => { setTabState(v); router.setParams({ tab: v }); };
   const [kind, setKind] = useState('booster');
   const r = useMemo(() => {
     if (!d.cat) return null;
@@ -58,21 +81,17 @@ export default function Market() {
   const favCards = d.favs.map(f => d.card(f.card)).filter(Boolean);
   return (
     <Screen onRefresh={() => d.loadCatalog(true)}>
-      <Title sub={`TCGplayer prices of ${d.cat.meta.updated} · US$1 = A$${d.cat.meta.fx}`}>Market</Title>
+      <Title sub={tab === 'prices' ? `TCGplayer prices of ${d.cat.meta.updated} · US$1 = A$${d.cat.meta.fx}` : tab === 'promos' ? 'Prize events and every promo card' : 'Ban list and what’s winning'}>Market</Title>
+      <Tabs tab={tab} setTab={setTab} />
+      {tab === 'promos' ? <PromosView /> : tab === 'meta' ? <MetaView /> : <>
       <Pressable onPress={() => router.push('/search')} accessibilityRole="search"
         style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48, borderRadius: 14, backgroundColor: c.soft, paddingHorizontal: 14, marginTop: 10 }}>
         <Ionicons name="search" size={19} color={c.mute} />
         <T mute size={15.5} w="medium">Search {d.cat.list.length.toLocaleString()} cards</T>
       </Pressable>
 
-      <ChipRow pad={wide ? 0 : 18} style={wide ? { marginTop: 12 } : { marginHorizontal: -18, marginTop: 12 }}>
-        <Chip onPress={() => router.push('/deck')}>Deck price</Chip>
-        <Chip onPress={() => router.push('/trade')}>⇄ Trade calculator</Chip>
-        <Chip onPress={() => router.push('/sets')}>Set progress</Chip>
-        <Chip onPress={() => router.push('/watchlist')}>☆ Watchlist</Chip>
-      </ChipRow>
       <Rail title="Your watchlist" cards={favCards} onMore={() => router.push('/watchlist')} />
-      <Rail title="Top promos" cards={r.promos} />
+      <Rail title="Top promos" cards={r.promos} onMore={() => setTab('promos')} />
       <Rail title="Rising this week" cards={r.up} onMore={() => router.push('/movers')} />
       <Rail title="Falling this week" cards={r.down} onMore={() => router.push('/movers')} />
       {r.newest ? <Rail title={`Newest: ${r.newest.code || r.newest.name}`} cards={r.newestTop} onMore={() => router.push({ pathname: '/set/[id]', params: { id: r.newest.id } })} /> : null}
@@ -99,6 +118,7 @@ export default function Market() {
           ))}
         </View>
       </Panel>
+      </>}
     </Screen>
   );
 }

@@ -54,6 +54,9 @@ function Nav() {
         <Stack.Screen name="stats" options={{ title: '' }} />
         <Stack.Screen name="meta" options={{ title: '' }} />
         <Stack.Screen name="promos" options={{ title: '' }} />
+        <Stack.Screen name="tools" options={{ title: 'Tools' }} />
+        <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+        <Stack.Screen name="about" options={{ title: 'Help and privacy' }} />
         <Stack.Screen name="movers" options={{ title: 'Market movers' }} />
         <Stack.Screen name="import" options={{ title: 'Import a collection', presentation: 'modal' }} />
         <Stack.Screen name="watchlist" options={{ title: 'Watchlist' }} />
