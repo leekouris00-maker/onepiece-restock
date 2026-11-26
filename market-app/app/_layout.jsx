@@ -55,6 +55,8 @@ function Nav() {
         <Stack.Screen name="meta" options={{ title: '' }} />
         <Stack.Screen name="promos" options={{ title: '' }} />
         <Stack.Screen name="tools" options={{ title: 'Tools' }} />
+        <Stack.Screen name="binders" options={{ title: 'Binders' }} />
+        <Stack.Screen name="binder/[id]" options={{ title: '' }} />
         <Stack.Screen name="settings" options={{ title: 'Settings' }} />
         <Stack.Screen name="about" options={{ title: 'Help and privacy' }} />
         <Stack.Screen name="movers" options={{ title: 'Market movers' }} />

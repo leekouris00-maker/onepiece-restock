@@ -34,6 +34,7 @@ export const COMMANDS = [
   { id: 'addcard', group: 'Add cards', label: 'Add your own card', sub: 'Japanese cards and promos TCGplayer doesn’t list', icon: 'create-outline', run: page('/addcard'), need: 'session' },
   { id: 'import', group: 'Add cards', label: 'Import a CSV', sub: 'From Collectr, TCGplayer or a spreadsheet', icon: 'cloud-upload-outline', run: page('/import'), need: 'session', tile: true },
 
+  { id: 'binders', group: 'Your collection', label: 'Binders', sub: 'Your cards page by page; fill from a group, a set, or pick them', icon: 'book-outline', keys: ['g i'], run: page('/binders'), tile: true },
   { id: 'export', group: 'Your collection', label: 'Export as CSV', sub: 'Opens in Excel or Google Sheets', icon: 'download-outline', run: d => exportCollection(d), need: 'session', tile: true },
   { id: 'sets', group: 'Your collection', label: 'Set progress', sub: 'How close you are to finishing each set, and the cost to finish', icon: 'grid-outline', keys: ['g r'], run: page('/sets'), tile: true },
   { id: 'sales', group: 'Your collection', label: 'Sales report', sub: 'What you sold each year, with profit', icon: 'receipt-outline', keys: ['g l'], run: page('/sales'), need: 'session', tile: true },
@@ -80,7 +81,7 @@ export const COMMANDS = [
 export const PAGE_KEYS = [
   ['Collection', [[['j', 'arrowdown'], 'Next item'], [['k', 'arrowup'], 'Previous item'], [['enter'], 'Open the highlighted item'], [['+'], 'One more of it'], [['-'], 'One less of it'],
     [['x'], 'Tick it'], [['e'], 'Select several on / off'], [['a'], 'Select all (while selecting)'], [['m'], 'Move ticked items to a group'], [['p'], 'Set price paid on ticked items'],
-    [['delete'], 'Remove ticked or highlighted (with Undo)'], [['/'], 'Search your collection'], [['v'], 'Grid / list'], [['o'], 'Owned / sold'], [['shift+x'], 'Clear search and filters']]],
+    [['delete'], 'Remove ticked or highlighted (with Undo)'], [['/'], 'Search your collection'], [['v'], 'Grid / list'], [['o'], 'Owned / sold'], [['shift+x'], 'Clear search and filters'], [['b'], 'Binders']]],
   ['Search', [[['/'], 'Jump to the search box'], [['arrowdown', 'arrowup'], 'Move through results'], [['enter'], 'Open the highlighted card or set'], [['escape'], 'Clear the search']]],
   ['Card page', [[['w'], 'Watch / unwatch'], [['a'], 'Add an English copy'], [['j'], 'Add a Japanese copy'], [['arrowleft', 'arrowright'], 'Other versions of this card'],
     [['[', ']'], 'Previous / next tool (Buying, Selling…)'], [['t'], 'Open on TCGplayer'], [['e'], 'eBay AU sold listings']]],

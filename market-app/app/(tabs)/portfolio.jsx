@@ -97,6 +97,7 @@ export default function Collection() {
     { keys: ['delete'], label: 'Remove ticked or highlighted (Undo)', when: () => chosen.length > 0 || !!cur(), run: () => { if (chosen.length) { act.removeMany(chosen); setSel(null); } else { const o = cur(); moveHi(1); act.remove(o); } } },
     { keys: ['/'], label: 'Search your collection', run: () => searchRef.current && searchRef.current.focus() },
     { keys: ['v'], label: 'Grid / list', run: () => setGrid(!grid) },
+    { keys: ['b'], label: 'Binders', run: () => router.push('/binders') },
     { keys: ['o'], label: 'Owned / sold', run: () => { setShow(sold ? 'owned' : 'sold'); setSel(null); } },
     { keys: ['shift+x'], label: 'Clear search and filters', run: clearAll },
     { keys: ['escape'], typing: true, label: 'Stop selecting / clear search', when: () => !!sel || (!!q && (searchFocused() || !web || !document.activeElement || document.activeElement === document.body)),
@@ -129,6 +130,7 @@ export default function Collection() {
     <Screen onRefresh={async () => { d.loadCatalog(true); await d.refresh(); }} refreshing={d.busy} after={bottom}>
       <Title right={<View style={{ flexDirection: 'row', gap: 8 }}>
         {wide ? <IconBtn icon="refresh" label="Reload" keys="r" onPress={() => { d.refresh(); d.loadCatalog(true); }} /> : null}
+        <IconBtn icon="book-outline" label="Binders" keys="b" onPress={() => router.push('/binders')} />
         <IconBtn icon={grid ? 'list' : 'grid-outline'} label={grid ? 'List view' : 'Grid view'} keys="v" onPress={() => setGrid(!grid)} />
         <IconBtn icon={sel ? 'close' : 'checkmark-circle-outline'} label={sel ? 'Stop selecting' : 'Select several'} keys="e" on={!!sel} onPress={() => (sel ? setSel(null) : startSel())} />
         {wide ? <IconBtn icon="scan" label="Scan a card" keys="s" onPress={() => router.push('/scan')} /> : null}
@@ -203,6 +205,7 @@ export default function Collection() {
         <MenuItem icon="cloud-upload-outline" label="Import a CSV" sub="From Collectr, TCGplayer or a spreadsheet" onPress={() => { setMore(false); router.push('/import'); }} />
         <MenuItem icon="download-outline" label="Export as CSV" sub="Opens in Excel or Google Sheets" onPress={() => { setMore(false); exportCollection(d); }} />
         <MenuItem icon="star-outline" label="Watchlist and price alerts" onPress={() => { setMore(false); router.push('/watchlist'); }} />
+        <MenuItem icon="book-outline" label="Binders" sub="Your cards page by page, like a real binder" onPress={() => { setMore(false); router.push('/binders'); }} />
         <MenuItem icon="grid-outline" label="Set progress" sub="What’s missing from each set" onPress={() => { setMore(false); router.push('/sets'); }} />
         <MenuItem icon="share-outline" label="Share a group" sub="A read-only link for a buyer or a friend" onPress={() => { setMore(false); setShare(true); }} />
         <MenuItem icon="swap-horizontal" label="Trade calculator" onPress={() => { setMore(false); router.push('/trade'); }} />
