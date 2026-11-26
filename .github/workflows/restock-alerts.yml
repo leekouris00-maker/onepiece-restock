@@ -1,0 +1,40 @@
+# Restock alerts for the One Piece Market app (restock_alerts.py): phone notifications for new posts on the
+# Restocks feed, to people whose alert choices match. GitHub runs this "every 5 minutes" as best it can
+# (it can be late); the restock bot on the PC also runs it after each check, which is quicker.
+name: Restock alerts
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "Only list new posts; send nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: restock-alerts
+  cancel-in-progress: false
+
+jobs:
+  alerts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - run: pip install --quiet pywebpush cryptography
+
+      - name: Send restock alerts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python restock_alerts.py ${{ inputs.dry && '--dry' || '' }}

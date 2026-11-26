@@ -67,6 +67,7 @@ export const COMMANDS = [
   { id: 'reset', group: 'Settings', label: 'Reset this device’s settings', sub: 'Sort orders, views, recent searches, calculator setups (your collection is untouched)', icon: 'refresh-circle-outline', where: 'Profile → Settings', run: page('/settings') },
   { id: 'privacy', group: 'Settings', label: 'Privacy policy', sub: 'What’s saved and how to delete it', icon: 'shield-checkmark-outline', run: () => web && window.open(siteBase() + 'privacy.html', '_blank') },
   { id: 'rewards', group: 'Rewards', label: 'Rewards', sub: 'Daily check-in, weekly bounties, sets and milestones: fixed points, no chance', icon: 'gift-outline', keys: ['g y'], run: page('/rewards') },
+  { id: 'restocks', group: 'Prices and alerts', label: 'Restocks', sub: 'Live retail restocks across Australia: sightings, shops and our watcher', icon: 'storefront-outline', keys: ['g n'], where: 'Market → Restocks', run: () => router.navigate({ pathname: '/market', params: { tab: 'restocks' } }), tile: true },
   { id: 'poster', group: 'Rewards', label: 'Your bounty poster', sub: 'Your rank and bounty, ready to share', icon: 'document-text-outline', keys: ['g u'], run: page('/poster') },
   { id: 'shop', group: 'Rewards', label: 'Points shop (preview)', sub: 'Swap points for store credit, packs and singles', icon: 'sparkles-outline', keys: ['g o'], run: page('/shop') },
 

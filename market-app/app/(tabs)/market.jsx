@@ -10,8 +10,9 @@ import { useTiles } from '../../src/layout';
 import { CardTile } from '../../src/tiles';
 import { PromosView } from '../../src/promosview';
 import { MetaView } from '../../src/metaview';
+import { RestocksView } from '../../src/restocks';
 
-const TABS = [['prices', 'Prices'], ['promos', 'Promos'], ['meta', 'Meta']];
+const TABS = [['prices', 'Prices'], ['restocks', 'Restocks'], ['promos', 'Promos'], ['meta', 'Meta']];
 
 // Prices | Promos | Meta at the top of Market
 function Tabs({ tab, setTab }) {
@@ -81,9 +82,9 @@ export default function Market() {
   const favCards = d.favs.map(f => d.card(f.card)).filter(Boolean);
   return (
     <Screen onRefresh={() => d.loadCatalog(true)}>
-      <Title sub={tab === 'prices' ? `TCGplayer prices of ${d.cat.meta.updated} · US$1 = A$${d.cat.meta.fx}` : tab === 'promos' ? 'Prize events and every promo card' : 'Ban list and what’s winning'}>Market</Title>
+      <Title sub={tab === 'prices' ? `TCGplayer prices of ${d.cat.meta.updated} · US$1 = A$${d.cat.meta.fx}` : tab === 'promos' ? 'Prize events and every promo card' : tab === 'restocks' ? 'Live retail restocks across Australia' : 'Ban list and what’s winning'}>Market</Title>
       <Tabs tab={tab} setTab={setTab} />
-      {tab === 'promos' ? <PromosView /> : tab === 'meta' ? <MetaView /> : <>
+      {tab === 'promos' ? <PromosView /> : tab === 'meta' ? <MetaView /> : tab === 'restocks' ? <RestocksView /> : <>
       <Pressable onPress={() => router.push('/search')} accessibilityRole="search"
         style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48, borderRadius: 14, backgroundColor: c.soft, paddingHorizontal: 14, marginTop: 10 }}>
         <Ionicons name="search" size={19} color={c.mute} />
