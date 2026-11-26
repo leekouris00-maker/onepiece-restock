@@ -68,16 +68,16 @@ language sql immutable set search_path = '' as $$ select (d - ((extract(isodow f
 -- the pool: id, label, points. The three for a week are picked the same way for everyone.
 create or replace function public._quest_pool() returns table (id text, label text)
 language sql immutable set search_path = '' as $$
-  values ('movers', 'See this week''s top movers'),
+  values ('movers', 'See this week’s top movers'),
          ('add3', 'Add 3 things to your collection'),
          ('alert', 'Set a price alert'),
          ('binder', 'Make or update a binder'),
          ('scan', 'Scan a card with the camera'),
          ('meta', 'Check the Ban & Meta Radar'),
-         ('promos', 'Look at this week''s promos'),
+         ('promos', 'Look at this week’s promos'),
          ('checkin5', 'Check in on 5 days this week'),
          ('search3', 'Look up 3 cards'),
-         ('sets', 'Browse a set''s prices')
+         ('sets', 'Browse a set’s prices')
 $$;
 
 create or replace function public._week_quests(wk date) returns text[]
@@ -149,7 +149,7 @@ language plpgsql security definer set search_path = '' as $$
 declare uid uuid := auth.uid(); wk date := public._week_start(public._mel_today()); lbl text; added integer;
 begin
   if uid is null then raise exception 'Sign in first'; end if;
-  if not (qid = any(public._week_quests(wk))) then raise exception 'Not one of this week''s bounties'; end if;
+  if not (qid = any(public._week_quests(wk))) then raise exception 'Not one of this week’s bounties'; end if;
   if not public._quest_done(uid, qid, wk) then raise exception 'Not done yet'; end if;
   perform pg_advisory_xact_lock(hashtext('quest:' || uid::text));
   insert into public.quest_claims (user_id, week, id) values (uid, wk, qid) on conflict do nothing;
