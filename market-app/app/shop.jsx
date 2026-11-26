@@ -1,15 +1,15 @@
 // Points shop: swap points earned in Rewards for store credit, packs and singles.
 // Fixed points prices (100 points = A$1), no mystery or random items.
 // PREVIEW (25 Nov 2026): points live on this device only and nothing is sent.
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useData, useTrack } from '../src/data';
+import { supabase, useData, useTrack } from '../src/data';
 import { useTheme } from '../src/theme';
 import { useWide } from '../src/layout';
 import { Button, CardArt, Panel, Sheet, T } from '../src/ui';
-import { SHOP, POINT_AUD, PRICES_SET, nextBonus, usePoints } from '../src/points';
+import { SHOP, POINT_AUD, PRICES_SET, SWAP_WAIT_DAYS, nextBonus, niceDay, swapOpens, usePoints } from '../src/points';
 import { toast } from '../src/toast';
 
 const ago = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
@@ -24,6 +24,9 @@ export default function Shop() {
   const can = pts.mode === 'server' || pts.mode === 'device';
   const items = SHOP.map(x => ({ ...x, card: x.k && d.card ? d.card(x.k) : null }));
   const nb = nextBonus(pts.streak);
+  const [owner, setOwner] = useState(false);
+  useEffect(() => { if (d.session && supabase) supabase.rpc('am_owner').then(r => setOwner(!!r.data?.owner), () => {}); }, [d.session]);
+  const opens = owner ? null : swapOpens(d.session);
   const cols = wide ? 3 : 2, gap = 10, w = Math.floor((Math.min(width, 760) - 36 - gap * (cols - 1)) / cols);
 
   const redeem = async x => {
@@ -61,6 +64,10 @@ export default function Shop() {
           <Ionicons name="flame-outline" size={17} color={pts.streak ? c.accent : c.mute} />
           <T size={13.5} style={{ flex: 1 }}>{pts.streak ? `${pts.streak}-day streak. ` : 'No streak yet. '}{`${nb.inDays} more ${nb.inDays === 1 ? 'day' : 'days'} in a row for +${nb.pts} points.`}</T>
         </View>
+        {opens && can ? <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderRadius: 12, backgroundColor: c.soft }}>
+          <Ionicons name="time-outline" size={18} color={c.accent} />
+          <T size={13} style={{ flex: 1 }}>{`Swaps open on ${niceDay(opens)}. New accounts wait ${SWAP_WAIT_DAYS} days so points stay fair. Keep earning until then.`}</T>
+        </View> : null}
         <Button icon="gift-outline" onPress={() => router.navigate('/rewards')}>{pts.mode === 'signedout' ? 'Sign in to earn points' : 'Earn points'}</Button>
       </Panel>
 
@@ -116,7 +123,7 @@ export default function Shop() {
       </Panel> : null}
 
       <Panel title="How points work (draft)">
-        <T size={13.5} mute>Earn points with the daily check-in, streak bonuses and milestones in Rewards. Every reward is fixed: nothing is left to chance. Points can’t be bought, sold or moved to another account, have no cash value, and members earn exactly the same as everyone else. Swapping is free, postage included.</T>
+        <T size={13.5} mute>Earn points with the daily check-in, streak bonuses and milestones in Rewards. Every reward is fixed: nothing is left to chance. Points can’t be bought, sold or moved to another account, have no cash value, and members earn exactly the same as everyone else. Swaps open once your account is 30 days old. Swapping is free, postage included.</T>
       </Panel>
 
       <Sheet open={!!pick} onClose={() => setPick(null)} title={pick ? pick.label : ''}>
@@ -125,6 +132,7 @@ export default function Shop() {
           {pick.id.startsWith('single') ? <T mute size={13.5}>In the real shop you’d pick the card next, from anything in stock up to the limit.</T> : null}
           <T mute size={13}>{pts.mode === 'server' ? 'Test phase: the swap is saved to your account and the points come off, but nothing ships yet and no address is asked for. You can undo it until it’s sent.' : 'Preview: swapping takes the points off on this device only. Nothing is sent.'}</T>
           {!can ? <Button ghost onPress={() => { setPick(null); router.push({ pathname: '/account', params: { back: '1' } }); }}>Sign in to swap</Button>
+            : opens ? <Button ghost disabled>{`Swaps open on ${niceDay(opens)}`}</Button>
             : pts.pts >= pick.cost ? <Button icon="swap-horizontal" disabled={busy} onPress={() => redeem(pick)}>Swap {pick.cost.toLocaleString()} points</Button>
             : <Button ghost disabled>{`${(pick.cost - pts.pts).toLocaleString()} more points needed`}</Button>}
         </View> : null}

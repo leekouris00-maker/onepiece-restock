@@ -36,6 +36,17 @@ export const SHOP = [
 ];
 export const PRICES_SET = 'November 2026';
 
+// Swaps open once an account is 30 days old (earning starts straight away). The database checks this too;
+// the app's owner is exempt there so swaps can be tested.
+export const SWAP_WAIT_DAYS = 30;
+export function swapOpens(session) {
+  const t = session?.user?.created_at ? new Date(session.user.created_at).getTime() : null;
+  if (!t) return null;
+  const at = new Date(t + SWAP_WAIT_DAYS * 86400000);
+  return at > new Date() ? at : null;
+}
+export const niceDay = t => t.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+
 // ---------- bounties (27 Nov 2026) ----------
 // Your bounty is every point you've ever earned plus set-completion bounty. Spending never lowers it.
 // Shown in berries: 1 point = ฿1,000,000.
