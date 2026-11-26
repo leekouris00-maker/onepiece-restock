@@ -22,7 +22,23 @@ async function load(uid) {
   publish({ uid, ready: cache.uid === uid && cache.ready });
   if (supabase && uid) {
     const r = await supabase.from('binders').select('*').order('position').order('created_at');
-    if (!r.error) { publish({ list: r.data.map(fromRow), local: false, ready: true }); return; }
+    if (!r.error) {
+      let list = r.data.map(fromRow);
+      // binders made on this phone before the account table existed: move them to the account once
+      try {
+        const raw = await AsyncStorage.getItem(localKey(uid));
+        const old = raw ? JSON.parse(raw) : [];
+        const have = new Set(list.map(x => x.id));
+        const move = old.filter(x => x && x.id && !have.has(x.id)).map((x, i) => ({ ...x, position: list.length + i }));
+        if (move.length) {
+          const up = await supabase.from('binders').upsert(move.map(toRow));
+          if (up.error) throw up.error;
+          list = [...list, ...move];
+        }
+        if (raw) await AsyncStorage.removeItem(localKey(uid));
+      } catch (e) { /* keep the phone copy and try again next time */ }
+      publish({ list, local: false, ready: true }); return;
+    }
     if (!missingTable(r.error)) { publish({ ready: true, error: r.error.message }); return; }
   }
   const raw = await AsyncStorage.getItem(localKey(uid));
