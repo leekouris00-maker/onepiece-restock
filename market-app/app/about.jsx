@@ -41,7 +41,7 @@ export default function About() {
         </> : null}
         {delMsg ? <T size={13.5} style={{ color: /deleted/.test(delMsg) ? c.accent : c.down }}>{delMsg}</T> : null}
       </Section>
-      <T mute size={11.5} style={{ textAlign: 'center', marginTop: 10 }}>Version 26 Nov</T>
+      <T mute size={11.5} style={{ textAlign: 'center', marginTop: 10 }}>Version 27 Nov</T>
     </View></Screen>
   );
 }

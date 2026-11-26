@@ -66,7 +66,8 @@ export const COMMANDS = [
   { id: 'feedback', group: 'Settings', label: 'Report a problem or idea', sub: 'Sends the page you’re on and your device', icon: 'chatbubble-ellipses-outline', run: () => emit('feedback') },
   { id: 'reset', group: 'Settings', label: 'Reset this device’s settings', sub: 'Sort orders, views, recent searches, calculator setups (your collection is untouched)', icon: 'refresh-circle-outline', where: 'Profile → Settings', run: page('/settings') },
   { id: 'privacy', group: 'Settings', label: 'Privacy policy', sub: 'What’s saved and how to delete it', icon: 'shield-checkmark-outline', run: () => web && window.open(siteBase() + 'privacy.html', '_blank') },
-  { id: 'rewards', group: 'Rewards', label: 'Rewards (preview)', sub: 'Daily check-in, streaks and milestones: fixed points, no chance', icon: 'gift-outline', keys: ['g y'], run: page('/rewards') },
+  { id: 'rewards', group: 'Rewards', label: 'Rewards', sub: 'Daily check-in, weekly bounties, sets and milestones: fixed points, no chance', icon: 'gift-outline', keys: ['g y'], run: page('/rewards') },
+  { id: 'poster', group: 'Rewards', label: 'Your bounty poster', sub: 'Your rank and bounty, ready to share', icon: 'document-text-outline', keys: ['g u'], run: page('/poster') },
   { id: 'shop', group: 'Rewards', label: 'Points shop (preview)', sub: 'Swap points for store credit, packs and singles', icon: 'sparkles-outline', keys: ['g o'], run: page('/shop') },
 
   { id: 'palette', group: 'Help', label: 'Search all functions', sub: 'Type what you want to do, or a card name', icon: 'flash-outline', keys: ['mod+k'], run: () => emit('palette') },

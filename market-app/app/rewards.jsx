@@ -14,9 +14,11 @@ import { usePref } from '../src/prefs';
 import { toast } from '../src/toast';
 import { haptic } from '../src/haptic';
 import { affected, eventsNow, cardsFor, myNums, newsWithin, niceDate, useGame } from '../src/game';
-import { CHECKIN, MILESTONES, MILESTONE_TOTAL, MONTH_BONUS, POINT_AUD, WEEK_BONUS, dayKey, nextBonus, usePoints } from '../src/points';
+import { CHECKIN, MILESTONES, MILESTONE_TOTAL, MONTH_BONUS, POINT_AUD, QUEST_ALL, QUEST_PTS, WEEK_BONUS, dayKey, nextBonus, usePoints } from '../src/points';
+import { BountyCard, ReminderRow, SetBounties, WeeklyBounties } from '../src/bounty';
 
 const WEEKDAY = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+const MAX_MONTH = 30 * CHECKIN + 4 * WEEK_BONUS + MONTH_BONUS + 4 * (3 * QUEST_PTS + QUEST_ALL);
 
 export default function Rewards() {
   const d = useData(), c = useTheme();
@@ -85,18 +87,9 @@ export default function Rewards() {
       {pts.mode === 'device' ? <T size={12.5} style={{ color: c.mute }}>Points are on this device for now: the rewards database update (supabase/2026-11-25-rewards.sql) hasn’t been run yet.</T> : null}
 
       {can ? <>
-      {/* balance */}
-      <Pressable onPress={() => router.push('/shop')} accessibilityRole="button" accessibilityLabel="Points shop"
-        style={({ pressed, hovered }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 18, backgroundColor: pressed || hovered ? c.raise : c.panel, borderWidth: 1, borderColor: c.line })}>
-        <View style={{ width: 46, height: 46, borderRadius: 14, backgroundColor: c.accentDim, alignItems: 'center', justifyContent: 'center' }}>
-          <Ionicons name="sparkles" size={22} color={c.accent} />
-        </View>
-        <View style={{ flex: 1, gap: 2 }}>
-          <T w="bold" size={22}>{pts.pts.toLocaleString()} points</T>
-          <T mute size={12.5}>{`About A$${(pts.pts * POINT_AUD).toFixed(2)} in the shop`}</T>
-        </View>
-        <T w="semi" size={14} style={{ color: c.accent }}>Points shop ›</T>
-      </Pressable>
+      {/* bounty + points */}
+      <BountyCard pts={pts} />
+      {pts.mode === 'server' && pts.bounty == null ? <T size={12.5} style={{ color: c.mute }}>Bounties, weekly bounties and set rewards switch on once the database update (supabase/2026-11-27-bounty.sql) has been run.</T> : null}
 
       {/* daily check-in */}
       <Panel>
@@ -128,6 +121,7 @@ export default function Rewards() {
           </View>
           : <Button icon="newspaper-outline" disabled={busy} onPress={checkIn}>{`Open today’s Morning Log · +${CHECKIN} points`}</Button>}
         {!pts.checkedIn ? <T mute size={12.5}>Your cards’ moves, anything that affects you, and what’s on this week.</T> : null}
+        <ReminderRow pts={pts} />
       </Panel>
 
       {/* what the check-in opens */}
@@ -163,6 +157,9 @@ export default function Rewards() {
           {meta && meta.rising.length ? <T size={13.5} numberOfLines={2}>{`Showing up more in winning decks: ${meta.rising.slice(0, 3).map(r => r.num).join(', ')}`}</T> : null}
         </Panel> : null}
       </> : null}
+
+      <WeeklyBounties pts={pts} busy={busy} run={run} />
+      <SetBounties pts={pts} busy={busy} run={run} />
 
       {/* milestones */}
       <Panel title="Milestones" right={<T mute size={12.5}>{`${Object.keys(pts.ms).length} of ${MILESTONES.length} · up to ${MILESTONE_TOTAL} pts`}</T>}>
@@ -207,7 +204,8 @@ export default function Rewards() {
       </> : null}
 
       <Panel title="How points work (draft)">
-        <T size={13.5} mute>{`Check in once a day for +${CHECKIN}. Every 7th day in a row adds +${WEEK_BONUS}, and day 30 adds +${MONTH_BONUS}. One missed day a month doesn’t break your streak. Milestones pay once each.`}</T>
+        <T size={13.5} mute>{`Check in once a day for +${CHECKIN}. Every 7th day in a row adds +${WEEK_BONUS}, and day 30 adds +${MONTH_BONUS}. One missed day a month doesn’t break your streak. Milestones pay once each. Weekly bounties: three tasks a week, +${QUEST_PTS} each and +${QUEST_ALL} for all three.`}</T>
+        <T size={13.5} mute>Your bounty is every point you’ve ever earned plus set-completion bounty, shown in berries (1 point = ฿1,000,000). Spending points never lowers it. Ranks: Rookie, Supernova (฿500M), Warlord (฿2B), Emperor (฿5B), Pirate King (฿10B). Set completion adds bounty only, not points.</T>
         <T size={13.5} mute>Points are free and fixed: nothing is left to chance and nothing can be bought. They have no cash value, can’t be sold or moved to another account, and paid members earn exactly the same. One account per person; points from extra accounts or automation are removed. Changes to how points work get at least 30 days’ notice, with a chance to use your points first. Points expire after 12 months without signing in. To run Rewards, the app records your check-ins, points and swaps, plus a daily count of a few things you do in the app (see the privacy policy).</T>
       </Panel>
 
@@ -217,11 +215,11 @@ export default function Rewards() {
         <T w="semi" size={14} mute>What this would cost you</T>
       </Pressable>
       {owner ? <Panel>
-        <Row label="Most one person can earn in a month (every day + bonuses)" value={`${(30 * CHECKIN + 4 * WEEK_BONUS + MONTH_BONUS).toLocaleString()} pts · A$${((30 * CHECKIN + 4 * WEEK_BONUS + MONTH_BONUS) * POINT_AUD).toFixed(2)}`} />
+        <Row label="Most one person can earn in a month (every day, bonuses, all weekly bounties)" value={`${MAX_MONTH.toLocaleString()} pts · A$${(MAX_MONTH * POINT_AUD).toFixed(2)}`} />
         <Row label="Milestones, once per new person" value={`${MILESTONE_TOTAL} pts · A$${(MILESTONE_TOTAL * POINT_AUD).toFixed(2)}`} />
         <View style={{ height: 1, backgroundColor: c.line }} />
-        <Row label="100 people checking in every day, per month (if every point is spent)" value={`A$${Math.round((30 * CHECKIN + 4 * WEEK_BONUS + MONTH_BONUS) * POINT_AUD * 100).toLocaleString()}`} bold />
-        <T mute size={12}>That’s the ceiling: most people skip days, and points only cost you when they’re swapped. Store credit costs you less than its face value, and packs cost what you paid for them.</T>
+        <Row label="100 people doing everything, every day, per month (if every point is spent)" value={`A$${Math.round(MAX_MONTH * POINT_AUD * 100).toLocaleString()}`} bold />
+        <T mute size={12}>Set completion and ranks cost nothing: they only raise bounty. That’s the ceiling: most people skip days, and points only cost you when they’re swapped. Store credit costs you less than its face value, and packs cost what you paid for them.</T>
       </Panel> : null}
     </ScrollView>
   );

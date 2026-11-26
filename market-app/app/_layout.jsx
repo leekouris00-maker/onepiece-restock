@@ -51,6 +51,7 @@ function Nav() {
         <Stack.Screen name="spin" options={{ title: '' }} />
         <Stack.Screen name="shop" options={{ title: '' }} />
         <Stack.Screen name="rewards" options={{ title: '' }} />
+        <Stack.Screen name="poster" options={{ title: 'Your bounty' }} />
         <Stack.Screen name="stats" options={{ title: '' }} />
         <Stack.Screen name="meta" options={{ title: '' }} />
         <Stack.Screen name="promos" options={{ title: '' }} />

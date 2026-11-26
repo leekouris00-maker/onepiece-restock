@@ -36,6 +36,83 @@ export const SHOP = [
 ];
 export const PRICES_SET = 'November 2026';
 
+// ---------- bounties (27 Nov 2026) ----------
+// Your bounty is every point you've ever earned plus set-completion bounty. Spending never lowers it.
+// Shown in berries: 1 point = ฿1,000,000.
+export const BERRIES = 1000000;
+export const RANKS = [
+  { id: 'rookie', label: 'Rookie', at: 0, icon: 'boat-outline' },
+  { id: 'supernova', label: 'Supernova', at: 500, icon: 'flash-outline' },
+  { id: 'warlord', label: 'Warlord', at: 2000, icon: 'shield-half-outline' },
+  { id: 'emperor', label: 'Emperor', at: 5000, icon: 'diamond-outline' },
+  { id: 'king', label: 'Pirate King', at: 10000, icon: 'trophy-outline' },
+];
+export function rankOf(b) {
+  let i = 0;
+  while (i + 1 < RANKS.length && b >= RANKS[i + 1].at) i++;
+  const r = RANKS[i], next = RANKS[i + 1] || null;
+  return { ...r, i, next, toNext: next ? next.at - b : 0, frac: next ? (b - r.at) / (next.at - r.at) : 1 };
+}
+// ฿1,250,000,000 (full) or ฿1.25B (short)
+export function berries(b, short) {
+  const v = Math.max(0, Math.round(b || 0)) * BERRIES;
+  if (!short) return '฿' + v.toLocaleString('en-AU');
+  const f = (x, u) => '฿' + (x >= 100 ? Math.round(x) : x >= 10 ? x.toFixed(1).replace(/\.0$/, '') : x.toFixed(2).replace(/\.?0+$/, '')) + u;
+  return v >= 1e9 ? f(v / 1e9, 'B') : v >= 1e6 ? f(v / 1e6, 'M') : '฿' + v.toLocaleString('en-AU');
+}
+
+// Weekly bounties: the database picks 3 a week (Monday, Melbourne time) and checks they're done.
+export const QUEST_PTS = 20, QUEST_ALL = 40;
+export const QUESTS = {
+  movers: { icon: 'trending-up', go: '/movers', sub: 'Biggest moves up and down' },
+  add3: { icon: 'add-circle-outline', go: '/search', sub: 'Cards, sealed, anything' },
+  alert: { icon: 'notifications-outline', go: '/watchlist', sub: 'On any card you watch' },
+  binder: { icon: 'book-outline', go: '/binders', sub: 'Make one or change one' },
+  scan: { icon: 'scan-outline', go: '/scan', sub: 'Scan one and add it' },
+  meta: { icon: 'shield-checkmark-outline', go: { pathname: '/market', params: { tab: 'meta' } }, sub: 'Bans and what’s winning' },
+  promos: { icon: 'gift-outline', go: { pathname: '/market', params: { tab: 'promos' } }, sub: 'Events and promo cards' },
+  checkin5: { icon: 'calendar-outline', go: '/rewards', sub: 'Your Morning Log, 5 days' },
+  search3: { icon: 'search', go: '/search', sub: 'Any 3 cards' },
+  sets: { icon: 'albums-outline', go: '/sets', sub: 'Any set' },
+};
+// Monday that starts this week (Melbourne)
+export function weekEnds() {
+  const t = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Melbourne' }));
+  const left = (8 - (t.getDay() || 7)) % 7 || 7;      // days until next Monday
+  return left === 1 ? 'Resets tonight at midnight' : `Resets in ${left} days (Monday)`;
+}
+
+// Set completion: bounty only (no spendable points), at 25 / 50 / 75 / 100% of a set's card numbers.
+export const SET_STEPS = [[25, 25], [50, 50], [75, 100], [100, 250]];
+// every main set (booster / extra / starter) with its card-number prefix and size, and how many numbers you own
+export function setProgress(d) {
+  if (!d.cat) return [];
+  const byPre = new Map();
+  const kinds = new Set(['booster', 'extra', 'starter']);
+  const groups = new Map();
+  for (const x of d.cat.list) if (x.t === 'card' && x.num) (groups.get(x.g) || groups.set(x.g, []).get(x.g)).push(x);
+  for (const s of d.cat.sets) {
+    if (!kinds.has(s.kind)) continue;
+    const cards = groups.get(s.id) || [];
+    const count = new Map();
+    for (const x of cards) { const p = x.num.split('-')[0].toUpperCase(); count.set(p, (count.get(p) || 0) + 1); }
+    const pre = [...count.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+    if (!pre || !/^[A-Z]{2,4}\d{2}$/.test(pre)) continue;
+    const size = new Set(cards.filter(x => x.num.toUpperCase().startsWith(pre + '-')).map(x => x.num.toUpperCase())).size;
+    if (size < 10 || size > 400) continue;
+    const had = byPre.get(pre);
+    if (!had || size > had.size) byPre.set(pre, { code: pre, size, name: s.name.replace(/^ST-\d+:\s*/, ''), set: s.id });
+  }
+  const mine = new Map();
+  for (const o of d.owned || []) {
+    if (o.status === 'sold' || !o.num) continue;
+    const n = String(o.num).toUpperCase(), p = n.split('-')[0];
+    if (byPre.has(p)) (mine.get(p) || mine.set(p, new Set()).get(p)).add(n);
+  }
+  return [...byPre.values()].map(x => ({ ...x, have: mine.get(x.code)?.size || 0 })).map(x => ({ ...x, pct: x.have / x.size }));
+}
+export const stepsReady = (x, got) => SET_STEPS.filter(([p]) => x.have >= Math.ceil((x.size * p) / 100) && !got.has(`set:${x.code}:${p}`));
+
 export const dayKey = (t = new Date()) => `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
 const back = (t, n = 1) => { const x = new Date(t); x.setDate(x.getDate() - n); return x; };
 
@@ -63,6 +140,7 @@ const nice = e => {
   const m = (e && (e.message || String(e))) || 'Something went wrong';
   if (/Not done yet/.test(m)) return 'Not done yet on your account. Do it once more, then claim.';
   if (/Not enough points/.test(m)) return 'Not enough points for that yet.';
+  if (/Not there yet/.test(m)) return 'Your account doesn’t have enough of that set yet. Check the card numbers on your items.';
   return m;
 };
 const missingFn = e => e && (e.code === 'PGRST202' || e.code === '42883' || /could not find the function|does not exist/i.test(e.message || ''));
@@ -141,6 +219,12 @@ export function usePoints() {
       claim: async m => { const r = await call('claim_milestone', { mid: m.id }); return !!r.claimed; },
       redeem: async it => { const r = await call('redeem', { item_id: it.id }); return r.redemption; },
       cancel: async id => { await call('cancel_redemption', { rid: id }); return true; },
+      // bounties: null until supabase/2026-11-27-bounty.sql has been run
+      bounty: s.bounty != null ? s.bounty : null, quests: s.quests || null, week: s.week || null,
+      sets: new Set(s.sets || []), remind: !!s.remind,
+      claimQuest: async id => { const r = await call('claim_quest', { qid: id }); return !!r.claimed; },
+      claimSet: async (x, pct) => { await call('claim_set', { code: x.code, size: x.size, pct }); return true; },
+      setRemind: async on => { const r = await supabase.rpc('set_streak_reminder', { onoff: on }); if (r.error) throw new Error(nice(r.error)); publish({ data: { ...cache.data, remind: on } }); },
     };
   }
   const v = dev.v, st = streakInfo(v.days);
@@ -149,5 +233,6 @@ export function usePoints() {
     pts: v.pts, days: v.days, log: v.log, ms: v.ms, swaps: v.swaps,
     checkedIn: v.days.includes(dayKey()), streak: st.n, freezeLeft: st.freezeLeft,
     checkIn: dev.checkIn, claim: dev.claim, redeem: dev.redeem, cancel: dev.cancel,
+    bounty: null, quests: null, week: null, sets: new Set(), remind: false,
   };
 }

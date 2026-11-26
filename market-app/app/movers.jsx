@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { FlatList, ScrollView, View } from 'react-native';
-import { useData } from '../src/data';
+import { useData, useTrack } from '../src/data';
 import { CardRow } from '../src/rows';
 import { OwnedRow } from '../src/tiles';
 import { Chip, Empty, T } from '../src/ui';
@@ -8,6 +8,7 @@ import { Chip, Empty, T } from '../src/ui';
 const TABS = [['mine', 'My cards'], ['up', 'Market risers'], ['down', 'Market fallers']];
 
 export default function Movers() {
+  useTrack('movers');
   const d = useData();
   const [tab, setTab] = useState(d.session ? 'mine' : 'up');
   const data = useMemo(() => {

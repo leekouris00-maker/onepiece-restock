@@ -1,0 +1,39 @@
+# Evening streak reminder for the One Piece Market app (streak_reminder.py).
+# Only people who turned it on in Rewards, checked in yesterday and not yet today. One notification at most.
+name: Streak reminder
+
+on:
+  schedule:
+    - cron: "4 8 * * *"       # 7:04pm Melbourne in summer (6:04pm in winter)
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "Only list who would get one"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: streak-reminder
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - run: pip install --quiet pywebpush cryptography
+
+      - name: Send streak reminders
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python streak_reminder.py ${{ inputs.dry && '--dry' || '' }}

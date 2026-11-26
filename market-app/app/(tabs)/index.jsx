@@ -13,27 +13,7 @@ import { useTiles } from '../../src/layout';
 import { CardTile, OwnedRow } from '../../src/tiles';
 import { CardRow } from '../../src/rows';
 import { emit } from '../../src/bus';
-import { CHECKIN, usePoints } from '../../src/points';
-
-// Rewards preview: a one-line nudge until today's check-in is done
-function CheckInCard() {
-  const c = useTheme(), pts = usePoints();
-  if (pts.checkedIn || !(pts.mode === 'server' || pts.mode === 'device')) return null;
-  return (
-    <Pressable onPress={() => router.push('/rewards')} accessibilityRole="button" accessibilityLabel="Daily check-in"
-      style={({ pressed, hovered }) => ({ marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, paddingRight: 14, borderRadius: 16,
-        backgroundColor: pressed || hovered ? c.raise : c.panel, borderWidth: 1, borderColor: c.accentDim })}>
-      <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: c.accentDim, alignItems: 'center', justifyContent: 'center' }}>
-        <Ionicons name="newspaper-outline" size={19} color={c.accent} />
-      </View>
-      <View style={{ flex: 1 }}>
-        <T w="semi" size={14.5}>Today’s Morning Log</T>
-        <T mute size={12.5}>{pts.streak ? `${pts.streak}-day streak · ` : ''}Your movers, ban news and events · +{CHECKIN} points</T>
-      </View>
-      <Ionicons name="chevron-forward" size={17} color={c.mute} />
-    </Pressable>
-  );
-}
+import { HomeRewardsCard } from '../../src/bounty';
 
 const CardRowLite = ({ card }) => <View style={{ marginHorizontal: -16 }}><CardRow card={card} /></View>;
 
@@ -116,7 +96,7 @@ export default function Home() {
       ) : (
         <>
           {d.loadError ? <Note tone="warn" title="Couldn’t load your collection" style={{ marginTop: 14 }} action="Retry" onAction={() => d.refresh()}>{d.loadError}</Note> : null}
-          <CheckInCard />
+          <HomeRewardsCard />
           {d.alerts.length ? <View style={{ marginTop: 14 }}><AlertList max={4} /></View> : null}
           <DealsPanel />
           <SignalsPanel />
