@@ -108,6 +108,15 @@ export function binderPockets(d, b) {
       }
     }
   }
+  // cards added with + to a group binder live only in its slots: keep them whatever the order
+  if (src.kind === 'group') {
+    const inList = new Set(list.map(e => e.key));
+    for (const k of b.slots || []) {
+      if (typeof k !== 'string' || !k.startsWith('o:') || inList.has(k)) continue;
+      const o = live.find(x => 'o:' + x.id === k);
+      if (o) { list.push(ownEntry(o)); inList.add(k); }
+    }
+  }
   list = list.filter(e => !hidden.has(e.key));
   if (src.kind === 'pick' || b.sort === 'custom') {
     // custom order: the saved slots first (null = empty pocket), then anything new at the end
