@@ -6,13 +6,15 @@ import { router, useLocalSearchParams } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { clean, useData } from '../../src/data';
 import { useTheme } from '../../src/theme';
-import { Button, CardArt, Choice, Field, Panel, SearchBar, Select, Sheet, T } from '../../src/ui';
+import { Button, CardArt, Choice, Field, MenuItem, Panel, SearchBar, Select, Sheet, T } from '../../src/ui';
 import { IconBtn, Screen } from '../../src/screen';
 import { useWide } from '../../src/layout';
 import { useKeys } from '../../src/keys';
 import { toast } from '../../src/toast';
 import { startedSets } from '../../src/sets';
-import { COLORS, GRIDS, binderPockets, binderStats, colorOf, useBinders } from '../../src/binders';
+import { COLORS, GRIDS, binderPockets, binderStats, colorOf, hiddenOf, slotsWithout, useBinders } from '../../src/binders';
+import { BinderMenu } from '../../src/bindermenu';
+import { haptic } from '../../src/haptic';
 
 export default function BinderScreen() {
   const { id, edit } = useLocalSearchParams();
@@ -24,6 +26,8 @@ export default function BinderScreen() {
   const [custom, setCustom] = useState(edit === '1');
   const [adding, setAdding] = useState(false);
   const [page, setPage] = useState(0);
+  const [menu, setMenu] = useState(false);       // binder options
+  const [pmenu, setPmenu] = useState(null);      // pocket index whose long-press menu is open
   const scroller = useRef(null);
 
   const pockets = useMemo(() => (b ? binderPockets(d, b) : []), [b, d.owned, d.cat]);
@@ -45,6 +49,8 @@ export default function BinderScreen() {
     { keys: ['arrowright'], label: 'Next page', run: () => goPage(page + 1) },
     { keys: ['arrowleft'], label: 'Previous page', run: () => goPage(page - 1) },
     { keys: ['e'], label: 'Arrange on / off', when: () => canArrange, run: () => { setArrange(a => !a); setSel(null); } },
+    { keys: ['delete'], label: 'Take the picked card out (Undo)', when: () => arrange && sel != null, run: () => removePocket(sel) },
+    { keys: ['.'], label: 'Binder options', run: () => setMenu(true) },
   ]);
 
   if (!b) return <Screen><T mute>{bs.ready ? 'This binder isn’t here any more.' : 'Loading…'}</T></Screen>;
@@ -55,9 +61,7 @@ export default function BinderScreen() {
   const tapPocket = i => {
     const p = pockets[i];
     if (!arrange) {
-      if (!p) return;
-      if (p.own) router.push({ pathname: '/item/[id]', params: { id: p.own.id } });
-      else if (p.card) router.push({ pathname: '/card/[k]', params: { k: p.card.k } });
+      if (p) openPocket(p);
       return;
     }
     if (sel == null) { if (p) setSel(i); return; }
@@ -66,18 +70,26 @@ export default function BinderScreen() {
     while (arr.length <= Math.max(i, sel)) arr.push(null);
     [arr[i], arr[sel]] = [arr[sel], arr[i]];
     setSel(null);
-    save({ ...b, slots: arr, sort: kind === 'pick' ? b.sort : 'custom' });
+    update(cur => ({ slots: [...arr, ...hiddenOf(cur)], sort: kind === 'pick' ? cur.sort : 'custom' }));
   };
-  const removeSel = () => {
-    const arr = keysNow(); const gone = arr[sel]; arr[sel] = null; setSel(null);
-    save({ ...b, slots: arr, sort: kind === 'pick' ? b.sort : 'custom' });
-    toast('Taken out of the binder (still in your collection)', { action: { label: 'Undo', onPress: () => { const a2 = keysNow(); a2[sel] = gone; save({ ...b, slots: a2 }); } } });
+  // Take one card out of the binder (never out of the collection), with Undo
+  function removePocket(i) {
+    const p = pockets[i]; if (!p) return;
+    const before = b.slots || [];
+    setSel(null); haptic('warn');
+    update(cur => ({ slots: slotsWithout(cur, p.key) }));
+    toast(`Took out ${p.own ? clean(p.own.name) : p.num}. Still in your collection.`, { action: { label: 'Undo', onPress: () => update({ slots: before }) } });
+  }
+  const openPocket = p => {
+    if (p.own) router.push({ pathname: '/item/[id]', params: { id: p.own.id } });
+    else if (p.card) router.push({ pathname: '/card/[k]', params: { k: p.card.k } });
   };
   const addOwned = o => {
     const k = 'o:' + o.id, base = keysNow();
     update(cur => {
-      const from = kind === 'pick' ? (cur.slots || []) : base;
-      return from.includes(k) ? {} : { slots: [...from, k], sort: kind === 'pick' ? cur.sort : 'custom' };
+      const hid = hiddenOf(cur).filter(x => x !== 'x:' + k);            // adding a removed card brings it back
+      const from = kind === 'pick' ? (cur.slots || []).filter(x => x !== 'x:' + k) : [...base, ...hid];
+      return from.includes(k) ? { slots: from } : { slots: kind === 'pick' ? [...from, k] : [...base, k, ...hid], sort: kind === 'pick' ? cur.sort : 'custom' };
     });
     toast(`Added ${clean(o.name)}`);
   };
@@ -96,11 +108,11 @@ export default function BinderScreen() {
         </View>
         {kind === 'pick' || b.sort === 'custom' || kind === 'group' ? <IconBtn icon="add" label="Add cards" onPress={() => setAdding(true)} /> : null}
         {canArrange ? <IconBtn icon="swap-horizontal" label={arrange ? 'Done arranging' : 'Arrange'} keys="e" on={arrange} onPress={() => { setArrange(a => !a); setSel(null); }} /> : null}
-        <IconBtn icon="options-outline" label="Customise" onPress={() => setCustom(true)} />
+        <IconBtn icon="ellipsis-horizontal" label="Binder options" keys="." onPress={() => setMenu(true)} />
       </View>
-      {arrange ? <T size={13} style={{ color: c.accent, marginTop: 10 }}>{sel == null ? 'Tap a card, then tap where it should go.' : 'Now tap another pocket to swap.'}</T> : null}
-      {arrange && sel != null && pockets[sel] && (kind === 'pick' || b.sort === 'custom' || kind === 'group') ? <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
-        <Button ghost icon="remove-circle-outline" onPress={removeSel}>Take out of binder</Button>
+      {arrange ? <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 }}>
+        <T size={13} style={{ color: c.accent, flex: 1 }}>{sel == null ? 'Tap a card, then tap where it should go. Tap − to take it out.' : 'Now tap another pocket to swap.'}</T>
+        <Button onPress={() => { setArrange(false); setSel(null); }}>Done</Button>
       </View> : null}
 
       {/* pages */}
@@ -114,7 +126,7 @@ export default function BinderScreen() {
                 const pk = pockets[i];
                 const picked = arrange && sel === i;
                 return (
-                  <Pressable key={i} onPress={() => tapPocket(i)} accessibilityRole="button" accessibilityLabel={pk ? `${pk.num} ${pk.have ? '' : 'missing'}` : 'Empty pocket'}
+                  <Pressable key={i} onPress={() => tapPocket(i)} onLongPress={pk && !arrange ? () => { haptic(); setPmenu(i); } : undefined} delayLongPress={380} accessibilityRole="button" accessibilityLabel={pk ? `${pk.num} ${pk.have ? '' : 'missing'}` : 'Empty pocket'}
                     style={{ width: pocketW, padding: 4, borderRadius: Math.max(6, pocketW / 16), backgroundColor: c.soft,
                       borderWidth: 2, borderColor: picked ? c.accent : arrange && sel != null ? c.raise : 'transparent' }}>
                     {pk ? <>
@@ -126,6 +138,10 @@ export default function BinderScreen() {
                       {showPrices ? <T size={11.5} w={pk.have ? 'semi' : 'medium'} mute={!pk.have} numberOfLines={1} style={{ textAlign: 'center', marginTop: 3 }}>{pk.price ? d.aud(pk.price) : '–'}</T> : null}
                     </> : <View style={{ width: pocketW - 12, aspectRatio: 63 / 88, borderRadius: Math.max(4, pocketW / 20), borderWidth: 1, borderStyle: 'dashed', borderColor: c.raise }} />}
                     {!pk && showPrices ? <T size={11.5} style={{ marginTop: 3 }}> </T> : null}
+                    {arrange && pk ? <Pressable onPress={() => removePocket(i)} hitSlop={6} accessibilityRole="button" accessibilityLabel={`Take ${pk.num} out of the binder`}
+                      style={{ position: 'absolute', top: -6, left: -6, width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: c.down, borderWidth: 2, borderColor: c.panel }}>
+                      <Ionicons name="remove" size={16} color="#fff" />
+                    </Pressable> : null}
                   </Pressable>
                 );
               })}
@@ -146,16 +162,28 @@ export default function BinderScreen() {
         <Button icon="add" onPress={() => setAdding(true)}>Add cards</Button>
       </Panel> : null}
 
-      <CustomiseSheet open={custom} onClose={() => setCustom(false)} b={b} update={update} remove={async () => {
-        setCustom(false); const gone = await bs.remove(b.id); router.back();
-        toast(`Deleted “${b.name}”`, { action: { label: 'Undo', onPress: () => bs.save(gone) } });
-      }} />
+      <CustomiseSheet open={custom} onClose={() => setCustom(false)} b={b} update={update} />
+      {menu ? <BinderMenu b={b} inside onClose={() => setMenu(false)} onCustomise={() => setCustom(true)} onAdd={() => setAdding(true)}
+        onArrange={() => { setArrange(true); setSel(null); }} /> : null}
+      {pmenu != null && pockets[pmenu] ? <PocketMenu p={pockets[pmenu]} onClose={() => setPmenu(null)} onOpen={() => openPocket(pockets[pmenu])}
+        onMove={canArrange ? () => { setArrange(true); setSel(pmenu); } : null} onRemove={() => removePocket(pmenu)} /> : null}
       <AddSheet open={adding} onClose={() => setAdding(false)} inBinder={new Set(pockets.filter(Boolean).map(p => p.key))} onAdd={addOwned} />
     </Screen>
   );
 }
 
-function CustomiseSheet({ open, onClose, b, update, remove }) {
+function PocketMenu({ p, onClose, onOpen, onMove, onRemove }) {
+  const go = f => () => { onClose(); f(); };
+  return (
+    <Sheet open onClose={onClose} title={p.own ? clean(p.own.name) : `${p.num} · not in your collection`}>
+      <MenuItem icon={p.own ? 'create-outline' : 'pricetags-outline'} label={p.own ? 'Open item' : 'Card prices'} onPress={go(onOpen)} />
+      {onMove ? <MenuItem icon="move-outline" label="Move" sub="Then tap the pocket it should go in" onPress={go(onMove)} /> : null}
+      <MenuItem icon="remove-circle-outline" label="Remove from binder" sub="Your collection isn’t changed" danger onPress={go(onRemove)} />
+    </Sheet>
+  );
+}
+
+function CustomiseSheet({ open, onClose, b, update }) {
   const d = useData(), c = useTheme();
   const [name, setName] = useState(b.name);
   const groups = [...new Set((d.owned || []).filter(o => o.status !== 'sold').map(o => o.group || 'Other'))];
@@ -201,8 +229,9 @@ function CustomiseSheet({ open, onClose, b, update, remove }) {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
           <Choice label="Prices under cards" value={b.showPrices !== false} onChange={v => set({ showPrices: v })} options={[[true, 'Show'], [false, 'Hide']]} />
         </View>
-        <Button ghost danger icon="trash-outline" onPress={remove}>Delete binder</Button>
-        <T mute size={12}>Deleting a binder never touches your collection.</T>
+        {hiddenOf(b).length ? <Button ghost icon="refresh" onPress={() => set(cur => ({ slots: (cur.slots || []).filter(k => !(typeof k === 'string' && k.startsWith('x:'))) }))}>
+          {`Bring back ${hiddenOf(b).length} removed ${hiddenOf(b).length === 1 ? 'card' : 'cards'}`}</Button> : null}
+        <T mute size={12}>To delete or copy this binder, use ⋯ next to its name.</T>
       </View>
     </Sheet>
   );

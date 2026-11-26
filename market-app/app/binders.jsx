@@ -10,12 +10,15 @@ import { Screen } from '../src/screen';
 import { useWide } from '../src/layout';
 import { binderPockets, binderStats, colorOf, useBinders } from '../src/binders';
 import { toast } from '../src/toast';
+import { haptic } from '../src/haptic';
+import { BinderMenu } from '../src/bindermenu';
 
 export default function Binders() {
   const d = useData(), c = useTheme(), wide = useWide();
   const b = useBinders();
   useTrack('binders');
   const [busy, setBusy] = useState(false);
+  const [menu, setMenu] = useState(null);       // binder whose options menu is open
   const groups = [...new Set((d.owned || []).filter(o => o.status !== 'sold').map(o => o.group || 'Other'))];
   const make = async init => {
     if (busy) return; setBusy(true);
@@ -32,7 +35,8 @@ export default function Binders() {
           const pockets = binderPockets(d, x), st = binderStats(pockets), col = colorOf(x.color);
           const peek = pockets.filter(p => p && p.have).slice(0, 3);
           return (
-            <Pressable key={x.id} onPress={() => router.push({ pathname: '/binder/[id]', params: { id: x.id } })} accessibilityRole="button" accessibilityLabel={x.name}
+            <Pressable key={x.id} onPress={() => router.push({ pathname: '/binder/[id]', params: { id: x.id } })} onLongPress={() => { haptic(); setMenu(x); }} delayLongPress={380}
+              accessibilityRole="button" accessibilityLabel={x.name} accessibilityHint="Long-press for options"
               style={({ pressed }) => ({ width: wide ? 260 : '100%', borderRadius: 18, overflow: 'hidden', backgroundColor: c.panel, opacity: pressed ? 0.8 : 1, borderWidth: 1, borderColor: c.line })}>
               <View style={{ flexDirection: 'row' }}>
                 <View style={{ width: 14, backgroundColor: col }} />
@@ -42,11 +46,15 @@ export default function Binders() {
                       : <View style={{ height: 72, justifyContent: 'center' }}><Ionicons name="book-outline" size={30} color={col} /></View>}
                   </View>
                   <View>
-                    <T w="bold" size={16.5} numberOfLines={1}>{x.name}</T>
+                    <T w="bold" size={16.5} numberOfLines={1} style={{ paddingRight: 30 }}>{x.name}</T>
                     <T mute size={12.5}>{x.source?.kind === 'set' ? `${st.have} of ${st.total} cards` : `${st.total} ${st.total === 1 ? 'card' : 'cards'}`}{st.value ? ` · ${d.aud(st.value)}` : ''}</T>
                   </View>
                 </View>
               </View>
+              <Pressable onPress={() => setMenu(x)} hitSlop={8} accessibilityRole="button" accessibilityLabel={`Options for ${x.name}`}
+                style={({ pressed }) => ({ position: 'absolute', right: 8, bottom: 10, width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? c.raise : 'transparent' })}>
+                <Ionicons name="ellipsis-horizontal" size={20} color={c.mute} />
+              </Pressable>
             </Pressable>
           );
         })}
@@ -65,6 +73,8 @@ export default function Binders() {
         </View> : null}
         <T mute size={12}>Set binders (every card in a set, missing ones faded) are made from a new binder’s Customise sheet.</T>
       </Panel>
+      {b.binders.length ? <T mute size={12} style={{ marginTop: 10 }}>Tip: long-press a binder, or tap its ⋯, to customise, copy or delete it.</T> : null}
+      {menu ? <BinderMenu b={menu} onClose={() => setMenu(null)} /> : null}
     </Screen>
   );
 }

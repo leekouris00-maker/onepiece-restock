@@ -57,14 +57,33 @@ export function useBinders() {
     if (!cache.local) { const r = await supabase.from('binders').delete().eq('id', id); if (r.error) throw new Error(r.error.message); }
     return gone;
   }, []);
+  // Put one binder first in the list
+  const moveTop = useCallback(async id => {
+    const me = cache.list.find(x => x.id === id);
+    if (!me) return;
+    const list = [me, ...cache.list.filter(x => x.id !== id)].map((x, i) => ({ ...x, position: i }));
+    await persist(list);
+    if (!cache.local) { const r = await supabase.from('binders').upsert(list.map(toRow)); if (r.error) throw new Error(r.error.message); }
+  }, []);
   const create = useCallback(async (init = {}) => save({ id: newId(), name: 'My binder', color: 'lime', grid: '3x3', source: { kind: 'pick' }, sort: 'number', slots: [], showPrices: true, position: cache.list.length, ...init }), [save]);
-  return { binders: c.list, ready: c.ready, local: c.local, error: c.error, save, update, remove, create, reload: () => load(uid) };
+  return { binders: c.list, ready: c.ready, local: c.local, error: c.error, save, update, remove, create, moveTop, reload: () => load(uid) };
 }
 
 const numCmp = (a, b) => String(a || '').localeCompare(String(b || ''), undefined, { numeric: true });
 
 // What's in the binder, in order. Each pocket: { key, own (owned row) | card (catalogue card, missing), have } or null (empty)
+// Cards taken out of a group or set binder are remembered in its slots as "x:<key>"
+export const hiddenOf = b => (b?.slots || []).filter(k => typeof k === 'string' && k.startsWith('x:'));
+const isHidden = k => typeof k === 'string' && k.startsWith('x:');
+
+// Slots after taking one card out: a picked binder just closes the gap; a group or set binder remembers it
+export function slotsWithout(b, key) {
+  const slots = (b.slots || []).filter(k => k !== key && k !== 'x:' + key);
+  return (b.source?.kind || 'pick') === 'pick' ? slots : [...slots, 'x:' + key];
+}
+
 export function binderPockets(d, b) {
+  const hidden = new Set(hiddenOf(b).map(k => k.slice(2)));
   const live = (d.owned || []).filter(o => o.status !== 'sold');
   const ownEntry = o => { const card = o.card ? d.card(o.card) : null; return { key: 'o:' + o.id, own: o, card, num: o.num || card?.num || '', price: d.unitAt(o, 0), added: o.added || '', have: true }; };
   let list = [];
@@ -89,12 +108,14 @@ export function binderPockets(d, b) {
       }
     }
   }
+  list = list.filter(e => !hidden.has(e.key));
   if (src.kind === 'pick' || b.sort === 'custom') {
     // custom order: the saved slots first (null = empty pocket), then anything new at the end
     const byKey = new Map(list.map(e => [e.key, e]));
     const out = [];
     for (const k of b.slots || []) {
       if (k == null) { out.push(null); continue; }
+      if (isHidden(k) || hidden.has(k)) continue;
       let e = byKey.get(k);
       if (!e && k.startsWith('o:')) { const o = live.find(x => 'o:' + x.id === k); if (o) e = ownEntry(o); }
       if (e) { out.push(e); byKey.delete(k); }
