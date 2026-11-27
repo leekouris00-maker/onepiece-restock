@@ -800,19 +800,246 @@
     }
    ],
    "none": false
+  },
+  "t:718680": {
+   "q": "one piece EB05-021 Alvida",
+   "at": "2026-11-27T03:48+00:00",
+   "count": 3,
+   "median": 1.57,
+   "p25": 1.5,
+   "p75": 6.99,
+   "min": 1.5,
+   "max": 6.99,
+   "newest": "2026-11-25",
+   "sales": [
+    {
+     "title": "Alvida Foil SR Heroines Edition Vol. 2 EB05-021 Japanese NM",
+     "url": "https://www.ebay.com/itm/117505457333?nordt=true",
+     "price": 6.99,
+     "sold": "2026-11-25",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Alvida EB05-021 SR Super Rare One Piece Heroines Edition Vol. 2 JAPANESE",
+     "url": "https://www.ebay.com/itm/227601758672?nordt=true",
+     "price": 1.57,
+     "sold": "2026-11-23",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "2026 One Piece ALVIDA #EB05-021 Heroines Edition Vol.2 Alt Art Super Rare JPN",
+     "url": "https://www.ebay.com/itm/307279945567?nordt=true",
+     "price": 1.5,
+     "sold": "2026-11-22",
+     "offer": false,
+     "grade": "Raw"
+    }
+   ],
+   "none": false
+  },
+  "t:694628": {
+   "q": "one piece OP16-080 Marshall.D.Teach Alternate Art",
+   "at": "2026-11-27T03:48+00:00",
+   "count": 126,
+   "median": 17.0,
+   "p25": 13.32,
+   "p75": 20.0,
+   "min": 1.25,
+   "max": 31.36,
+   "newest": "2026-11-25",
+   "sales": [
+    {
+     "title": "Marshall.D.Teach OP16-080 L (Alternate Art) The Time of Battle Foil English",
+     "url": "https://www.ebay.com/itm/128008380642?nordt=true",
+     "price": 17.65,
+     "sold": "2026-11-25",
+     "offer": true,
+     "grade": "Raw"
+    },
+    {
+     "title": "Marshall.D.Teach (Alternate Art) OP16-080 OP16 Foil One Piece Card Game",
+     "url": "https://www.ebay.com/itm/168878735377?nordt=true",
+     "price": 13.17,
+     "sold": "2026-11-25",
+     "offer": true,
+     "grade": "Raw"
+    },
+    {
+     "title": "Bandai One Piece Marshall.D.Teach Leader Foil Alt Art OP16-080 EN",
+     "url": "https://www.ebay.com/itm/227628525272?nordt=true",
+     "price": 9.81,
+     "sold": "2026-11-24",
+     "offer": true,
+     "grade": "Raw"
+    },
+    {
+     "title": "Marshall.D.Teach 2026 One Piece The Time of Battle Alternate Art #OP16-080 SP",
+     "url": "https://www.ebay.com/itm/237185970819?nordt=true",
+     "price": 2.26,
+     "sold": "2026-11-24",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "One Piece The Time of Battle Marshall D Teach Alternate Art OP16-080 Leader Foil",
+     "url": "https://www.ebay.com/itm/366805859491?nordt=true",
+     "price": 6.5,
+     "sold": "2026-11-22",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Marshall.D.Teach (080) (Alternate Art) OP16-080 The Time of Battle Foil",
+     "url": "https://www.ebay.com/itm/168699392865?nordt=true",
+     "price": 11.9,
+     "sold": "2026-11-20",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Marshall.D.Teach (080) (Alternate Art) OP16-080 The Time of Battle Foil",
+     "url": "https://www.ebay.com/itm/880103582912?nordt=true",
+     "price": 5.0,
+     "sold": "2026-11-17",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Marshall.D.Teach Alt Art Leader OP16-080 NM ONE PIECE",
+     "url": "https://www.ebay.com/itm/920094791504?nordt=true",
+     "price": 18.41,
+     "sold": "2026-11-16",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "One Piece TCG - B/Y Marshal D. Teach Alternate Art Leader OP16-080",
+     "url": "https://www.ebay.com/itm/147673182102?nordt=true",
+     "price": 20.48,
+     "sold": "2026-11-15",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Marshall.D.Teach (080) (Alternate Art) OP16-080 The Time of Battle Foil",
+     "url": "https://www.ebay.com/itm/800910585138?nordt=true",
+     "price": 13.99,
+     "sold": "2026-11-14",
+     "offer": false,
+     "grade": "Raw"
+    }
+   ],
+   "none": false
+  },
+  "t:712904": {
+   "q": "one piece The Dominance of God Booster Pack",
+   "at": "2026-11-27T03:48+00:00",
+   "auto": true,
+   "count": 107,
+   "median": 24.28,
+   "p25": 13.23,
+   "p75": 59.99,
+   "min": 5.98,
+   "max": 219.01,
+   "newest": "2026-11-27",
+   "sales": [
+    {
+     "title": "6 Pack One Piece Card Game OP-18 The Dominance of God Japanese Booster Pack",
+     "url": "https://www.ebay.com/itm/137940548010?nordt=true",
+     "price": 24.5,
+     "sold": "2026-11-27",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "One Piece OP-18 The Dominance of God Sleeved Booster Pack Art As Pictured QTY",
+     "url": "https://www.ebay.com/itm/920176890957?nordt=true",
+     "price": 12.95,
+     "sold": "2026-11-27",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "6 Pack One Piece Card Game OP-18 The Dominance of God Japanese Booster Pack",
+     "url": "https://www.ebay.com/itm/137940546878?nordt=true",
+     "price": 24.5,
+     "sold": "2026-11-27",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Bandai One Piece Card Game OP-18 The Dominance of God Booster Box 6 Packs ENG",
+     "url": "https://www.ebay.com/itm/840146488586?nordt=true",
+     "price": 50.0,
+     "sold": "2026-11-27",
+     "offer": true,
+     "grade": "Raw"
+    },
+    {
+     "title": "The Dominance Of God Booster Pack One Piece Card Game English OP18 OPTCG",
+     "url": "https://www.ebay.com/itm/940114559151?nordt=true",
+     "price": 9.17,
+     "sold": "2026-11-26",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Bandai One Piece Card Game OP-18 The Dominance of God Booster Box 6 Packs ENG",
+     "url": "https://www.ebay.com/itm/147698679785?nordt=true",
+     "price": 39.99,
+     "sold": "2026-11-26",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "One Piece TCG: The Dominance of God Set 13 (OP-18) Double Pack (English) Sealed",
+     "url": "https://www.ebay.com/itm/407377314675?nordt=true",
+     "price": 27.15,
+     "sold": "2026-11-26",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Bandai One Piece Card Game OP-18 Dominance of God Double Pack Set 13 English",
+     "url": "https://www.ebay.com/itm/267849420046?nordt=true",
+     "price": 20.0,
+     "sold": "2026-11-26",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "🔥Super Heavy~36.01🔥One Piece OP-18 The Dominance of God Sleeved Booster Pack🍀",
+     "url": "https://www.ebay.com/itm/820374761634?nordt=true",
+     "price": 19.99,
+     "sold": "2026-11-26",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "🔥Super Heavy~35.49🔥One Piece OP-18 The Dominance of God Sleeved Booster Pack🍀",
+     "url": "https://www.ebay.com/itm/820374741600?nordt=true",
+     "price": 19.99,
+     "sold": "2026-11-26",
+     "offer": false,
+     "grade": "Raw"
+    }
+   ],
+   "none": false
   }
  },
  "usage": {
   "plan": "free",
-  "monthly_used": 9,
+  "monthly_used": 12,
   "monthly_quota": 100,
   "rpm_limit": 10,
-  "day_utc": "2026-11-26",
-  "used": 9,
+  "day_utc": "2026-11-27",
+  "used": 12,
   "daily_cap": null,
   "expires": null,
   "trial_hours": null,
   "trial_started": null
  },
- "updated": "2026-11-26"
+ "updated": "2026-11-27"
 }
