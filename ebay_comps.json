@@ -2,15 +2,23 @@
  "items": {
   "t:712717": {
    "q": "one piece OP17-084 Tony Tony.Chopper",
-   "at": "2026-11-21T12:01+00:00",
-   "count": 78,
-   "median": 1.35,
-   "p25": 1.0,
-   "p75": 2.15,
+   "at": "2026-11-28T03:33+00:00",
+   "count": 63,
+   "median": 1.29,
+   "p25": 0.99,
+   "p75": 1.85,
    "min": 0.41,
-   "max": 7.75,
-   "newest": "2026-11-20",
+   "max": 4.57,
+   "newest": "2026-11-23",
    "sales": [
+    {
+     "title": "One Piece CCG TCG Tony Tony.Chopper OP17-084 UC The World's Strongest Warriors",
+     "url": "https://www.ebay.com/itm/366634191065?nordt=true",
+     "price": 4.57,
+     "sold": "2026-11-23",
+     "offer": false,
+     "grade": "Raw"
+    },
     {
      "title": "One Piece Card Game Tony Tony.Chopper Uncommon - OP17-084 NM EN",
      "url": "https://www.ebay.com/itm/137746196013?nordt=true",
@@ -80,14 +88,6 @@
      "url": "https://www.ebay.com/itm/147637910440?nordt=true",
      "price": 1.06,
      "sold": "2026-11-06",
-     "offer": false,
-     "grade": "Raw"
-    },
-    {
-     "title": "Tony Tony.Chopper UC The World's Strongest Warriors OP17-084 NM English",
-     "url": "https://www.ebay.com/itm/377515055837?nordt=true",
-     "price": 1.39,
-     "sold": "2026-11-05",
      "offer": false,
      "grade": "Raw"
     }
@@ -1027,19 +1027,207 @@
     }
    ],
    "none": false
+  },
+  "t:712117": {
+   "q": "one piece OP17-118 Rocks.D.Xebec Super Alternate Art",
+   "at": "2026-11-28T03:33+00:00",
+   "count": 80,
+   "median": 24.3,
+   "p25": 16.25,
+   "p75": 2343.75,
+   "min": 8.5,
+   "max": 6800.0,
+   "newest": "2026-11-24",
+   "sales": [
+    {
+     "title": "ONE PIECE OP17-118 ROCKS D. XEBEC PIRATE CREW MANGA SUPER PARALLEL",
+     "url": "https://www.ebay.com/itm/800925520950?nordt=true",
+     "price": 2749.0,
+     "sold": "2026-11-24",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Rocks D. Xebec OP17-118 SR Alt Art Foil one piece TCG Mint!!! ",
+     "url": "https://www.ebay.com/itm/820385575379?nordt=true",
+     "price": 21.66,
+     "sold": "2026-11-23",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Rocks.D.Xebec (118) (Super Alternate Art) OP17-118",
+     "url": "https://www.ebay.com/itm/407283291147?nordt=true",
+     "price": 3100.0,
+     "sold": "2026-11-22",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Rocks D. Xebec OP17-118 SR Alt Art Foil one piece TCG Mint!!! ",
+     "url": "https://www.ebay.com/itm/227602498077?nordt=true",
+     "price": 23.61,
+     "sold": "2026-11-22",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Bandai One Piece Card Game Rocks D. Xebec OP17-118 SEC",
+     "url": "https://www.ebay.com/itm/860158000114?nordt=true",
+     "price": 9.67,
+     "sold": "2026-11-22",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "One Piece CCG Rocks D. Xebec OP17-118 World's Strongest Warriors SR Alt Art Foil",
+     "url": "https://www.ebay.com/itm/960217166576?nordt=true",
+     "price": 8.71,
+     "sold": "2026-11-21",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Rocks.D.Xebec -Super Alternate Art) OP17-118 The World's Strongest Warriors Foil",
+     "url": "https://www.ebay.com/itm/128189141258?nordt=true",
+     "price": 2175.0,
+     "sold": "2026-11-18",
+     "offer": true,
+     "grade": "Raw"
+    },
+    {
+     "title": "Rocks.D.Xebec OP17-118 SEC SP Manga Alt Art Pirate Crew Super Parallel OP-17 NM",
+     "url": "https://www.ebay.com/itm/336885631454?nordt=true",
+     "price": 2400.0,
+     "sold": "2026-11-17",
+     "offer": true,
+     "grade": "Raw"
+    },
+    {
+     "title": "2026 One Piece Rocks.D.Xebec Pirate Crew Super Alt Art #OP17-118",
+     "url": "https://www.ebay.com/itm/377637972161?nordt=true",
+     "price": 2875.0,
+     "sold": "2026-11-17",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "2026 One Piece Rocks.D.Xebec Pirate Crew Super Alt Art #OP17-118",
+     "url": "https://www.ebay.com/itm/377624096299?nordt=true",
+     "price": 3750.0,
+     "sold": "2026-11-11",
+     "offer": false,
+     "grade": "Raw"
+    }
+   ],
+   "none": false
+  },
+  "t:485262": {
+   "q": "one piece OP01-001 Roronoa Zoro - OP01-001 Alternate Art",
+   "at": "2026-11-28T03:33+00:00",
+   "count": 54,
+   "median": 85.0,
+   "p25": 19.99,
+   "p75": 159.99,
+   "min": 2.7,
+   "max": 673.13,
+   "newest": "2026-11-27",
+   "sales": [
+    {
+     "title": "Roronoa Zoro OP01-001 L [PAR] Parallel Promo 25th Anniversary Card ONE PIECE",
+     "url": "https://www.ebay.com/itm/234777570391?nordt=true",
+     "price": 21.02,
+     "sold": "2026-11-27",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Roronoa Zoro (OP01-001) (Alternate Art) - One Piece Promotion Cards (OP-PR)",
+     "url": "https://www.ebay.com/itm/920178027735?nordt=true",
+     "price": 65.0,
+     "sold": "2026-11-26",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Roronoa Zoro (001) - Romance Dawn Leader  OP01-001 One Piece Card English",
+     "url": "https://www.ebay.com/itm/198519186930?nordt=true",
+     "price": 4.24,
+     "sold": "2026-11-23",
+     "offer": true,
+     "grade": "Raw"
+    },
+    {
+     "title": "Roronoa Zoro P-114 C2E2 Exclusive Convention\tOne Piece Promo Card Sealed English",
+     "url": "https://www.ebay.com/itm/820359205568?nordt=true",
+     "price": 85.0,
+     "sold": "2026-11-23",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Roronoa Zoro OP01-001 Leader Parallel Alt Art Japanese One Piece Card OP-01",
+     "url": "https://www.ebay.com/itm/820315894172?nordt=true",
+     "price": 13.5,
+     "sold": "2026-11-14",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Roronoa Zoro OP01-001 Romance Dawn Leader Alt Art Foil",
+     "url": "https://www.ebay.com/itm/227593192443?nordt=true",
+     "price": 415.0,
+     "sold": "2026-11-06",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Bandai One Piece Card Game Romance Dawn Roronoa Zoro OP01-001 Leader EN 5000",
+     "url": "https://www.ebay.com/itm/198765568971?nordt=true",
+     "price": 3.5,
+     "sold": "2026-11-05",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "One Piece Bandai One Piece Card Game Roronoa Zoro OP01-001 AA Holo JP 5000",
+     "url": "https://www.ebay.com/itm/237149450539?nordt=true",
+     "price": 9.62,
+     "sold": "2026-11-04",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Bandai One Piece CCG Roronoa Zoro OP01-001 promo leader card",
+     "url": "https://www.ebay.com/itm/117425242573?nordt=true",
+     "price": 21.18,
+     "sold": "2026-11-04",
+     "offer": false,
+     "grade": "Raw"
+    },
+    {
+     "title": "Roronoa Zoro - OP01-001 (Alternate Art) OP01-001 One Piece Promotion Cards Foil",
+     "url": "https://www.ebay.com/itm/168628403445?nordt=true",
+     "price": 1000.0,
+     "sold": "2026-11-04",
+     "offer": false,
+     "grade": "Raw"
+    }
+   ],
+   "none": false
   }
  },
  "usage": {
   "plan": "free",
-  "monthly_used": 12,
+  "monthly_used": 15,
   "monthly_quota": 100,
   "rpm_limit": 10,
-  "day_utc": "2026-11-27",
-  "used": 12,
+  "day_utc": "2026-11-28",
+  "used": 15,
   "daily_cap": null,
   "expires": null,
   "trial_hours": null,
   "trial_started": null
  },
- "updated": "2026-11-27"
+ "updated": "2026-11-28"
 }
